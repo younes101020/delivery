@@ -1,0 +1,18 @@
+services:
+  web:
+    container_name: web
+    build:
+      context: ./packages/web
+      dockerfile: prod.Dockerfile
+      args:
+        ENV_VARIABLE: ${ENV_VARIABLE}
+        NEXT_PUBLIC_ENV_VARIABLE: ${NEXT_PUBLIC_ENV_VARIABLE}
+    restart: always
+    ports:
+      - 3000:3000
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    external: true

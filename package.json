@@ -1,0 +1,12 @@
+{
+  "name": "delivery",
+  "version": "0.0.1",
+  "description": "minimalist applications deployment system",
+  "main": "index.js",
+  "repository": "https://github.com/younes101020/delivery",
+  "author": "younes101020 <senyoupl@icloud.com>",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ]
+}
