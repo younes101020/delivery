@@ -5,8 +5,7 @@
 **Description**: This a self-hostable Coolify, Vercel, Heroku alternative focusing on one single thing: deploying your applications as simply as possible, without any vendor lock-in.
 
   - **Technology stack**: BullMQ, NextJS, Tailwind, PostgreSQL
-  - **Status**:  0.0![delivery-logo](https://github.com/user-attachments/assets/6e106526-e98f-471d-bab3-e0a20c71b4a1)
-
+  - **Status**:  0.0
 
 ----
 
