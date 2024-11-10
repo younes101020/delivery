@@ -1,0 +1,22 @@
+{
+  "name": "@delivery/jobs",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev src/index.ts",
+    "deploy": "wrangler deploy --minify src/index.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@types/dockerode": "^3.3.31",
+    "bullmq": "^5.25.3",
+    "dockerode": "^4.0.2",
+    "hono": "^4.0.8",
+    "node-ssh": "^13.2.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240208.0",
+    "typescript": "^5.6.3",
+    "wrangler": "^3.25.0"
+  }
+}
