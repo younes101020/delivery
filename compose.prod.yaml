@@ -12,6 +12,17 @@ services:
       - 3000:3000
     networks:
       - my_network
+    depends_on:
+      - jobs
+
+  jobs:
+    container_name: jobs
+    build:
+      context: ./packages/jobs
+      dockerfile: prod.Dockerfile
+    restart: always
+    networks:
+      - my_network
 
 networks:
   my_network:
