@@ -20,6 +20,8 @@ services:
     build:
       context: ./packages/jobs
       dockerfile: prod.Dockerfile
+    volumes:
+      - /data/delivery/ssh:/var/ssh
     restart: always
     networks:
       - my_network

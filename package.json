@@ -8,6 +8,6 @@
   "author": "younes101020 <senyoupl@icloud.com>",
   "license": "MIT",
   "workspaces": [
-    "packages/*"
+    "apps/*"
   ]
 }
