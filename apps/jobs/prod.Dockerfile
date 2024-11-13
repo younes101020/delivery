@@ -5,11 +5,11 @@ FROM base AS builder
 RUN apk add --no-cache gcompat
 WORKDIR /app
 
-COPY package*json tsconfig.json src ./
+COPY package*.json tsconfig.json src ./
 
-RUN npm ci && \
+RUN npm install && \
     npm run build && \
-    npm prune --production
+    npm install --production --ignore-scripts
 
 FROM base AS runner
 WORKDIR /app

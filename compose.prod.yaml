@@ -2,7 +2,7 @@ services:
   web:
     container_name: web
     build:
-      context: ./packages/web
+      context: ./apps/web
       dockerfile: prod.Dockerfile
       args:
         ENV_VARIABLE: ${ENV_VARIABLE}
@@ -11,21 +11,22 @@ services:
     ports:
       - 3000:3000
     networks:
-      - my_network
+      - host_network
     depends_on:
       - jobs
 
   jobs:
     container_name: jobs
     build:
-      context: ./packages/jobs
+      context: ./apps/jobs
       dockerfile: prod.Dockerfile
     volumes:
       - /data/delivery/ssh/keys:/var/ssh/keys
     restart: always
     networks:
-      - my_network
+      - host_network
 
 networks:
-  my_network:
-    external: true
+  host_network:
+    name: host_network
+    driver: bridge

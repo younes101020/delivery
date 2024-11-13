@@ -5,8 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "strict": true,
-    "lib": ["ESNext"],
-    "types": ["@cloudflare/workers-types"],
+    "lib": ["ESNext", "es2017", "dom"],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx"
   },
