@@ -21,7 +21,7 @@ services:
       context: ./packages/jobs
       dockerfile: prod.Dockerfile
     volumes:
-      - /data/delivery/ssh:/var/ssh
+      - /data/delivery/ssh/keys:/var/ssh/keys
     restart: always
     networks:
       - my_network

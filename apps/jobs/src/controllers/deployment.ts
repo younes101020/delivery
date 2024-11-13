@@ -1,5 +1,10 @@
 import { Context } from "hono";
+import { startDeployment } from "../services/deployment";
 
-export const startDeployment = async (c: Context) => {
-  return c.text("Hello World");
+export const startDeploymentController = async (c: Context) => {
+  const result = await startDeployment();
+  if (result.stderr) {
+    return c.json({ error: result.stderr }, 500);
+  }
+  return c.json(result);
 };

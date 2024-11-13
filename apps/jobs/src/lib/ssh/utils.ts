@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-export const findSSHKey = async (keyDirectory = "/var/ssh") => {
+export const findSSHKey = async (keyDirectory = "/var/ssh/keys") => {
   try {
     const files = await fs.promises.readdir(keyDirectory);
 
@@ -22,8 +22,8 @@ export const findSSHKey = async (keyDirectory = "/var/ssh") => {
   }
 };
 
-export const getUserFromKeyPath = (keyPath: string): string | null => {
+export const getUserFromKeyPath = (keyPath: string): string => {
   const filename = path.basename(keyPath);
-  const match = filename.match(/^id\.(.+)@host\.docker\.internal$/);
-  return match ? match[1] : null;
+  const match = filename.match(/^id\.(.+)@host\.docker\.internal$/)!;
+  return match[1];
 };

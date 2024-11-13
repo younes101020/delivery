@@ -1,8 +1,8 @@
 import { Hono } from "hono";
-import { startDeployment } from "../controllers/deployment";
+import { startDeploymentController } from "../controllers/deployment";
 
 const app = new Hono();
 
-app.post("/start", startDeployment);
+app.post("/start", startDeploymentController);
 
 export default app;
