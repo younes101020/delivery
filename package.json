@@ -9,5 +9,8 @@
   "license": "MIT",
   "workspaces": [
     "apps/*"
-  ]
+  ],
+  "scripts": {
+    "dev": "yarn workspaces run dev"
+  }
 }

@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { startDeployment } from "../services/deployment";
+import { startDeployment } from "../services/deployment.js";
 
 export const startDeploymentController = async (c: Context) => {
   const result = await startDeployment();

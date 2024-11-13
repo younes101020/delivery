@@ -1,5 +1,5 @@
 import { NodeSSH } from "node-ssh";
-import { findSSHKey, getUserFromKeyPath } from "./utils";
+import { findSSHKey, getUserFromKeyPath } from "./utils.js";
 
 export class SSHClient {
   private ssh: NodeSSH;

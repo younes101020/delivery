@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { startDeploymentController } from "../controllers/deployment";
+import { startDeploymentController } from "../controllers/deployment.js";
 
 const app = new Hono();
 

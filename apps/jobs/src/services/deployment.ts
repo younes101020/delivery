@@ -1,4 +1,4 @@
-import { SSHClient } from "../lib/ssh/client";
+import { SSHClient } from "../lib/ssh/client.js";
 
 const sshClient = async () => {
   const ssh = new SSHClient();

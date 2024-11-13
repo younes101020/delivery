@@ -1,6 +1,6 @@
 services:
   web:
-    container_name: web
+    container_name: web-prod
     build:
       context: ./apps/web
       dockerfile: prod.Dockerfile
@@ -16,13 +16,15 @@ services:
       - jobs
 
   jobs:
-    container_name: jobs
+    container_name: jobs-prod
     build:
       context: ./apps/jobs
       dockerfile: prod.Dockerfile
     volumes:
       - /data/delivery/ssh/keys:/var/ssh/keys
     restart: always
+    ports:
+      - 3090:3090
     networks:
       - host_network
 
