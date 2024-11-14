@@ -1,6 +1,5 @@
 services:
   web:
-    container_name: web-prod
     build:
       context: ./apps/web
       dockerfile: prod.Dockerfile
@@ -16,7 +15,6 @@ services:
       - jobs
 
   jobs:
-    container_name: jobs-prod
     build:
       context: ./apps/jobs
       dockerfile: prod.Dockerfile
