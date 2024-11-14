@@ -1,4 +1,4 @@
-# Delivery
+# Get Started
 
 <div align="center">
   <img src="https://github.com/user-attachments/assets/904f879b-1a7a-4f9c-8250-b595caf89dbb" alt="Delivery Logo">
@@ -28,20 +28,20 @@ git clone https://github.com/younes101020/delivery.git
 cd delivery
 ```
 
-### Development environment
+### Launch development environment
 
 ```bash
 yarn install
 yarn dev
 ```
 
-### Deployment
+### Deploy production environment
 
 ```bash
 yarn deploy
 ```
 
-> **_Note:_**: This will run the frontend and backend in containerized environment.
+> **_Note:_** This will run the frontend and backend in containerized environment.
 
 #### Development experience script
 
@@ -57,7 +57,3 @@ yarn stop
 # Restart all services
 yarn restart
 ```
-
-## Credits and references
-
-1. Mainly inspired by Coolify
