@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-export const findSSHKey = async (keyDirectory = "./var/ssh/keys") => {
+export const findSSHKey = async (keyDirectory = "/var/ssh/keys") => {
   try {
     const files = await fs.promises.readdir(keyDirectory);
 
