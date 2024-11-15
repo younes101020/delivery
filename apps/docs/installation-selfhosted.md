@@ -1,3 +1,11 @@
+## Installation
+
+Run the following command in your server:
+
+```bash
+...
+```
+
 ## Compatibility
 
 Before installing Delivery, make sure your system and application are supported.
@@ -31,11 +39,3 @@ Before installing Delivery, make sure your system and application are supported.
 - Swift
 - Scala
 - Zig
-
-## Installation
-
-Run the following command in your server:
-
-```bash
-...
-```
