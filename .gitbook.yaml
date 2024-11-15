@@ -1,4 +1,4 @@
-root: ./
+root: ./apps/docs
 
 ​structure:
-  summary: ./apps/docs/SUMMARY.md
+  summary: ./SUMMARY.md
