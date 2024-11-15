@@ -26,9 +26,10 @@ export class SSHClient {
       if (!this.user) {
         throw new Error("User is not set");
       }
-
+      // On WSL2, the host is the IP address of the WSL2 VM otherwise it's host.docker.internal
+      // TODO: Find a better way to determine the host
       await this.ssh.connect({
-        host: "localhost",
+        host: "172.20.123.35",
         username: this.user,
         privateKeyPath: this.privateKeyPath,
       });
