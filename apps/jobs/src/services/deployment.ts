@@ -6,9 +6,11 @@ const sshClient = async () => {
   return await ssh.connect();
 };
 
-export const startDeployment = async () => {
+export const startDeployment = async (appName: string) => {
   const ssh = await sshClient();
-  const result = await ssh.execCommand("ls -la");
+  const result = await ssh.execCommand(
+    `nixpacks build ./ --name ${appName} -o /data/delivery/applications/${appName}`
+  );
   return {
     stdout: result.stdout,
     stderr: result.stderr,
