@@ -29,7 +29,7 @@ export class SSHClient {
       // On WSL2, the host is the IP address of the WSL2 VM otherwise it's host.docker.internal
       // TODO: Find a better way to determine the host
       await this.ssh.connect({
-        host: "172.20.123.35",
+        host: "host.docker.internal",
         username: this.user,
         privateKeyPath: this.privateKeyPath,
       });
