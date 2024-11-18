@@ -45,4 +45,4 @@ yarn stop
 yarn restart
 ```
 
-**Important note**: If you are using *WSL2* for staging, you need to set the host of `apps/jobs/src/lib/ssh/client.ts` on line 32, to the IP address of the WSL2 VM. since the `host.docker.internal` is resolved to the Windows host and not the wsl instance. You can find the IP address of the WSL2 VM by running `ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1`.
+**Important note**: If you are using *WSL2* for staging, you need to set `SSH_HOST` environment variable to your distro ip. You can find the IP address of the WSL2 VM by running `ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1`.

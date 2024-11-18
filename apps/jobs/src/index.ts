@@ -1,16 +1,16 @@
 import { serve } from "@hono/node-server";
-import { Hono } from "hono";
-import deployment from "./routes/deployment.js";
 
-const app = new Hono();
+import app from "./app";
+import env from "./env";
 
-app.get("/api/status", (c) => {
-  return c.json({ status: new Date().toISOString() });
-});
-
-app.route("/api/deployment", deployment);
+const port = env.PORT;
+// eslint-disable-next-line no-console
+console.log(`
+🚀 Delivery API is running on port http://localhost:${port}
+🗒️  API Docs available at: http://localhost:${port}/reference
+`);
 
 serve({
   fetch: app.fetch,
-  port: 3090,
+  port,
 });

@@ -18,6 +18,8 @@ services:
     build:
       context: ./apps/jobs
       dockerfile: prod.Dockerfile
+    env_file:
+      - .env
     volumes:
       - /data/delivery/ssh/keys:/var/ssh/keys
     restart: always
