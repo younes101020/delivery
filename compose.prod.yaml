@@ -3,9 +3,13 @@ services:
     build:
       context: ./apps/web
       dockerfile: prod.Dockerfile
+    env_file:
+      - .env.web
       args:
         ENV_VARIABLE: ${ENV_VARIABLE}
         NEXT_PUBLIC_ENV_VARIABLE: ${NEXT_PUBLIC_ENV_VARIABLE}
+    volumes:
+      - ./apps/web/src:/app/src
     restart: always
     ports:
       - 3000:3000
@@ -19,7 +23,7 @@ services:
       context: ./apps/jobs
       dockerfile: prod.Dockerfile
     env_file:
-      - .env
+      - .env.jobs
     volumes:
       - /data/delivery/ssh/keys:/var/ssh/keys
     restart: always
