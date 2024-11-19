@@ -3,6 +3,9 @@
   "type": "module",
   "version": "1.0.0",
   "license": "MIT",
+  "exports": {
+    "./types": "./src/db/schema.ts"
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "node ./dist/src/index.js",
