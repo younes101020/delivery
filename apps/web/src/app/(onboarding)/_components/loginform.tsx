@@ -59,8 +59,7 @@ export function Login({ mode = "signin" }: { mode?: "signin" | "signup" }) {
           <div className="text-destructive text-sm">{state.error}</div>
         )}
 
-        <CardFooter className="flex justify-between px-0">
-          <Button variant="outline">Cancel</Button>
+        <CardFooter className="flex px-0 pt-8">
           <Button type="submit" disabled={pending}>
             {pending ? (
               <>
