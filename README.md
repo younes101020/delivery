@@ -15,6 +15,7 @@ Delivery act as tiny wrapper around [Nixpacks](https://nixpacks.com/docs) allowi
 
 ## Screenshots
 
+### Onboarding
 ![Capture d'écran 2024-11-20 163518](https://github.com/user-attachments/assets/3cb12ba4-c73f-416d-8fb4-2c46954285a7)
 
 ## Prerequisites
