@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         app:
@@ -39,6 +39,7 @@ jobs:
           path: apps/${{ matrix.app }}/dist
 
   test:
+    runs-on: self-hosted
     environment: test
     env:
       NODE_ENV: ${{ vars.NODE_ENV }}
