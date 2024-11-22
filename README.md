@@ -8,7 +8,7 @@ Self-hostable Coolify, Vercel, Heroku alternative focusing on one single thing: 
 
 Delivery act as tiny wrapper around [Nixpacks](https://nixpacks.com/docs) allowing you to transform your github repository into a production-ready application.
 
-- **Technology stack**: BullMQ, NextJS, Tailwind, PostgreSQL
+- **Technology stack**: BullMQ, NextJS, Tailwind, PostgreSQL, Hono, SQLite
 - **Status**: 0.0
 
 ---

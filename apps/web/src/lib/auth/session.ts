@@ -1,8 +1,9 @@
+import env from "@/env";
+import { NewUser } from "@delivery/jobs/types";
 import { SignJWT, jwtVerify } from "jose";
-import { NewUser } from "@delivery/jobs/types"
 import { cookies } from "next/headers";
 
-const key = new TextEncoder().encode(process.env.AUTH_SECRET);
+const key = new TextEncoder().encode(env.AUTH_SECRET);
 
 type SessionData = {
   user: { id: number };
@@ -13,7 +14,7 @@ export async function signToken(payload: SessionData) {
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("5 day from now")
+    .setExpirationTime("1 day from now")
     .sign(key);
 }
 

@@ -8,7 +8,7 @@ export const users = sqliteTable("users", {
   passwordHash: text("password_hash").notNull(),
   role: text("role").notNull().default("member"),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
-    () => new Date()
+    () => new Date(),
   ),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .$defaultFn(() => new Date())
@@ -18,19 +18,28 @@ export const users = sqliteTable("users", {
   emailVerificationToken: text("email_verification_token"),
   emailVerificationTokenExpiresAt: integer(
     "email_verification_token_expires_at",
-    { mode: "timestamp" }
+    { mode: "timestamp" },
   ),
+});
+
+export const githubApp = sqliteTable("github_app", {
+  id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+  webhookSecret: text("webhook_secret").notNull(),
+  clientId: text("client_id").notNull(),
+  clientSecret: text("client_secret").notNull(),
+  privateKey: text("private_key").notNull(),
+  appId: text("app_id").notNull(),
 });
 
 export const applications = sqliteTable("applications", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   fqdn: text("fqdn").notNull().unique(),
-  githubRepoUrl: text("github_repo_url").notNull(),
-  githubBranch: text("github_branch").notNull(),
   logs: text("logs"),
+  githubAppId: integer("github_app_id").references(() => githubApp.id),
+  githubAppName: text("github_app_name").notNull(),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
-    () => new Date()
+    () => new Date(),
   ),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .$defaultFn(() => new Date())
@@ -46,7 +55,7 @@ export const environmentVariables = sqliteTable("environment_variables", {
     .notNull()
     .default(false),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
-    () => new Date()
+    () => new Date(),
   ),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .$defaultFn(() => new Date())
@@ -64,7 +73,7 @@ export const applicationEnvironmentVariables = sqliteTable(
     environmentVariableId: integer("environment_variable_id")
       .notNull()
       .references(() => environmentVariables.id),
-  }
+  },
 );
 
 // Zod schemas converters
@@ -72,7 +81,7 @@ export const applicationEnvironmentVariables = sqliteTable(
 export const selectUsersSchema = createSelectSchema(users);
 
 export const insertUsersSchema = createInsertSchema(users, {
-  name: (schema) => schema.name.min(1).max(500),
+  name: schema => schema.name.min(1).max(500),
 })
   .required({
     email: true,
@@ -86,7 +95,7 @@ export const insertUsersSchema = createInsertSchema(users, {
 export const selectApplicationsSchema = createSelectSchema(applications);
 
 export const insertApplicationsSchema = createInsertSchema(applications, {
-  name: (schema) => schema.name.min(1).max(500),
+  name: schema => schema.name.min(1).max(500),
 })
   .required({
     fqdn: true,
@@ -104,7 +113,7 @@ export const selectEnvironmentVariablesSchema =
   createSelectSchema(environmentVariables);
 
 export const insertEnvironmentVariablesSchema = createInsertSchema(
-  environmentVariables
+  environmentVariables,
 )
   .required({
     key: true,
@@ -118,11 +127,11 @@ export const insertEnvironmentVariablesSchema = createInsertSchema(
   });
 
 export const selectApplicationEnvironmentVariablesSchema = createSelectSchema(
-  applicationEnvironmentVariables
+  applicationEnvironmentVariables,
 );
 
 export const insertApplicationEnvironmentVariablesSchema = createInsertSchema(
-  applicationEnvironmentVariables
+  applicationEnvironmentVariables,
 )
   .required({
     applicationId: true,

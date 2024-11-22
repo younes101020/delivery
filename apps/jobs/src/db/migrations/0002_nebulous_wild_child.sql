@@ -1,0 +1,1 @@
+ALTER TABLE `applications` ADD `github_app_name` text NOT NULL;

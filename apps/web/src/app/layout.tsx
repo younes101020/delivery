@@ -28,8 +28,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.className} ${geistMono.className} antialiased absolute inset-0 h-full w-full bg-black bg-[linear-gradient(to_right,rgba(188,185,184,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(188,185,184,0.1)_1px,transparent_1px)] bg-[size:24px_24px]`}
       >
-        <header className="bg-black/45 border-primary border-b h-[5vh]">
-          <Image src="/logo.svg" width={200} height={200} alt="Delivery logo" />
+        <header className="bg-black/45 border-primary border-b h-[5vh] flex justify-center">
+          <Image src="/logo.svg" width={200} height={200} alt="Delivery logo" className="border border-primary border-y-0 rounded-full" />
         </header>
         {children}
       </body>

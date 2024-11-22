@@ -29,7 +29,7 @@ function BounceIndicator() {
 
 export function StepTracker() {
   return (
-    <CardHeader className="flex md:flex-row gap-4 justify-around">
+    <CardHeader className="flex md:flex-row gap-8 md:gap-4 justify-around mt-8">
       {STEP_METADATA.map((step, i) => (
         <div key={i} className={`w-56 ${i !== 0 && "opacity-40"} relative`}>
           <CardTitle className="flex gap-2">

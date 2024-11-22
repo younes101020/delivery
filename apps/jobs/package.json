@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "npm run lint --fix",
+    "test": "cross-env NODE_ENV=test vitest",
     "build": "tsc && tsc-alias"
   },
   "dependencies": {
@@ -26,13 +27,13 @@
     "dotenv-expand": "^11.0.6",
     "drizzle-orm": "^0.33.0",
     "drizzle-zod": "^0.5.1",
-    "generate-lockfile": "^0.0.12",
     "hono": "^4.6.6",
     "hono-pino": "^0.4.0",
     "node-ssh": "^13.2.0",
     "pino": "^9.5.0",
     "pino-pretty": "^11.3.0",
     "stoker": "^1.2.7",
+    "vitest": "^2.1.5",
     "zod": "^3.23.8"
   },
   "devDependencies": {

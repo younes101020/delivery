@@ -1,13 +1,13 @@
-import fs from "fs";
-import { NodeSSH } from "node-ssh";
-import path from "path";
 import env from "@/env";
+import { NodeSSH } from "node-ssh";
+import fs from "node:fs";
+import path from "node:path";
 
-export const getUserFromKeyPath = (keyPath: string): string => {
+export function getUserFromKeyPath(keyPath: string) {
   const filename = path.basename(keyPath);
   const match = filename.match(/^id\.(.+)@host\.docker\.internal$/)!;
   return match[1];
-};
+}
 
 export class SSHClient {
   private ssh: NodeSSH;
@@ -45,14 +45,14 @@ export class SSHClient {
       return this.ssh;
     } catch (error: unknown) {
       if (error instanceof Error) {
-        throw new Error(`SSH connection failed: ${error.message}`);
+        throw new TypeError(`SSH connection failed: ${error.message}`);
       }
       throw new Error("SSH connection failed: Unknown error occurred");
     }
   }
 }
 
-export const findSSHKey = async (keyDirectory = "/var/ssh/keys") => {
+export async function findSSHKey(keyDirectory = "/var/ssh/keys") {
   try {
     const files = await fs.promises.readdir(keyDirectory);
 
@@ -67,8 +67,8 @@ export const findSSHKey = async (keyDirectory = "/var/ssh/keys") => {
     return path.join(keyDirectory, keyFile);
   } catch (error: unknown) {
     if (error instanceof Error) {
-      throw new Error(`Failed to find SSH key: ${error.message}`);
+      throw new TypeError(`Failed to find SSH key: ${error.message}`);
     }
     throw new Error("Failed to find SSH key: Unknown error occurred");
   }
-};
+}

@@ -16,18 +16,18 @@ export const create = createRoute({
   request: {
     body: jsonContentRequired(
       insertApplicationsSchema,
-      "The application to create"
+      "The application to create",
     ),
   },
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       selectApplicationsSchema,
-      "The created application"
+      "The created application",
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(insertApplicationsSchema),
-      "The validation error(s)"
+      "The validation error(s)",
     ),
   },
 });

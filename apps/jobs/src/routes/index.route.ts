@@ -13,7 +13,7 @@ const router = createRouter().openapi(
     responses: {
       [HttpStatusCodes.OK]: jsonContent(
         createMessageObjectSchema("Delivery API"),
-        "Delivery API Index"
+        "Delivery API Index",
       ),
     },
   }),
@@ -22,9 +22,9 @@ const router = createRouter().openapi(
       {
         message: "Delivery API",
       },
-      HttpStatusCodes.OK
+      HttpStatusCodes.OK,
     );
-  }
+  },
 );
 
 export default router;

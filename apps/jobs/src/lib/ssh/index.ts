@@ -1,6 +1,6 @@
 import { SSHClient } from "./client";
 
-const sshClient = async () => {
+async function sshClient() {
   const ssh = new SSHClient();
   await ssh.init();
   return await ssh.connect();

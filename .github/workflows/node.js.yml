@@ -1,45 +1,84 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
-name: Node.js CI
+name: Monorepo Build and Test
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [main]
   pull_request:
-    branches: [ "master" ]
+    branches: [main]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       matrix:
-        node-version: [16.x, 18.x, 21.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-    steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
-      working-directory: packages/jobs
+        app:
+          - jobs
+          - web
 
-  notification:
-    runs-on: ubuntu-latest
-    name: Notify PagerDuty
-    needs: [build]
-    if: always()
     steps:
-      # make build job status available
-      # see https://github.com/marketplace/actions/workflow-status-action
-      - uses: martialonline/workflow-status@v3
-        id: check
-      - name: Create a change event
-        uses: PagerDuty/pagerduty-change-events-action@master
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
         with:
-          integration-key: ${{ secrets.PAGERDUTY_CHANGE_INTEGRATION_KEY }}
-          custom-event: Tests Status ${{ steps.check.outputs.status }}
+          node-version: "20.x"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build app
+        run: |
+          cd apps/${{ matrix.app }}
+          npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.app }}
+          path: apps/${{ matrix.app }}/dist
+
+  test:
+    environment: test
+    env:
+      NODE_ENV: ${{ vars.NODE_ENV }}
+      LOG_LEVEL: ${{ vars.LOG_LEVEL }}
+      PORT: ${{ vars.PORT }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
+    needs: build
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        app:
+          - jobs
+          - web
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-${{ matrix.app }}
+          path: apps/${{ matrix.app }}/dist
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: |
+          cd apps/${{ matrix.app }}
+          npm test
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.app }}
+          path: apps/${{ matrix.app }}/coverage

@@ -18,6 +18,7 @@ const EnvSchema = z.object({
   DATABASE_URL: z.string().url(),
   DATABASE_AUTH_TOKEN: z.string().optional(),
   SSH_HOST: z.string().default("host.docker.internal"),
+  BEARER_TOKEN: z.string(),
 }).superRefine((input, ctx) => {
   if (input.NODE_ENV === "production" && !input.DATABASE_AUTH_TOKEN) {
     ctx.addIssue({

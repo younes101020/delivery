@@ -2,10 +2,10 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import {db} from "@/db";
-
+import { db } from "@/db";
 import { applications } from "@/db/schema";
 import sshClient from "@/lib/ssh";
+
 import type { CreateRoute } from "./applications.routes";
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
@@ -31,18 +31,18 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
   */
   const ssh = await sshClient();
   const result = await ssh.execCommand(
-    "ls"
+    "ls",
     // `nixpacks build ./ --name ${application.name} -o /data/delivery/applications/${application.name}`
   );
-
-  console.log(result);
 
   const [inserted] = await db
     .insert(applications)
     .values(application)
     .returning();
 
-  return c.json(inserted, HttpStatusCodes.OK);
+  const withSshOutput = Object.assign(inserted, result);
+
+  return c.json(withSshOutput, HttpStatusCodes.OK);
 };
 
 // TODO: Add job to deploy application and stream logs
