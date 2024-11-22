@@ -48,7 +48,6 @@ jobs:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
     needs: build
-    runs-on: self-hosted
     strategy:
       matrix:
         app:
