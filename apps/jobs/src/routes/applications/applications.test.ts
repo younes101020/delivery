@@ -18,7 +18,7 @@ const client = testClient(createApp().route("/", router));
 
 describe("applications routes", () => {
   beforeAll(async () => {
-    execSync("pnpm drizzle-kit push");
+    execSync("yarn drizzle-kit push");
   });
 
   afterAll(async () => {
