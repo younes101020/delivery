@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd apps/${{ matrix.app }}
-          npm ci
+          npm ci --legacy-peer-deps
 
       - name: Build app
         run: |
@@ -74,7 +74,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd apps/${{ matrix.app }}
-          npm ci
+          npm ci --legacy-peer-deps
 
       - name: Run tests
         run: |
