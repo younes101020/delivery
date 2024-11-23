@@ -1,6 +1,9 @@
 name: Minimal CI
 
-on: [push]
+on:
+  push:
+    paths:
+      - 'apps/jobs/src/**'
 
 jobs:
   build:
