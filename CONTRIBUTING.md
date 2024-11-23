@@ -14,7 +14,7 @@ the main guidelines for contributing.
 ## Getting Started
 
 1. Fork the project
-2. Clone your fork: `git clone https://github.com/younes101020/delivery.git`
+2. Clone your fork
 3. Create your branch: `git checkout -b your-branch-name`
 4. Set up your development environment:
 
@@ -56,5 +56,7 @@ yarn restart
 
 **Important note**: If you are using _WSL2_ for staging simulation, you need to set
 `SSH_HOST` environment variable to your distro ip. You can find the IP address
-of the WSL2 VM by running
-`ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1`.
+of the WSL2 VM by running:
+```bash
+ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1
+```
