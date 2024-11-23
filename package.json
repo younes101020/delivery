@@ -16,5 +16,8 @@
     "stop": "sh ./scripts/delivery.sh stop",
     "restart": "sh ./scripts/delivery.sh restart",
     "redeploy": "sh ./scripts/delivery.sh redeploy"
+  },
+  "dependencies": {
+    "generate-lockfile": "^0.0.12"
   }
 }
