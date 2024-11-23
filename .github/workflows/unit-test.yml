@@ -8,7 +8,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js
+      - name: Unit-testing
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
@@ -19,4 +19,4 @@ jobs:
           NODE_ENV: ${{ env.NODE_ENV }}
           PORT: ${{ env.PORT }}
       - run: yarn install
-      - run: yarn test
+      - run: yarn ut:test
