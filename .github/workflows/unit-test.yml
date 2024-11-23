@@ -6,16 +6,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [10.x, 12.x, 14.19.1]
-
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: '18.x'
         env:
           BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
