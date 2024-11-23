@@ -1,4 +1,3 @@
 node_modules
-.env.web
-.env.jobs
+.env
 
