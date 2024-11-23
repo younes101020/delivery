@@ -22,17 +22,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20.x"
-          cache: "npm"
+          cache: "yarn"
 
       - name: Install dependencies
         run: |
           cd apps/${{ matrix.app }}
-          npm ci --legacy-peer-deps
+          yarn install --frozen-lockfile
 
       - name: Build app
         run: |
           cd apps/${{ matrix.app }}
-          npm run build
+          yarn build
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -63,7 +63,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20.x"
-          cache: "npm"
+          cache: "yarn"
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -74,12 +74,12 @@ jobs:
       - name: Install dependencies
         run: |
           cd apps/${{ matrix.app }}
-          npm ci --legacy-peer-deps
+          yarn install --frozen-lockfile
 
       - name: Run tests
         run: |
           cd apps/${{ matrix.app }}
-          npm test
+          yarn test
 
       - name: Upload coverage
         uses: actions/upload-artifact@v4
