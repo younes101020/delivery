@@ -1,29 +1,30 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+  boolean,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
-export const users = sqliteTable("users", {
-  id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+export const users = pgTable("users", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   name: text("name"),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   role: text("role").notNull().default("member"),
-  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
-    () => new Date(),
-  ),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
-    .$defaultFn(() => new Date())
-    .$onUpdate(() => new Date()),
-  deletedAt: integer("deleted_at", { mode: "timestamp" }),
-  emailVerified: integer("email_verified", { mode: "boolean" }).default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  deletedAt: timestamp("deleted_at"),
+  emailVerified: boolean("email_verified").default(false),
   emailVerificationToken: text("email_verification_token"),
-  emailVerificationTokenExpiresAt: integer(
+  emailVerificationTokenExpiresAt: timestamp(
     "email_verification_token_expires_at",
-    { mode: "timestamp" },
   ),
 });
 
-export const githubApp = sqliteTable("github_app", {
-  id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+export const githubApp = pgTable("github_app", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   webhookSecret: text("webhook_secret").notNull(),
   clientId: text("client_id").notNull(),
   clientSecret: text("client_secret").notNull(),
@@ -31,42 +32,32 @@ export const githubApp = sqliteTable("github_app", {
   appId: text("app_id").notNull(),
 });
 
-export const applications = sqliteTable("applications", {
-  id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+export const applications = pgTable("applications", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   name: text("name").notNull(),
   fqdn: text("fqdn").notNull().unique(),
   logs: text("logs"),
   githubAppId: integer("github_app_id").references(() => githubApp.id),
   githubAppName: text("github_app_name").notNull(),
-  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
-    () => new Date(),
-  ),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
-    .$defaultFn(() => new Date())
-    .$onUpdate(() => new Date()),
-  deletedAt: integer("deleted_at", { mode: "timestamp" }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  deletedAt: timestamp("deleted_at"),
 });
 
-export const environmentVariables = sqliteTable("environment_variables", {
-  id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+export const environmentVariables = pgTable("environment_variables", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   key: text("key").notNull(),
   value: text("value").notNull(),
-  isBuildTime: integer("is_build_time", { mode: "boolean" })
-    .notNull()
-    .default(false),
-  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
-    () => new Date(),
-  ),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
-    .$defaultFn(() => new Date())
-    .$onUpdate(() => new Date()),
-  deletedAt: integer("deleted_at", { mode: "timestamp" }),
+  isBuildTime: boolean("is_build_time").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  deletedAt: timestamp("deleted_at"),
 });
 
-export const applicationEnvironmentVariables = sqliteTable(
+export const applicationEnvironmentVariables = pgTable(
   "application_environment_variables",
   {
-    id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
     applicationId: integer("application_id")
       .notNull()
       .references(() => applications.id),
@@ -109,8 +100,7 @@ export const insertApplicationsSchema = createInsertSchema(applications, {
 
 export const patchApplicationsSchema = insertApplicationsSchema.partial();
 
-export const selectEnvironmentVariablesSchema =
-  createSelectSchema(environmentVariables);
+export const selectEnvironmentVariablesSchema = createSelectSchema(environmentVariables);
 
 export const insertEnvironmentVariablesSchema = createInsertSchema(
   environmentVariables,

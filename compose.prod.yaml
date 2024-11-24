@@ -15,7 +15,7 @@ services:
       - host_network
     depends_on:
       - jobs
-      - postgres
+      - db
 
   jobs:
     build:
@@ -37,19 +37,25 @@ services:
     networks:
       - host_network
     depends_on:
-      - postgres
+      - db
 
-  postgres:
-    image: postgres:15
-    environment:
-      - POSTGRES_DB
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: always
+  db:
+    image: postgres:latest
     ports:
       - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD
+    networks:
+      - host_network
+    volumes:
+      - ${PWD}/db-data/:/var/lib/postgresql/data/
+      #- ${PWD}/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
     networks:
       - host_network
 

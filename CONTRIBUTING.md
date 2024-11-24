@@ -20,6 +20,8 @@ the main guidelines for contributing.
 
 ```bash
 yarn install
+# You can also choose to use a remote postgres database, in this case skip `yarn start db` command and make sure to provide your db credentials inside the .env file
+yarn start db
 yarn dev
 ```
 

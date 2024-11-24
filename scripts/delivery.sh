@@ -28,7 +28,9 @@ elif [ "$1" = "redeploy" ]; then
         docker compose -f compose.prod.yaml build "$2"
         docker compose -f compose.prod.yaml up -d "$2"
     fi
+elif [ "$1" = "start" ] && [ "$2" = "db" ]; then
+    docker compose -f compose.prod.yaml up -d db
 else
-    echo "Please provide either 'deploy', 'stop', 'restart', or 'redeploy' as an argument"
+    echo "Please provide either 'deploy', 'stop', 'restart', 'redeploy', or 'start db' as an argument"
     exit 1
 fi

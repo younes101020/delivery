@@ -18,9 +18,7 @@
   "dependencies": {
     "@hono/node-server": "^1.13.2",
     "@hono/zod-openapi": "^0.16.4",
-    "@libsql/linux-x64-musl": "^0.5.0-pre.2",
     "@scalar/hono-api-reference": "^0.5.156",
-    "better-sqlite3": "^11.5.0",
     "bullmq": "^5.26.2",
     "dockerode": "^4.0.2",
     "dotenv": "^16.4.5",
@@ -30,6 +28,7 @@
     "hono": "^4.6.6",
     "hono-pino": "^0.4.0",
     "node-ssh": "^13.2.0",
+    "pg": "^8.13.1",
     "pino": "^9.5.0",
     "pino-pretty": "^11.3.0",
     "stoker": "^1.2.7",
@@ -38,8 +37,8 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.8.0",
-    "@types/better-sqlite3": "^7.6.11",
     "@types/node": "^22.9.0",
+    "@types/pg": "^8.11.10",
     "cross-env": "^7.0.3",
     "drizzle-kit": "^0.24.2",
     "eslint": "^9.13.0",
