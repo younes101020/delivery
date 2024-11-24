@@ -24,7 +24,7 @@ jobs:
           - 5432:5432
 
     env:
-      DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
       BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
       NODE_ENV: test
       PORT: 3090
