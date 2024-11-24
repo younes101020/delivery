@@ -5,15 +5,16 @@ on:
     paths:
       - 'apps/jobs/src/**'
 
+env:
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  NODE_ENV: ${{ env.NODE_ENV }}
+  PORT: ${{ env.PORT }}
+  POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+  LOG_LEVEL: ${{ env.LOG_LEVEL }}
+
 jobs:
   Test:
     runs-on: ubuntu-latest
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      NODE_ENV: ${{ env.NODE_ENV }}
-      PORT: ${{ env.PORT }}
-      POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
-      LOG_LEVEL: ${{ env.LOG_LEVEL }}
     services:
       db:
         image: postgres
