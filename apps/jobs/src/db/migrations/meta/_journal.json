@@ -1,33 +1,12 @@
 {
   "version": "7",
-  "dialect": "sqlite",
+  "dialect": "postgresql",
   "entries": [
     {
       "idx": 0,
-      "version": "6",
-      "when": 1728133964232,
-      "tag": "0000_same_squadron_sinister",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1731940532238,
-      "tag": "0001_wandering_layla_miller",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1732302312425,
-      "tag": "0002_nebulous_wild_child",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1732313803180,
-      "tag": "0003_sturdy_mordo",
+      "version": "7",
+      "when": 1732461253735,
+      "tag": "0000_blue_hairball",
       "breakpoints": true
     }
   ]
