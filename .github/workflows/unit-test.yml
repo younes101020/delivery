@@ -6,9 +6,9 @@ on:
       - 'apps/jobs/src/**'
 
 jobs:
-  Test:
+  TestJobs:
     runs-on: ubuntu-latest
-    environment: test
+    #environment: test
     services:
       db:
         image: postgres
