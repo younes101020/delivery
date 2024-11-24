@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 const key = new TextEncoder().encode(env.AUTH_SECRET);
 
 type SessionData = {
-  user: { id: number };
+  user: { id: string };
   expires: string;
 };
 
@@ -31,10 +31,10 @@ export async function getSession() {
   return await verifyToken(session);
 }
 
-export async function setSession(user: NewUser) {
+export async function setSession(user: NewUser & { id: string }) {
   const expiresInOneDay = new Date(Date.now() + 24 * 60 * 60 * 1000);
   const session: SessionData = {
-    user: { id: user.id! },
+    user: { id: user.id },
     expires: expiresInOneDay.toISOString(),
   };
   const encryptedSession = await signToken(session);

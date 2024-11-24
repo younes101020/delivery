@@ -133,4 +133,4 @@ export const insertApplicationEnvironmentVariablesSchema = createInsertSchema(
 
 // Shared types
 
-export type NewUser = typeof users.$inferInsert;
+export type NewUser = typeof users.$inferSelect;

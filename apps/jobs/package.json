@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "license": "MIT",
   "exports": {
-    "./types": "./src/db/schema.ts"
+    "./types": "./src/db/schema.ts",
+    "./http": "./src/app.ts"
   },
   "scripts": {
     "dev": "tsx watch src/index.ts",
