@@ -16,18 +16,18 @@ export const create = createRoute({
   request: {
     body: jsonContentRequired(
       insertEnvironmentVariablesSchema,
-      "The environment variable to create"
+      "The environment variable to create",
     ),
   },
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       selectEnvironmentVariablesSchema,
-      "The created environment variable"
+      "The created environment variable",
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(insertEnvironmentVariablesSchema),
-      "The validation error(s)"
+      "The validation error(s)",
     ),
   },
 });
