@@ -29,12 +29,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 20
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
-          NODE_ENV: ${{ env.NODE_ENV }}
-          PORT: ${{ env.PORT }}
-          LOG_LEVEL: ${{ env.LOG_LEVEL }}
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile --non-interactive --prefer-offline
@@ -44,6 +38,18 @@ jobs:
 
       - name: Migrate database
         run: yarn workspace @delivery/jobs run migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
+          NODE_ENV: test
+          PORT: 3090
+          LOG_LEVEL: silent
 
       - name: Run the unitesting
         run: yarn workspace @delivery/jobs run test
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
+          NODE_ENV: test
+          PORT: 3090
+          LOG_LEVEL: silent
