@@ -16,7 +16,7 @@ export const create = createRoute({
   request: {
     body: jsonContentRequired(
       insertEnvironmentVariablesSchema,
-      "The environment variable to create.",
+      "The environment variable to create",
     ),
   },
   tags,

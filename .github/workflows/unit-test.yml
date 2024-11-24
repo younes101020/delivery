@@ -8,6 +8,7 @@ on:
 jobs:
   Test:
     runs-on: ubuntu-latest
+    environment: test
     services:
       db:
         image: postgres
@@ -22,11 +23,9 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-
     env:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
       BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
-      NODE_ENV: test
       PORT: 3090
       LOG_LEVEL: silent
 
@@ -38,6 +37,8 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 20
+        run: |
+          echo ${#BEARER_TOKEN}
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile --non-interactive --prefer-offline
