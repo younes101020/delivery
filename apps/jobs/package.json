@@ -14,7 +14,8 @@
     "lint:fix": "npm run lint --fix",
     "test": "cross-env NODE_ENV=test vitest",
     "build": "tsc && tsc-alias",
-    "seed": "npx tsx src/db/seed.ts"
+    "seed": "npx tsx src/db/seed.ts",
+    "migrate": "npx tsx src/db/migrate.ts"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.2.13",
@@ -25,6 +26,7 @@
     "dockerode": "^4.0.2",
     "dotenv": "^16.4.5",
     "dotenv-expand": "^11.0.6",
+    "drizzle-kit": "^0.28.1",
     "drizzle-orm": "0.36.4",
     "drizzle-seed": "^0.1.1",
     "drizzle-zod": "^0.5.1",

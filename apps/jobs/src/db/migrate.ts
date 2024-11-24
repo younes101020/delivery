@@ -3,10 +3,14 @@ import path from "node:path";
 
 import { db } from ".";
 
-function main() {
-  migrate(db, {
+async function main() {
+  await migrate(db, {
     migrationsFolder: path.join(process.cwd(), "/src/db/migrations"),
   });
+  process.exit(0);
 }
 
-main();
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
