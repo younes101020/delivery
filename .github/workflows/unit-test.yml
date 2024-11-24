@@ -8,12 +8,15 @@ on:
 jobs:
   Test:
     runs-on: ubuntu-latest
-
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      NODE_ENV: ${{ env.NODE_ENV }}
+      PORT: ${{ env.PORT }}
+      POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+      LOG_LEVEL: ${{ env.LOG_LEVEL }}
     services:
       db:
         image: postgres
-        env:
-          POSTGRES_PASSWORD: mytestpassword
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -39,10 +42,6 @@ jobs:
 
       - name: Migrate database
         run: yarn workspace @delivery/jobs run migrate
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Run the unitesting
         run: yarn workspace @delivery/jobs run test
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
