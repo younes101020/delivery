@@ -13,9 +13,11 @@
     "lint": "eslint .",
     "lint:fix": "npm run lint --fix",
     "test": "cross-env NODE_ENV=test vitest",
-    "build": "tsc && tsc-alias"
+    "build": "tsc && tsc-alias",
+    "seed": "npx tsx src/db/seed.ts"
   },
   "dependencies": {
+    "@electric-sql/pglite": "^0.2.13",
     "@hono/node-server": "^1.13.2",
     "@hono/zod-openapi": "^0.16.4",
     "@scalar/hono-api-reference": "^0.5.156",
@@ -23,7 +25,8 @@
     "dockerode": "^4.0.2",
     "dotenv": "^16.4.5",
     "dotenv-expand": "^11.0.6",
-    "drizzle-orm": "^0.33.0",
+    "drizzle-orm": "0.36.4",
+    "drizzle-seed": "^0.1.1",
     "drizzle-zod": "^0.5.1",
     "hono": "^4.6.6",
     "hono-pino": "^0.4.0",
@@ -31,6 +34,7 @@
     "pg": "^8.13.1",
     "pino": "^9.5.0",
     "pino-pretty": "^11.3.0",
+    "postgres": "^3.4.5",
     "stoker": "^1.2.7",
     "vitest": "^2.1.5",
     "zod": "^3.23.8"
