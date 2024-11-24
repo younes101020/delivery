@@ -11,6 +11,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error(`Error while applying migrations: ${err}`);
+  console.error(`Error when applying migrations: ${err}`);
   process.exit(1);
 });
