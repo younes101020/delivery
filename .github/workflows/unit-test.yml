@@ -1,4 +1,4 @@
-name: Minimal CI
+name: Running unittest on jobs service
 
 on:
   push:
@@ -6,20 +6,45 @@ on:
       - 'apps/jobs/src/**'
 
 jobs:
-  build:
+  Test:
     runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v3
-      - name: Unit-testing
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18.x'
+    services:
+      postgres:
+        image: postgres
+
         env:
-          BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --non-interactive --prefer-offline
+
+      - name: Lint
+        run: yarn workspace @delivery/jobs run lint
+
+      - name: Migrate database
+        run: yarn workspace @delivery/jobs run migrate
+        env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          LOG_LEVEL: ${{ env.LOG_LEVEL }}
-          NODE_ENV: ${{ env.NODE_ENV }}
-          PORT: ${{ env.PORT }}
-      - run: yarn install
-      - run: yarn ut:test
+
+      - name: Run the unitesting
+        run: yarn workspace @delivery/jobs run test
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
