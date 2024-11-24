@@ -21,10 +21,6 @@ describe("applications routes", () => {
     execSync("yarn drizzle-kit push");
   });
 
-  afterAll(async () => {
-    fs.rmSync("test.db", { force: true });
-  });
-
   it("post /applications validates the body when creating", async () => {
     const response = await client.applications.$post(
       {
