@@ -28,7 +28,7 @@ export function OnboardingForms() {
   } = helpers;
 
   return (
-    <Card className="w-[90%] lg:w-[60%] -z-20">
+    <Card className="w-[90%] lg:w-[60%]">
       <StepTracker />
       <CardContent>{CurrentComponent}</CardContent>
     </Card>

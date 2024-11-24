@@ -33,17 +33,15 @@ export function StepTracker() {
       {STEP_METADATA.map((step, i) => (
         <div key={i} className={`w-56 ${i !== 0 && "opacity-40"} relative`}>
           <CardTitle className="flex gap-2">
-            <div>{step.title}</div>
+            <div className=" z-20">{step.title}</div>
             {i === 0 && <BounceIndicator />}
           </CardTitle>
           <CardDescription>{step.description}</CardDescription>
           <div
             className={`
-              absolute top-[-1.5rem] left-[-1rem] text-muted-foreground font-bold text-4xl -z-10
+              absolute top-[-2rem] left-[-.8rem] text-muted-foreground font-bold text-6xl opacity-30
               before:content-[''] 
               before:absolute 
-              before:top-0
-              before:left-0 
               before:w-4 
             `}
           >
