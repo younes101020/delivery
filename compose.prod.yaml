@@ -6,6 +6,7 @@ services:
     environment:
       - AUTH_SECRET
       - BEARER_TOKEN
+      - JOBS_API_BASEURL
     volumes:
       - ./apps/web/src:/app/src
     restart: always

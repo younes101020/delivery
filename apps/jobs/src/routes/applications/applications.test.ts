@@ -1,7 +1,6 @@
 /* eslint-disable ts/ban-ts-comment */
 import { testClient } from "hono/testing";
-import { execSync } from "node:child_process";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import env from "@/env";
 import { ZOD_ERROR_MESSAGES } from "@/lib/constants";
@@ -14,12 +13,11 @@ if (env.NODE_ENV !== "test") {
 }
 
 const client = testClient(createApp().route("/", router));
+const httpOptions = {
+  headers: { Authorization: `Bearer ${env.BEARER_TOKEN}` },
+};
 
 describe("applications routes", () => {
-  beforeAll(async () => {
-    execSync("yarn drizzle-kit push");
-  });
-
   it("post /applications validates the body when creating", async () => {
     const response = await client.applications.$post(
       {
@@ -28,7 +26,7 @@ describe("applications routes", () => {
           name: "electra",
         },
       },
-      { headers: { Authorization: `Bearer ${env.BEARER_TOKEN}` } },
+      httpOptions,
     );
     expect(response.status).toBe(422);
     if (response.status === 422) {

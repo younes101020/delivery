@@ -1,9 +1,12 @@
-import { OnboardingForms } from "./_components/onboardingforms";
+import { Login } from "./_components/login-form";
+import { StepProvider } from "./_components/step";
 
 export default function Onboarding() {
   return (
     <div className="flex justify-center items-center h-[95vh]">
-      <OnboardingForms />
+      <StepProvider>
+        <Login />
+      </StepProvider>
     </div>
   );
 }
