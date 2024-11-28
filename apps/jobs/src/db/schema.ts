@@ -1,14 +1,10 @@
-import {
-  boolean,
-  integer,
-  pgTable,
-  text,
-  timestamp,
-} from "drizzle-orm/pg-core";
+import type { z } from "zod";
+
+import { boolean, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const users = pgTable("users", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  id: serial("id").primaryKey(),
   name: text("name"),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
@@ -24,7 +20,7 @@ export const users = pgTable("users", {
 });
 
 export const githubApp = pgTable("github_app", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  id: serial("id").primaryKey(),
   webhookSecret: text("webhook_secret").notNull(),
   clientId: text("client_id").notNull(),
   clientSecret: text("client_secret").notNull(),
@@ -33,11 +29,11 @@ export const githubApp = pgTable("github_app", {
 });
 
 export const applications = pgTable("applications", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  id: serial("id").primaryKey(),
   name: text("name").notNull(),
   fqdn: text("fqdn").notNull().unique(),
   logs: text("logs"),
-  githubAppId: integer("github_app_id").references(() => githubApp.id),
+  githubAppId: serial("github_app_id").references(() => githubApp.id),
   githubAppName: text("github_app_name").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -45,7 +41,7 @@ export const applications = pgTable("applications", {
 });
 
 export const environmentVariables = pgTable("environment_variables", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  id: serial("id").primaryKey(),
   key: text("key").notNull(),
   value: text("value").notNull(),
   isBuildTime: boolean("is_build_time").notNull().default(false),
@@ -57,11 +53,11 @@ export const environmentVariables = pgTable("environment_variables", {
 export const applicationEnvironmentVariables = pgTable(
   "application_environment_variables",
   {
-    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-    applicationId: integer("application_id")
+    id: serial("id").primaryKey(),
+    applicationId: serial("application_id")
       .notNull()
       .references(() => applications.id),
-    environmentVariableId: integer("environment_variable_id")
+    environmentVariableId: serial("environment_variable_id")
       .notNull()
       .references(() => environmentVariables.id),
   },
@@ -135,5 +131,14 @@ export const insertApplicationEnvironmentVariablesSchema = createInsertSchema(
   });
 
 // Shared types
-
-export type NewUser = typeof users.$inferSelect;
+// workaround to https://github.com/honojs/hono/issues/1800
+type NewUserWithoutDateTypes = Omit<
+  z.infer<typeof selectUsersSchema>,
+  "createdAt" | "updatedAt" | "deletedAt" | "emailVerificationTokenExpiresAt"
+>;
+export type NewUser = NewUserWithoutDateTypes & {
+  createdAt: string | null;
+  updatedAt: string | null;
+  deletedAt: string | null;
+  emailVerificationTokenExpiresAt: string | null;
+};
