@@ -6,7 +6,7 @@ import env from "./env";
 const port = env.PORT;
 // eslint-disable-next-line no-console
 console.log(`
-🚀 Delivery API is running on port http://localhost:${port}
+🚀 Delivery API is running on http://localhost:${port}
 🗒️  API Docs available at: http://localhost:${port}/reference
 `);
 
