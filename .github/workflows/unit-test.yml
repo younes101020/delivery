@@ -39,7 +39,7 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --non-interactive --prefer-offline
+        run: yarn install --immutable
 
       - name: Lint
         run: yarn workspace @delivery/jobs run lint
