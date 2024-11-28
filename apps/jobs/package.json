@@ -47,7 +47,6 @@
     "@types/node": "^22.9.0",
     "@types/pg": "^8.11.10",
     "cross-env": "^7.0.3",
-    "drizzle-kit": "^0.24.2",
     "eslint": "^9.13.0",
     "eslint-plugin-format": "^0.1.2",
     "tsc-alias": "^1.8.10",
