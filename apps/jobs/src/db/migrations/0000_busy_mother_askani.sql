@@ -1,15 +1,15 @@
 CREATE TABLE IF NOT EXISTS "application_environment_variables" (
-	"id" integer PRIMARY KEY NOT NULL,
-	"application_id" integer NOT NULL,
-	"environment_variable_id" integer NOT NULL
+	"id" serial PRIMARY KEY NOT NULL,
+	"application_id" serial NOT NULL,
+	"environment_variable_id" serial NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "applications" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"fqdn" text NOT NULL,
 	"logs" text,
-	"github_app_id" integer,
+	"github_app_id" serial NOT NULL,
 	"github_app_name" text NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now(),
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS "applications" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "environment_variables" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"key" text NOT NULL,
 	"value" text NOT NULL,
 	"is_build_time" boolean DEFAULT false NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS "environment_variables" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "github_app" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"webhook_secret" text NOT NULL,
 	"client_id" text NOT NULL,
 	"client_secret" text NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS "github_app" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "users" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"name" text,
 	"email" text NOT NULL,
 	"password_hash" text NOT NULL,

@@ -1,5 +1,5 @@
 {
-  "id": "af1a88cc-f001-414b-8675-d945bc927a9d",
+  "id": "03562d10-87ef-42e9-b5cc-64722fb7225f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -10,19 +10,19 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
         "application_id": {
           "name": "application_id",
-          "type": "integer",
+          "type": "serial",
           "primaryKey": false,
           "notNull": true
         },
         "environment_variable_id": {
           "name": "environment_variable_id",
-          "type": "integer",
+          "type": "serial",
           "primaryKey": false,
           "notNull": true
         }
@@ -68,7 +68,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
@@ -92,9 +92,9 @@
         },
         "github_app_id": {
           "name": "github_app_id",
-          "type": "integer",
+          "type": "serial",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "github_app_name": {
           "name": "github_app_name",
@@ -159,7 +159,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
@@ -217,7 +217,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
@@ -266,7 +266,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "serial",
           "primaryKey": true,
           "notNull": true
         },

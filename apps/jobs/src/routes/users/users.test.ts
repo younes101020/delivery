@@ -41,8 +41,8 @@ describe("users routes", () => {
   });
 });
 
-const name = "younesfkl";
-const email = "hellofkl@gmail.com";
+const name = "youdfgnesfkl";
+const email = "helldfgofkl@gmail.com";
 const passwordHash = "Azerty-60";
 
 it("post /users creates a user", async () => {
