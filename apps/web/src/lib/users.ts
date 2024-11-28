@@ -9,9 +9,10 @@ export async function getUser() {
 
   const response = await client.users[":id"].$get({
     param: {
-      id: sessionData.user.id,
+      id: sessionData.user.id.toString(),
     },
   });
+
   if (response.status !== 200) {
     return null;
   }
