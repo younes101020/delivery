@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1732461253735,
-      "tag": "0000_blue_hairball",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1732832884104,
-      "tag": "0001_dazzling_mentor",
+      "when": 1732834795321,
+      "tag": "0000_exotic_blur",
       "breakpoints": true
     }
   ]

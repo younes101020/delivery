@@ -1,10 +1,10 @@
 import type { z } from "zod";
 
-import { boolean, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey(),
   name: text("name"),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
@@ -20,7 +20,7 @@ export const users = pgTable("users", {
 });
 
 export const githubApp = pgTable("github_app", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey(),
   webhookSecret: text("webhook_secret").notNull(),
   clientId: text("client_id").notNull(),
   clientSecret: text("client_secret").notNull(),
@@ -29,11 +29,11 @@ export const githubApp = pgTable("github_app", {
 });
 
 export const applications = pgTable("applications", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey(),
   name: text("name").notNull(),
   fqdn: text("fqdn").notNull().unique(),
   logs: text("logs"),
-  githubAppId: serial("github_app_id").references(() => githubApp.id),
+  githubAppId: integer("github_app_id").references(() => githubApp.id),
   githubAppName: text("github_app_name").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -41,7 +41,7 @@ export const applications = pgTable("applications", {
 });
 
 export const environmentVariables = pgTable("environment_variables", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey(),
   key: text("key").notNull(),
   value: text("value").notNull(),
   isBuildTime: boolean("is_build_time").notNull().default(false),
@@ -53,11 +53,11 @@ export const environmentVariables = pgTable("environment_variables", {
 export const applicationEnvironmentVariables = pgTable(
   "application_environment_variables",
   {
-    id: serial("id").primaryKey(),
-    applicationId: serial("application_id")
+    id: integer("id").primaryKey(),
+    applicationId: integer("application_id")
       .notNull()
       .references(() => applications.id),
-    environmentVariableId: serial("environment_variable_id")
+    environmentVariableId: integer("environment_variable_id")
       .notNull()
       .references(() => environmentVariables.id),
   },
