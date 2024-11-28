@@ -11,15 +11,17 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "yarn workspaces run dev",
+    "dev": "turbo dev",
     "deploy": "sh ./scripts/delivery.sh deploy",
     "stop": "sh ./scripts/delivery.sh stop",
     "restart": "sh ./scripts/delivery.sh restart",
     "redeploy": "sh ./scripts/delivery.sh redeploy",
     "start": "sh ./scripts/delivery.sh start",
-    "ut:test": "yarn workspace @delivery/jobs run test"
+    "ut:test": "yarn workspace @delivery/jobs run test",
+    "check-types": "tsc --noEmit"
   },
-  "dependencies": {
-    "generate-lockfile": "^0.0.12"
+  "packageManager": "yarn@4.5.3",
+  "devDependencies": {
+    "turbo": "^2.3.3"
   }
 }
