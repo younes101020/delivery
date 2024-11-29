@@ -1,7 +1,14 @@
 import type { z } from "zod";
 
-import { boolean, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, pgTable, serial, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+
+export const systemConfig = pgTable("system_config", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  onboardingCompleted: boolean("onboarding_completed").default(false),
+  onboardingCompletedAt: timestamp("onboarding_completed_at"),
+  completedByUserId: text("completed_by_user_id"),
+});
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -99,7 +106,8 @@ export const insertApplicationsSchema = createInsertSchema(applications, {
 
 export const patchApplicationsSchema = insertApplicationsSchema.partial();
 
-export const selectEnvironmentVariablesSchema = createSelectSchema(environmentVariables);
+export const selectEnvironmentVariablesSchema =
+  createSelectSchema(environmentVariables);
 
 export const insertEnvironmentVariablesSchema = createInsertSchema(
   environmentVariables,
