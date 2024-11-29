@@ -21,9 +21,7 @@ export const users = pgTable("users", {
   deletedAt: timestamp("deleted_at"),
   emailVerified: boolean("email_verified").default(false),
   emailVerificationToken: text("email_verification_token"),
-  emailVerificationTokenExpiresAt: timestamp(
-    "email_verification_token_expires_at",
-  ),
+  emailVerificationTokenExpiresAt: timestamp("email_verification_token_expires_at"),
 });
 
 export const githubApp = pgTable("github_app", {
@@ -57,18 +55,15 @@ export const environmentVariables = pgTable("environment_variables", {
   deletedAt: timestamp("deleted_at"),
 });
 
-export const applicationEnvironmentVariables = pgTable(
-  "application_environment_variables",
-  {
-    id: serial("id").primaryKey(),
-    applicationId: serial("application_id")
-      .notNull()
-      .references(() => applications.id),
-    environmentVariableId: serial("environment_variable_id")
-      .notNull()
-      .references(() => environmentVariables.id),
-  },
-);
+export const applicationEnvironmentVariables = pgTable("application_environment_variables", {
+  id: serial("id").primaryKey(),
+  applicationId: serial("application_id")
+    .notNull()
+    .references(() => applications.id),
+  environmentVariableId: serial("environment_variable_id")
+    .notNull()
+    .references(() => environmentVariables.id),
+});
 
 // DTOs
 
@@ -106,12 +101,9 @@ export const insertApplicationsSchema = createInsertSchema(applications, {
 
 export const patchApplicationsSchema = insertApplicationsSchema.partial();
 
-export const selectEnvironmentVariablesSchema =
-  createSelectSchema(environmentVariables);
+export const selectEnvironmentVariablesSchema = createSelectSchema(environmentVariables);
 
-export const insertEnvironmentVariablesSchema = createInsertSchema(
-  environmentVariables,
-)
+export const insertEnvironmentVariablesSchema = createInsertSchema(environmentVariables)
   .required({
     key: true,
     value: true,

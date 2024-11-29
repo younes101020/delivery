@@ -1,3 +1,5 @@
+import { UserProvider } from "@/lib/auth";
+import { getUser } from "@/lib/users";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import Image from "next/image";
@@ -24,6 +26,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  let userPromise = getUser();
   return (
     <html lang="en" className="dark">
       <body
@@ -38,7 +41,7 @@ export default function RootLayout({
             className="border border-primary border-y-0 rounded-full"
           />
         </header>
-        {children}
+        <UserProvider userPromise={userPromise}>{children}</UserProvider>
       </body>
     </html>
   );

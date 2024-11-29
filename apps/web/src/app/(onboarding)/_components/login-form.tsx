@@ -4,12 +4,22 @@ import { Button } from "@/components/ui/button";
 import { CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useUser } from "@/lib/auth";
 import { ActionState } from "@/lib/auth/middleware";
 import { Loader2 } from "lucide-react";
-import { useActionState } from "react";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect } from "react";
 import { signIn, signUp } from "../actions";
 
 export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
+  const session = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    console.log(session)
+    if (session) router.replace("/?step=2");
+  }, []);
+
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
     mode === "signin" ? signIn : signUp,
     { error: "" },
@@ -44,9 +54,7 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
             id="password"
             name="password"
             type="password"
-            autoComplete={
-              mode === "signin" ? "current-password" : "new-password"
-            }
+            autoComplete={mode === "signin" ? "current-password" : "new-password"}
             required
             minLength={8}
             maxLength={100}
@@ -56,11 +64,9 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
         </div>
       </div>
 
-      {state?.error && (
-        <div className="text-destructive text-sm">{state.error}</div>
-      )}
+      {state?.error && <div className="text-destructive text-sm">{state.error}</div>}
 
-      <CardFooter className="flex px-0 pt-8">
+      <CardFooter className="flex px-0 pt-8 justify-end">
         <Button type="submit" disabled={pending}>
           {pending ? (
             <>
