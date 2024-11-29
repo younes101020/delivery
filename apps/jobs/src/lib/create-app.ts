@@ -19,7 +19,7 @@ export default function createApp() {
   const app = createRouter();
   app.use(serveEmojiFavicon("📝"));
   app.use(pinoLogger());
-  app.use(bearerAuth({ token: env.BEARER_TOKEN }));
+  app.use("/^(?!/(doc|reference)).*$/", bearerAuth({ token: env.BEARER_TOKEN }));
 
   app.notFound(notFound);
   app.onError(onError);
