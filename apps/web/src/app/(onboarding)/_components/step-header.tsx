@@ -9,7 +9,7 @@ const headerData = [
   },
   {
     title: "Github App",
-    description: "This will give you control over your GitHub repositories.",
+    description: "This will allow Delivery to create deployment from your GitHub repositories.",
   },
   {
     title: "Deploy your app",

@@ -15,6 +15,20 @@
       "when": 1732872395742,
       "tag": "0001_brown_nico_minoru",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1733003455839,
+      "tag": "0002_wakeful_unicorn",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1733005166362,
+      "tag": "0003_condemned_moonstone",
+      "breakpoints": true
     }
   ]
 }

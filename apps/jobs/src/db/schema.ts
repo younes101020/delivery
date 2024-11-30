@@ -24,13 +24,20 @@ export const users = pgTable("users", {
   emailVerificationTokenExpiresAt: timestamp("email_verification_token_expires_at"),
 });
 
+export const githubAppSecret = pgTable("github_app_secret", {
+  id: serial("id").primaryKey(),
+  encryptedData: text("encrypted_data").notNull(),
+  iv: text("iv").notNull(),
+  key: text("key").notNull(),
+});
+
 export const githubApp = pgTable("github_app", {
   id: serial("id").primaryKey(),
   webhookSecret: text("webhook_secret").notNull(),
   clientId: text("client_id").notNull(),
   clientSecret: text("client_secret").notNull(),
-  privateKey: text("private_key").notNull(),
   appId: text("app_id").notNull(),
+  secretId: serial("secret_id").references(() => githubAppSecret.id),
 });
 
 export const applications = pgTable("applications", {
@@ -65,12 +72,10 @@ export const applicationEnvironmentVariables = pgTable("application_environment_
     .references(() => environmentVariables.id),
 });
 
-// DTOs
-
+// user DTOs
 export const selectUsersSchema = createSelectSchema(users).omit({
   passwordHash: true,
 });
-
 export const insertUsersSchema = createInsertSchema(users, {
   name: schema => schema.name.min(1).max(500),
 })
@@ -84,8 +89,17 @@ export const insertUsersSchema = createInsertSchema(users, {
     updatedAt: true,
   });
 
-export const selectApplicationsSchema = createSelectSchema(applications);
+// githubapp DTOs
+export const selectGithubAppsSchema = createSelectSchema(githubApp);
+export const insertGithubAppsSchema = createInsertSchema(githubApp);
+export const patchGithubAppsSchema = insertGithubAppsSchema.partial();
 
+// githubAppSecret DTOs & type
+export const selectGithubAppSecretSchema = createSelectSchema(githubAppSecret);
+export const insertGithubAppSecretSchema = createInsertSchema(githubAppSecret);
+
+// app DTOs
+export const selectApplicationsSchema = createSelectSchema(applications);
 export const insertApplicationsSchema = createInsertSchema(applications, {
   name: schema => schema.name.min(1).max(500),
 })
@@ -98,11 +112,10 @@ export const insertApplicationsSchema = createInsertSchema(applications, {
     updatedAt: true,
     deletedAt: true,
   });
-
 export const patchApplicationsSchema = insertApplicationsSchema.partial();
 
+// envvar DTOs
 export const selectEnvironmentVariablesSchema = createSelectSchema(environmentVariables);
-
 export const insertEnvironmentVariablesSchema = createInsertSchema(environmentVariables)
   .required({
     key: true,
@@ -114,11 +127,10 @@ export const insertEnvironmentVariablesSchema = createInsertSchema(environmentVa
     updatedAt: true,
     deletedAt: true,
   });
-
+// envvar <=> app join DTOs
 export const selectApplicationEnvironmentVariablesSchema = createSelectSchema(
   applicationEnvironmentVariables,
 );
-
 export const insertApplicationEnvironmentVariablesSchema = createInsertSchema(
   applicationEnvironmentVariables,
 )

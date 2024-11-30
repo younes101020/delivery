@@ -36,7 +36,6 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
       passwordHash: password,
     },
   });
-  console.log(response.statusText);
   // Non explicit error message to end-user to prevent from enumeration attack
   if (response.status !== 200) return { error: "Impossible to signup" };
   const createdUser = await response.json();
@@ -47,12 +46,3 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
 export async function signOut() {
   (await cookies()).delete("session");
 }
-
-const githubBatchingSchema = z.object({
-  name: z.string(),
-  organization: z.coerce.boolean(),
-});
-
-export const githubBatching = validatedAction(githubBatchingSchema, async (data, formData) => {
-  const { name, organization } = data;
-});
