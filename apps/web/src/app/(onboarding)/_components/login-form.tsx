@@ -4,19 +4,21 @@ import { Button } from "@/components/ui/button";
 import { CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useUser } from "@/lib/auth";
 import { ActionState } from "@/lib/auth/middleware";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { signIn, signUp } from "../actions";
 
 export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
   const session = useUser();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    console.log(session)
+    setIsLoading(false);
     if (session) router.replace("/?step=2");
   }, []);
 
@@ -25,7 +27,18 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
     { error: "" },
   );
 
-  return (
+  return isLoading ? (
+    <div className="space-y-10">
+      <div className="space-y-2">
+        <Skeleton className="h-5 w-[10%]" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-5 w-[10%]" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+    </div>
+  ) : (
     <form className="space-y-6" action={formAction}>
       <div>
         <Label htmlFor="email" className="block text-sm font-medium">

@@ -19,13 +19,17 @@ export async function GET(request: NextRequest) {
   if (!response.ok) {
     return new Response("Failed to convert app manifest", { status: response.status });
   }
-
   const result = await response.json();
-  /*const data = await client.githubapps.$post({
+  console.log(result, request.nextUrl.basePath);
+  await client.githubapps.$post({
     json: {
+      webhookSecret: result.webhook_secret,
+      clientId: result.client_id,
+      clientSecret: result.client_secret,
+      appId: result.id,
+      privateKey: result.pem,
+    },
+  });
 
-    }
-  })*/
-
-  return Response.redirect(new URL("/?step=3", request.url));
+  return Response.redirect(`https://github.com/apps/${result.slug}/installations/new`);
 }

@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
-import Form from "next/form";
 import { useMemo, useState } from "react";
 
 export function GithubAppForm({ baseUrl }: { baseUrl: string }) {
@@ -25,6 +24,7 @@ export function GithubAppForm({ baseUrl }: { baseUrl: string }) {
       },
       redirect_url: `${baseUrl}/api/webhooks/github/redirect`,
       callback_urls: [`${baseUrl}/?step=3`],
+      setup_url: `${baseUrl}/?step=3`,
       request_oauth_on_install: false,
       default_permissions: {
         contents: "read",
@@ -44,7 +44,7 @@ export function GithubAppForm({ baseUrl }: { baseUrl: string }) {
   };
 
   return (
-    <Form action={url} formMethod="POST" className="space-y-4">
+    <form action={url} method="POST" className="space-y-4">
       <div>
         <Label htmlFor="name" className="block text-sm font-medium">
           Github App name
@@ -109,6 +109,6 @@ export function GithubAppForm({ baseUrl }: { baseUrl: string }) {
       <CardFooter className="flex px-0 pt-8 justify-end">
         <Button type="submit">Create & install Github App</Button>
       </CardFooter>
-    </Form>
+    </form>
   );
 }
