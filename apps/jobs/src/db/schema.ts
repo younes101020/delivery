@@ -1,5 +1,6 @@
 import type { z } from "zod";
 
+import { relations } from "drizzle-orm";
 import { boolean, pgTable, serial, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
@@ -71,6 +72,13 @@ export const applicationEnvironmentVariables = pgTable("application_environment_
     .notNull()
     .references(() => environmentVariables.id),
 });
+
+export const githubAppRelations = relations(githubApp, ({ one }) => ({
+  secret: one(githubAppSecret, {
+    fields: [githubApp.secretId],
+    references: [githubAppSecret.id],
+  }),
+}));
 
 // user DTOs
 export const selectUsersSchema = createSelectSchema(users).omit({

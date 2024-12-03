@@ -24,8 +24,10 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
     where(fields, operators) {
       return operators.eq(fields.id, id);
     },
+    with: {
+      secret: true,
+    },
   });
-
   if (!githubApp) {
     return c.json(
       {
@@ -35,7 +37,16 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
     );
   }
 
-  return c.json(githubApp, HttpStatusCodes.OK);
+  const { secret } = githubApp;
+  const privateKey = await decryptSecret({
+    encryptedData: Buffer.from(secret.encryptedData, "base64"),
+    iv: Buffer.from(secret.iv, "base64"),
+    key: await crypto.subtle.importKey("raw", Buffer.from(secret.key, "base64"), "AES-GCM", true, [
+      "decrypt",
+    ]),
+  });
+
+  return c.json({ ...githubApp, privateKey }, HttpStatusCodes.OK);
 };
 
 export async function encryptSecret(secretKey: string) {

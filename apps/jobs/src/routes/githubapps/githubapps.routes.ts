@@ -35,7 +35,10 @@ export const getOne = createRoute({
   },
   tags,
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(selectGithubAppsSchema, "The requested github app"),
+    [HttpStatusCodes.OK]: jsonContent(
+      selectGithubAppsSchema.extend({ privateKey: z.string() }),
+      "The requested github app",
+    ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Github app not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),

@@ -1,6 +1,7 @@
 /* eslint-disable ts/ban-ts-comment */
 import { testClient } from "hono/testing";
 import { Buffer } from "node:buffer";
+import * as HttpStatusPhrases from "stoker/http-status-phrases";
 import { describe, expect, it } from "vitest";
 
 import env from "@/env";
@@ -20,16 +21,19 @@ const httpOptions = {
 };
 
 describe("applications routes", () => {
-  it("post /applications validates the body when creating", async () => {
+  const privateKey = "sdlofgihjsdofuighsdopigjsfd";
+  const missedField = {
+    clientId: "5",
+    appId: "78",
+    clientSecret: "sqpmfjkgsdf",
+    webhookSecret: "oksdfokfd",
+  };
+  // e2e
+  it("post /githubapps validates the body when creating", async () => {
     const response = await client.githubapps.$post(
       {
         // @ts-expect-error
-        json: {
-          clientId: "5",
-          appId: "78",
-          clientSecret: "sqpmfjkgsdf",
-          webhookSecret: "oksdfokfd",
-        },
+        json: missedField,
       },
       httpOptions,
     );
@@ -41,6 +45,44 @@ describe("applications routes", () => {
     }
   });
 
+  it("post /githubapps creates a githubapps", async () => {
+    const response = await client.githubapps.$post({
+      json: { ...missedField, privateKey },
+    });
+    expect(response.status).toBe(200);
+    if (response.status === 200) {
+      const json = await response.json();
+      expect(json.appId).toBe(missedField.appId);
+    }
+  });
+
+  it("get /githubapps/{id} returns 404 when githubapps not found", async () => {
+    const response = await client.githubapps[":id"].$get({
+      param: {
+        id: "2",
+      },
+    });
+    expect(response.status).toBe(404);
+    if (response.status === 404) {
+      const json = await response.json();
+      expect(json.message).toBe(HttpStatusPhrases.NOT_FOUND);
+    }
+  });
+
+  it("get /githubapps/{id} gets a single githubapps", async () => {
+    const response = await client.githubapps[":id"].$get({
+      param: {
+        id: "1",
+      },
+    });
+    expect(response.status).toBe(200);
+    if (response.status === 200) {
+      const json = await response.json();
+      expect(json.privateKey).toBe(privateKey);
+    }
+  });
+
+  // unit test
   it("should generate encrypted github app private key with base64 properties", async () => {
     const privateKey = "test-secret";
     const { encryptedData, iv, key } = await encryptSecret(privateKey);

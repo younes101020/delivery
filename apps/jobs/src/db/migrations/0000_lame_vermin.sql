@@ -32,8 +32,22 @@ CREATE TABLE IF NOT EXISTS "github_app" (
 	"webhook_secret" text NOT NULL,
 	"client_id" text NOT NULL,
 	"client_secret" text NOT NULL,
-	"private_key" text NOT NULL,
-	"app_id" text NOT NULL
+	"app_id" text NOT NULL,
+	"secret_id" serial NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "github_app_secret" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"encrypted_data" text NOT NULL,
+	"iv" text NOT NULL,
+	"key" text NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "system_config" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"onboarding_completed" boolean DEFAULT false,
+	"onboarding_completed_at" timestamp,
+	"completed_by_user_id" text
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "users" (
@@ -65,6 +79,12 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "applications" ADD CONSTRAINT "applications_github_app_id_github_app_id_fk" FOREIGN KEY ("github_app_id") REFERENCES "public"."github_app"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "github_app" ADD CONSTRAINT "github_app_secret_id_github_app_secret_id_fk" FOREIGN KEY ("secret_id") REFERENCES "public"."github_app_secret"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
