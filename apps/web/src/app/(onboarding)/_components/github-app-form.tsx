@@ -23,8 +23,8 @@ export function GithubAppForm({ baseUrl }: { baseUrl: string }) {
         active: true,
       },
       redirect_url: `${baseUrl}/api/webhooks/github/redirect`,
-      callback_urls: [`${baseUrl}/?step=3`],
-      setup_url: `${baseUrl}/?step=3`,
+      callback_urls: [`${baseUrl}/?step=3&page=1`],
+      setup_url: `${baseUrl}/?step=3&page=1`,
       request_oauth_on_install: false,
       default_permissions: {
         contents: "read",

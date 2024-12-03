@@ -6,7 +6,7 @@ on:
       - 'apps/jobs/src/**'
 
 jobs:
-  TestJobs:
+  TestCore:
     runs-on: ubuntu-latest
     environment: test
     services:
@@ -47,5 +47,5 @@ jobs:
       - name: Migrate database
         run: yarn workspace @delivery/jobs run migrate
 
-      - name: Run the unitesting
+      - name: Run the e2e/unitesting
         run: yarn workspace @delivery/jobs run test

@@ -16,9 +16,9 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
   const { email, password } = data;
 
   // TODO: req to job for signin process, on error return { error: error_message }
-  const foundUser = await fetch();
+  //const foundUser = await fetch();
 
-  await setSession(foundUser);
+  //await setSession(foundUser);
 
   redirect("/dashboard");
 });
