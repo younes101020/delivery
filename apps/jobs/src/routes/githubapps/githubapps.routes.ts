@@ -8,6 +8,18 @@ import { notFoundSchema } from "@/lib/constants";
 
 const tags = ["Githubapps"];
 
+export const list = createRoute({
+  path: "/githubapps",
+  method: "get",
+  tags,
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      z.array(selectGithubAppsSchema.extend({ privateKey: z.string() })),
+      "The list of githubapps",
+    ),
+  },
+});
+
 export const create = createRoute({
   path: "/githubapps",
   method: "post",
@@ -47,5 +59,6 @@ export const getOne = createRoute({
   },
 });
 
+export type ListRoute = typeof list;
 export type CreateRoute = typeof create;
 export type GetOneRoute = typeof getOne;

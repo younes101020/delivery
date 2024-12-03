@@ -7,7 +7,35 @@ import type { AppRouteHandler } from "@/lib/types";
 import { db } from "@/db";
 import { githubApp, githubAppSecret } from "@/db/schema";
 
-import type { CreateRoute, GetOneRoute } from "./githubapps.routes";
+import type { CreateRoute, GetOneRoute, ListRoute } from "./githubapps.routes";
+
+export const list: AppRouteHandler<ListRoute> = async (c) => {
+  const githubApps = await db.query.githubApp.findMany({
+    with: {
+      secret: true,
+    },
+  });
+
+  const githubAppsWithPrivateKey = await Promise.all(
+    githubApps.map(async (app) => {
+      const { secret } = app;
+      const privateKey = await decryptSecret({
+        encryptedData: Buffer.from(secret.encryptedData, "base64"),
+        iv: Buffer.from(secret.iv, "base64"),
+        key: await crypto.subtle.importKey(
+          "raw",
+          Buffer.from(secret.key, "base64"),
+          "AES-GCM",
+          true,
+          ["decrypt"],
+        ),
+      });
+      return { ...app, privateKey };
+    }),
+  );
+
+  return c.json(githubAppsWithPrivateKey);
+};
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const newGithubApp = c.req.valid("json");

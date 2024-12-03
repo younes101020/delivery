@@ -2,7 +2,7 @@
 import { testClient } from "hono/testing";
 import { Buffer } from "node:buffer";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
 import env from "@/env";
 import { ZOD_ERROR_MESSAGES } from "@/lib/constants";
@@ -53,6 +53,16 @@ describe("applications routes", () => {
     if (response.status === 200) {
       const json = await response.json();
       expect(json.appId).toBe(missedField.appId);
+    }
+  });
+
+  it("get /githubapps lists all githubapps", async () => {
+    const response = await client.githubapps.$get();
+    expect(response.status).toBe(200);
+    if (response.status === 200) {
+      const json = await response.json();
+      expectTypeOf(json).toBeArray();
+      expect(json.length).toBe(1);
     }
   });
 
