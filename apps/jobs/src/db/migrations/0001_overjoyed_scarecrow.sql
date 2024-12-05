@@ -1,0 +1,1 @@
+ALTER TABLE "github_app" ADD COLUMN "installation_id" serial NOT NULL;

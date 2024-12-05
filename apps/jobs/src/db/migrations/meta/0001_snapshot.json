@@ -1,6 +1,6 @@
 {
-  "id": "1fed0aa5-3a1a-4328-90c4-642c49883a92",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "41ba4f8c-5c7f-4ff2-b09f-df19be0a05a9",
+  "prevId": "1fed0aa5-3a1a-4328-90c4-642c49883a92",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -236,6 +236,12 @@
         "client_secret": {
           "name": "client_secret",
           "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "installation_id": {
+          "name": "installation_id",
+          "type": "serial",
           "primaryKey": false,
           "notNull": true
         },

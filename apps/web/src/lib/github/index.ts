@@ -1,4 +1,5 @@
 import { client } from "@/lib/http";
+import { GithubInstallation } from "@delivery/jobs/types";
 import { listInstallationRepositories } from "./utils";
 
 export type Repository = {
@@ -13,12 +14,22 @@ export type Installation = {
   repositories: Repository[];
 };
 
-export async function getAllInstallationsWithRepos(): Promise<Installation[] | null> {
+export async function getAllInstallations(): Promise<
+  (GithubInstallation & { privateKey: string })[] | null
+> {
   const response = await client.githubapps.$get();
   if (response.status !== 200) {
     return null;
   }
   const result = await response.json();
+  return result;
+}
+
+export async function getAllInstallationsWithRepos(): Promise<Installation[] | null> {
+  const result = await getAllInstallations();
+  if (!result) {
+    return null;
+  }
 
   const installations = await Promise.all(
     result.map(async (installation: any) => {
@@ -27,7 +38,7 @@ export async function getAllInstallationsWithRepos(): Promise<Installation[] | n
         privateKey: installation.privateKey,
         installationId: installation.installationId,
       });
-
+console.log(installation, "debug")
       if (!repos.success) {
         return null;
       }

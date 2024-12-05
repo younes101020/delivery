@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { Buffer } from "node:buffer";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
@@ -6,8 +7,9 @@ import type { AppRouteHandler } from "@/lib/types";
 
 import { db } from "@/db";
 import { githubApp, githubAppSecret } from "@/db/schema";
+import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
 
-import type { CreateRoute, GetOneRoute, ListRoute } from "./githubapps.routes";
+import type { CreateRoute, GetOneRoute, ListRoute, PatchRoute } from "./githubapps.routes";
 
 export const list: AppRouteHandler<ListRoute> = async (c) => {
   const githubApps = await db.query.githubApp.findMany({
@@ -97,6 +99,47 @@ export async function encryptSecret(secretKey: string) {
     key: Buffer.from(await crypto.subtle.exportKey("raw", encryptionKey)).toString("base64"),
   };
 }
+
+export const patch: AppRouteHandler<PatchRoute> = async (c) => {
+  const { id } = c.req.valid("param");
+  const updates = c.req.valid("json");
+
+  if (Object.keys(updates).length === 0) {
+    return c.json(
+      {
+        success: false,
+        error: {
+          issues: [
+            {
+              code: ZOD_ERROR_CODES.INVALID_UPDATES,
+              path: [],
+              message: ZOD_ERROR_MESSAGES.NO_UPDATES,
+            },
+          ],
+          name: "ZodError",
+        },
+      },
+      HttpStatusCodes.UNPROCESSABLE_ENTITY,
+    );
+  }
+
+  const [githubapp] = await db
+    .update(githubApp)
+    .set(updates)
+    .where(eq(githubApp.appId, id))
+    .returning();
+
+  if (!githubapp) {
+    return c.json(
+      {
+        message: HttpStatusPhrases.NOT_FOUND,
+      },
+      HttpStatusCodes.NOT_FOUND,
+    );
+  }
+
+  return c.json(githubapp, HttpStatusCodes.OK);
+};
 
 interface Secret {
   encryptedData: BufferSource;

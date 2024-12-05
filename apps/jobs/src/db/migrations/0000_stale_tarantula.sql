@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS "github_app" (
 	"webhook_secret" text NOT NULL,
 	"client_id" text NOT NULL,
 	"client_secret" text NOT NULL,
-	"app_id" text NOT NULL,
+	"app_id" serial NOT NULL,
 	"secret_id" serial NOT NULL
 );
 --> statement-breakpoint

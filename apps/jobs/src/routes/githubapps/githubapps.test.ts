@@ -24,7 +24,7 @@ describe("applications routes", () => {
   const privateKey = "sdlofgihjsdofuighsdopigjsfd";
   const missedField = {
     clientId: "5",
-    appId: "78",
+    appId: 78,
     clientSecret: "sqpmfjkgsdf",
     webhookSecret: "oksdfokfd",
   };

@@ -3,7 +3,7 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 
-import { insertGithubAppsSchema, selectGithubAppsSchema } from "@/db/schema";
+import { insertGithubAppsSchema, patchGithubAppsSchema, selectGithubAppsSchema } from "@/db/schema";
 import { notFoundSchema } from "@/lib/constants";
 
 const tags = ["Githubapps"];
@@ -59,6 +59,25 @@ export const getOne = createRoute({
   },
 });
 
+export const patch = createRoute({
+  path: "/githubapps/{id}",
+  method: "patch",
+  request: {
+    params: IdParamsSchema,
+    body: jsonContentRequired(patchGithubAppsSchema, "The githubapps updates"),
+  },
+  tags,
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(selectGithubAppsSchema, "The updated githubapps"),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Githubapps not found"),
+    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
+      createErrorSchema(patchGithubAppsSchema).or(createErrorSchema(IdParamsSchema)),
+      "The validation error(s)",
+    ),
+  },
+});
+
 export type ListRoute = typeof list;
+export type PatchRoute = typeof patch;
 export type CreateRoute = typeof create;
 export type GetOneRoute = typeof getOne;

@@ -22,9 +22,9 @@ export function GithubAppForm({ baseUrl }: { baseUrl: string }) {
         url: `${baseUrl}/api/webhooks/github/events`,
         active: true,
       },
-      redirect_url: `${baseUrl}/api/webhooks/github/redirect`,
-      callback_urls: [`${baseUrl}/?step=3&page=1`],
-      setup_url: `${baseUrl}/?step=3&page=1`,
+      redirect_url: `${baseUrl}/api/webhooks/github/register`,
+      callback_urls: [`${baseUrl}/api/webhooks/github/install`],
+      setup_url: `${baseUrl}/api/webhooks/github/install`,
       request_oauth_on_install: false,
       default_permissions: {
         contents: "read",

@@ -37,7 +37,8 @@ export const githubApp = pgTable("github_app", {
   webhookSecret: text("webhook_secret").notNull(),
   clientId: text("client_id").notNull(),
   clientSecret: text("client_secret").notNull(),
-  appId: text("app_id").notNull(),
+  installationId: serial("installation_id"),
+  appId: serial("app_id").notNull(),
   secretId: serial("secret_id").references(() => githubAppSecret.id),
 });
 
@@ -162,3 +163,4 @@ export type NewUser = NewUserWithoutDateTypes & {
   deletedAt: string | null;
   emailVerificationTokenExpiresAt: string | null;
 };
+export type GithubInstallation = z.infer<typeof selectGithubAppsSchema>;
