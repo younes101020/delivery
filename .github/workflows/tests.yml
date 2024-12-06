@@ -2,8 +2,8 @@ name: Running unittest on jobs service
 
 on:
   push:
-    paths:
-      - 'apps/jobs/src/**'
+    branches:
+      - main
 
 jobs:
   TestCore:
@@ -17,17 +17,18 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
         options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
         ports:
           - 5432:5432
     env:
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
       BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
-      PORT: 3090
-      LOG_LEVEL: silent
+      PORT: ${{ env.PORT }}
+      LOG_LEVEL: ${{ env.LOG_LEVEL }}
+      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+      JOBS_BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
+      JOBS_API_BASEURL: ${{ env.JOBS_API_BASEURL }}
+      NEXT_PUBLIC_BASEURL: ${{ env.NEXT_PUBLIC_BASEURL }}
 
     steps:
       - name: Checkout repository
@@ -42,10 +43,10 @@ jobs:
         run: yarn install --immutable
 
       - name: Lint
-        run: yarn workspace @delivery/jobs run lint
+        run: turbo lint
 
       - name: Migrate database
-        run: yarn workspace @delivery/jobs run migrate
+        run: turbo run migrate --filter=@delivery/jobs
 
-      - name: Run the e2e/unitesting
-        run: yarn workspace @delivery/jobs run test
+      - name: Run e2e/unit tests
+        run: turbo test

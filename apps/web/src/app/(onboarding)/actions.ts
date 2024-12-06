@@ -12,8 +12,8 @@ const signInSchema = z.object({
   password: z.string().min(8).max(100),
 });
 
-export const signIn = validatedAction(signInSchema, async (data, formData) => {
-  const { email, password } = data;
+export const signIn = validatedAction(signInSchema, async () => {
+  // const { email, password } = data;
 
   // TODO: req to job for signin process, on error return { error: error_message }
   //const foundUser = await fetch();
@@ -28,7 +28,7 @@ const signUpSchema = z.object({
   password: z.string().min(8),
 });
 
-export const signUp = validatedAction(signUpSchema, async (data, formData) => {
+export const signUp = validatedAction(signUpSchema, async (data) => {
   const { email, password } = data;
   const response = await client.users.$post({
     json: {

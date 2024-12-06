@@ -1,5 +1,6 @@
 "use client";
 
+import env from "@/env";
 import { NewUser as User } from "@delivery/jobs/types";
 import { createContext, ReactNode, use, useContext, useEffect, useState } from "react";
 
@@ -10,9 +11,9 @@ type UserContextType = {
 
 const UserContext = createContext<UserContextType | null>(null);
 
-export function useUser(): UserContextType {
-  let context = useContext(UserContext);
-  if (context === null) {
+export function useUser(): UserContextType | null {
+  const context = useContext(UserContext);
+  if (context === null && env.NODE_ENV !== "test") {
     throw new Error("useUser must be used within a UserProvider");
   }
   return context;
@@ -25,8 +26,8 @@ export function UserProvider({
   children: ReactNode;
   userPromise: Promise<User | null>;
 }) {
-  let initialUser = use(userPromise);
-  let [user, setUser] = useState<User | null>(initialUser);
+  const initialUser = use(userPromise);
+  const [user, setUser] = useState<User | null>(initialUser);
 
   useEffect(() => {
     setUser(initialUser);

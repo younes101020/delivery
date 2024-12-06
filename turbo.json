@@ -11,6 +11,11 @@
     "dev": {
       "persistent": true,
       "cache": false
+    },
+    "test": {},
+    "lint": {},
+    "migrate": {
+      "outputs": []
     }
   }
 }

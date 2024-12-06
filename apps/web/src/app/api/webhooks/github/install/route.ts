@@ -22,6 +22,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
+    console.error(error)
     redirect("/?step=2");
   }
 

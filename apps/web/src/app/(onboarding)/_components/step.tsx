@@ -29,7 +29,7 @@ const StepContext = createContext<UseStepActions | null>(null);
 export function useStep(): UseStepActions {
   const context = useContext(StepContext);
   if (context === null) {
-    throw new Error("useStep must be used within a UserProvider");
+    throw new Error("useStep must be used within a StepProvider");
   }
   return context;
 }

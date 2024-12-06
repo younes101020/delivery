@@ -35,7 +35,7 @@ export function GithubAppForm({ baseUrl }: { baseUrl: string }) {
       },
       default_events: ["pull_request", "push"],
     }),
-    [name],
+    [name, baseUrl],
   );
 
   const handleOrgNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {

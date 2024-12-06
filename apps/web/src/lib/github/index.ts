@@ -32,13 +32,13 @@ export async function getAllInstallationsWithRepos(): Promise<Installation[] | n
   }
 
   const installations = await Promise.all(
-    result.map(async (installation: any) => {
+    result.map(async (installation: GithubInstallation & { privateKey: string }) => {
       const repos = await listInstallationRepositories({
-        appId: installation.appId,
+        appId: installation.appId.toString(),
         privateKey: installation.privateKey,
-        installationId: installation.installationId,
+        installationId: installation.installationId.toString(),
       });
-console.log(installation, "debug")
+
       if (!repos.success) {
         return null;
       }

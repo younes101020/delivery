@@ -20,7 +20,7 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
   useEffect(() => {
     setIsLoading(false);
     if (session) router.replace("/?step=2");
-  }, []);
+  }, [router, session]);
 
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
     mode === "signin" ? signIn : signUp,
@@ -39,7 +39,7 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
       </div>
     </div>
   ) : (
-    <form className="space-y-6" action={formAction}>
+    <form className="space-y-6" action={formAction} aria-label="form">
       <div>
         <Label htmlFor="email" className="block text-sm font-medium">
           Email
@@ -48,6 +48,7 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
           <Input
             id="email"
             name="email"
+            aria-label="email"
             type="email"
             autoComplete="email"
             required
@@ -67,6 +68,7 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
             id="password"
             name="password"
             type="password"
+            aria-label="password"
             autoComplete={mode === "signin" ? "current-password" : "new-password"}
             required
             minLength={8}

@@ -26,7 +26,7 @@
     "bullmq": "^5.26.2",
     "dockerode": "^4.0.2",
     "dotenv": "^16.4.5",
-    "dotenv-expand": "^11.0.6",
+    "dotenv-expand": "^12.0.1",
     "drizzle-kit": "^0.28.1",
     "drizzle-orm": "0.36.4",
     "drizzle-seed": "^0.1.1",
@@ -39,7 +39,7 @@
     "pino-pretty": "^11.3.0",
     "postgres": "^3.4.5",
     "stoker": "^1.2.7",
-    "vitest": "^2.1.5",
+    "vitest": "^2.1.8",
     "zod": "^3.23.8"
   },
   "devDependencies": {
