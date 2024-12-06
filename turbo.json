@@ -12,7 +12,9 @@
       "persistent": true,
       "cache": false
     },
-    "test": {},
+    "test": {
+      "env": ["AUTH_SECRET", "JOBS_BEARER_TOKEN", "JOBS_API_BASEURL"]
+    },
     "lint": {},
     "migrate": {
       "outputs": [],
