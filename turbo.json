@@ -13,7 +13,7 @@
       "cache": false
     },
     "test": {
-      "env": ["AUTH_SECRET", "JOBS_BEARER_TOKEN", "JOBS_API_BASEURL"]
+      "env": ["AUTH_SECRET", "JOBS_BEARER_TOKEN", "JOBS_API_BASEURL", "DATABASE_URL"]
     },
     "lint": {},
     "migrate": {
