@@ -43,10 +43,10 @@ jobs:
         run: yarn install --immutable
 
       - name: Lint
-        run: turbo lint
+        run: yarn run lint
 
       - name: Migrate database
-        run: turbo run migrate --filter=@delivery/jobs
+        run: yarn run migrate
 
       - name: Run e2e/unit tests
-        run: turbo test
+        run: yarn run test
