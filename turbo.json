@@ -15,7 +15,8 @@
     "test": {},
     "lint": {},
     "migrate": {
-      "outputs": []
+      "outputs": [],
+      "env": ["LOG_LEVEL", "DATABASE_URL", "BEARER_TOKEN"]
     }
   }
 }
