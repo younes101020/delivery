@@ -23,12 +23,12 @@ jobs:
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
-      PORT: ${{ env.PORT }}
-      LOG_LEVEL: ${{ env.LOG_LEVEL }}
       AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
       JOBS_BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
-      JOBS_API_BASEURL: ${{ env.JOBS_API_BASEURL }}
-      NEXT_PUBLIC_BASEURL: ${{ env.NEXT_PUBLIC_BASEURL }}
+      PORT: 9030
+      LOG_LEVEL: silent
+      JOBS_API_BASEURL: http://localhost:3090
+      NEXT_PUBLIC_BASEURL: http://localhost:3000
 
     steps:
       - name: Checkout repository
