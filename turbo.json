@@ -3,10 +3,11 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "@delivery/web#build": {
-      "dependsOn": ["@delivery/jobs#build"]
+      "dependsOn": ["@delivery/jobs#build"],
+      "env": ["AUTH_SECRET", "JOBS_BEARER_TOKEN", "JOBS_API_BASEURL"]
     },
     "check-types": {
       "dependsOn": ["^check-types"]
