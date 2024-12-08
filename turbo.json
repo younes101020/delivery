@@ -5,6 +5,9 @@
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
+    "@delivery/web#build": {
+      "dependsOn": ["@delivery/jobs#build"]
+    },
     "check-types": {
       "dependsOn": ["^check-types"]
     },
