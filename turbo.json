@@ -13,6 +13,7 @@
       "cache": false
     },
     "test": {
+      "dependsOn": ["^build"],
       "env": ["AUTH_SECRET", "JOBS_BEARER_TOKEN", "JOBS_API_BASEURL", "DATABASE_URL"]
     },
     "lint": {},
