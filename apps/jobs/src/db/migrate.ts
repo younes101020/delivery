@@ -5,7 +5,7 @@ import { db } from ".";
 
 async function main() {
   await migrate(db, {
-    migrationsFolder: path.join(process.cwd(), "/apps/jobs/src/db/migrations"),
+    migrationsFolder: path.join(process.cwd(), "/src/db/migrations"),
   });
   process.exit(0);
 }
