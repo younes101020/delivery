@@ -45,7 +45,7 @@ export async function getAllInstallationsWithRepos(): Promise<Installation[] | n
 
       return {
         githubAppId: installation.appId,
-        githubInstallationName: installation.accountName,
+        //githubInstallationName: installation.accountName,
         repositories: repos.repositories.map(repo => ({
           full_name: repo.full_name,
           git_url: repo.git_url,

@@ -1,6 +1,6 @@
 import { config } from "dotenv";
 import { expand } from "dotenv-expand";
-import path from "node:path";
+import path from "path";
 import { z } from "zod";
 
 expand(

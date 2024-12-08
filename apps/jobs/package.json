@@ -5,7 +5,13 @@
   "license": "MIT",
   "exports": {
     "./types": "./src/db/schema.ts",
-    "./http": "./src/app.ts"
+    "./http": "./src/app.ts",
+    "./hc": {
+      "import": {
+        "types": "./dist/src/hc.d.ts",
+        "default": "./dist/src/hc.js"
+      }
+    }
   },
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -14,7 +20,7 @@
     "lint": "eslint .",
     "lint:fix": "npm run lint --fix",
     "test": "cross-env NODE_ENV=test vitest",
-    "build": "tsc && tsc-alias",
+    "build": "tsc -p tsconfig.build.json && tsc-alias",
     "seed": "npx tsx src/db/seed.ts",
     "migrate": "npx tsx src/db/migrate.ts"
   },

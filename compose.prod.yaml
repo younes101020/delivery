@@ -1,12 +1,12 @@
 services:
   web:
     build:
-      context: ./apps/web
-      dockerfile: prod.Dockerfile
+      dockerfile: ./apps/web/prod.Dockerfile
     environment:
       - AUTH_SECRET
-      - BEARER_TOKEN
+      - JOBS_BEARER_TOKEN
       - JOBS_API_BASEURL
+      - NEXT_PUBLIC_BASEURL
     volumes:
       - ./apps/web/src:/app/src
     restart: always
@@ -20,8 +20,8 @@ services:
 
   jobs:
     build:
-      context: ./apps/jobs
-      dockerfile: prod.Dockerfile
+      context: .
+      dockerfile: ./apps/jobs/prod.Dockerfile
     environment:
       - PORT
       - DATABASE_URL
