@@ -1,9 +1,9 @@
-import env from "@/env";
+import { serverEnv } from "@/env";
 import { NewUser } from "@delivery/jobs/types";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
-const key = new TextEncoder().encode(env.AUTH_SECRET);
+const key = new TextEncoder().encode(serverEnv.AUTH_SECRET);
 
 type SessionData = {
   user: { id: number };

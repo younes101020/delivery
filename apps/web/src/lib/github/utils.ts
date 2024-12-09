@@ -9,6 +9,7 @@ type SuccessResult = {
   success: true;
   repositories: RepositoriesResult;
   totalCount: number;
+  name: string;
 };
 
 type ErrorResult = {
@@ -34,6 +35,7 @@ export async function listInstallationRepositories({
       },
     });
 
+
     const { token } = (await octokit.auth({
       type: "installation",
     })) as { token: string };
@@ -42,6 +44,7 @@ export async function listInstallationRepositories({
       auth: token,
     });
 
+ 
     const repositories = [];
     let page = 1;
 
@@ -64,6 +67,7 @@ export async function listInstallationRepositories({
       success: true,
       repositories,
       totalCount: repositories.length,
+      name: "installation.account?.name!",
     };
   } catch (error) {
     if (error instanceof Error) {
