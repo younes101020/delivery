@@ -3,6 +3,7 @@ import { GithubInstallation } from "@delivery/jobs/types";
 import { listInstallationRepositories } from "./utils";
 
 export type Repository = {
+  id: number;
   full_name: string;
   git_url: string;
   description: string | null;
@@ -25,7 +26,11 @@ export async function getAllInstallations(): Promise<
   return result;
 }
 
-export async function getAllInstallationsWithRepos(): Promise<Installation[] | null> {
+export async function getAllInstallationsWithRepos({
+  repoPage,
+}: {
+  repoPage: number;
+}): Promise<Installation[] | null> {
   const result = await getAllInstallations();
   if (!result) {
     return null;
@@ -37,6 +42,7 @@ export async function getAllInstallationsWithRepos(): Promise<Installation[] | n
         appId: installation.appId.toString(),
         privateKey: installation.privateKey,
         installationId: installation.installationId.toString(),
+        repoPage,
       });
 
       if (!repos.success) {
@@ -45,8 +51,8 @@ export async function getAllInstallationsWithRepos(): Promise<Installation[] | n
 
       return {
         githubAppId: installation.appId,
-        githubInstallationName: repos.name,
         repositories: repos.repositories.map(repo => ({
+          id: repo.id,
           full_name: repo.full_name,
           git_url: repo.git_url,
           description: repo.description,

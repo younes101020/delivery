@@ -8,10 +8,16 @@ import { GithubAppForm } from "./_components/github-app-form";
 import { Login as LoginStep } from "./_components/login-form";
 import { StepProvider } from "./_components/step";
 
-async function GithubRepositoriesStep() {
-  const githubInstallationsWithRepos = await getAllInstallationsWithRepos();
-  if (!githubInstallationsWithRepos || githubInstallationsWithRepos.length <= 0) redirect("/?step=2");
-  return <Deployment githubInstallationsWithRepos={githubInstallationsWithRepos} />;
+async function GithubRepositoriesStep(props: { page: number }) {
+  const githubInstallationsWithRepos = await getAllInstallationsWithRepos({ repoPage: props.page });
+  if (!githubInstallationsWithRepos || githubInstallationsWithRepos.length <= 0)
+    redirect("/?step=2");
+  return (
+    <Deployment
+      githubInstallationsWithRepos={githubInstallationsWithRepos}
+      currentPage={props.page}
+    />
+  );
 }
 
 async function GithubAppStep() {
@@ -20,19 +26,21 @@ async function GithubAppStep() {
   return <GithubAppForm baseUrl={publicEnv.NEXT_PUBLIC_BASEURL} />;
 }
 
-export default async function Onboarding(props: { searchParams?: Promise<{ step: string }> }) {
+export default async function Onboarding(props: {
+  searchParams?: Promise<{ step: string; page: number }>;
+}) {
   const searchParams = await props.searchParams;
-  if (!searchParams?.step) {
+  if (!searchParams) {
     return notFound();
   }
   return (
     <div className="flex justify-center items-center h-[95vh]">
       <StepProvider>
-        {searchParams.step === "1" && <LoginStep />}
+        <LoginStep />
         {searchParams.step === "2" && <GithubAppStep />}
         {searchParams.step === "3" && (
           <Suspense fallback={<Skeleton className="h-52 w-full" />}>
-            <GithubRepositoriesStep />
+            <GithubRepositoriesStep page={searchParams.page ?? "1"} />
           </Suspense>
         )}
       </StepProvider>

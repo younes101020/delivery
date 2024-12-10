@@ -9,7 +9,6 @@ type SuccessResult = {
   success: true;
   repositories: RepositoriesResult;
   totalCount: number;
-  name: string;
 };
 
 type ErrorResult = {
@@ -22,9 +21,17 @@ export async function listInstallationRepositories({
   appId,
   privateKey,
   installationId,
-  perPage = 50,
+  repoPerPage = 5,
+  repoPage = 1,
   type = "all",
-}: { [key: string]: string } & { perPage?: number }): Promise<ListInstallationRepositoriesResult> {
+}: {
+  appId: string;
+  privateKey: string;
+  installationId: string;
+  type?: string;
+  repoPerPage?: number;
+  repoPage?: number;
+}): Promise<ListInstallationRepositoriesResult> {
   try {
     const octokit = new Octokit({
       authStrategy: createAppAuth,
@@ -35,7 +42,6 @@ export async function listInstallationRepositories({
       },
     });
 
-
     const { token } = (await octokit.auth({
       type: "installation",
     })) as { token: string };
@@ -44,30 +50,16 @@ export async function listInstallationRepositories({
       auth: token,
     });
 
- 
-    const repositories = [];
-    let page = 1;
-
-    while (true) {
-      const {
-        data: { repositories: repos },
-      } = await installationOctokit.apps.listReposAccessibleToInstallation({
-        per_page: perPage,
-        page,
-        type,
-      });
-
-      repositories.push(...repos);
-
-      if (repos.length < perPage) break;
-      page++;
-    }
+    const { data } = await installationOctokit.apps.listReposAccessibleToInstallation({
+      per_page: repoPerPage,
+      page: repoPage,
+      type,
+    });
 
     return {
       success: true,
-      repositories,
-      totalCount: repositories.length,
-      name: "installation.account?.name!",
+      repositories: data.repositories,
+      totalCount: data.total_count,
     };
   } catch (error) {
     if (error instanceof Error) {
