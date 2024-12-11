@@ -3,6 +3,7 @@ import { getUser } from "@/lib/users";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import Image from "next/image";
+import { Suspense } from "react";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -41,7 +42,9 @@ export default function RootLayout({
             className="border border-primary border-y-0 rounded-full"
           />
         </header>
-        <UserProvider userPromise={userPromise}>{children}</UserProvider>
+        <Suspense>
+          <UserProvider userPromise={userPromise}>{children}</UserProvider>
+        </Suspense>
       </body>
     </html>
   );

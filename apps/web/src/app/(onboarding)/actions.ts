@@ -28,7 +28,7 @@ const signUpSchema = z.object({
   password: z.string().min(8),
 });
 
-export const signUp = validatedAction(signUpSchema, async (data) => {
+export const signUp = validatedAction(signUpSchema, async data => {
   const { email, password } = data;
   const response = await client.users.$post({
     json: {
@@ -46,3 +46,12 @@ export const signUp = validatedAction(signUpSchema, async (data) => {
 export async function signOut() {
   (await cookies()).delete("session");
 }
+
+const deploySchema = z.object({
+  repoId: z.coerce.number(),
+});
+
+export const deploy = validatedAction(deploySchema, async data => {
+  const { repoId } = data;
+  console.log(repoId);
+});

@@ -8,6 +8,10 @@ import { GithubAppForm } from "./_components/github-app-form";
 import { Login as LoginStep } from "./_components/login-form";
 import { StepProvider } from "./_components/step";
 
+interface StepChildrenProps {
+  searchParams: Promise<{ step: number; page: number }>;
+}
+
 /**
  * Iterates through all repository pages up to maxIteration to fetch GitHub installations with repos
  * This function fetches repositories page by page to handle pagination of GitHub API results
@@ -20,22 +24,32 @@ async function getAllInstallReposForEachRepoPage(maxIteration: number) {
   return results.flat().flatMap(e => e!.repositories);
 }
 
-async function GithubRepositoriesStep(props: { page: number }) {
-  const repositories = await getAllInstallReposForEachRepoPage(props.page);
+async function GithubRepositoriesStep(props: StepChildrenProps) {
+  const searchParams = await props.searchParams;
+  if (searchParams.step != 3) {
+    return null;
+  }
+  const repositories = await getAllInstallReposForEachRepoPage(searchParams.page ?? 1);
   if (!repositories || repositories.length <= 0) redirect("/?step=2");
   return <Deployment repositories={repositories} />;
 }
 
-async function GithubAppStep() {
+async function GithubAppStep(props: StepChildrenProps) {
+  
+  const searchParams = await props.searchParams;
+  console.log(searchParams.step)
+  if (searchParams.step != 2) {
+    return null;
+  }
   const allGithubInstallations = await getAllInstallations();
   if (allGithubInstallations && allGithubInstallations.length > 0) redirect("/?step=3");
   return <GithubAppForm baseUrl={publicEnv.NEXT_PUBLIC_BASEURL} />;
 }
 
 export default async function Onboarding(props: {
-  searchParams?: Promise<{ step: string; page: number }>;
+  searchParams?: Promise<{ step: number; page: number }>;
 }) {
-  const searchParams = await props.searchParams;
+  const searchParams = props.searchParams?.then(sp => ({ step: sp.step, page: sp.page }));
   if (!searchParams) {
     return notFound();
   }
@@ -43,12 +57,12 @@ export default async function Onboarding(props: {
     <div className="flex justify-center items-center h-[95vh]">
       <StepProvider>
         <LoginStep />
-        {searchParams.step === "2" && <GithubAppStep />}
-        {searchParams.step === "3" && (
-          <Suspense fallback={<Skeleton className="h-52 w-full" />}>
-            <GithubRepositoriesStep page={searchParams.page ?? "1"} />
-          </Suspense>
-        )}
+        <Suspense fallback={<Skeleton className="h-52 w-[50%]" />}>
+          <GithubAppStep searchParams={searchParams} />
+        </Suspense>
+        <Suspense fallback={<Skeleton className="h-52 w-full" />}>
+          <GithubRepositoriesStep searchParams={searchParams} />
+        </Suspense>
       </StepProvider>
     </div>
   );
