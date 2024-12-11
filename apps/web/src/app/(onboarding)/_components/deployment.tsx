@@ -53,6 +53,7 @@ interface DeploymentProps {
 
 export function Deployment({ repositories }: DeploymentProps) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(deploy, { error: "" });
+  console.log(state, pending)
   const { isIntersecting, ref } = useIntersectionObserver({
     threshold: 0.8,
   });
