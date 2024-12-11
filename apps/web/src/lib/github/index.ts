@@ -18,6 +18,7 @@ export type Installation = {
 export async function getAllInstallations(): Promise<
   (GithubInstallation & { privateKey: string })[] | null
 > {
+  "use cache";
   const response = await client.githubapps.$get();
   if (response.status !== 200) {
     return null;

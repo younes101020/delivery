@@ -24,16 +24,23 @@ if (process.env.NEXT_RUNTIME === "nodejs") {
     }),
   );
 
-  serverEnv = serverEnvSchema.parse(process.env);
-  const { data, error } = publicEnvSchema.safeParse(process.env);
-
-  if (error) {
-    console.error("❌ Invalid public env vars:");
-    console.error(JSON.stringify(error.flatten().fieldErrors, null, 2));
+  const serverEnvResult = serverEnvSchema.safeParse(process.env);
+  if (serverEnvResult.success) {
+    serverEnv = serverEnvResult.data;
+  } else {
+    console.error("❌ Invalid server env vars:");
+    console.error(JSON.stringify(serverEnvResult.error.flatten().fieldErrors, null, 2));
     process.exit(1);
   }
-  
-  publicEnv = data;
+
+  const publicEnvResult = publicEnvSchema.safeParse(process.env);
+  if (publicEnvResult.success) {
+    publicEnv = publicEnvResult.data;
+  } else {
+    console.error("❌ Invalid public env vars:");
+    console.error(JSON.stringify(publicEnvResult.error.flatten().fieldErrors, null, 2));
+    process.exit(1);
+  }
 }
 
 export { publicEnv, serverEnv };

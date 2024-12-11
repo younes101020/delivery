@@ -32,6 +32,7 @@ export async function listInstallationRepositories({
   repoPerPage?: number;
   repoPage?: number;
 }): Promise<ListInstallationRepositoriesResult> {
+  "use cache";
   try {
     const octokit = new Octokit({
       authStrategy: createAppAuth,
