@@ -17,7 +17,8 @@ const publicEnvSchema = z.object({
 let publicEnv: z.infer<typeof publicEnvSchema>;
 let serverEnv: z.infer<typeof serverEnvSchema>;
 
-if (process.env.NEXT_RUNTIME === "nodejs") {
+if (process.env.NEXT_RUNTIME === "nodejs" || process.env.NODE_ENV === "test") {
+
   expand(
     config({
       path: path.resolve(process.cwd(), process.env.NODE_ENV === "test" ? ".env.test" : ".env"),
