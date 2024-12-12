@@ -44,7 +44,7 @@ export function GithubAppForm({ baseUrl }: { baseUrl: string }) {
   };
 
   return (
-    <form action={url} method="POST" className="space-y-4">
+    <form action={url} method="POST" className="space-y-4" aria-label="form">
       <div>
         <Label htmlFor="name" className="block text-sm font-medium">
           Github App name
@@ -105,7 +105,14 @@ export function GithubAppForm({ baseUrl }: { baseUrl: string }) {
           </Tooltip>
         </TooltipProvider>
       </div>
-      <input type="hidden" name="manifest" id="manifest" value={JSON.stringify(data)} />
+      <input
+        type="hidden"
+        id="manifest"
+        name="manifest"
+        aria-label="manifest"
+        value={JSON.stringify(data)}
+      />
+
       <CardFooter className="flex px-0 pt-8 justify-end">
         <Button type="submit">Create & install Github App</Button>
       </CardFooter>

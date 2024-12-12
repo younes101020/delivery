@@ -59,7 +59,7 @@ export async function listInstallationRepositories({
 
     return {
       success: true,
-      repositories: data.repositories,
+      repositories: data.repositories.reverse(),
       totalCount: data.total_count,
     };
   } catch (error) {

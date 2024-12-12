@@ -4,21 +4,18 @@ import { Button } from "@/components/ui/button";
 import { CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useUser } from "@/lib/auth";
 import { ActionState } from "@/lib/auth/middleware";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect } from "react";
 import { signIn, signUp } from "../actions";
 
 export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
   const session = useUser();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(false);
     if (session) router.replace("/?step=2");
   }, [router, session]);
 
@@ -27,18 +24,7 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
     { error: "" },
   );
 
-  return isLoading ? (
-    <div className="space-y-10">
-      <div className="space-y-2">
-        <Skeleton className="h-5 w-[10%]" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-      <div className="space-y-2">
-        <Skeleton className="h-5 w-[10%]" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-    </div>
-  ) : (
+  return (
     <form className="space-y-6" action={formAction} aria-label="form">
       <div>
         <Label htmlFor="email" className="block text-sm font-medium">
@@ -82,7 +68,7 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
       {state?.error && <div className="text-destructive text-sm">{state.error}</div>}
 
       <CardFooter className="flex px-0 pt-8 justify-end">
-        <Button type="submit" disabled={pending}>
+        <Button type="submit" disabled={pending} aria-label="submit">
           {pending ? (
             <>
               <Loader2 className="animate-spin mr-2 h-4 w-4" />
