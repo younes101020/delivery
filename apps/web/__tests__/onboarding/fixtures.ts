@@ -1,10 +1,18 @@
 import { Repository } from "@/lib/github";
 import { test } from "vitest";
 
+type User = {
+  email: string;
+  password: string;
+  registered: boolean;
+};
+
 const repositories: Repository[] = [];
+const users: User[] = [];
 
 interface OnBoardingFixtures {
   repositories: Repository[];
+  users: User[];
 }
 
 export const onBoardingTest = test.extend<OnBoardingFixtures>({
@@ -43,5 +51,26 @@ export const onBoardingTest = test.extend<OnBoardingFixtures>({
     );
     await use(repositories);
     repositories.length = 0;
+  },
+  users: async ({}, use) => {
+    users.push(
+      {
+        email: "younefghfghslow60@gmail.com",
+        password: "Azerty-02",
+        registered: true,
+      },
+      {
+        email: "jane@example.com",
+        password: "password456",
+        registered: false,
+      },
+      {
+        email: "bob@example.com",
+        password: "password789",
+        registered: false,
+      },
+    );
+    await use(users);
+    users.length = 0;
   },
 });

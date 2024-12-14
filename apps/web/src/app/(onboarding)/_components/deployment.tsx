@@ -29,6 +29,7 @@ function RepositorySection({ repo, setSelected, selected }: RepositorySectionPro
       onClick={() => {
         setSelected(repo.full_name);
       }}
+      data-testid={`${repo.id}-repo-card`}
     >
       <Card className={`h-40 overflow-hidden relative ${isSelected && "border-primary"}`}>
         {isSelected && (

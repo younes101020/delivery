@@ -2,7 +2,8 @@ import { Deployment } from "@/app/(onboarding)/_components/deployment";
 import { GithubAppForm } from "@/app/(onboarding)/_components/github-app-form";
 import { Login } from "@/app/(onboarding)/_components/login-form";
 import { publicEnv } from "@/env";
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, beforeAll, describe, expect, vi } from "vitest";
 import { onBoardingTest } from "./fixtures";
 
@@ -22,7 +23,14 @@ vi.mock("next/navigation", async () => {
   };
 });
 
-describe("Onboarding page", () => {
+function setup(jsx: React.ReactElement) {
+  return {
+    userAction: userEvent.setup(),
+    ...render(jsx),
+  };
+}
+
+describe("Onboarding process", () => {
   beforeAll(() => {
     global.ResizeObserver = vi.fn().mockImplementation(() => ({
       observe: vi.fn(),
@@ -35,16 +43,23 @@ describe("Onboarding page", () => {
     cleanup();
   });
 
-  onBoardingTest("display signup form", () => {
-    render(<Login />);
-    const form = within(screen.getByRole("form"));
-    expect(form.getByRole("textbox", { name: "email" })).toBeDefined();
-    expect(form.getByLabelText("password")).toBeDefined();
-    expect(form.getByRole("button")).toBeDefined();
-  });
+  onBoardingTest(
+    "display error message when trying to register a user who has already registered",
+    async ({ users }) => {
+      const { userAction } = setup(<Login />);
+      const registeredUser = users.find(user => user.registered);
+      const form = within(screen.getByRole("form"));
+      await userAction.type(form.getByRole("textbox", { name: "email" }), registeredUser!.email);
+      await userAction.type(form.getByLabelText("password"), registeredUser!.password);
+      await userAction.click(form.getByRole("button"));
+      await waitFor(() => {
+        expect(form.getByText("Impossible to signup")).toBeDefined();
+      });
+    },
+  );
 
-  onBoardingTest("include initial object to create a github app from manifest", () => {
-    render(<GithubAppForm baseUrl={publicEnv.NEXT_PUBLIC_BASEURL} />);
+  onBoardingTest("github form include initial object to create a github app from manifest", () => {
+    setup(<GithubAppForm baseUrl={publicEnv.NEXT_PUBLIC_BASEURL} />);
     const form = within(screen.getByRole("form"));
     const manifestInput = form.getByLabelText<HTMLInputElement>("manifest");
     expect(manifestInput.value).toBeDefined();
@@ -73,9 +88,23 @@ describe("Onboarding page", () => {
     );
   });
 
-  onBoardingTest("disable submit input when no repository selected", ({ repositories }) => {
-    render(<Deployment repositories={repositories} />);
-    const form = within(screen.getByRole("form"));
-    expect(form.getByLabelText("submit")).toHaveProperty("disabled", true);
-  });
+  onBoardingTest(
+    "submit input should be disabled when no repository is selected",
+    ({ repositories }) => {
+      setup(<Deployment repositories={repositories} />);
+      const form = within(screen.getByRole("form"));
+      expect(form.getByLabelText("submit")).toHaveProperty("disabled", true);
+    },
+  );
+
+  onBoardingTest(
+    "submit input should be enabled when repository is selected",
+    async ({ repositories }) => {
+      const { userAction } = setup(<Deployment repositories={repositories} />);
+      const form = within(screen.getByRole("form"));
+      const repoCard = screen.getByTestId("1-repo-card");
+      await userAction.click(repoCard);
+      expect(form.getByLabelText("submit")).toHaveProperty("disabled", false);
+    },
+  );
 });
