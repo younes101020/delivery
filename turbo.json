@@ -5,10 +5,6 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
-    "@delivery/web#build": {
-      "dependsOn": ["@delivery/jobs#build"],
-      "env": ["AUTH_SECRET", "JOBS_BEARER_TOKEN", "JOBS_API_BASEURL"]
-    },
     "check-types": {
       "dependsOn": ["^check-types"]
     },
@@ -24,6 +20,14 @@
     "migrate": {
       "outputs": [],
       "env": ["LOG_LEVEL", "DATABASE_URL", "BEARER_TOKEN"]
+    },
+    "@delivery/web#build": {
+      "dependsOn": ["@delivery/jobs#build"],
+      "env": ["AUTH_SECRET", "JOBS_BEARER_TOKEN", "JOBS_API_BASEURL"]
+    },
+    "@delivery/web#test": {
+      "dependsOn": ["@delivery/jobs#test"],
+      "env": ["AUTH_SECRET", "JOBS_BEARER_TOKEN", "JOBS_API_BASEURL"]
     }
   }
 }

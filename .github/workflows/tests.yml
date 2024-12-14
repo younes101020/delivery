@@ -51,8 +51,5 @@ jobs:
       - name: Migrate database
         run: yarn run migrate
 
-      - name: Run backend to perform tests
-        run: yarn dev --filter=@delivery/jobs
-
       - name: Run e2e/unit tests
         run: yarn run test
