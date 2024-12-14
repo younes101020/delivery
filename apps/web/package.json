@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node ../jobs/dist/src/index.js & && cross-env NODE_ENV=test vitest"
+    "test": "node ../jobs/dist/src/index.js & cross-env NODE_ENV=test vitest"
   },
   "dependencies": {
     "@hono/client": "^0.0.3",
