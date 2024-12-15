@@ -43,7 +43,7 @@ jobs:
       - name: Clean up database
         if: always()
         run: |
-          PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+          PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "TRUNCATE TABLE system_config, users, github_app_secret, github_app, applications, environment_variables, application_environment_variables CASCADE;"
 
       - name: Install dependencies
         run: yarn install --immutable
