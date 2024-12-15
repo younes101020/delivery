@@ -27,10 +27,6 @@
     "@delivery/web#build": {
       "dependsOn": ["@delivery/jobs#build"],
       "env": ["AUTH_SECRET", "JOBS_BEARER_TOKEN", "JOBS_API_BASEURL"]
-    },
-    "@delivery/web#test": {
-      "dependsOn": ["@delivery/jobs#test"],
-      "env": ["AUTH_SECRET", "JOBS_BEARER_TOKEN", "JOBS_API_BASEURL"]
     }
   }
 }
