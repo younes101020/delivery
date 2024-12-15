@@ -1,4 +1,3 @@
-// @vitest-environment node
 import { Deployment } from "@/app/(onboarding)/_components/deployment";
 import { GithubAppForm } from "@/app/(onboarding)/_components/github-app-form";
 import { Login } from "@/app/(onboarding)/_components/login-form";
@@ -33,6 +32,30 @@ function setup(jsx: React.ReactElement) {
 
 describe("Onboarding process", () => {
   beforeAll(() => {
+    class ESBuildAndJSDOMCompatibleTextEncoder extends TextEncoder {
+      constructor() {
+        super();
+      }
+
+      encode(input: string) {
+        if (typeof input !== "string") {
+          throw new TypeError("`input` must be a string");
+        }
+
+        const decodedURI = decodeURIComponent(encodeURIComponent(input));
+        const arr = new Uint8Array(decodedURI.length);
+        const chars = decodedURI.split("");
+        for (let i = 0; i < chars.length; i++) {
+          arr[i] = decodedURI[i].charCodeAt(0);
+        }
+        return arr;
+      }
+    }
+
+    Object.defineProperty(global, "TextEncoder", {
+      value: ESBuildAndJSDOMCompatibleTextEncoder,
+      writable: true,
+    });
     global.ResizeObserver = vi.fn().mockImplementation(() => ({
       observe: vi.fn(),
       unobserve: vi.fn(),
@@ -52,7 +75,7 @@ describe("Onboarding process", () => {
       const form = within(screen.getByRole("form"));
       await userAction.type(form.getByRole("textbox", { name: "email" }), registeredUser!.email);
       await userAction.type(form.getByLabelText("password"), registeredUser!.password),
-      await userAction.click(form.getByRole("button"));
+        await userAction.click(form.getByRole("button"));
       await waitFor(() => {
         expect(form.getByText("Impossible to signup")).toBeDefined();
       });
