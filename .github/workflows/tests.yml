@@ -1,4 +1,4 @@
-name: Running unittest on jobs service
+name: Running UT/E2E and IT tests on jobs service
 
 on:
   push:
@@ -9,6 +9,7 @@ jobs:
   TestCore:
     runs-on: ubuntu-latest
     environment: test
+
     services:
       db:
         image: postgres
