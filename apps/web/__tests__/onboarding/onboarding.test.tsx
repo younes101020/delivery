@@ -50,9 +50,8 @@ describe("Onboarding process", () => {
       const registeredUser = users.find(user => user.registered);
       const form = within(screen.getByRole("form"));
       await userAction.type(form.getByRole("textbox", { name: "email" }), registeredUser!.email);
-      await userAction.type(form.getByLabelText("password"), registeredUser!.password);
+      await userAction.type(form.getByLabelText("password"), registeredUser!.password),
       await userAction.click(form.getByRole("button"));
-
       await waitFor(() => {
         expect(form.getByText("Impossible to signup")).toBeDefined();
       });

@@ -5,7 +5,7 @@ import { defineConfig, ViteUserConfig } from "vitest/config";
 export default defineConfig({
   plugins: [react()] as ViteUserConfig["plugins"],
   test: {
-    environment: "happy-dom",
+    environment: "jsdom",
   },
   resolve: {
     alias: {

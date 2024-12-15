@@ -30,17 +30,19 @@ const signUpSchema = z.object({
 
 export const signUp = validatedAction(signUpSchema, async data => {
   const { email, password } = data;
+
   const response = await client.users.$post({
     json: {
       email,
       passwordHash: password,
     },
   });
-  
+
   // Non explicit error message to end-user to prevent from enumeration attack
   if (response.status !== 200) return { error: "Impossible to signup" };
   const createdUser = await response.json();
   await setSession(createdUser);
+
   redirect("/?step=2");
 });
 
