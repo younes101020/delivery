@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  TestCore:
+  tests:
     runs-on: ubuntu-latest
     environment: test
 
@@ -54,3 +54,8 @@ jobs:
 
       - name: Run e2e/unit tests
         run: yarn run test
+
+      - name: Clean up database
+        if: always()
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
