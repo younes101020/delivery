@@ -41,17 +41,13 @@ describe("users routes", () => {
   });
 });
 
-const name = "youdfgnesfkl";
-const email = "younesfkl@gmail.com";
-const passwordHash = "Azerty-60";
-
 it("post /users creates a user", async () => {
   const response = await client.users.$post(
     {
       json: {
-        name,
-        email,
-        passwordHash,
+        name: "youdfgnesfkl",
+        email: "younesfkl@gmail.com",
+        passwordHash: "Azerty-60",
       },
     },
     httpOptions,

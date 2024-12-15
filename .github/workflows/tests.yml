@@ -40,11 +40,6 @@ jobs:
         with:
           node-version: 20
 
-      - name: Clean up database
-        if: always()
-        run: |
-          PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "TRUNCATE TABLE users, github_app_secret, github_app, applications, environment_variables, application_environment_variables CASCADE;"
-
       - name: Install dependencies
         run: yarn install --immutable
 
