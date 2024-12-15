@@ -19,7 +19,7 @@ const httpOptions = {
 
 describe("applications routes", () => {
   it("post /applications validates the body when creating", async () => {
-    const response = await client.applications.$post(
+    const response = await client.deployments.$post(
       {
         // @ts-expect-error
         json: {
