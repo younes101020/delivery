@@ -62,7 +62,7 @@ describe("applications routes", () => {
     if (response.status === 200) {
       const json = await response.json();
       expectTypeOf(json).toBeArray();
-      expect(json.length).toBe(1);
+      expect(json.length).toBe(2);
     }
   });
 
