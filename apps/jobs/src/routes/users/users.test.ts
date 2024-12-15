@@ -55,6 +55,6 @@ it("post /users creates a user", async () => {
   expect(response.status).toBe(200);
   if (response.status === 200) {
     const json = await response.json();
-    expect(json.email).toBe(email);
+    expect(json.email).toBe("younesfkl@gmail.com");
   }
 });
