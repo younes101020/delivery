@@ -42,7 +42,7 @@ describe("users routes", () => {
 });
 
 const name = "youdfgnesfkl";
-const email = "helldfgofkl@gmail.com";
+const email = "younesfkl@gmail.com";
 const passwordHash = "Azerty-60";
 
 it("post /users creates a user", async () => {
