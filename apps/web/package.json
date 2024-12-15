@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "concurrently \"cd ../jobs && NODE_ENV=test node ./dist/src/index.js\" \"cd ../web && cross-env vitest run; kill $PPID\" && pkill -f \"node ../jobs/dist/src/index.js\""
+    "test": "concurrently --kill-others \"cd ../jobs && NODE_ENV=test node ./dist/src/index.js\" \"cd ../web && cross-env vitest run\""
   },
   "dependencies": {
     "@hono/client": "^0.0.3",
