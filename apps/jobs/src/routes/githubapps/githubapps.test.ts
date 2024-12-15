@@ -62,14 +62,14 @@ describe("applications routes", () => {
     if (response.status === 200) {
       const json = await response.json();
       expectTypeOf(json).toBeArray();
-      expect(json.length).toBe(1);
+      expect(json.length).toBe(2);
     }
   });
 
   it("get /githubapps/{id} returns 404 when githubapps not found", async () => {
     const response = await client.githubapps[":id"].$get({
       param: {
-        id: "2",
+        id: "3",
       },
     });
     expect(response.status).toBe(404);
