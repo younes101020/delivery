@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "cd ../jobs && NODE_ENV=test node ./dist/src/index.js & cd ../web cross-env vitest"
+    "test": "concurrently \"cd ../jobs && NODE_ENV=test node ./dist/src/index.js\" \"cd ../web && cross-env vitest run; kill $PPID\""
   },
   "dependencies": {
     "@hono/client": "^0.0.3",
@@ -46,6 +46,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.0",
     "cross-env": "^7.0.3",
     "eslint": "^8",
     "eslint-config-next": "15.0.3",
