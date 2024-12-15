@@ -36,10 +36,10 @@ export default function RootLayout({
         <header className="bg-black/45 border-primary border-b h-[5vh] flex justify-center">
           <Image
             src="/logo.svg"
-            width={200}
-            height={200}
+            width={100}
+            height={100}
             alt="Delivery logo"
-            className="border border-primary border-y-0 rounded-full"
+            className="bg-primary"
           />
         </header>
         <Suspense>

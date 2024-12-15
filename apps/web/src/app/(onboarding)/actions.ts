@@ -36,6 +36,7 @@ export const signUp = validatedAction(signUpSchema, async data => {
       passwordHash: password,
     },
   });
+  
   // Non explicit error message to end-user to prevent from enumeration attack
   if (response.status !== 200) return { error: "Impossible to signup" };
   const createdUser = await response.json();

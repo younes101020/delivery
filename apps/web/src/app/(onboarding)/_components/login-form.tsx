@@ -16,7 +16,7 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
   const router = useRouter();
 
   useEffect(() => {
-    if (session) router.replace("/?step=2");
+    if (session?.user) router.replace("/?step=2");
   }, [router, session]);
 
   const [state, formAction, pending] = useActionState<ActionState, FormData>(

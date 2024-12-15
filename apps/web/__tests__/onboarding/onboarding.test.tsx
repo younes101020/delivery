@@ -52,6 +52,7 @@ describe("Onboarding process", () => {
       await userAction.type(form.getByRole("textbox", { name: "email" }), registeredUser!.email);
       await userAction.type(form.getByLabelText("password"), registeredUser!.password);
       await userAction.click(form.getByRole("button"));
+
       await waitFor(() => {
         expect(form.getByText("Impossible to signup")).toBeDefined();
       });
