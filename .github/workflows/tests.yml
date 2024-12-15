@@ -40,6 +40,11 @@ jobs:
         with:
           node-version: 20
 
+      - name: Clean up database
+        if: always()
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+
       - name: Install dependencies
         run: yarn install --immutable
 
@@ -54,8 +59,3 @@ jobs:
 
       - name: Run e2e/unit tests
         run: yarn run test
-
-      - name: Clean up database
-        if: always()
-        run: |
-          PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
