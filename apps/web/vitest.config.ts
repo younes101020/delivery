@@ -5,6 +5,7 @@ import { defineConfig, ViteUserConfig } from "vitest/config";
 export default defineConfig({
   plugins: [react()] as ViteUserConfig["plugins"],
   test: {
+    setupFiles: ["__tests__/setup.ts"],
     environment: "jsdom",
   },
   resolve: {
