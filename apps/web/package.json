@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "turbo run dev --filter=@delivery/jobs & cross-env NODE_ENV=test vitest"
+    "test:it": "cross-env NODE_ENV=test vitest",
+    "test": "turbo run dev --filter=@delivery/jobs & turbo run test:it --filter=@delivery/web"
   },
   "dependencies": {
     "@hono/client": "^0.0.3",
