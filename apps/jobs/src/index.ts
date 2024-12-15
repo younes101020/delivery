@@ -14,3 +14,7 @@ serve({
   fetch: app.fetch,
   port,
 });
+
+process.on("SIGINT", () => {
+  process.exit(0);
+});
