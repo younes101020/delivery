@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { Deployment } from "@/app/(onboarding)/_components/deployment";
 import { GithubAppForm } from "@/app/(onboarding)/_components/github-app-form";
 import { Login } from "@/app/(onboarding)/_components/login-form";
