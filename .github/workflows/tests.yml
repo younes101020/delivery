@@ -1,4 +1,4 @@
-name: Running UT/E2E and IT tests on jobs service
+name: Running UT/E2E and IT tests
 
 on:
   push:
@@ -43,7 +43,7 @@ jobs:
       - name: Clean up database
         if: always()
         run: |
-          PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "TRUNCATE TABLE system_config, users, github_app_secret, github_app, applications, environment_variables, application_environment_variables CASCADE;"
+          PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "TRUNCATE TABLE users, github_app_secret, github_app, applications, environment_variables, application_environment_variables CASCADE;"
 
       - name: Install dependencies
         run: yarn install --immutable
