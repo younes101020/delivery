@@ -41,13 +41,17 @@ describe("users routes", () => {
   });
 });
 
+const name = "youdfgnesfkl";
+const email = "younesfkl@gmail.com";
+const passwordHash = "Azerty-60";
+
 it("post /users creates a user", async () => {
   const response = await client.users.$post(
     {
       json: {
-        name: "youdfgnesfkl",
-        email: "younesvvvvvfkl@gmail.com",
-        passwordHash: "Azerty-60",
+        name,
+        email,
+        passwordHash,
       },
     },
     httpOptions,
@@ -55,6 +59,6 @@ it("post /users creates a user", async () => {
   expect(response.status).toBe(200);
   if (response.status === 200) {
     const json = await response.json();
-    expect(json.email).toBe("younesvvvvvfkl@gmail.com");
+    expect(json.email).toBe(email);
   }
 });
