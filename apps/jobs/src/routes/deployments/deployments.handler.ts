@@ -8,7 +8,7 @@ import sshClient from "@/lib/ssh";
 
 import type { CreateRoute } from "./deployments.routes";
 
-export const create: AppRouteHandler<CreateRoute> = async c => {
+export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const application = c.req.valid("json");
   // TODO: move this ssh executation to bullmq job and replace ./ with the path to the cloned repo
   // After github app manifest creation do:
