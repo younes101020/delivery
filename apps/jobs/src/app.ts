@@ -1,6 +1,6 @@
 import configureOpenAPI from "@/lib/configure-open-api";
 import createApp from "@/lib/create-app";
-import applications from "@/routes/applications/applications.index";
+import applications from "@/routes/deployments/deployments.index";
 import githubApps from "@/routes/githubapps/githubapps.index";
 import index from "@/routes/index.route";
 import users from "@/routes/users/users.index";

@@ -8,22 +8,22 @@ import {
   selectApplicationsSchema,
 } from "@/db/schema";
 
-const tags = ["Applications"];
+const tags = ["Deployments"];
 
 export const create = createRoute({
-  path: "/applications",
+  path: "/deployments",
   method: "post",
   request: {
     body: jsonContentRequired(
       insertApplicationsSchema,
-      "The application to create",
+      "The deployment to create",
     ),
   },
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       selectApplicationsSchema,
-      "The created application",
+      "The created deployment",
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(insertApplicationsSchema),
