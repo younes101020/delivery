@@ -23,7 +23,7 @@ describe("applications routes", () => {
       {
         // @ts-expect-error
         json: {
-          name: "electra",
+          githubAppId: 1,
         },
       },
       httpOptions,

@@ -1,8 +1,7 @@
-import type { z } from "zod";
-
 import { relations } from "drizzle-orm";
 import { boolean, pgTable, serial, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
 
 export const systemConfig = pgTable("system_config", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -150,6 +149,12 @@ export const insertApplicationEnvironmentVariablesSchema = createInsertSchema(
   .omit({
     id: true,
   });
+
+// Deployment DTOs
+export const insertDeploymentSchema = z.object({
+  repoUrl: z.string().url(),
+  githubAppId: z.number(),
+});
 
 // Shared types
 // workaround to https://github.com/honojs/hono/issues/1800

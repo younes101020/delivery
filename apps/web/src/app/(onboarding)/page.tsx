@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { publicEnv } from "@/env";
-import { getAllInstallations, getAllInstallationsWithRepos } from "@/lib/github";
+import { getAllInstallations, getAllInstallationsWithRepos, Repository } from "@/lib/github";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Deployment } from "./_components/deployment";
@@ -21,7 +21,15 @@ async function getAllInstallReposForEachRepoPage(maxIteration: number) {
     getAllInstallationsWithRepos({ repoPage: i + 1 }),
   );
   const results = await Promise.all(promises);
-  return results.flat().flatMap(e => e!.repositories);
+  return results.flat().flatMap<Repository & { githubAppId: number }>(e => {
+    if (!e?.githubAppId) {
+      return [];
+    }
+    return e.repositories.map(repo => ({
+      ...repo,
+      githubAppId: e.githubAppId,
+    }));
+  });
 }
 
 async function GithubRepositoriesStep(props: StepChildrenProps) {
@@ -30,7 +38,6 @@ async function GithubRepositoriesStep(props: StepChildrenProps) {
     return null;
   }
   const repositories = await getAllInstallReposForEachRepoPage(searchParams.page ?? 1);
-  console.log(repositories.length)
   if (!repositories || repositories.length <= 0) redirect("/?step=2");
   return <Deployment repositories={repositories} />;
 }

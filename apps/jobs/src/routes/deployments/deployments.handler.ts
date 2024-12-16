@@ -9,7 +9,7 @@ import sshClient from "@/lib/ssh";
 import type { CreateRoute } from "./deployments.routes";
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
-  const application = c.req.valid("json");
+  // const application = c.req.valid("json");
   // TODO: move this ssh executation to bullmq job and replace ./ with the path to the cloned repo
   // After github app manifest creation do:
 
@@ -30,16 +30,16 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
   => CLONE solution: Replace TOKEN with the installationAuthentication: git clone https://x-access-token:TOKEN@github.com/owner/repo.git.
   */
   const ssh = await sshClient();
-  const result = await ssh.execCommand(
+  await ssh.execCommand(
     "ls",
     // `nixpacks build ./ --name ${application.name} -o /data/delivery/applications/${application.name}`
   );
 
-  const [inserted] = await db.insert(applications).values(application).returning();
+  /* const [inserted] = await db.insert(applications).values(application).returning();
 
-  const withSshOutput = Object.assign(inserted, result);
+  const withSshOutput = Object.assign(inserted, result); */
 
-  return c.json(withSshOutput, HttpStatusCodes.OK);
+  return c.json({} as any, HttpStatusCodes.OK);
 };
 
 // TODO: Add job to deploy application and stream logs

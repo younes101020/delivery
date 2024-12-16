@@ -47,7 +47,7 @@ function RepositorySection({ repo, setSelected, selected }: RepositorySectionPro
 }
 
 interface DeploymentProps {
-  repositories: Repository[];
+  repositories: (Repository & { githubAppId: number })[];
 }
 
 export function Deployment({ repositories }: DeploymentProps) {
