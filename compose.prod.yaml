@@ -52,7 +52,11 @@ services:
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ${PWD}/db-data/:/var/lib/postgresql/data/
     restart: always
-      #- ${PWD}/init.sql:/docker-entrypoint-initdb.d/init.sql
+  
+  bull_queue:
+    image: redis
+    container_name: bull_queue_redis
+    command: redis-server --save 60 1 --loglevel warning --maxmemory-policy noeviction --maxmemory 2gb
 
   adminer:
     image: adminer

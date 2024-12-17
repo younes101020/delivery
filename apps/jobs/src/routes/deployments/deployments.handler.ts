@@ -2,8 +2,6 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import { db } from "@/db";
-import { applications } from "@/db/schema";
 import sshClient from "@/lib/ssh";
 
 import type { CreateRoute } from "./deployments.routes";

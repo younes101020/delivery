@@ -1,3 +1,4 @@
 {
-  "prettier.proseWrap": "always"
+  "prettier.proseWrap": "always",
+  "prettier.arrowParens": "always"
 }
