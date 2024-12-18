@@ -1,6 +1,6 @@
-import { Deployment } from "@/app/(onboarding)/_components/deployment";
-import { GithubAppForm } from "@/app/(onboarding)/_components/github-app-form";
-import { Login } from "@/app/(onboarding)/_components/login-form";
+import { Deployment } from "@/app/(onboarding)/onboarding/_components/deployment";
+import { GithubAppForm } from "@/app/(onboarding)/onboarding/_components/github-app-form";
+import { Login } from "@/app/(onboarding)/onboarding/_components/login-form";
 import { publicEnv } from "@/env";
 import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";

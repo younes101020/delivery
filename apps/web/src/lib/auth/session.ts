@@ -1,9 +1,9 @@
-import { serverEnv } from "@/env";
 import { NewUser } from "@delivery/jobs/types";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
-const key = new TextEncoder().encode(serverEnv.AUTH_SECRET);
+// TODO: wait for nextjs middleware to be nodejs compatible (https://github.com/vercel/next.js/discussions/71727) to use `serverEnv.AUTH_SECRET`
+const key = new TextEncoder().encode(process.env.AUTH_SECRET);
 
 type SessionData = {
   user: { id: number };
