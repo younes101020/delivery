@@ -4,6 +4,7 @@ import { notFound, onError, serveEmojiFavicon } from "stoker/middlewares";
 import { defaultHook } from "stoker/openapi";
 
 import env from "@/env";
+import { onboardingFlag } from "@/middlewares/onboarding-flag";
 import { pinoLogger } from "@/middlewares/pino-logger";
 
 import type { AppBindings, AppOpenAPI } from "./types";
@@ -20,6 +21,7 @@ export default function createApp() {
   app.use(serveEmojiFavicon("📝"));
   app.use(pinoLogger());
   app.use("/^(?!/(doc|reference)).*$/", bearerAuth({ token: env.BEARER_TOKEN }));
+  app.use(onboardingFlag);
 
   app.notFound(notFound);
   app.onError(onError);
