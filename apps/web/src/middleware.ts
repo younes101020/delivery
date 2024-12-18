@@ -15,7 +15,7 @@ export async function middleware(request: NextRequest) {
   const isProtectedRoute = pathname.startsWith(protectedRoutes);
   const isOnboardingRoute = pathname.startsWith(onboardingRoute);
 
-  let res = NextResponse.next();
+  const res = NextResponse.next();
 
   if (!onboardingCookie) await forwardOnboardingStatus(res);
 
