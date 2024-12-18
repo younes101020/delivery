@@ -3,6 +3,7 @@
 import { validatedAction } from "@/lib/auth/middleware";
 import { setSession } from "@/lib/auth/session";
 import { client } from "@/lib/http";
+import { getUser } from "@/lib/users";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -28,7 +29,7 @@ const signUpSchema = z.object({
   password: z.string().min(8),
 });
 
-export const signUp = validatedAction(signUpSchema, async data => {
+export const signUp = validatedAction(signUpSchema, async (data) => {
   const { email, password } = data;
 
   const response = await client.users.$post({
@@ -54,7 +55,21 @@ const deploySchema = z.object({
   repoId: z.coerce.number(),
 });
 
-export const deploy = validatedAction(deploySchema, async data => {
-  const { repoId } = data;
-  console.log(repoId);
+export const deploy = validatedAction(deploySchema, async () => {
+  //const { repoId } = data;
+  const user = await getUser();
+  const response = await client.onboarding.$patch({
+    json: {
+      completedByUserId: user?.id.toString(),
+      onboardingCompleted: true,
+    },
+  });
+  if (response.status !== 200) {
+    return { error: response.statusText };
+  }
+  (await cookies()).set("skiponboarding", "true", {
+    maxAge: 60 * 60 * 24 * 7,
+    path: "/",
+  });
+  redirect("/dashboard");
 });
