@@ -6,7 +6,7 @@ import { createErrorSchema } from "stoker/openapi/schemas";
 import {
   insertEnvironmentVariablesSchema,
   selectEnvironmentVariablesSchema,
-} from "@/db/schema";
+} from "@/db/dto/envvars.dto";
 
 const tags = ["Envvars"];
 

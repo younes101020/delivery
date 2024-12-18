@@ -1,7 +1,11 @@
 import { relations } from "drizzle-orm";
 import { boolean, pgTable, serial, text, timestamp, uuid } from "drizzle-orm/pg-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+// eslint-disable-next-line ts/consistent-type-imports
 import { z } from "zod";
+// eslint-disable-next-line ts/consistent-type-imports
+import { selectGithubAppsSchema } from "./dto/githubapps.dto";
+// eslint-disable-next-line ts/consistent-type-imports
+import { selectUsersSchema } from "./dto/users.dto";
 
 export const systemConfig = pgTable("system_config", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -79,82 +83,6 @@ export const githubAppRelations = relations(githubApp, ({ one }) => ({
     references: [githubAppSecret.id],
   }),
 }));
-
-// user DTOs
-export const selectUsersSchema = createSelectSchema(users).omit({
-  passwordHash: true,
-});
-export const insertUsersSchema = createInsertSchema(users, {
-  name: schema => schema.name.min(1).max(500),
-})
-  .required({
-    email: true,
-    passwordHash: true,
-  })
-  .omit({
-    id: true,
-    createdAt: true,
-    updatedAt: true,
-  });
-
-// githubapp DTOs
-export const selectGithubAppsSchema = createSelectSchema(githubApp);
-export const insertGithubAppsSchema = createInsertSchema(githubApp);
-export const patchGithubAppsSchema = insertGithubAppsSchema.partial();
-
-// githubAppSecret DTOs & type
-export const selectGithubAppSecretSchema = createSelectSchema(githubAppSecret);
-export const insertGithubAppSecretSchema = createInsertSchema(githubAppSecret);
-
-// app DTOs
-export const selectApplicationsSchema = createSelectSchema(applications);
-export const insertApplicationsSchema = createInsertSchema(applications, {
-  name: schema => schema.name.min(1).max(500),
-})
-  .required({
-    fqdn: true,
-  })
-  .omit({
-    id: true,
-    createdAt: true,
-    updatedAt: true,
-    deletedAt: true,
-  });
-export const patchApplicationsSchema = insertApplicationsSchema.partial();
-
-// envvar DTOs
-export const selectEnvironmentVariablesSchema = createSelectSchema(environmentVariables);
-export const insertEnvironmentVariablesSchema = createInsertSchema(environmentVariables)
-  .required({
-    key: true,
-    value: true,
-  })
-  .omit({
-    id: true,
-    createdAt: true,
-    updatedAt: true,
-    deletedAt: true,
-  });
-// envvar <=> app join DTOs
-export const selectApplicationEnvironmentVariablesSchema = createSelectSchema(
-  applicationEnvironmentVariables,
-);
-export const insertApplicationEnvironmentVariablesSchema = createInsertSchema(
-  applicationEnvironmentVariables,
-)
-  .required({
-    applicationId: true,
-    environmentVariableId: true,
-  })
-  .omit({
-    id: true,
-  });
-
-// Deployment DTOs
-export const insertDeploymentSchema = z.object({
-  repoUrl: z.string().url(),
-  githubAppId: z.number(),
-});
 
 // Shared types
 // workaround to https://github.com/honojs/hono/issues/1800
