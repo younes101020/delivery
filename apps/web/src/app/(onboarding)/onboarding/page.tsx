@@ -7,7 +7,6 @@ import { Deployment } from "./_components/deployment";
 import { GithubAppForm } from "./_components/github-app-form";
 import { Login as LoginStep } from "./_components/login-form";
 import { StepProvider } from "./_components/step";
-import { revalidateTag } from "next/cache";
 
 interface StepChildrenProps {
   searchParams: Promise<{ step: number; page: number }> | undefined;
@@ -22,11 +21,11 @@ async function getAllInstallReposForEachRepoPage(maxIteration: number) {
     getAllInstallationsWithRepos({ repoPage: i + 1 }),
   );
   const results = await Promise.all(promises);
-  return results.flat().flatMap<Repository & { githubAppId: number }>(e => {
+  return results.flat().flatMap<Repository & { githubAppId: number }>((e) => {
     if (!e?.githubAppId) {
       return [];
     }
-    return e.repositories.map(repo => ({
+    return e.repositories.map((repo) => ({
       ...repo,
       githubAppId: e.githubAppId,
     }));
@@ -56,7 +55,7 @@ async function GithubAppStep(props: StepChildrenProps) {
 export default async function Onboarding(props: {
   searchParams?: Promise<{ step: number; page: number }>;
 }) {
-  const searchParams = props.searchParams?.then(sp => ({ step: sp.step, page: sp.page }));
+  const searchParams = props.searchParams?.then((sp) => ({ step: sp.step, page: sp.page }));
   return (
     <div className="flex justify-center items-center h-[95vh]">
       <StepProvider>
