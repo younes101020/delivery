@@ -28,7 +28,7 @@ export function UserProvider({
 }) {
   const initialUser = use(userPromise);
   const [user, setUser] = useState<User | null>(initialUser);
-
+  
   useEffect(() => {
     setUser(initialUser);
   }, [initialUser]);

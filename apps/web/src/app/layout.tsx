@@ -1,8 +1,8 @@
+import { Header } from "@/components/header";
 import { UserProvider } from "@/lib/auth";
 import { getUser } from "@/lib/users";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import Image from "next/image";
 import { Suspense } from "react";
 import "./globals.css";
 
@@ -33,15 +33,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.className} ${geistMono.className} antialiased absolute inset-0 h-full w-full bg-black bg-[linear-gradient(to_right,rgba(188,185,184,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(188,185,184,0.1)_1px,transparent_1px)] bg-[size:24px_24px]`}
       >
-        <header className="bg-black/45 border-primary border-b h-[5vh] flex justify-center">
-          <Image
-            src="/logo.svg"
-            width={100}
-            height={100}
-            alt="Delivery logo"
-            className="bg-primary"
-          />
-        </header>
+        <Header />
         <Suspense>
           <UserProvider userPromise={userPromise}>{children}</UserProvider>
         </Suspense>

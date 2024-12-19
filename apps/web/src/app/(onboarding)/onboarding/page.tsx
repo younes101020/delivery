@@ -7,6 +7,7 @@ import { Deployment } from "./_components/deployment";
 import { GithubAppForm } from "./_components/github-app-form";
 import { Login as LoginStep } from "./_components/login-form";
 import { StepProvider } from "./_components/step";
+import { revalidateTag } from "next/cache";
 
 interface StepChildrenProps {
   searchParams: Promise<{ step: number; page: number }> | undefined;
@@ -38,7 +39,7 @@ async function GithubRepositoriesStep(props: StepChildrenProps) {
     return null;
   }
   const repositories = await getAllInstallReposForEachRepoPage(searchParams.page ?? 1);
-  if (!repositories || repositories.length <= 0) redirect("/?step=2");
+  if (!repositories || repositories.length <= 0) redirect("/onboarding/?step=2");
   return <Deployment repositories={repositories} />;
 }
 
@@ -48,7 +49,7 @@ async function GithubAppStep(props: StepChildrenProps) {
     return null;
   }
   const allGithubInstallations = await getAllInstallations();
-  if (allGithubInstallations && allGithubInstallations.length > 0) redirect("/?step=3");
+  if (allGithubInstallations && allGithubInstallations.length > 0) redirect("/onboarding/?step=3");
   return <GithubAppForm baseUrl={publicEnv.NEXT_PUBLIC_BASEURL} />;
 }
 

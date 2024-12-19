@@ -16,3 +16,7 @@ export function parseSetCookie(header: string) {
 
   return parsed;
 }
+
+export type Nullable<T> = {
+  [K in keyof T]: T[K] | null;
+};

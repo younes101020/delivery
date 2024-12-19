@@ -1,4 +1,5 @@
 import { client } from "@/lib/http";
+import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
 
@@ -7,7 +8,7 @@ export async function GET(req: NextRequest) {
   const state = req.nextUrl.searchParams.get("state");
 
   if (!installationId || !state) {
-    redirect("/?step=2");
+    redirect("/onboarding/?step=2");
   }
 
   const stateObj = JSON.parse(decodeURIComponent(state));
@@ -22,9 +23,9 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error(error)
-    redirect("/?step=2");
+    console.error(error);
+    redirect("/onboarding/?step=2");
   }
-
-  redirect("/?state=3");
+  revalidateTag("github-app-installations-creds");
+  redirect("/onboarding/?state=3");
 }

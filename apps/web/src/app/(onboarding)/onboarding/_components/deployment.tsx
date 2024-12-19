@@ -7,27 +7,40 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import { ActionState } from "@/lib/auth/middleware";
 import type { Repository } from "@/lib/github";
+import type { Nullable } from "@/lib/utils";
 import { Check, Rocket } from "lucide-react";
 import { motion } from "motion/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import { deploy } from "../actions";
 
+interface DeploymentProps {
+  repositories: (Repository & { githubAppId: number })[];
+}
+
+type SelectedRepositoryProps = Nullable<{
+  name: string;
+  id: number;
+}>;
+
 interface RepositorySectionProps {
   repo: Repository;
-  selected: string;
-  setSelected: (name: string) => void;
+  selected: SelectedRepositoryProps;
+  setSelected: (repository: SelectedRepositoryProps) => void;
 }
 
 function RepositorySection({ repo, setSelected, selected }: RepositorySectionProps) {
-  const isSelected = selected === repo.full_name;
+  const isSelected = selected.name === repo.full_name;
   return (
     <motion.section
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.9 }}
       className="cursor-pointer"
       onClick={() => {
-        setSelected(repo.full_name);
+        setSelected({
+          name: repo.full_name,
+          id: repo.id,
+        });
       }}
       data-testid={`${repo.id}-repo-card`}
     >
@@ -46,10 +59,6 @@ function RepositorySection({ repo, setSelected, selected }: RepositorySectionPro
   );
 }
 
-interface DeploymentProps {
-  repositories: (Repository & { githubAppId: number })[];
-}
-
 export function Deployment({ repositories }: DeploymentProps) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(deploy, { error: "" });
   const { isIntersecting, ref } = useIntersectionObserver();
@@ -58,7 +67,10 @@ export function Deployment({ repositories }: DeploymentProps) {
   const params = new URLSearchParams(searchParams);
   const pathname = usePathname();
   const { replace } = useRouter();
-  const [selected, setSelected] = useState("");
+  const [selected, setSelected] = useState<SelectedRepositoryProps>({
+    name: null,
+    id: null,
+  });
 
   useEffect(() => {
     if (isIntersecting) {
@@ -78,7 +90,7 @@ export function Deployment({ repositories }: DeploymentProps) {
     <>
       <ScrollArea className="h-80 my-4 px-5">
         <div className="max-h-96 grid grid-cols-1 md:grid-cols-2 gap-2">
-          {repositories.map(repo => (
+          {repositories.map((repo) => (
             <RepositorySection
               repo={repo}
               key={repo.id}
@@ -92,8 +104,9 @@ export function Deployment({ repositories }: DeploymentProps) {
         </div>
       </ScrollArea>
       <form action={formAction} className="flex justify-end px-5" aria-label="form">
-        <Button type="submit" disabled={selected.length === 0} aria-label="submit">
-          <Rocket /> | Deploy <span className="underline text-xs">{selected}</span>
+        <input type="hidden" name="repoId" id="repoId" value={selected.id ?? "no-id"} />
+        <Button type="submit" disabled={!selected.name} aria-label="submit">
+          <Rocket /> | Deploy <span className="underline text-xs">{selected.name ?? ""}</span>
         </Button>
       </form>
     </>

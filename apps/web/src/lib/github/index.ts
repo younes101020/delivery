@@ -1,6 +1,7 @@
 import { client } from "@/lib/http";
 import { GithubInstallation } from "@delivery/jobs/types";
 import { listInstallationRepositories } from "./utils";
+import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
 export type Repository = {
   id: number;
@@ -19,6 +20,8 @@ export async function getAllInstallations(): Promise<
   (GithubInstallation & { privateKey: string })[] | null
 > {
   "use cache";
+  cacheTag('github-app-installations-creds')
+  console.log('okkkk')
   const response = await client.githubapps.$get();
   if (response.status !== 200) {
     return null;
