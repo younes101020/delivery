@@ -9,7 +9,7 @@ import { ActionState } from "@/lib/auth/middleware";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect } from "react";
-import { signIn, signUp } from "../actions";
+import { signIn, signUp } from "../(onboarding)/onboarding/actions";
 
 export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
   const session = useUser();
@@ -67,8 +67,8 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
 
       {state?.error && <div className="text-destructive text-sm">{state.error}</div>}
 
-      <CardFooter className="flex px-0 pt-8 justify-end">
-        <Button type="submit" disabled={pending} aria-label="submit">
+      <CardFooter className="flex px-0 pt-8">
+        <Button type="submit" disabled={pending} aria-label="submit" className="w-full">
           {pending ? (
             <>
               <Loader2 className="animate-spin mr-2 h-4 w-4" />

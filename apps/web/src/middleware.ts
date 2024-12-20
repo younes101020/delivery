@@ -21,7 +21,9 @@ export async function middleware(request: NextRequest) {
 
   if (onboardingCookie) {
     const skiponboarding = JSON.parse(onboardingCookie.value);
-    if (!skiponboarding && !isOnboardingRoute) {
+    if (isOnboardingRoute && skiponboarding) {
+      return NextResponse.redirect(new URL("/", request.url));
+    } else if (!skiponboarding && !isOnboardingRoute) {
       return NextResponse.redirect(new URL(onboardingRoute, request.url));
     }
   }

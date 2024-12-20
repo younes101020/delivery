@@ -3,9 +3,9 @@ import { publicEnv } from "@/env";
 import { getAllInstallations, getAllInstallationsWithRepos, Repository } from "@/lib/github";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { Login as LoginStep } from "../../_components/login-form";
 import { Deployment } from "./_components/deployment";
 import { GithubAppForm } from "./_components/github-app-form";
-import { Login as LoginStep } from "./_components/login-form";
 import { StepProvider } from "./_components/step";
 
 interface StepChildrenProps {
