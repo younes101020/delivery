@@ -19,6 +19,6 @@
   "tsc-alias": {
     "resolveFullPaths": true
   },
-  "include": ["./src/**/*.ts", "./package.json"],
+  "include": ["./src/**/*.ts", "./package.json", "./__tests__/**/*.ts"],
   "exclude": ["./dist", "./node_modules"]
 }

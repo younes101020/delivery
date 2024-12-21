@@ -1,6 +1,7 @@
 /* eslint-disable ts/ban-ts-comment */
+import { it } from "@/../__tests__";
 import { testClient } from "hono/testing";
-import { describe, expect, it } from "vitest";
+import { describe, expect } from "vitest";
 
 import env from "@/env";
 import { ZOD_ERROR_MESSAGES } from "@/lib/constants";
@@ -21,13 +22,14 @@ const httpOptions = {
   headers: { Authorization: `Bearer ${env.BEARER_TOKEN}` },
 };
 
-describe("users routes", () => {
-  it("post /users validates the body when creating", async () => {
+describe("users routes / E2E", () => {
+  it("post /users validates the body when creating", async ({ users }) => {
+    const { email } = users[0];
     const response = await client.users.$post(
       {
         // @ts-expect-error
         json: {
-          email: "hello@gmail.com",
+          email,
         },
       },
       httpOptions,
@@ -41,11 +43,8 @@ describe("users routes", () => {
   });
 });
 
-const name = "youdfgnesfkl";
-const email = "younesfkl@gmail.com";
-const passwordHash = "Azerty-60";
-
-it("post /users creates a user", async () => {
+it("post /users creates a user", async ({ users }) => {
+  const { passwordHash, name, email } = users[0];
   const response = await client.users.$post(
     {
       json: {

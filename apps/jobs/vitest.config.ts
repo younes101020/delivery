@@ -3,7 +3,7 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    setupFiles: ["./src/test.ts"],
+    setupFiles: ["./__tests__/setup.ts"],
   },
   resolve: {
     alias: {

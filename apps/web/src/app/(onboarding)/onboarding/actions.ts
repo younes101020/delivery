@@ -8,22 +8,6 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-const signInSchema = z.object({
-  email: z.string().email().min(3).max(255),
-  password: z.string().min(8).max(100),
-});
-
-export const signIn = validatedAction(signInSchema, async () => {
-  // const { email, password } = data;
-
-  // TODO: req to job for signin process, on error return { error: error_message }
-  //const foundUser = await fetch();
-
-  //await setSession(foundUser);
-
-  redirect("/dashboard");
-});
-
 const signUpSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
@@ -40,11 +24,11 @@ export const signUp = validatedAction(signUpSchema, async (data) => {
   });
 
   // Non explicit error message to end-user to prevent from enumeration attack
-  if (response.status !== 200) return { error: "Impossible to signup" };
+  if (response.status !== 200) return { error: "Impossible to sign up" };
   const createdUser = await response.json();
   await setSession(createdUser);
 
-  redirect("/?step=2");
+  redirect("/onboarding?step=2");
 });
 
 export async function signOut() {

@@ -7,4 +7,9 @@ async function hashPassword(password: string) {
     .join("");
 }
 
-export { hashPassword };
+async function verifyPassword(password: string, hash: string) {
+  const hashedPassword = await hashPassword(password);
+  return hashedPassword === hash;
+}
+
+export { hashPassword, verifyPassword };

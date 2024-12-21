@@ -1,4 +1,6 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+// eslint-disable-next-line ts/consistent-type-imports
+import { z } from "zod";
 
 import { users } from "../schema";
 
@@ -17,3 +19,5 @@ export const insertUsersSchema = createInsertSchema(users, {
     createdAt: true,
     updatedAt: true,
   });
+
+export type InsertUsersSchema = z.infer<typeof insertUsersSchema>;

@@ -1,8 +1,9 @@
 /* eslint-disable ts/ban-ts-comment */
+import { it } from "__tests__";
 import { testClient } from "hono/testing";
 import { Buffer } from "node:buffer";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
-import { describe, expect, expectTypeOf, it } from "vitest";
+import { describe, expect, expectTypeOf } from "vitest";
 
 import env from "@/env";
 import { ZOD_ERROR_MESSAGES } from "@/lib/constants";
@@ -20,20 +21,18 @@ const httpOptions = {
   headers: { Authorization: `Bearer ${env.BEARER_TOKEN}` },
 };
 
-describe("applications routes", () => {
-  const privateKey = "sdlofgihjsdofuighsdopigjsfd";
-  const missedField = {
-    clientId: "5",
-    appId: 78,
-    clientSecret: "sqpmfjkgsdf",
-    webhookSecret: "oksdfokfd",
-  };
-  // e2e
-  it("post /githubapps validates the body when creating", async () => {
+describe("applications routes / E2E", () => {
+  it("post /githubapps validates the body when creating", async ({ githubApps }) => {
+    const { clientId, appId, clientSecret, webhookSecret } = githubApps[0];
     const response = await client.githubapps.$post(
       {
         // @ts-expect-error
-        json: missedField,
+        json: {
+          clientId,
+          appId,
+          clientSecret,
+          webhookSecret,
+        },
       },
       httpOptions,
     );
@@ -45,14 +44,15 @@ describe("applications routes", () => {
     }
   });
 
-  it("post /githubapps creates a githubapps", async () => {
+  it("post /githubapps creates a githubapps", async ({ githubApps }) => {
+    const githubApp = githubApps[0];
     const response = await client.githubapps.$post({
-      json: { ...missedField, privateKey },
+      json: githubApp,
     });
     expect(response.status).toBe(200);
     if (response.status === 200) {
       const json = await response.json();
-      expect(json.appId).toBe(missedField.appId);
+      expect(json.appId).toBe(githubApp.appId);
     }
   });
 
@@ -79,7 +79,8 @@ describe("applications routes", () => {
     }
   });
 
-  it("get /githubapps/{id} gets a single githubapps", async () => {
+  it("get /githubapps/{id} gets a single githubapp", async ({ githubApps }) => {
+    const { privateKey } = githubApps[0];
     const response = await client.githubapps[":id"].$get({
       param: {
         id: "1",
@@ -92,38 +93,41 @@ describe("applications routes", () => {
     }
   });
 
-  // unit test
-  it("should generate encrypted github app private key with base64 properties", async () => {
-    const privateKey = "test-secret";
-    const { encryptedData, iv, key } = await encryptSecret(privateKey);
+  describe("applications routes / UT", () => {
+    it("should decrypt an encrypted github app private key", async ({ githubApps }) => {
+      const { privateKey } = githubApps[0];
+      const { encryptedData, iv, key } = await encryptSecret(privateKey);
 
-    expect(encryptedData).toBeTruthy();
-    expect(iv).toBeTruthy();
-    expect(key).toBeTruthy();
+      const importedKey = await crypto.subtle.importKey(
+        "raw",
+        Buffer.from(key, "base64"),
+        { name: "AES-GCM", length: 256 },
+        true,
+        ["decrypt"],
+      );
 
-    expect(() => atob(encryptedData)).not.toThrow();
-    expect(() => atob(iv)).not.toThrow();
-    expect(() => atob(key)).not.toThrow();
-  });
+      const decryptedSecret = await decryptSecret({
+        encryptedData: Buffer.from(encryptedData, "base64"),
+        iv: Buffer.from(iv, "base64"),
+        key: importedKey,
+      });
 
-  it("should decrypt an encrypted github app private key", async () => {
-    const privateKey = "test-secret";
-    const { encryptedData, iv, key } = await encryptSecret(privateKey);
-
-    const importedKey = await crypto.subtle.importKey(
-      "raw",
-      Buffer.from(key, "base64"),
-      { name: "AES-GCM", length: 256 },
-      true,
-      ["decrypt"],
-    );
-
-    const decryptedSecret = await decryptSecret({
-      encryptedData: Buffer.from(encryptedData, "base64"),
-      iv: Buffer.from(iv, "base64"),
-      key: importedKey,
+      expect(decryptedSecret).toBe(privateKey);
     });
 
-    expect(decryptedSecret).toBe(privateKey);
+    it("should generate encrypted github app private key with base64 properties", async ({
+      githubApps,
+    }) => {
+      const { privateKey } = githubApps[0];
+      const { encryptedData, iv, key } = await encryptSecret(privateKey);
+
+      expect(encryptedData).toBeTruthy();
+      expect(iv).toBeTruthy();
+      expect(key).toBeTruthy();
+
+      expect(() => atob(encryptedData)).not.toThrow();
+      expect(() => atob(iv)).not.toThrow();
+      expect(() => atob(key)).not.toThrow();
+    });
   });
 });

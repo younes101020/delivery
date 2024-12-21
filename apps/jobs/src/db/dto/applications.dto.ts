@@ -22,3 +22,5 @@ export const insertDeploymentSchema = z.object({
   repoUrl: z.string().url(),
   githubAppId: z.number(),
 });
+
+export type InsertDeploymentSchema = z.infer<typeof insertDeploymentSchema>;

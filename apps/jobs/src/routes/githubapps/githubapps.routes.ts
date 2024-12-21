@@ -3,7 +3,11 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 
-import { insertGithubAppsSchema, patchGithubAppsSchema, selectGithubAppsSchema } from "@/db/dto/githubapps.dto";
+import {
+  insertGithubAppsSchema,
+  patchGithubAppsSchema,
+  selectGithubAppsSchema,
+} from "@/db/dto/githubapps.dto";
 import { notFoundSchema } from "@/lib/constants";
 
 const tags = ["Githubapps"];
@@ -24,16 +28,13 @@ export const create = createRoute({
   path: "/githubapps",
   method: "post",
   request: {
-    body: jsonContentRequired(
-      insertGithubAppsSchema.extend({ privateKey: z.string() }),
-      "The github app to create",
-    ),
+    body: jsonContentRequired(insertGithubAppsSchema, "The github app to create"),
   },
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(selectGithubAppsSchema, "The created github app"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(insertGithubAppsSchema.extend({ privateKey: z.string() })),
+      createErrorSchema(insertGithubAppsSchema),
       "The validation error(s)",
     ),
   },
