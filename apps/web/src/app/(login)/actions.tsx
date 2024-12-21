@@ -14,7 +14,7 @@ const signInSchema = z.object({
   password: z.string().min(8).max(100),
 });
 
-export const signIn = validatedAction(signInSchema, async (data, formData) => {
+export const signIn = validatedAction(signInSchema, async (data) => {
   const { email, password } = data;
   console.log(email, password);
   redirect("/dashboard");
