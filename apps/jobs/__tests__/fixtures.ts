@@ -42,13 +42,16 @@ const deployments = faker.helpers.multiple(
 );
 
 export const it = base.extend<Fixtures>({
-  githubApps: async (_, use) => {
+  // eslint-disable-next-line no-empty-pattern
+  githubApps: async ({}, use) => {
     await use(githubApps);
   },
-  users: async (_, use) => {
+  // eslint-disable-next-line no-empty-pattern
+  users: async ({}, use) => {
     await use(users);
   },
-  deployments: async (_, use) => {
+  // eslint-disable-next-line no-empty-pattern
+  deployments: async ({}, use) => {
     await use(deployments);
   },
 });
