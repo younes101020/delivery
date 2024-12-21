@@ -2,6 +2,7 @@
 
 import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut } from "lucide-react";
 
+import { signOut } from "@/app/(login)/actions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -18,6 +19,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useUser } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 export function NavUser({
   user,
@@ -28,7 +31,17 @@ export function NavUser({
     avatar: string;
   };
 }) {
+  const router = useRouter();
   const { isMobile } = useSidebar();
+  const session = useUser();
+  if (!session) return null;
+  const { setUser } = session;
+
+  async function handleSignOut() {
+    setUser(null);
+    await signOut();
+    router.push("/");
+  }
 
   return (
     <SidebarMenu>
@@ -84,7 +97,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleSignOut}>
               <LogOut />
               Log out
             </DropdownMenuItem>
