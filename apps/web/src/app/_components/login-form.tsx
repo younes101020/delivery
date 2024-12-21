@@ -9,7 +9,8 @@ import { ActionState } from "@/lib/auth/middleware";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect } from "react";
-import { signIn, signUp } from "../(onboarding)/onboarding/actions";
+import { signUp } from "../(onboarding)/onboarding/actions";
+import { signIn } from "../(login)/actions";
 
 export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
   const session = useUser();
