@@ -5,5 +5,5 @@
     "declarationMap": true,
     "outDir": "./dist"
   },
-  "include": ["src/hc.ts", "./src/**/*.ts", "./package.json"]
+  "include": ["src/hc.ts", "./src/**/*.ts", "./package.json", "./__tests__/**/*.ts"]
 }
