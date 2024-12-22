@@ -25,9 +25,9 @@ const githubApps = faker.helpers.multiple(
 );
 
 const users = faker.helpers.multiple(
-  () => ({
+  (_, i) => ({
     name: faker.person.firstName(),
-    email: faker.internet.email(),
+    email: i === 0 ? "test@example.com" : faker.internet.email(),
     passwordHash: faker.internet.password(),
   }),
   { count: 10 },

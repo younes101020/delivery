@@ -60,7 +60,7 @@ export const onBoardingTest = test.extend<OnBoardingFixtures>({
   users: async ({}, use) => {
     users.push(
       {
-        email: "younesfkl@gmail.com",
+        email: "test@example.com",
         password: "Azerty-60",
         registered: true,
       },
