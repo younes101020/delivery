@@ -4,6 +4,7 @@ import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema } from "stoker/openapi/schemas";
 
 import { insertDeploymentSchema, selectApplicationsSchema } from "@/db/dto/applications.dto";
+import { notFoundSchema } from "@/lib/constants";
 
 const tags = ["Deployments"];
 
@@ -16,6 +17,7 @@ export const create = createRoute({
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(selectApplicationsSchema, "The created deployment"),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Github application not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(insertDeploymentSchema),
       "The validation error(s)",

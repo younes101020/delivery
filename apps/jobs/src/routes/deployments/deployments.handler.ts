@@ -1,33 +1,40 @@
 import * as HttpStatusCodes from "stoker/http-status-codes";
+import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import sshClient from "@/lib/ssh";
+import { db } from "@/db";
+import { startDeploy } from "@/lib/tasks/deploy";
 
 import type { CreateRoute } from "./deployments.routes";
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
-  // const application = c.req.valid("json");
+  const deployment = c.req.valid("json");
+
   // TODO: move this ssh executation to bullmq job and replace ./ with the path to the cloned repo
   // After github app manifest creation do:
 
+  const githubApp = await db.query.githubApp.findFirst({
+    where(fields, operators) {
+      return operators.eq(fields.id, deployment.githubAppId);
+    },
+    with: {
+      secret: true,
+    },
+  });
+
+  if (!githubApp) {
+    return c.json(
+      {
+        message: HttpStatusPhrases.NOT_FOUND,
+      },
+      HttpStatusCodes.NOT_FOUND,
+    );
+  }
+
+  await startDeploy({ clone: githubApp, build: { name: "" } });
   /*
-    const auth = createAppAuth({
-    appId: 1,
-    privateKey: "-----BEGIN PRIVATE KEY-----\n...", => will be in response of github app manifest creation
-    clientId: "lv1.1234567890abcdef", => will be in response of github app manifest creation
-    clientSecret: "1234567890abcdef12341234567890abcdef1234", => will be in response of github app manifest creation
-  });
 
-  // Retrieve installation access token
-  const installationAuthentication = await auth({
-    type: "installation",
-    installationId: 123,
-  });
-
-  => CLONE solution: Replace TOKEN with the installationAuthentication: git clone https://x-access-token:TOKEN@github.com/owner/repo.git.
-  */
-  const ssh = await sshClient();
   await ssh.execCommand(
     "ls",
     // `nixpacks build ./ --name ${application.name} -o /data/delivery/applications/${application.name}`

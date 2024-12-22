@@ -8,8 +8,8 @@ import { describe, expect, expectTypeOf } from "vitest";
 import env from "@/env";
 import { ZOD_ERROR_MESSAGES } from "@/lib/constants";
 import createApp from "@/lib/create-app";
+import { decryptSecret, encryptSecret } from "@/lib/utils";
 
-import { decryptSecret, encryptSecret } from "./githubapps.handlers";
 import router from "./githubapps.index";
 
 if (env.NODE_ENV !== "test") {

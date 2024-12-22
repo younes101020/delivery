@@ -26,11 +26,7 @@ export const createWorker: CreateWorkerFn = () => {
   );
 };
 
-export async function addJob<T extends JobName>(
-  queue: Queue,
-  jobName: T,
-  data: Omit<JobDataMap[T], "timestamp">,
-) {
+export async function addJob<T extends JobName>(queue: Queue, jobName: T, data: JobDataMap[T]) {
   return queue.add(jobName, {
     ...data,
     timestamp: Date.now(),
