@@ -6,12 +6,15 @@ import { createErrorSchema } from "stoker/openapi/schemas";
 import { requiredAuthSchema, selectUserSchema } from "@/db/dto/auth.dto";
 import { unauthorizedSchema } from "@/lib/constants";
 
+const tags = ["Auth"];
+
 export const verify = createRoute({
   path: "/auth",
   method: "post",
   request: {
     body: jsonContentRequired(requiredAuthSchema, "The authentication credentials"),
   },
+  tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(selectUserSchema, "The authenticated user"),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(unauthorizedSchema, "Invalid user credentials"),

@@ -1,6 +1,8 @@
 "use server";
 
 import { validatedAction } from "@/lib/auth/middleware";
+import { setSession } from "@/lib/auth/session";
+import { client } from "@/lib/http";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -15,7 +17,17 @@ const signInSchema = z.object({
 });
 
 export const signIn = validatedAction(signInSchema, async (data) => {
-  const { email, password } = data;
-  console.log(email, password);
+  const { email, password: passwordHash } = data;
+  const response = await client.auth.$post({
+    json: {
+      email,
+      passwordHash,
+    },
+  });
+  if (response.status !== 200) {
+    return { error: "Invalid email or password. Please try again.", email, passwordHash };
+  }
+  const user = await response.json();
+  await setSession(user);
   redirect("/dashboard");
 });
