@@ -55,7 +55,7 @@ export const deploy = validatedAction(deploySchema, async (data) => {
     maxAge: 60 * 60 * 24 * 7,
     path: "/",
   });
-  const deployment = await client.deployments.$post({
+  await client.deployments.$post({
     json: data,
   });
   redirect("/dashboard");

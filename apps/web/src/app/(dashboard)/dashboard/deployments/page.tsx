@@ -1,8 +1,6 @@
 import { BoxReveal } from "./_components/box-reveal";
 import Ripple from "./_components/ripple";
 
-const texts = ["Get Github secret", "Cloning repository"];
-
 export default function Deployments() {
   return (
     <div className="h-full flex justify-center items-center py-4">

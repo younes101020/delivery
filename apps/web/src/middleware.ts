@@ -18,7 +18,7 @@ export async function middleware(request: NextRequest) {
   const res = NextResponse.next();
 
   if (!onboardingCookie) await forwardOnboardingStatus(res);
-/*
+
   if (onboardingCookie) {
     const skiponboarding = JSON.parse(onboardingCookie.value);
     if (isOnboardingRoute && skiponboarding) {
@@ -56,7 +56,7 @@ export async function middleware(request: NextRequest) {
       }
     }
   }
-*/
+
   return res;
 }
 
