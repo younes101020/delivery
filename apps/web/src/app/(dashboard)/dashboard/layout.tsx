@@ -24,7 +24,7 @@ export default function Layout({
             </Breadcrumb>
           </div>
         </div>
-        {children}
+        <div className="h-full px-4">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

@@ -20,11 +20,13 @@ interface DeploymentProps {
 
 type SelectedRepositoryProps = Nullable<{
   name: string;
+  gitUrl: string;
+  githubAppId: number;
   id: number;
 }>;
 
 interface RepositorySectionProps {
-  repo: Repository;
+  repo: Repository & { githubAppId: number };
   selected: SelectedRepositoryProps;
   setSelected: (repository: SelectedRepositoryProps) => void;
 }
@@ -40,6 +42,8 @@ function RepositorySection({ repo, setSelected, selected }: RepositorySectionPro
         setSelected({
           name: repo.full_name,
           id: repo.id,
+          githubAppId: repo.githubAppId,
+          gitUrl: repo.git_url,
         });
       }}
       data-testid={`${repo.id}-repo-card`}
@@ -62,7 +66,7 @@ function RepositorySection({ repo, setSelected, selected }: RepositorySectionPro
 export function Deployment({ repositories }: DeploymentProps) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(deploy, { error: "" });
   const { isIntersecting, ref } = useIntersectionObserver();
-  console.log(state, pending, isIntersecting);
+  console.log(state, pending, isIntersecting, repositories);
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams);
   const pathname = usePathname();
@@ -70,6 +74,8 @@ export function Deployment({ repositories }: DeploymentProps) {
   const [selected, setSelected] = useState<SelectedRepositoryProps>({
     name: null,
     id: null,
+    githubAppId: null,
+    gitUrl: null,
   });
 
   useEffect(() => {
@@ -104,7 +110,13 @@ export function Deployment({ repositories }: DeploymentProps) {
         </div>
       </ScrollArea>
       <form action={formAction} className="flex justify-end px-5" aria-label="form">
-        <input type="hidden" name="repoId" id="repoId" value={selected.id ?? "no-id"} />
+        <input type="hidden" name="repoUrl" id="repoUrl" value={selected.gitUrl ?? "no-url"} />
+        <input
+          type="hidden"
+          name="githubAppId"
+          id="githubAppId"
+          value={selected.githubAppId ?? "no-github-app-id"}
+        />
         <Button type="submit" disabled={!selected.name} aria-label="submit">
           <Rocket /> | Deploy <span className="underline text-xs">{selected.name ?? ""}</span>
         </Button>

@@ -36,11 +36,11 @@ export async function signOut() {
 }
 
 const deploySchema = z.object({
-  repoId: z.coerce.number(),
+  repoUrl: z.string().url(),
+  githubAppId: z.number(),
 });
 
-export const deploy = validatedAction(deploySchema, async () => {
-  //const { repoId } = data;
+export const deploy = validatedAction(deploySchema, async (data) => {
   const user = await getUser();
   const response = await client.onboarding.$patch({
     json: {
@@ -49,11 +49,14 @@ export const deploy = validatedAction(deploySchema, async () => {
     },
   });
   if (response.status !== 200) {
-    return { error: response.statusText };
+    return { error: "Something went wrong, please retry later." };
   }
   (await cookies()).set("skiponboarding", "true", {
     maxAge: 60 * 60 * 24 * 7,
     path: "/",
+  });
+  const deployment = await client.deployments.$post({
+    json: data,
   });
   redirect("/dashboard");
 });
