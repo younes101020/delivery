@@ -1,7 +1,7 @@
-import { createRoute } from "@hono/zod-openapi";
+import { createRoute, z } from "@hono/zod-openapi";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
-import { createErrorSchema } from "stoker/openapi/schemas";
+import { createErrorSchema, SlugParamsSchema } from "stoker/openapi/schemas";
 
 import { deploymentTrackerIdentifier, insertDeploymentSchema } from "@/db/dto";
 import { notFoundSchema } from "@/lib/constants";
@@ -28,4 +28,24 @@ export const create = createRoute({
   },
 });
 
+export const streamLog = createRoute({
+  path: "/deployments/logs/{slug}",
+  method: "get",
+  tags,
+  request: {
+    params: SlugParamsSchema,
+  },
+  responses: {
+    [HttpStatusCodes.OK]: {
+      content: {
+        "text/event-stream": {
+          schema: z.unknown(),
+        },
+      },
+      description: "The build process logs of the Docker image",
+    },
+  },
+});
+
+export type StreamRoute = typeof streamLog;
 export type CreateRoute = typeof create;
