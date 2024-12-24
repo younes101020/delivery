@@ -1,5 +1,6 @@
 import { createAppAuth } from "@octokit/auth-app";
 import { Buffer } from "node:buffer";
+import { basename } from "node:path";
 
 import { APPLICATIONS_PATH } from "@/lib/constants";
 import sshClient from "@/lib/ssh";
@@ -7,8 +8,12 @@ import { decryptSecret } from "@/lib/utils";
 
 import type { JobFn } from "../../types";
 
-export const clone: JobFn<"clone"> = async ({ data }) => {
-  const { secret, appId, clientId, clientSecret, installationId } = data;
+export interface CloneReturnType {
+  repoName: string;
+}
+
+export const clone: JobFn<"clone", CloneReturnType> = async ({ data }) => {
+  const { secret, appId, clientId, clientSecret, installationId, repoUrl } = data;
 
   const privateKey = await decryptSecret({
     encryptedData: Buffer.from(secret.encryptedData, "base64"),
@@ -30,10 +35,13 @@ export const clone: JobFn<"clone"> = async ({ data }) => {
     installationId,
   });
 
-  const ssh = await sshClient();
-  await ssh.execCommand(
-    `git clone https://x-access-token:${installationAuthentication.token}@github.com/owner/repo.git`,
-    { cwd: APPLICATIONS_PATH },
+  const formattedRepoUrl = repoUrl.replace(
+    "git://",
+    `https://x-access-token:${installationAuthentication.token}@`,
   );
-  return true;
+
+  const ssh = await sshClient();
+  await ssh.execCommand(`git clone ${formattedRepoUrl}`, { cwd: APPLICATIONS_PATH });
+  const repoName = basename(repoUrl, ".git");
+  return { repoName };
 };

@@ -14,7 +14,7 @@ export const startDeploy: StartTaskFn = async (jobsData) => {
     worker = createWorker();
     flowProducer = new FlowProducer({ connection: { host: "bull_queue" } });
 
-    await flowProducer.add({
+    const jobs = await flowProducer.add({
       name: "build",
       data: jobsData.build,
       queueName: "deploy",
@@ -28,14 +28,7 @@ export const startDeploy: StartTaskFn = async (jobsData) => {
     });
 
     return {
-      stop: async () => {
-        if (queue && worker) {
-          await cleanup(queue, worker);
-        }
-        if (flowProducer) {
-          await flowProducer.close();
-        }
-      },
+      queueName: jobs.job.queueName,
     };
   }
   catch (error) {

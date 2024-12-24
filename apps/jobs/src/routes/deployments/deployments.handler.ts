@@ -11,9 +11,6 @@ import type { CreateRoute } from "./deployments.routes";
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const deployment = c.req.valid("json");
 
-  // TODO: move this ssh executation to bullmq job and replace ./ with the path to the cloned repo
-  // After github app manifest creation do:
-
   const githubApp = await db.query.githubApp.findFirst({
     where(fields, operators) {
       return operators.eq(fields.id, deployment.githubAppId);
@@ -32,19 +29,10 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
     );
   }
 
-  await startDeploy({ clone: githubApp, build: { name: "" } });
-  /*
+  const tracking = await startDeploy({
+    clone: { ...githubApp, repoUrl: deployment.repoUrl },
+    build: { name: "" },
+  });
 
-  await ssh.execCommand(
-    "ls",
-    // `nixpacks build ./ --name ${application.name} -o /data/delivery/applications/${application.name}`
-  );
-
-  /* const [inserted] = await db.insert(applications).values(application).returning();
-
-  const withSshOutput = Object.assign(inserted, result); */
-
-  return c.json({} as any, HttpStatusCodes.OK);
+  return c.json(tracking, HttpStatusCodes.OK);
 };
-
-// TODO: Add job to deploy application and stream logs
