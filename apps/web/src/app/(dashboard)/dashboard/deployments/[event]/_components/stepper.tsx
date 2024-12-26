@@ -3,11 +3,15 @@
 import { useEffect } from "react";
 import BoxReveal from "./ui/box-reveal";
 import Ripple from "./ui/ripple";
-import { publicEnv } from "@/env";
 
-export function Stepper() {
+interface StepperProps {
+  baseUrl: string;
+  queueName: string;
+}
+
+export function Stepper({ queueName, baseUrl }: StepperProps) {
   useEffect(() => {
-    const eventSource = new EventSource(`${publicEnv.NEXT_PUBLIC_BASEURL}/api/deployments/logs/deploy`);
+    const eventSource = new EventSource(`${baseUrl}/api/deployments/logs/${queueName}`);
     eventSource.onmessage = (e) => {
       console.log(e);
     };

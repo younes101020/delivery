@@ -8,12 +8,8 @@ import { decryptSecret } from "@/lib/utils";
 
 import type { JobFn } from "../../types";
 
-export interface CloneReturnType {
-  repoName: string;
-}
-
-export const clone: JobFn<"clone", CloneReturnType> = async ({ data }) => {
-  const { secret, appId, clientId, clientSecret, installationId, repoUrl } = data;
+export const clone: JobFn<"clone"> = async (job) => {
+  const { secret, appId, clientId, clientSecret, installationId, repoUrl } = job.data;
 
   const privateKey = await decryptSecret({
     encryptedData: Buffer.from(secret.encryptedData, "base64"),
@@ -41,7 +37,9 @@ export const clone: JobFn<"clone", CloneReturnType> = async ({ data }) => {
   );
 
   const ssh = await sshClient();
-  await ssh.execCommand(`git clone ${formattedRepoUrl}`, { cwd: APPLICATIONS_PATH });
+  await ssh.execCommand(`git clone ${formattedRepoUrl}`, {
+    cwd: APPLICATIONS_PATH,
+  });
   const repoName = basename(repoUrl, ".git");
   return { repoName };
 };

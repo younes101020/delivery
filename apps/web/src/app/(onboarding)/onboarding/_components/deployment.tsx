@@ -118,6 +118,7 @@ export function Deployment({ repositories }: DeploymentProps) {
           id="githubAppId"
           value={selected.githubAppId ?? "no-github-app-id"}
         />
+        {state?.error && <div className="text-destructive text-sm">{state.error}</div>}
         <Button type="submit" disabled={!selected.name} aria-label="submit">
           <Rocket /> | Deploy <span className="underline text-xs">{selected.name ?? ""}</span>
         </Button>

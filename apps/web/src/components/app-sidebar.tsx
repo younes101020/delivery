@@ -53,7 +53,7 @@ const data = {
     },
     {
       title: "Deployments",
-      url: "#",
+      url: "/dashboard/deployments",
       icon: Truck,
       items: [
         {

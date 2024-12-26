@@ -1,43 +1,27 @@
 import { FlowProducer } from "bullmq";
 
-import type { JobQueue, JobWorker, StartTaskFn } from "../types";
+import type { StartTaskFn } from "../types";
 
-import { cleanup, createQueue, createWorker } from "../queue";
+import { connection } from "../worker";
 
 export const startDeploy: StartTaskFn = async (jobsData) => {
-  let queue: JobQueue | undefined;
-  let worker: JobWorker | undefined;
-  let flowProducer: FlowProducer | undefined;
+  const queueName = "deploy";
+  const flowProducer = new FlowProducer({ connection });
 
-  try {
-    queue = createQueue();
-    worker = createWorker();
-    flowProducer = new FlowProducer({ connection: { host: "bull_queue" } });
+  const jobs = await flowProducer.add({
+    name: "build",
+    data: jobsData.build,
+    queueName,
+    children: [
+      {
+        name: "clone",
+        data: jobsData.clone,
+        queueName,
+      },
+    ],
+  });
 
-    const jobs = await flowProducer.add({
-      name: "build",
-      data: jobsData.build,
-      queueName: "deploy",
-      children: [
-        {
-          name: "clone",
-          data: jobsData.clone,
-          queueName: "deploy",
-        },
-      ],
-    });
-
-    return {
-      queueName: jobs.job.queueName,
-    };
-  }
-  catch (error) {
-    if (queue || worker) {
-      await cleanup(queue!, worker!);
-    }
-    if (flowProducer) {
-      await flowProducer.close();
-    }
-    throw error;
-  }
+  return {
+    queueName: jobs.job.queueName,
+  };
 };

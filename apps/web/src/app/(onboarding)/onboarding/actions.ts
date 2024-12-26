@@ -37,11 +37,17 @@ export async function signOut() {
 
 const deploySchema = z.object({
   repoUrl: z.string().url(),
-  githubAppId: z.number(),
+  githubAppId: z.coerce.number(),
 });
 
 export const deploy = validatedAction(deploySchema, async (data) => {
   const user = await getUser();
+  const deploymentResponse = await client.deployments.$post({
+    json: data,
+  });
+  if (deploymentResponse.status !== 200) {
+    return { error: "Impossible to start the deployment." };
+  }
   const response = await client.onboarding.$patch({
     json: {
       completedByUserId: user?.id.toString(),
@@ -55,8 +61,6 @@ export const deploy = validatedAction(deploySchema, async (data) => {
     maxAge: 60 * 60 * 24 * 7,
     path: "/",
   });
-  await client.deployments.$post({
-    json: data,
-  });
-  redirect("/dashboard");
+  const result = await deploymentResponse.json();
+  redirect(`/dashboard/deployments/${result.queueName}`);
 });

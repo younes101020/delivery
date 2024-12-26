@@ -1,4 +1,4 @@
-import { QueueEvents } from "bullmq";
+import { Job, Queue, QueueEvents } from "bullmq";
 import { streamSSE } from "hono/streaming";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
@@ -7,26 +7,39 @@ import type { AppRouteHandler } from "@/lib/types";
 
 import { db } from "@/db";
 import { startDeploy } from "@/lib/tasks/deploy";
+import { connection } from "@/lib/tasks/worker";
 
 import type { CreateRoute, StreamRoute } from "./deployments.routes";
 
 export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
   return streamSSE(c, async (stream) => {
     const { slug } = c.req.valid("param");
-    const queueEvents = new QueueEvents(slug);
-    queueEvents.on("progress", async ({ data }) => {
+    const queue = new Queue(slug, { connection: connection.duplicate() });
+    const queueEvents = new QueueEvents(slug, { connection: connection.duplicate() });
+    queueEvents.on("progress", progressHandler);
+    queueEvents.on("completed", completeHandler);
+    async function progressHandler({ data }: { data: number | object }) {
       if (typeof data !== "number" && "logs" in data && typeof data.logs === "string") {
         await stream.writeSSE({
           data: data.logs,
           event: "image-build-logs",
         });
-        await stream.sleep(1000);
       }
+    }
+    async function completeHandler(job: { jobId: string; returnvalue: string; prev?: string }) {
+      const jobState = await Job.fromId(queue, job.jobId);
+      if (jobState?.name === "build") {
+        stream.close();
+      }
+    }
+    stream.onAbort(() => {
+      queueEvents.removeListener("progress", progressHandler);
+      queueEvents.removeListener("completed", completeHandler);
     });
-    queueEvents.on("completed", () => stream.abort());
-    queueEvents.on("failed", () => stream.abort());
-    queueEvents.on("error", () => stream.abort());
-    // no typescript support for sse in hono https://github.com/honojs/hono/issues/3309
+    while (true) {
+      await stream.sleep(4000);
+    }
+    // casting cause: no typescript support for sse in hono https://github.com/honojs/hono/issues/3309
   }) as any;
 };
 
@@ -35,7 +48,7 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
 
   const githubApp = await db.query.githubApp.findFirst({
     where(fields, operators) {
-      return operators.eq(fields.id, deployment.githubAppId);
+      return operators.eq(fields.appId, deployment.githubAppId);
     },
     with: {
       secret: true,

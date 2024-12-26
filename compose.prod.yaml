@@ -55,8 +55,13 @@ services:
   
   bull_queue:
     image: redis
-    container_name: bull_queue_redis
+    container_name: delivery-bull-queue
     command: redis-server --save 60 1 --loglevel warning --maxmemory-policy noeviction --maxmemory 2gb
+    restart: always
+    ports:
+      - 6379:6379
+    networks:
+      - host_network
 
   adminer:
     image: adminer
