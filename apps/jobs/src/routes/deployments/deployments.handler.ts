@@ -14,24 +14,34 @@ import type { CreateRoute, StreamRoute } from "./deployments.routes";
 export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
   return streamSSE(c, async (stream) => {
     const { slug } = c.req.valid("param");
+
     const queue = new Queue(slug, { connection: connection.duplicate() });
     const queueEvents = new QueueEvents(slug, { connection: connection.duplicate() });
-    queueEvents.on("progress", progressHandler);
-    queueEvents.on("completed", completeHandler);
-    async function progressHandler({ data }: { data: number | object }) {
+    async function progressHandler({ data, jobId }: { data: number | object; jobId: string }) {
+      const jobState = await Job.fromId(queue, jobId);
       if (typeof data !== "number" && "logs" in data && typeof data.logs === "string") {
+        const sseData = JSON.stringify({ jobName: jobState?.name, logs: data.logs });
         await stream.writeSSE({
-          data: data.logs,
+          data: sseData,
+          event: "image-build-logs",
+        });
+      }
+      else {
+        const sseData = JSON.stringify({ jobName: jobState?.name });
+        await stream.writeSSE({
+          data: sseData,
           event: "image-build-logs",
         });
       }
     }
-    async function completeHandler(job: { jobId: string; returnvalue: string; prev?: string }) {
+    async function completeHandler(job: { jobId: string }) {
       const jobState = await Job.fromId(queue, job.jobId);
       if (jobState?.name === "build") {
         stream.close();
       }
     }
+    queueEvents.on("progress", progressHandler);
+    queueEvents.on("completed", completeHandler);
     stream.onAbort(() => {
       queueEvents.removeListener("progress", progressHandler);
       queueEvents.removeListener("completed", completeHandler);

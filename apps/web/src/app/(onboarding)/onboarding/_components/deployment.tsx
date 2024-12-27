@@ -8,7 +8,7 @@ import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import { ActionState } from "@/lib/auth/middleware";
 import type { Repository } from "@/lib/github";
 import type { Nullable } from "@/lib/utils";
-import { Check, Rocket } from "lucide-react";
+import { Check, Loader2, Rocket } from "lucide-react";
 import { motion } from "motion/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
@@ -39,7 +39,7 @@ function RepositorySection({ repo, setSelected, selected }: RepositorySectionPro
       whileTap={{ scale: 0.9 }}
       className="cursor-pointer"
       onClick={() => {
-        console.log(repo.git_url)
+        console.log(repo.git_url);
         setSelected({
           name: repo.full_name,
           id: repo.id,
@@ -67,7 +67,7 @@ function RepositorySection({ repo, setSelected, selected }: RepositorySectionPro
 export function Deployment({ repositories }: DeploymentProps) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(deploy, { error: "" });
   const { isIntersecting, ref } = useIntersectionObserver();
-  console.log(state, pending, isIntersecting, repositories);
+  console.log(state, isIntersecting, repositories);
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams);
   const pathname = usePathname();
@@ -119,8 +119,17 @@ export function Deployment({ repositories }: DeploymentProps) {
           value={selected.githubAppId ?? "no-github-app-id"}
         />
         {state?.error && <div className="text-destructive text-sm">{state.error}</div>}
-        <Button type="submit" disabled={!selected.name} aria-label="submit">
-          <Rocket /> | Deploy <span className="underline text-xs">{selected.name ?? ""}</span>
+        <Button type="submit" disabled={!selected.name || pending} aria-label="submit">
+          {pending ? (
+            <>
+              <Loader2 className="animate-spin mr-2 h-4 w-4" />
+              Loading...
+            </>
+          ) : (
+            <>
+              <Rocket /> | Deploy <span className="underline text-xs">{selected.name ?? ""}</span>
+            </>
+          )}
         </Button>
       </form>
     </>

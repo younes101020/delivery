@@ -19,8 +19,11 @@ export async function middleware(request: NextRequest) {
 
   if (!onboardingCookie) await forwardOnboardingStatus(res);
 
-  if (onboardingCookie) {
-    const skiponboarding = JSON.parse(onboardingCookie.value);
+  const forwardedOnboardingCookie = res.cookies.get("skiponboarding");
+
+  if (onboardingCookie || forwardedOnboardingCookie) {
+    const skiponboarding =
+      onboardingCookie?.value === "true" || forwardedOnboardingCookie?.value === "true";
     if (isOnboardingRoute && skiponboarding) {
       return NextResponse.redirect(new URL("/", request.url));
     } else if (!skiponboarding && !isOnboardingRoute) {

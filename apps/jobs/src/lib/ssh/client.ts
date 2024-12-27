@@ -4,6 +4,8 @@ import path from "node:path";
 
 import env from "@/env";
 
+import { isContainerized } from "./utils";
+
 export function getUserFromKeyPath(keyPath: string) {
   const filename = path.basename(keyPath);
   const match = filename.match(/^id\.(.+)@host\.docker\.internal$/)!;
@@ -52,8 +54,10 @@ export class SSHClient {
   }
 }
 
-export async function findSSHKey(keyDirectory = "/var/ssh/keys") {
+export async function findSSHKey() {
   try {
+    const isContainerizhed = await isContainerized();
+    const keyDirectory = isContainerizhed ? "/var/ssh/keys" : "/data/delivery/ssh/keys";
     const files = await fs.promises.readdir(keyDirectory);
 
     const keyFile = files.find(
