@@ -1,5 +1,6 @@
 services:
   web:
+    image: younes60/web:latest
     build:
       dockerfile: ./apps/web/prod.Dockerfile
     environment:
@@ -19,6 +20,7 @@ services:
       - db
 
   jobs:
+    image: younes60/jobs:latest
     build:
       context: .
       dockerfile: ./apps/jobs/prod.Dockerfile
