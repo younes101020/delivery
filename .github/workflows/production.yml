@@ -25,5 +25,5 @@ jobs:
 
       - name: Build and push images
         run: |
-          docker compose build
-          docker compose push
+          docker compose -f compose.prod.yaml build
+          docker compose -f compose.prod.yaml push
