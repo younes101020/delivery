@@ -7,7 +7,7 @@ import Ripple from "./ui/ripple";
 
 interface StepperProps {
   baseUrl: string;
-  queueName: string;
+  eventName: string;
 }
 
 const DEPLOYMENTMETADATA = {
@@ -26,13 +26,13 @@ type EventData = Nullable<{
   logs: string;
 }>;
 
-export function Stepper({ queueName, baseUrl }: StepperProps) {
+export function Stepper({ eventName, baseUrl }: StepperProps) {
   const [eventData, setEventData] = useState<EventData>({
     step: null,
     logs: null,
   });
   useEffect(() => {
-    const url = `${baseUrl}/api/deployments/logs/${queueName}`;
+    const url = `${baseUrl}/api/deployments/logs/${eventName}`;
     const eventSource = new EventSource(url);
 
     const handleLogs = (e: MessageEvent) => {
@@ -49,7 +49,7 @@ export function Stepper({ queueName, baseUrl }: StepperProps) {
       eventSource.removeEventListener("image-build-logs", handleLogs);
       eventSource.close();
     };
-  }, [baseUrl, queueName]);
+  }, [baseUrl, eventName]);
 
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden">
