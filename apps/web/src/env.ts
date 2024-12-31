@@ -1,6 +1,6 @@
 import { config } from "dotenv";
 import { expand } from "dotenv-expand";
-import { readFileSync } from "node:fs";
+import fs from "fs";
 import path from "node:path";
 import { z } from "zod";
 
@@ -50,7 +50,7 @@ if (envValidation) {
 }
 
 function isDocker() {
-  return readFileSync("/proc/1/cgroup", "utf8").includes("docker");
+  return fs.readFileSync("/proc/1/cgroup", "utf8").includes("docker");
 }
 
 export { publicEnv, serverEnv };
