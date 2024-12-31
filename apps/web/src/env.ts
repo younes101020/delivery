@@ -2,6 +2,7 @@ import { config } from "dotenv";
 import { expand } from "dotenv-expand";
 import path from "node:path";
 import { z } from "zod";
+import { isDocker } from "./lib/utils";
 
 const serverEnvSchema = z.object({
   NODE_ENV: z.string(),
@@ -17,8 +18,11 @@ const publicEnvSchema = z.object({
 let publicEnv: z.infer<typeof publicEnvSchema>;
 let serverEnv: z.infer<typeof serverEnvSchema>;
 
-if (process.env.NEXT_RUNTIME === "nodejs" || process.env.NODE_ENV === "test") {
+const isDockerBuildProcess = await isDocker();
+const envValidation =
+  (process.env.NEXT_RUNTIME === "nodejs" || process.env.NODE_ENV === "test") && !isDockerBuildProcess;
 
+if (envValidation) {
   expand(
     config({
       path: path.resolve(process.cwd(), process.env.NODE_ENV === "test" ? ".env.test" : ".env"),

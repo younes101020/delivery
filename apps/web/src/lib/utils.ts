@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import { readFile } from "node:fs/promises";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -20,3 +21,8 @@ export function parseSetCookie(header: string) {
 export type Nullable<T> = {
   [K in keyof T]: T[K] | null;
 };
+
+export async function isDocker() {
+  const cgroup = await readFile("/proc/1/cgroup", "utf8");
+  return cgroup.includes("docker");
+}
