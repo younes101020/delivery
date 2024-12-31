@@ -1,6 +1,5 @@
 import { config } from "dotenv";
 import { expand } from "dotenv-expand";
-import fs from "fs";
 import path from "node:path";
 import { z } from "zod";
 
@@ -21,36 +20,29 @@ let serverEnv: z.infer<typeof serverEnvSchema>;
 const envValidation = process.env.NEXT_RUNTIME === "nodejs" || process.env.NODE_ENV === "test";
 
 if (envValidation) {
-  const isDockerBuildProcess = isDocker();
-  if (!isDockerBuildProcess) {
-    expand(
-      config({
-        path: path.resolve(process.cwd(), process.env.NODE_ENV === "test" ? ".env.test" : ".env"),
-      }),
-    );
+  expand(
+    config({
+      path: path.resolve(process.cwd(), process.env.NODE_ENV === "test" ? ".env.test" : ".env"),
+    }),
+  );
 
-    const serverEnvResult = serverEnvSchema.safeParse(process.env);
-    if (serverEnvResult.success) {
-      serverEnv = serverEnvResult.data;
-    } else {
-      console.error("❌ Invalid server env vars:");
-      console.error(JSON.stringify(serverEnvResult.error.flatten().fieldErrors, null, 2));
-      process.exit(1);
-    }
-
-    const publicEnvResult = publicEnvSchema.safeParse(process.env);
-    if (publicEnvResult.success) {
-      publicEnv = publicEnvResult.data;
-    } else {
-      console.error("❌ Invalid public env vars:");
-      console.error(JSON.stringify(publicEnvResult.error.flatten().fieldErrors, null, 2));
-      process.exit(1);
-    }
+  const serverEnvResult = serverEnvSchema.safeParse(process.env);
+  if (serverEnvResult.success) {
+    serverEnv = serverEnvResult.data;
+  } else {
+    console.error("❌ Invalid server env vars:");
+    console.error(JSON.stringify(serverEnvResult.error.flatten().fieldErrors, null, 2));
+    process.exit(1);
   }
-}
 
-function isDocker() {
-  return fs.readFileSync("/proc/1/cgroup", "utf8").includes("docker");
+  const publicEnvResult = publicEnvSchema.safeParse(process.env);
+  if (publicEnvResult.success) {
+    publicEnv = publicEnvResult.data;
+  } else {
+    console.error("❌ Invalid public env vars:");
+    console.error(JSON.stringify(publicEnvResult.error.flatten().fieldErrors, null, 2));
+    process.exit(1);
+  }
 }
 
 export { publicEnv, serverEnv };
