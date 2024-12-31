@@ -1,8 +1,8 @@
 import { config } from "dotenv";
 import { expand } from "dotenv-expand";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
-import { isDocker } from "./lib/utils";
 
 const serverEnvSchema = z.object({
   NODE_ENV: z.string(),
@@ -20,7 +20,8 @@ let serverEnv: z.infer<typeof serverEnvSchema>;
 
 const isDockerBuildProcess = await isDocker();
 const envValidation =
-  (process.env.NEXT_RUNTIME === "nodejs" || process.env.NODE_ENV === "test") && !isDockerBuildProcess;
+  (process.env.NEXT_RUNTIME === "nodejs" || process.env.NODE_ENV === "test") &&
+  !isDockerBuildProcess;
 
 if (envValidation) {
   expand(
@@ -46,6 +47,11 @@ if (envValidation) {
     console.error(JSON.stringify(publicEnvResult.error.flatten().fieldErrors, null, 2));
     process.exit(1);
   }
+}
+
+async function isDocker() {
+  const cgroup = await readFile("/proc/1/cgroup", "utf8");
+  return cgroup.includes("docker");
 }
 
 export { publicEnv, serverEnv };
