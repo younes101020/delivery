@@ -10,8 +10,7 @@
     "test": "concurrently --kill-others --success=first \"cd ../jobs && NODE_ENV=test node ./dist/src/index.js\" \"cross-env vitest run\""
   },
   "dependencies": {
-    "@delivery/jobs/hc": "workspace:*",
-    "@delivery/jobs/types": "workspace:*",
+    "@delivery/jobs": "*",
     "@hono/client": "^0.0.3",
     "@octokit/app": "^15.1.0",
     "@octokit/auth-app": "^7.1.3",
