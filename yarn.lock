@@ -404,7 +404,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@delivery/jobs@workspace:apps/jobs":
+"@delivery/jobs@npm:*, @delivery/jobs@workspace:apps/jobs":
   version: 0.0.0-use.local
   resolution: "@delivery/jobs@workspace:apps/jobs"
   dependencies:
@@ -451,6 +451,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@delivery/web@workspace:apps/web"
   dependencies:
+    "@delivery/jobs": "npm:*"
     "@hono/client": "npm:^0.0.3"
     "@octokit/app": "npm:^15.1.0"
     "@octokit/auth-app": "npm:^7.1.3"
