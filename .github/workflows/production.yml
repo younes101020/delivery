@@ -19,7 +19,7 @@ jobs:
       BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
       AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
       JOBS_BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
-      PORT: 9030
+      PORT: 3090
       LOG_LEVEL: silent
       JOBS_API_BASEURL: http://localhost:3090
       NEXT_PUBLIC_BASEURL: http://localhost:3000
