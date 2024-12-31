@@ -5,10 +5,10 @@ services:
       context: .
       dockerfile: ./apps/web/prod.Dockerfile
     environment:
-      - INPUT_AUTH_SECRET
-      - INPUT_JOBS_BEARER_TOKEN
-      - INPUT_JOBS_API_BASEURL
-      - INPUT_NEXT_PUBLIC_BASEURL
+      - AUTH_SECRET
+      - JOBS_BEARER_TOKEN
+      - JOBS_API_BASEURL
+      - NEXT_PUBLIC_BASEURL
     volumes:
       - ./apps/web/src:/app/src
     restart: always
@@ -25,13 +25,13 @@ services:
       context: .
       dockerfile: ./apps/jobs/prod.Dockerfile
     environment:
-      - INPUT_PORT
-      - INPUT_DATABASE_URL
-      - INPUT_DATABASE_AUTH_TOKEN
-      - INPUT_LOG_LEVEL
-      - INPUT_NODE_ENV
-      - INPUT_SSH_HOST
-      - INPUT_BEARER_TOKEN
+      - PORT
+      - DATABASE_URL
+      - DATABASE_AUTH_TOKEN
+      - LOG_LEVEL
+      - NODE_ENV
+      - SSH_HOST
+      - BEARER_TOKEN
     volumes:
       - /data/delivery/ssh/keys:/var/ssh/keys
     restart: always
