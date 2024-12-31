@@ -52,7 +52,7 @@ services:
       - host_network
     volumes:
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - postgres_data:/var/lib/postgresql/data
+      - ${PWD}/db-data/:/var/lib/postgresql@16/data:rw
     restart: always
   
   bull_queue:
