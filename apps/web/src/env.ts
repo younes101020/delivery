@@ -1,6 +1,6 @@
 import { config } from "dotenv";
 import { expand } from "dotenv-expand";
-import { readFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { z } from "zod";
 
@@ -18,40 +18,39 @@ const publicEnvSchema = z.object({
 let publicEnv: z.infer<typeof publicEnvSchema>;
 let serverEnv: z.infer<typeof serverEnvSchema>;
 
-const isDockerBuildProcess = await isDocker();
-const envValidation =
-  (process.env.NEXT_RUNTIME === "nodejs" || process.env.NODE_ENV === "test") &&
-  !isDockerBuildProcess;
+const envValidation = process.env.NEXT_RUNTIME === "nodejs" || process.env.NODE_ENV === "test";
 
 if (envValidation) {
-  expand(
-    config({
-      path: path.resolve(process.cwd(), process.env.NODE_ENV === "test" ? ".env.test" : ".env"),
-    }),
-  );
+  const isDockerBuildProcess = isDocker();
+  if (!isDockerBuildProcess) {
+    expand(
+      config({
+        path: path.resolve(process.cwd(), process.env.NODE_ENV === "test" ? ".env.test" : ".env"),
+      }),
+    );
 
-  const serverEnvResult = serverEnvSchema.safeParse(process.env);
-  if (serverEnvResult.success) {
-    serverEnv = serverEnvResult.data;
-  } else {
-    console.error("❌ Invalid server env vars:");
-    console.error(JSON.stringify(serverEnvResult.error.flatten().fieldErrors, null, 2));
-    process.exit(1);
-  }
+    const serverEnvResult = serverEnvSchema.safeParse(process.env);
+    if (serverEnvResult.success) {
+      serverEnv = serverEnvResult.data;
+    } else {
+      console.error("❌ Invalid server env vars:");
+      console.error(JSON.stringify(serverEnvResult.error.flatten().fieldErrors, null, 2));
+      process.exit(1);
+    }
 
-  const publicEnvResult = publicEnvSchema.safeParse(process.env);
-  if (publicEnvResult.success) {
-    publicEnv = publicEnvResult.data;
-  } else {
-    console.error("❌ Invalid public env vars:");
-    console.error(JSON.stringify(publicEnvResult.error.flatten().fieldErrors, null, 2));
-    process.exit(1);
+    const publicEnvResult = publicEnvSchema.safeParse(process.env);
+    if (publicEnvResult.success) {
+      publicEnv = publicEnvResult.data;
+    } else {
+      console.error("❌ Invalid public env vars:");
+      console.error(JSON.stringify(publicEnvResult.error.flatten().fieldErrors, null, 2));
+      process.exit(1);
+    }
   }
 }
 
-async function isDocker() {
-  const cgroup = await readFile("/proc/1/cgroup", "utf8");
-  return cgroup.includes("docker");
+function isDocker() {
+  return readFileSync("/proc/1/cgroup", "utf8").includes("docker");
 }
 
 export { publicEnv, serverEnv };
