@@ -7,11 +7,11 @@ const serverEnvSchema = z.object({
   NODE_ENV: z.string(),
   AUTH_SECRET: z.string(),
   JOBS_BEARER_TOKEN: z.string(),
-  JOBS_API_BASEURL: z.string().url(),
+  JOBS_API_BASEURL: z.string(),
 });
 
 const publicEnvSchema = z.object({
-  NEXT_PUBLIC_BASEURL: z.string().url(),
+  NEXT_PUBLIC_BASEURL: z.string(),
 });
 
 let publicEnv: z.infer<typeof publicEnvSchema>;
