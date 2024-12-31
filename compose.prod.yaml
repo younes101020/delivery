@@ -2,6 +2,7 @@ services:
   web:
     image: younes60/web:latest
     build:
+      context: .
       dockerfile: ./apps/web/prod.Dockerfile
     environment:
       - AUTH_SECRET
