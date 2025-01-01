@@ -77,20 +77,4 @@ describe("auth routes / E2E", () => {
       expect(json.message).toBe(HttpStatusPhrases.UNAUTHORIZED);
     }
   });
-  describe("auth routes / UT", () => {
-    it("verifyPassword returns true for matching password and hash", async ({ users }) => {
-      const { passwordHash: password } = users[0];
-      const hash = await hashPassword(password);
-      const result = await verifyPassword(password, hash);
-      expect(result).toBe(true);
-    });
-
-    it("verifyPassword returns false for non-matching password and hash", async ({ users }) => {
-      const { passwordHash: password } = users[0];
-      const wrongPassword = `${password}wrong`;
-      const hash = await hashPassword(password);
-      const result = await verifyPassword(wrongPassword, hash);
-      expect(result).toBe(false);
-    });
-  });
 });

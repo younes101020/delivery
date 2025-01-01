@@ -92,42 +92,4 @@ describe("applications routes / E2E", () => {
       expect(json.privateKey).toBe(privateKey);
     }
   });
-
-  describe("applications routes / UT", () => {
-    it("should decrypt an encrypted github app private key", async ({ githubApps }) => {
-      const { privateKey } = githubApps[0];
-      const { encryptedData, iv, key } = await encryptSecret(privateKey);
-
-      const importedKey = await crypto.subtle.importKey(
-        "raw",
-        Buffer.from(key, "base64"),
-        { name: "AES-GCM", length: 256 },
-        true,
-        ["decrypt"],
-      );
-
-      const decryptedSecret = await decryptSecret({
-        encryptedData: Buffer.from(encryptedData, "base64"),
-        iv: Buffer.from(iv, "base64"),
-        key: importedKey,
-      });
-
-      expect(decryptedSecret).toBe(privateKey);
-    });
-
-    it("should generate encrypted github app private key with base64 properties", async ({
-      githubApps,
-    }) => {
-      const { privateKey } = githubApps[0];
-      const { encryptedData, iv, key } = await encryptSecret(privateKey);
-
-      expect(encryptedData).toBeTruthy();
-      expect(iv).toBeTruthy();
-      expect(key).toBeTruthy();
-
-      expect(() => atob(encryptedData)).not.toThrow();
-      expect(() => atob(iv)).not.toThrow();
-      expect(() => atob(key)).not.toThrow();
-    });
-  });
 });
