@@ -2,6 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
@@ -13,10 +15,6 @@ import { motion } from "motion/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import { deploy } from "../actions";
-
-interface DeploymentProps {
-  repositories: (Repository & { githubAppId: number })[];
-}
 
 type SelectedRepositoryProps = Nullable<{
   name: string;
@@ -64,6 +62,10 @@ function RepositorySection({ repo, setSelected, selected }: RepositorySectionPro
   );
 }
 
+interface DeploymentProps {
+  repositories: (Repository & { githubAppId: number })[];
+}
+
 export function Deployment({ repositories }: DeploymentProps) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(deploy, { error: "" });
   const { isIntersecting, ref } = useIntersectionObserver();
@@ -94,42 +96,80 @@ export function Deployment({ repositories }: DeploymentProps) {
 
   return (
     <>
-      <ScrollArea className="h-80 my-4 px-5">
-        <div className="max-h-96 grid grid-cols-1 md:grid-cols-2 gap-2">
-          {repositories.map((repo) => (
-            <RepositorySection
-              repo={repo}
-              key={repo.id}
-              setSelected={setSelected}
-              selected={selected}
+      <form action={formAction} className="px-5 space-y-4" aria-label="form">
+        <div>
+          <Label htmlFor="port" className="block text-sm font-medium">
+            Exposed or mapped port
+          </Label>
+          <div className="mt-1">
+            <Input
+              id="port"
+              name="port"
+              type="number"
+              required
+              min={1}
+              className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
+              placeholder="ex: 3000 or 5695:3000"
             />
-          ))}
-          <div ref={ref}>
-            <Skeleton className="w-full h-40" />
           </div>
+          <p className="text-muted-foreground text-xs pt-1">
+            This port will be used by the reverse proxy to make your application accessible.
+          </p>
         </div>
-      </ScrollArea>
-      <form action={formAction} className="flex justify-end px-5" aria-label="form">
-        <input type="hidden" name="repoUrl" id="repoUrl" value={selected.gitUrl ?? "no-url"} />
-        <input
-          type="hidden"
-          name="githubAppId"
-          id="githubAppId"
-          value={selected.githubAppId ?? "no-github-app-id"}
-        />
-        {state?.error && <div className="text-destructive text-sm">{state.error}</div>}
-        <Button type="submit" disabled={!selected.name || pending} aria-label="submit">
-          {pending ? (
-            <>
-              <Loader2 className="animate-spin mr-2 h-4 w-4" />
-              Loading...
-            </>
-          ) : (
-            <>
-              <Rocket /> | Deploy
-            </>
-          )}
-        </Button>
+        <div>
+          <Label htmlFor="env" className="block text-sm font-medium">
+            Environment variables
+          </Label>
+          <div className="mt-1">
+            <Input
+              id="env"
+              name="env"
+              type="text"
+              className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
+              placeholder="ex: KEY1=value1 KEY2=value2"
+            />
+          </div>
+          <p className="text-muted-foreground text-xs pt-1">
+            These variables will be injected into the container environment.
+          </p>
+        </div>
+        <ScrollArea className="h-80 my-4">
+          <div className="max-h-96 grid grid-cols-1 md:grid-cols-2 gap-2">
+            {repositories.map((repo) => (
+              <RepositorySection
+                repo={repo}
+                key={repo.id}
+                setSelected={setSelected}
+                selected={selected}
+              />
+            ))}
+            <div ref={ref}>
+              <Skeleton className="w-full h-40" />
+            </div>
+          </div>
+        </ScrollArea>
+        <div className="flex justify-end">
+          <input type="hidden" name="repoUrl" id="repoUrl" value={selected.gitUrl ?? "no-url"} />
+          <input
+            type="hidden"
+            name="githubAppId"
+            id="githubAppId"
+            value={selected.githubAppId ?? "no-github-app-id"}
+          />
+          {state?.error && <div className="text-destructive text-sm">{state.error}</div>}
+          <Button type="submit" disabled={!selected.name || pending} aria-label="submit">
+            {pending ? (
+              <>
+                <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                Loading...
+              </>
+            ) : (
+              <>
+                <Rocket /> | Deploy
+              </>
+            )}
+          </Button>
+        </div>
       </form>
     </>
   );

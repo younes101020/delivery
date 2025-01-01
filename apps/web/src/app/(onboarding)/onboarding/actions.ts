@@ -38,6 +38,14 @@ export async function signOut() {
 const deploySchema = z.object({
   repoUrl: z.string().url(),
   githubAppId: z.coerce.number(),
+  port: z
+    .string()
+    .regex(/^\d+(?::\d+)?$/)
+    .transform((port) => {
+      const [first, second] = port.split(":");
+      return second ? port : `${first}:${first}`;
+    }),
+  env: z.string().optional(),
 });
 
 export const deploy = validatedAction(deploySchema, async (data) => {

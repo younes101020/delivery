@@ -8,7 +8,7 @@ export interface JobDataMap {
     repoUrl: string;
     repoName: string;
   };
-  build: { repoName: string };
+  build: { repoName: string; env?: string; port: string };
 }
 export type JobName = "clone" | "build";
 export type JobFn<T extends JobName> = (job: Job<JobDataMap[T]>) => Promise<any>;

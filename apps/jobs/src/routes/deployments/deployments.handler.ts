@@ -37,7 +37,7 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
 
   const tracking = await startDeploy({
     clone: { ...githubApp, repoUrl: deployment.repoUrl, repoName },
-    build: { repoName },
+    build: { repoName, port: deployment.port, env: deployment.env },
   });
 
   return c.json(tracking, HttpStatusCodes.OK);

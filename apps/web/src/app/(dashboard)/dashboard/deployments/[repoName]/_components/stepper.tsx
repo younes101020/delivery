@@ -4,8 +4,8 @@ import { Nullable } from "@/lib/utils";
 import { ExternalLink as ExternalLinkIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import BoxReveal from "./ui/box-reveal";
-import Ripple from "./ui/ripple";
 import { LogsTerminal } from "./ui/logsterminal";
+import Ripple from "./ui/ripple";
 
 interface StepperProps {
   baseUrl: string;
@@ -62,10 +62,12 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
           <span className="text-primary">.</span>
         </p>
       </BoxReveal>
-      <p className="text-xs text-primary">
-        {sseData.step && DEPLOYMENTMETADATA[sseData.step].position}
-      </p>
-      <LogsTerminalButton step={sseData.step} logs={sseData.logs} />
+      <div className="flex gap-2">
+        <p className="text-xs text-primary">
+          {sseData.step && DEPLOYMENTMETADATA[sseData.step].position}
+        </p>
+        <LogsTerminalButton step={sseData.step} logs={sseData.logs} />
+      </div>
       <Ripple />
     </div>
   );
