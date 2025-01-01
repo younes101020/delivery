@@ -37,6 +37,7 @@ const deployments = faker.helpers.multiple(
   (_, i) => ({
     repoUrl: faker.internet.url(),
     githubAppId: i,
+    port: faker.internet.port().toString(),
   }),
   { count: 10 },
 );
