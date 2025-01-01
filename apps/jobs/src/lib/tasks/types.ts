@@ -10,8 +10,12 @@ export interface JobDataMap {
   };
   build: { repoName: string; env?: string; port: string };
 }
+export interface JobParam<T extends JobName> {
+  data: JobDataMap[T];
+  updateProgress: (progress: number | object) => void;
+}
 export type JobName = "clone" | "build";
-export type JobFn<T extends JobName> = (job: Job<JobDataMap[T]>) => Promise<any>;
+export type JobFn<T extends JobName> = (job: JobParam<T>) => Promise<unknown>;
 export type Jobs = { [K in JobName]: JobFn<K> };
 
 export type JobWorker = Worker<JobDataMap[JobName], any, JobName>;
@@ -21,5 +25,4 @@ export type CleanupFn = (queue: JobQueue, worker: JobWorker) => Promise<void>;
 export interface StartTaskReturn {
   queueName: JobNode["job"]["queueName"];
 }
-export type StartTaskFn = (jobsData: JobDataMap) => Promise<StartTaskReturn>;
 export type { Job };

@@ -41,23 +41,23 @@ describe("users routes / E2E", () => {
       expect(json.error.issues[0].message).toBe(ZOD_ERROR_MESSAGES.REQUIRED);
     }
   });
-});
 
-it("post /users creates a user", async ({ users }) => {
-  const { passwordHash, name, email } = users[0];
-  const response = await client.users.$post(
-    {
-      json: {
-        name,
-        email,
-        passwordHash,
+  it("post /users creates a user", async ({ users }) => {
+    const { passwordHash, name, email } = users[0];
+    const response = await client.users.$post(
+      {
+        json: {
+          name,
+          email,
+          passwordHash,
+        },
       },
-    },
-    httpOptions,
-  );
-  expect(response.status).toBe(200);
-  if (response.status === 200) {
-    const json = await response.json();
-    expect(json.email).toBe(email);
-  }
+      httpOptions,
+    );
+    expect(response.status).toBe(200);
+    if (response.status === 200) {
+      const json = await response.json();
+      expect(json.email).toBe(email);
+    }
+  });
 });

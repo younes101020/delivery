@@ -19,16 +19,12 @@ export const clone: JobFn<"clone"> = async (job) => {
     ]),
   });
 
-  job.updateProgress(25);
-
   const auth = createAppAuth({
     appId,
     privateKey,
     clientId,
     clientSecret,
   });
-
-  job.updateProgress(50);
 
   const installationAuthentication = await auth({
     type: "installation",
@@ -40,15 +36,10 @@ export const clone: JobFn<"clone"> = async (job) => {
     `https://x-access-token:${installationAuthentication.token}@`,
   );
 
-  job.updateProgress(75);
-
   const ssh = await sshClient();
-
   await ssh.execCommand(`git clone ${formattedRepoUrl}`, {
     cwd: APPLICATIONS_PATH,
   });
-
-  job.updateProgress(100);
 
   return { status: "success" };
 };

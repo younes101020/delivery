@@ -1,10 +1,14 @@
 /* eslint-disable ts/ban-ts-comment */
+import { it } from "__tests__";
 import { testClient } from "hono/testing";
-import { describe, expect, it } from "vitest";
+import { describe, expect, vi } from "vitest";
+import { ZodError } from "zod";
 
+import { insertDeploymentSchema } from "@/db/dto";
 import env from "@/env";
 import { ZOD_ERROR_MESSAGES } from "@/lib/constants";
 import createApp from "@/lib/create-app";
+import { clone } from "@/lib/tasks/deploy/jobs/clone";
 
 import router from "./deployments.index";
 
@@ -17,13 +21,38 @@ const httpOptions = {
   headers: { Authorization: `Bearer ${env.BEARER_TOKEN}` },
 };
 
-describe("applications routes", () => {
-  it("post /applications validates the body when creating", async () => {
+vi.mock("@/lib/utils", async () => {
+  return {
+    decryptSecret: vi.fn().mockResolvedValue("mocked-decrypted-secret"),
+  };
+});
+
+vi.mock("@octokit/auth-app", async () => {
+  return {
+    createAppAuth: vi.fn().mockReturnValue(() => ({
+      type: "installation",
+      installationId: 123,
+      token: "mocked-token",
+    })),
+  };
+});
+
+vi.mock("@/lib/ssh", async () => {
+  return {
+    default: vi.fn().mockResolvedValue({
+      execCommand: vi.fn().mockResolvedValue({ stdout: "", stderr: "" }),
+    }),
+  };
+});
+
+describe("deployments routes", () => {
+  it("post /deployments validates the body when creating", async () => {
     const response = await client.deployments.$post(
       {
         // @ts-expect-error
         json: {
           githubAppId: 1,
+          port: "3000:3000",
         },
       },
       httpOptions,
@@ -34,5 +63,35 @@ describe("applications routes", () => {
       expect(json.error.issues[0].path[0]).toBe("repoUrl");
       expect(json.error.issues[0].message).toBe(ZOD_ERROR_MESSAGES.REQUIRED);
     }
+  });
+  describe("deployments routes / UT", () => {
+    it("should format repo URL correctly with github app auth token", async ({ job }) => {
+      const result = await clone(job);
+
+      const expectedUrl = job.data.repoUrl.replace(
+        "git://",
+        "https://x-access-token:mocked-token@",
+      );
+
+      const sshClient = (await import("@/lib/ssh")).default;
+      const mockExecCommand = vi.mocked(await sshClient()).execCommand;
+
+      expect(mockExecCommand).toHaveBeenCalledWith(`git clone ${expectedUrl}`, expect.any(Object));
+      expect(result).toEqual({ status: "success" });
+    });
+
+    it("should reject invalid port formats", ({ deployments }) => {
+      const invalidPorts = ["8080:80:90", "abc", "8080:abc", ":8080", "8080:", ""];
+
+      invalidPorts.forEach((invalidPort) => {
+        const input = {
+          repoUrl: deployments.repoUrl,
+          githubAppId: deployments.githubAppId,
+          port: invalidPort,
+        };
+
+        expect(() => insertDeploymentSchema.parse(input)).toThrow(ZodError);
+      });
+    });
   });
 });

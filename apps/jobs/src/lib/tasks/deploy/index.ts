@@ -1,10 +1,10 @@
 import { FlowProducer } from "bullmq";
 
-import type { StartTaskFn } from "../types";
+import type { JobDataMap } from "../types";
 
 import { connection, createWorker } from "../worker";
 
-export const startDeploy: StartTaskFn = async (jobsData) => {
+export async function startDeploy(jobsData: JobDataMap) {
   await createWorker(jobsData.build.repoName);
   const flowProducer = new FlowProducer({ connection });
 

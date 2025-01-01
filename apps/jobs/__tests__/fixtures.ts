@@ -1,6 +1,8 @@
 import { faker } from "@faker-js/faker";
 import { it as base } from "vitest";
 
+import type { JobDataMap, JobParam } from "@/lib/tasks/types";
+
 import type {
   InsertDeploymentSchema,
   InsertGithubAppsSchema,
@@ -10,7 +12,8 @@ import type {
 interface Fixtures {
   githubApps: InsertGithubAppsSchema[];
   users: InsertUsersSchema[];
-  deployments: InsertDeploymentSchema[];
+  deployments: InsertDeploymentSchema & JobDataMap;
+  job: JobParam<"clone">;
 }
 
 const githubApps = faker.helpers.multiple(
@@ -33,14 +36,38 @@ const users = faker.helpers.multiple(
   { count: 10 },
 );
 
-const deployments = faker.helpers.multiple(
-  (_, i) => ({
+const deployments = {
+  repoUrl: "git://github.com/user/repo",
+  githubAppId: 1,
+  port: faker.internet.port().toString(),
+  clone: {
+    id: 1,
+    appId: 1,
+    clientId: "1",
+    clientSecret: faker.internet.password(),
+    webhookSecret: faker.internet.password(),
+    secretId: 4,
+    installationId: faker.number.int(),
+    secret: {
+      id: 4,
+      encryptedData: faker.string.alphanumeric(64),
+      iv: faker.string.alphanumeric(32),
+      key: faker.string.alphanumeric(32),
+    },
     repoUrl: faker.internet.url(),
-    githubAppId: i,
+    repoName: faker.system.fileName(),
+  },
+  build: {
+    repoName: faker.system.fileName(),
     port: faker.internet.port().toString(),
-  }),
-  { count: 10 },
-);
+    env: `KEY=${faker.string.sample()}`,
+  },
+};
+
+const job = {
+  data: deployments.clone,
+  updateProgress: () => {},
+};
 
 export const it = base.extend<Fixtures>({
   // eslint-disable-next-line no-empty-pattern
@@ -54,5 +81,9 @@ export const it = base.extend<Fixtures>({
   // eslint-disable-next-line no-empty-pattern
   deployments: async ({}, use) => {
     await use(deployments);
+  },
+  // eslint-disable-next-line no-empty-pattern
+  job: async ({}, use) => {
+    await use(job);
   },
 });
