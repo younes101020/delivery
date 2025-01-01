@@ -2,7 +2,7 @@ import { publicEnv } from "@/env";
 import { Suspense } from "react";
 import { Stepper } from "./_components/stepper";
 
-export default function DeploymentsPage({ params }: { params: Promise<{ event: string }> }) {
+export default function DeploymentsPage({ params }: { params: Promise<{ repoName: string }> }) {
   return (
     <Suspense>
       <SuspensedDeploymentsPage params={params} />
@@ -10,11 +10,11 @@ export default function DeploymentsPage({ params }: { params: Promise<{ event: s
   );
 }
 
-async function SuspensedDeploymentsPage({ params }: { params: Promise<{ event: string }> }) {
-  const { event } = await params;
+async function SuspensedDeploymentsPage({ params }: { params: Promise<{ repoName: string }> }) {
+  const { repoName } = await params;
   return (
     <div className="h-full flex justify-center items-center py-4">
-      <Stepper eventName={event} baseUrl={publicEnv.NEXT_PUBLIC_BASEURL} />
+      <Stepper repoName={repoName} baseUrl={publicEnv.NEXT_PUBLIC_BASEURL} />
     </div>
   );
 }

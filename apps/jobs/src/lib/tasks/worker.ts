@@ -7,9 +7,9 @@ import { jobs } from "./deploy/jobs";
 
 export const connection = new IORedis({ maxRetriesPerRequest: null });
 
-export async function createWorker() {
+export async function createWorker(queueName: string) {
   const worker = new Worker<JobDataMap[JobName], any, JobName>(
-    "deploy",
+    queueName,
     async <T extends JobName>(job: Job<JobDataMap[T]> & { name: T }) => {
       const processor = jobs[job.name];
       if (!processor) {

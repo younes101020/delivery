@@ -2,21 +2,21 @@ import { FlowProducer } from "bullmq";
 
 import type { StartTaskFn } from "../types";
 
-import { connection } from "../worker";
+import { connection, createWorker } from "../worker";
 
 export const startDeploy: StartTaskFn = async (jobsData) => {
-  const queueName = "deploy";
+  await createWorker(jobsData.build.repoName);
   const flowProducer = new FlowProducer({ connection });
 
   const jobs = await flowProducer.add({
     name: "build",
     data: jobsData.build,
-    queueName,
+    queueName: jobsData.build.repoName,
     children: [
       {
         name: "clone",
         data: jobsData.clone,
-        queueName,
+        queueName: jobsData.clone.repoName,
       },
     ],
   });

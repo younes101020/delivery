@@ -1,5 +1,6 @@
 import { Job, Queue, QueueEvents } from "bullmq";
 import { streamSSE } from "hono/streaming";
+import { basename } from "node:path";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
@@ -10,48 +11,6 @@ import { startDeploy } from "@/lib/tasks/deploy";
 import { connection } from "@/lib/tasks/worker";
 
 import type { CreateRoute, StreamRoute } from "./deployments.routes";
-
-export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
-  return streamSSE(c, async (stream) => {
-    const { slug } = c.req.valid("param");
-
-    const queue = new Queue(slug, { connection: connection.duplicate() });
-    const queueEvents = new QueueEvents(slug, { connection: connection.duplicate() });
-    async function progressHandler({ data, jobId }: { data: number | object; jobId: string }) {
-      const jobState = await Job.fromId(queue, jobId);
-      if (typeof data !== "number" && "logs" in data && typeof data.logs === "string") {
-        const sseData = JSON.stringify({ jobName: jobState?.name, logs: data.logs });
-        await stream.writeSSE({
-          data: sseData,
-          event: "image-build-logs",
-        });
-      }
-      else {
-        const sseData = JSON.stringify({ jobName: jobState?.name });
-        await stream.writeSSE({
-          data: sseData,
-          event: "image-build-logs",
-        });
-      }
-    }
-    async function completeHandler(job: { jobId: string }) {
-      const jobState = await Job.fromId(queue, job.jobId);
-      if (jobState?.name === "build") {
-        stream.close();
-      }
-    }
-    queueEvents.on("progress", progressHandler);
-    queueEvents.on("completed", completeHandler);
-    stream.onAbort(() => {
-      queueEvents.removeListener("progress", progressHandler);
-      queueEvents.removeListener("completed", completeHandler);
-    });
-    while (true) {
-      await stream.sleep(4000);
-    }
-    // casting cause: no typescript support for sse in hono https://github.com/honojs/hono/issues/3309
-  }) as any;
-};
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const deployment = c.req.valid("json");
@@ -74,10 +33,58 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
     );
   }
 
+  const repoName = basename(deployment.repoUrl, ".git");
+
   const tracking = await startDeploy({
-    clone: { ...githubApp, repoUrl: deployment.repoUrl },
-    build: { name: "" },
+    clone: { ...githubApp, repoUrl: deployment.repoUrl, repoName },
+    build: { repoName },
   });
 
   return c.json(tracking, HttpStatusCodes.OK);
+};
+
+export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
+  return streamSSE(c, async (stream) => {
+    const { slug } = c.req.valid("param");
+
+    const queue = new Queue(slug, { connection: connection.duplicate() });
+    const queueEvents = new QueueEvents(slug, { connection: connection.duplicate() });
+    async function progressHandler({ data, jobId }: { data: number | object; jobId: string }) {
+      const jobState = await Job.fromId(queue, jobId);
+      const sseData = JSON.stringify({
+        jobName: jobState?.name,
+        ...(typeof data === "object" && "logs" in data ? { logs: data.logs } : {}),
+      });
+      switch (jobState?.name) {
+        case "clone":
+          await stream.writeSSE({
+            data: sseData,
+            event: `${jobState.data.repoName}-build-logs`,
+          });
+          break;
+        case "build":
+          await stream.writeSSE({
+            data: sseData,
+            event: `${jobState.data.repoName}-build-logs`,
+          });
+          break;
+      }
+    }
+    async function completeHandler(job: { jobId: string }) {
+      const jobState = await Job.fromId(queue, job.jobId);
+      if (jobState?.name === "build") {
+        stream.close();
+      }
+    }
+    queueEvents.on("progress", progressHandler);
+    queueEvents.on("completed", completeHandler);
+    stream.onAbort(() => {
+      queueEvents.removeListener("progress", progressHandler);
+      queueEvents.removeListener("completed", completeHandler);
+    });
+    while (true) {
+      await stream.sleep(4000);
+    }
+    // casting cause: no typescript support for sse in hono https://github.com/honojs/hono/issues/3309
+  }) as any;
 };

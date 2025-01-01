@@ -1,6 +1,5 @@
 import { createAppAuth } from "@octokit/auth-app";
 import { Buffer } from "node:buffer";
-import { basename } from "node:path";
 
 import { APPLICATIONS_PATH } from "@/lib/constants";
 import sshClient from "@/lib/ssh";
@@ -44,13 +43,12 @@ export const clone: JobFn<"clone"> = async (job) => {
   job.updateProgress(75);
 
   const ssh = await sshClient();
+
   await ssh.execCommand(`git clone ${formattedRepoUrl}`, {
     cwd: APPLICATIONS_PATH,
   });
 
-  const repoName = basename(repoUrl, ".git");
-
   job.updateProgress(100);
 
-  return { repoName };
+  return { status: "success" };
 };

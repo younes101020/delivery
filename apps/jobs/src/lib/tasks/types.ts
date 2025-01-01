@@ -2,12 +2,13 @@ import type { Job, JobNode, Queue, Worker } from "bullmq";
 
 import type { SelectedGithubAppSecretSchema, SelectedGithubAppsSchema } from "@/db/dto";
 
-export interface BuildJobData {
-  name: string;
-}
 export interface JobDataMap {
-  clone: SelectedGithubAppsSchema & { secret: SelectedGithubAppSecretSchema; repoUrl: string };
-  build: BuildJobData;
+  clone: SelectedGithubAppsSchema & {
+    secret: SelectedGithubAppSecretSchema;
+    repoUrl: string;
+    repoName: string;
+  };
+  build: { repoName: string };
 }
 export type JobName = "clone" | "build";
 export type JobFn<T extends JobName> = (job: Job<JobDataMap[T]>) => Promise<any>;

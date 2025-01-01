@@ -1,13 +1,15 @@
 "use client";
 
 import { Nullable } from "@/lib/utils";
+import { ExternalLink as ExternalLinkIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import BoxReveal from "./ui/box-reveal";
 import Ripple from "./ui/ripple";
+import { LogsTerminal } from "./ui/logsterminal";
 
 interface StepperProps {
   baseUrl: string;
-  eventName: string;
+  repoName: string;
 }
 
 const DEPLOYMENTMETADATA = {
@@ -21,48 +23,60 @@ const DEPLOYMENTMETADATA = {
   },
 };
 
-type EventData = Nullable<{
+type SseData = Nullable<{
   step: "clone" | "build";
   logs: string;
 }>;
 
-export function Stepper({ eventName, baseUrl }: StepperProps) {
-  const [eventData, setEventData] = useState<EventData>({
+export function Stepper({ repoName, baseUrl }: StepperProps) {
+  const [sseData, setSseData] = useState<SseData>({
     step: null,
     logs: null,
   });
+
   useEffect(() => {
-    const url = `${baseUrl}/api/deployments/logs/${eventName}`;
+    const url = `${baseUrl}/api/deployments/logs/${repoName}`;
     const eventSource = new EventSource(url);
 
     const handleLogs = (e: MessageEvent) => {
       const data = JSON.parse(e.data);
-      setEventData({
+      setSseData({
         step: data.jobName,
         logs: data.logs,
       });
     };
 
-    eventSource.addEventListener("image-build-logs", handleLogs);
+    eventSource.addEventListener(`${repoName}-build-logs`, handleLogs);
 
     return () => {
-      eventSource.removeEventListener("image-build-logs", handleLogs);
+      eventSource.removeEventListener(`${repoName}-build-logs`, handleLogs);
       eventSource.close();
     };
-  }, [baseUrl, eventName]);
+  }, [baseUrl, repoName]);
 
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden">
       <BoxReveal duration={0.5}>
         <p className="text-xl font-semibold">
-          {eventData.step && DEPLOYMENTMETADATA[eventData.step].phrase}
+          {sseData.step && DEPLOYMENTMETADATA[sseData.step].phrase}
           <span className="text-primary">.</span>
         </p>
       </BoxReveal>
       <p className="text-xs text-primary">
-        {eventData.step && DEPLOYMENTMETADATA[eventData.step].position}
+        {sseData.step && DEPLOYMENTMETADATA[sseData.step].position}
       </p>
+      <LogsTerminalButton step={sseData.step} logs={sseData.logs} />
       <Ripple />
     </div>
+  );
+}
+
+function LogsTerminalButton({ step, logs }: SseData) {
+  if (step !== "build" || !logs) return null;
+
+  return (
+    <LogsTerminal logs={logs}>
+      <ExternalLinkIcon />
+    </LogsTerminal>
   );
 }

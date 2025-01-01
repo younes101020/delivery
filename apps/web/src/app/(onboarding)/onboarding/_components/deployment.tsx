@@ -67,7 +67,6 @@ function RepositorySection({ repo, setSelected, selected }: RepositorySectionPro
 export function Deployment({ repositories }: DeploymentProps) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(deploy, { error: "" });
   const { isIntersecting, ref } = useIntersectionObserver();
-  console.log(state, isIntersecting, repositories);
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams);
   const pathname = usePathname();
@@ -127,7 +126,7 @@ export function Deployment({ repositories }: DeploymentProps) {
             </>
           ) : (
             <>
-              <Rocket /> | Deploy <span className="underline text-xs">{selected.name ?? ""}</span>
+              <Rocket /> | Deploy
             </>
           )}
         </Button>

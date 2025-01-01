@@ -7,13 +7,9 @@ import index from "@/routes/index.route";
 import onboarding from "@/routes/onboarding/onboarding.index";
 import users from "@/routes/users/users.index";
 
-import { createWorker } from "./lib/tasks/worker";
-
 const app = createApp();
 
 configureOpenAPI(app);
-
-createWorker();
 
 const routes = [index, deployments, users, githubApps, onboarding, auth] as const;
 
