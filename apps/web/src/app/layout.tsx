@@ -1,4 +1,3 @@
-import { Header } from "@/components/header";
 import { UserProvider } from "@/lib/auth";
 import { getUser } from "@/lib/users";
 import type { Metadata } from "next";
@@ -33,7 +32,6 @@ export default function RootLayout({
       <body
         className={`${geistSans.className} ${geistMono.className} antialiased absolute inset-0 h-full w-full bg-background bg-[linear-gradient(to_right,rgba(188,185,184,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(188,185,184,0.1)_1px,transparent_1px)] bg-[size:24px_24px]`}
       >
-        <Header />
         <Suspense>
           <UserProvider userPromise={userPromise}>{children}</UserProvider>
         </Suspense>

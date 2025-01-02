@@ -8,7 +8,22 @@ import { db } from "@/db";
 import { systemConfig } from "@/db/schema";
 import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
 
-import type { PatchRoute } from "./onboarding.route";
+import type { GetFirstRoute, PatchRoute } from "./server-config.route";
+
+export const getFirst: AppRouteHandler<GetFirstRoute> = async (c) => {
+  const systemconfig = await db.query.systemConfig.findFirst();
+
+  if (!systemconfig) {
+    return c.json(
+      {
+        message: HttpStatusPhrases.NOT_FOUND,
+      },
+      HttpStatusCodes.NOT_FOUND,
+    );
+  }
+
+  return c.json(systemconfig, HttpStatusCodes.OK);
+};
 
 export const patch: AppRouteHandler<PatchRoute> = async (c) => {
   const updates = c.req.valid("json");

@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     },
   });
   if (appResponse.status !== 200) {
-    redirect("/onboarding/?step=2");
+    redirect("/onboarding/?step=3");
   }
   const app = await appResponse.json();
   const metadata = {

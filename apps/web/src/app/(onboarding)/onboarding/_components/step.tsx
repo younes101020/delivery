@@ -89,7 +89,7 @@ function BaseStepProvider({ children }: { children: ReactNode }) {
         currentStep,
       }}
     >
-      <Card className="w-[90%] lg:w-[60%]">
+      <Card className="w-full mx-4 mt-4">
         <StepsHeader className="p-10" />
         {React.Children.map(children, (child, index) => {
           if (React.isValidElement(child) && index + 1 === currentStep) {

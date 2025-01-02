@@ -105,9 +105,8 @@ export function Deployment({ repositories }: DeploymentProps) {
             <Input
               id="port"
               name="port"
-              type="number"
+              type="text"
               required
-              min={1}
               className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
               placeholder="ex: 3000 or 5695:3000"
             />

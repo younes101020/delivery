@@ -36,7 +36,7 @@ export async function signOut() {
 }
 
 const deploySchema = z.object({
-  repoUrl: z.string().url(),
+  repoUrl: z.string(),
   githubAppId: z.coerce.number(),
   port: z
     .string()
@@ -56,7 +56,7 @@ export const deploy = validatedAction(deploySchema, async (data) => {
   if (deploymentResponse.status !== 200) {
     return { error: "Impossible to start the deployment." };
   }
-  const response = await client.onboarding.$patch({
+  const response = await client.serverconfig.$patch({
     json: {
       completedByUserId: user?.id.toString(),
       onboardingCompleted: true,
@@ -71,4 +71,20 @@ export const deploy = validatedAction(deploySchema, async (data) => {
   });
   const result = await deploymentResponse.json();
   redirect(`/dashboard/deployments/${result.queueName}`);
+});
+
+const domainNameSchema = z.object({
+  domainName: z.string().url(),
+});
+
+export const domainName = validatedAction(domainNameSchema, async (data) => {
+  const response = await client.serverconfig.$patch({
+    json: {
+      domainName: data.domainName,
+    },
+  });
+  if (response.status !== 200) {
+    return { error: "Something went wrong, please retry later." };
+  }
+  redirect("/onboarding?step=3");
 });

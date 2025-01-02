@@ -1,7 +1,7 @@
 import { client } from "@/lib/http";
 import { GithubInstallation } from "@delivery/jobs/types";
-import { listInstallationRepositories } from "./utils";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
+import { listInstallationRepositories } from "./utils";
 
 export type Repository = {
   id: number;
@@ -16,12 +16,31 @@ export type Installation = {
   repositories: Repository[];
 };
 
+/**
+ * This function iterates through all repository pages up to maxIteration to fetch GitHub installations with repos
+ * This function fetches repositories page by page to handle pagination of GitHub API results
+ */
+export async function getAllInstallReposForEachRepoPage(maxIteration: number) {
+  const promises = Array.from({ length: maxIteration }, (_, i) =>
+    getAllInstallationsWithRepos({ repoPage: i + 1 }),
+  );
+  const results = await Promise.all(promises);
+  return results.flat().flatMap<Repository & { githubAppId: number }>((e) => {
+    if (!e?.githubAppId) {
+      return [];
+    }
+    return e.repositories.map((repo) => ({
+      ...repo,
+      githubAppId: e.githubAppId,
+    }));
+  });
+}
+
 export async function getAllInstallations(): Promise<
   (GithubInstallation & { privateKey: string })[] | null
 > {
   "use cache";
-  cacheTag('github-app-installations-creds')
-  console.log('okkkk')
+  cacheTag("github-app-installations-creds");
   const response = await client.githubapps.$get();
   if (response.status !== 200) {
     return null;
@@ -55,7 +74,7 @@ export async function getAllInstallationsWithRepos({
 
       return {
         githubAppId: installation.appId,
-        repositories: repos.repositories.map(repo => ({
+        repositories: repos.repositories.map((repo) => ({
           id: repo.id,
           full_name: repo.full_name,
           git_url: repo.git_url,

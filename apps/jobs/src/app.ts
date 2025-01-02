@@ -4,14 +4,14 @@ import auth from "@/routes/auth/auth.index";
 import deployments from "@/routes/deployments/deployments.index";
 import githubApps from "@/routes/githubapps/githubapps.index";
 import index from "@/routes/index.route";
-import onboarding from "@/routes/onboarding/onboarding.index";
+import serverConfig from "@/routes/server-config/server-config.index";
 import users from "@/routes/users/users.index";
 
 const app = createApp();
 
 configureOpenAPI(app);
 
-const routes = [index, deployments, users, githubApps, onboarding, auth] as const;
+const routes = [index, deployments, users, githubApps, serverConfig, auth] as const;
 
 routes.forEach((route) => {
   app.route("/", route);

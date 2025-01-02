@@ -12,6 +12,7 @@ export const systemConfig = pgTable("system_config", {
   onboardingCompleted: boolean("onboarding_completed").default(false),
   onboardingCompletedAt: timestamp("onboarding_completed_at"),
   completedByUserId: text("completed_by_user_id"),
+  domainName: text("domain_name"),
 });
 
 export const users = pgTable("users", {

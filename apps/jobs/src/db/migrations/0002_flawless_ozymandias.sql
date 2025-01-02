@@ -1,0 +1,1 @@
+ALTER TABLE "system_config" ADD COLUMN "domain_name" text;

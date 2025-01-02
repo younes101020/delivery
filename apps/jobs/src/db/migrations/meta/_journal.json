@@ -15,6 +15,13 @@
       "when": 1733428145502,
       "tag": "0001_overjoyed_scarecrow",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1735773021301,
+      "tag": "0002_flawless_ozymandias",
+      "breakpoints": true
     }
   ]
 }

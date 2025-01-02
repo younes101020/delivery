@@ -4,22 +4,13 @@ import { Button } from "@/components/ui/button";
 import { CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useUser } from "@/lib/auth";
 import { ActionState } from "@/lib/auth/middleware";
 import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useActionState, useEffect } from "react";
-import { signUp } from "../(onboarding)/onboarding/actions";
+import { useActionState } from "react";
 import { signIn } from "../(login)/actions";
+import { signUp } from "../(onboarding)/onboarding/actions";
 
 export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
-  const session = useUser();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (session?.user) router.replace("/onboarding/?step=2");
-  }, [router, session]);
-
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
     mode === "signin" ? signIn : signUp,
     { error: "" },
