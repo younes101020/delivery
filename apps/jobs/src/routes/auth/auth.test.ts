@@ -5,7 +5,6 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 import { describe, expect } from "vitest";
 
 import env from "@/env";
-import { hashPassword, verifyPassword } from "@/lib/auth";
 import { ZOD_ERROR_MESSAGES } from "@/lib/constants";
 import createApp from "@/lib/create-app";
 

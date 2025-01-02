@@ -1,14 +1,12 @@
 /* eslint-disable ts/ban-ts-comment */
 import { it } from "__tests__";
 import { testClient } from "hono/testing";
-import { Buffer } from "node:buffer";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
 import { describe, expect, expectTypeOf } from "vitest";
 
 import env from "@/env";
 import { ZOD_ERROR_MESSAGES } from "@/lib/constants";
 import createApp from "@/lib/create-app";
-import { decryptSecret, encryptSecret } from "@/lib/utils";
 
 import router from "./githubapps.index";
 
