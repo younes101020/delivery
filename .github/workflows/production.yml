@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
 
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
@@ -22,8 +24,6 @@ jobs:
       JOBS_API_BASEURL: ${{ vars.JOBS_API_BASEURL }}
       NEXT_PUBLIC_BASEURL: ${{ vars.NEXT_PUBLIC_BASEURL }}
 
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -33,8 +33,14 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Release
+        run: npx -p @semantic-release/exec semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push images
+        if: github.env.docker_publish == 'true'
         run: |
           docker compose -f compose.prod.yaml build
           docker compose -f compose.prod.yaml push

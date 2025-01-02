@@ -1,0 +1,14 @@
+ {
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "DELIVERY_VERSION=${nextRelease.version} sh -c \"echo 'docker_tags=younes60/delivery:${nextRelease.version},younes60/delivery:latest'\" >> \"$GITHUB_ENV\"",
+        "publishCmd": "echo \"docker_publish=true\" >> \"$GITHUB_ENV\""
+      }
+    ],
+    "@semantic-release/github"
+  ]
+}
