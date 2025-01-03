@@ -49,6 +49,18 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
 
     const queue = new Queue(slug, { connection: connection.duplicate() });
     const queueEvents = new QueueEvents(slug, { connection: connection.duplicate() });
+    const activeJobsCount = await queue.getActiveCount();
+    if (activeJobsCount === 0 || !activeJobsCount) {
+      stream.close();
+    }
+
+    const activeJobs = await queue.getJobs("active");
+    const activeJob = activeJobs[0];
+    await stream.writeSSE({
+      data: JSON.stringify({ jobName: activeJob.name }),
+      event: `${slug}-build-logs`,
+    });
+
     async function progressHandler({ data, jobId }: { data: number | object; jobId: string }) {
       const jobState = await Job.fromId(queue, jobId);
       const sseData = JSON.stringify({
@@ -59,17 +71,18 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
         case "clone":
           await stream.writeSSE({
             data: sseData,
-            event: `${jobState.data.repoName}-build-logs`,
+            event: `${slug}-build-logs`,
           });
           break;
         case "build":
           await stream.writeSSE({
             data: sseData,
-            event: `${jobState.data.repoName}-build-logs`,
+            event: `${slug}-build-logs`,
           });
           break;
       }
     }
+
     async function completeHandler(job: { jobId: string }) {
       const jobState = await Job.fromId(queue, job.jobId);
       if (jobState?.name === "build") {

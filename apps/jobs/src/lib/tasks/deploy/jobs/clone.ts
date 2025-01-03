@@ -8,8 +8,8 @@ import { decryptSecret } from "@/lib/utils";
 import type { JobFn } from "../../types";
 
 export const clone: JobFn<"clone"> = async (job) => {
-  job.updateProgress(0);
   const { secret, appId, clientId, clientSecret, installationId, repoUrl } = job.data;
+  job.updateProgress({ logs: "Github repository will be fetched..." });
 
   const privateKey = await decryptSecret({
     encryptedData: Buffer.from(secret.encryptedData, "base64"),
@@ -39,7 +39,7 @@ export const clone: JobFn<"clone"> = async (job) => {
   const ssh = await sshClient();
   await ssh.execCommand(`git clone ${formattedRepoUrl}`, {
     cwd: APPLICATIONS_PATH,
+    onStderr: chunk => job.updateProgress({ logs: chunk.toString("utf8") }),
+    onStdout: chunk => job.updateProgress({ logs: chunk.toString("utf8") }),
   });
-
-  return { status: "success" };
 };

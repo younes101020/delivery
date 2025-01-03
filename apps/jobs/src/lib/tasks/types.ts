@@ -11,10 +11,9 @@ export interface JobDataMap {
   build: { repoName: string; env?: string; port: string };
 }
 export interface JobParam<T extends JobName>
-  extends Partial<Omit<Job<JobDataMap[T]>, "data" | "updateProgress" | "remove">> {
+  extends Partial<Omit<Job<JobDataMap[T]>, "data" | "updateProgress">> {
   data: JobDataMap[T];
   updateProgress: Job<JobDataMap[T]>["updateProgress"];
-  remove: Job<JobDataMap[T]>["remove"];
 }
 export type JobName = "clone" | "build";
 export type JobFn<T extends JobName> = (job: JobParam<T>) => Promise<unknown>;

@@ -56,18 +56,19 @@ const deployments = {
     },
     repoUrl: faker.internet.url(),
     repoName: faker.system.fileName(),
+    token: faker.string.uuid(),
   },
   build: {
     repoName: faker.system.fileName(),
     port: faker.internet.port().toString(),
     env: `KEY=${faker.string.sample()}`,
+    token: faker.string.uuid(),
   },
 };
 
 const job = {
   data: deployments.clone,
   updateProgress: async () => Promise.resolve(),
-  remove: async () => Promise.resolve(),
 };
 
 export const it = base.extend<Fixtures>({

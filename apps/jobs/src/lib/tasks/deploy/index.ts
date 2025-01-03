@@ -16,11 +16,13 @@ export async function startDeploy(jobsData: JobDataMap) {
     name: "build",
     data: jobsData.build,
     queueName: jobsData.build.repoName,
+    opts: { removeOnComplete: true, removeOnFail: true },
     children: [
       {
         name: "clone",
         data: jobsData.clone,
         queueName: jobsData.clone.repoName,
+        opts: { removeOnComplete: true, failParentOnFailure: true, removeOnFail: true },
       },
     ],
   });
@@ -28,4 +30,4 @@ export async function startDeploy(jobsData: JobDataMap) {
   return {
     queueName: jobs.job.queueName,
   };
-};
+}
