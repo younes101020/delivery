@@ -29,6 +29,27 @@ interface RepositorySectionProps {
   setSelected: (repository: SelectedRepositoryProps) => void;
 }
 
+function useInfiniteScroll(isIntersecting: boolean) {
+  const searchParams = useSearchParams();
+  const params = new URLSearchParams(searchParams);
+  const pathname = usePathname();
+  const { replace } = useRouter();
+
+  useEffect(() => {
+    if (isIntersecting) {
+      const repoPage = params.get("page");
+      if (!repoPage) {
+        params.set("page", "2");
+      } else {
+        let updatedRepoPage = parseInt(repoPage);
+        updatedRepoPage++;
+        params.set("page", `${updatedRepoPage}`);
+      }
+      replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }
+  }, [isIntersecting, params, pathname, replace]);
+}
+
 function RepositorySection({ repo, setSelected, selected }: RepositorySectionProps) {
   const isSelected = selected.name === repo.full_name;
   return (
@@ -69,10 +90,6 @@ interface DeploymentProps {
 export function Deployment({ repositories }: DeploymentProps) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(deploy, { error: "" });
   const { isIntersecting, ref } = useIntersectionObserver();
-  const searchParams = useSearchParams();
-  const params = new URLSearchParams(searchParams);
-  const pathname = usePathname();
-  const { replace } = useRouter();
   const [selected, setSelected] = useState<SelectedRepositoryProps>({
     name: null,
     id: null,
@@ -80,19 +97,7 @@ export function Deployment({ repositories }: DeploymentProps) {
     gitUrl: null,
   });
 
-  useEffect(() => {
-    if (isIntersecting) {
-      const repoPage = params.get("page");
-      if (!repoPage) {
-        params.set("page", "2");
-      } else {
-        let updatedRepoPage = parseInt(repoPage);
-        updatedRepoPage++;
-        params.set("page", `${updatedRepoPage}`);
-      }
-      replace(`${pathname}?${params.toString()}`, { scroll: false });
-    }
-  }, [isIntersecting]);
+  useInfiniteScroll(isIntersecting);
 
   return (
     <>

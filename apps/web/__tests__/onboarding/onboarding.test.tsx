@@ -1,11 +1,15 @@
 import { Deployment } from "@/app/(onboarding)/onboarding/_components/deployment";
 import { GithubAppForm } from "@/app/(onboarding)/onboarding/_components/github-app-form";
+import { useInfiniteScroll } from "@/app/(onboarding)/onboarding/_hooks/use-infinite-scroll";
 import { Login } from "@/app/_components/login-form";
 import { publicEnv } from "@/env";
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, render, renderHook, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeAll, describe, expect, vi } from "vitest";
 import { onBoardingTest } from "./fixtures";
+import { usePathname } from "next/navigation";
+
+const mockReplace = vi.fn();
 
 vi.mock("next/navigation", async () => {
   const actual = await vi.importActual("next/navigation");
@@ -13,12 +17,12 @@ vi.mock("next/navigation", async () => {
     ...actual,
     useRouter: vi.fn(() => ({
       push: vi.fn(),
-      replace: vi.fn(),
+      replace: mockReplace,
     })),
     useSearchParams: vi.fn(() => ({
       get: vi.fn(),
     })),
-    usePathname: vi.fn(),
+    usePathname: "/onboarding",
     useUser: vi.fn(),
   };
 });
@@ -41,6 +45,7 @@ describe("Onboarding process", () => {
 
   afterEach(() => {
     cleanup();
+    vi.restoreAllMocks();
   });
 
   onBoardingTest(
@@ -107,4 +112,18 @@ describe("Onboarding process", () => {
       expect(form.getByLabelText("submit")).toHaveProperty("disabled", false);
     },
   );
+
+  onBoardingTest(
+    "when search params isn't present it should increment github repositories page number sequentially",
+    () => {
+      renderHook(() => useInfiniteScroll(true));
+      expect(mockReplace).toHaveBeenCalledWith("/onboarding?page=2", { scroll: false });
+    },
+  );
+
+  onBoardingTest("should increment github repositories page number sequentially", () => {
+    vi.mocked(usePathname).mockReturnValue("/onboarding?=page2")
+    renderHook(() => useInfiniteScroll(true));
+    expect(mockReplace).toHaveBeenCalledWith("/onboarding?page=3", { scroll: false });
+  });
 });
