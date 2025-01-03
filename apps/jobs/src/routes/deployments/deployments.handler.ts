@@ -33,11 +33,11 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
     );
   }
 
-  const repoName = basename(deployment.repoUrl, ".git");
+  const queueRef = basename(deployment.repoUrl, ".git");
 
   const tracking = await startDeploy({
-    clone: { ...githubApp, repoUrl: deployment.repoUrl, repoName },
-    build: { repoName, port: deployment.port, env: deployment.env },
+    clone: { ...githubApp, repoUrl: deployment.repoUrl, repoName: queueRef },
+    build: { repoName: queueRef, port: deployment.port, env: deployment.env },
   });
 
   return c.json(tracking, HttpStatusCodes.OK);

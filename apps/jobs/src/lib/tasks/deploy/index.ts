@@ -4,6 +4,10 @@ import type { JobDataMap } from "../types";
 
 import { connection, createWorker } from "../worker";
 
+/**
+ * Creates and starts deployment jobs.
+ * Returns a queue name reference that can be used to track the deployment state.
+ */
 export async function startDeploy(jobsData: JobDataMap) {
   await createWorker(jobsData.build.repoName);
   const flowProducer = new FlowProducer({ connection });
