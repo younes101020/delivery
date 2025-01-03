@@ -1,6 +1,6 @@
 services:
   web:
-    image: younes60/web:latest
+    image: younes60/web:${DOCKER_TAGS}
     build:
       context: .
       dockerfile: ./apps/web/prod.Dockerfile
@@ -20,7 +20,7 @@ services:
       - jobs
 
   jobs:
-    image: younes60/jobs:latest
+    image: younes60/jobs:${DOCKER_TAGS}
     build:
       context: .
       dockerfile: ./apps/jobs/prod.Dockerfile
