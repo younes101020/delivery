@@ -78,7 +78,7 @@ function LogsTerminalButton({ step, logs }: SseData) {
 
   return (
     <LogsTerminal logs={logs}>
-      <ExternalLinkIcon />
+      <ExternalLinkIcon className="text-primary cursor-pointer" size={15} />
     </LogsTerminal>
   );
 }
