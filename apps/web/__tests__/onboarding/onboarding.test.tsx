@@ -5,27 +5,9 @@ import { Login } from "@/app/_components/login-form";
 import { publicEnv } from "@/env";
 import { cleanup, render, renderHook, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { afterEach, beforeAll, describe, expect, vi } from "vitest";
 import { onBoardingTest } from "./fixtures";
-import { usePathname } from "next/navigation";
-
-const mockReplace = vi.fn();
-
-vi.mock("next/navigation", async () => {
-  const actual = await vi.importActual("next/navigation");
-  return {
-    ...actual,
-    useRouter: vi.fn(() => ({
-      push: vi.fn(),
-      replace: mockReplace,
-    })),
-    useSearchParams: vi.fn(() => ({
-      get: vi.fn(),
-    })),
-    usePathname: "/onboarding",
-    useUser: vi.fn(),
-  };
-});
 
 function setup(jsx: React.ReactElement) {
   return {
@@ -34,6 +16,8 @@ function setup(jsx: React.ReactElement) {
   };
 }
 
+const mockReplace = vi.fn();
+
 describe("Onboarding process", () => {
   beforeAll(() => {
     global.ResizeObserver = vi.fn().mockImplementation(() => ({
@@ -41,11 +25,27 @@ describe("Onboarding process", () => {
       unobserve: vi.fn(),
       disconnect: vi.fn(),
     }));
+
+    vi.mock("next/navigation", async () => {
+      const actual = await vi.importActual("next/navigation");
+      return {
+        ...actual,
+        useRouter: vi.fn(() => ({
+          push: vi.fn(),
+          replace: mockReplace,
+        })),
+        useSearchParams: vi.fn(() => ({
+          get: vi.fn(),
+        })),
+        usePathname: vi.fn().mockReturnValue("/onboarding"),
+        useUser: vi.fn(),
+      };
+    });
   });
 
   afterEach(() => {
     cleanup();
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   onBoardingTest(
@@ -116,14 +116,17 @@ describe("Onboarding process", () => {
   onBoardingTest(
     "when search params isn't present it should increment github repositories page number sequentially",
     () => {
+      const searchParams = new URLSearchParams("") as ReadonlyURLSearchParams;
+    vi.mocked(useSearchParams).mockReturnValue(searchParams);
       renderHook(() => useInfiniteScroll(true));
-      expect(mockReplace).toHaveBeenCalledWith("/onboarding?page=2", { scroll: false });
+      expect(mockReplace).toHaveBeenLastCalledWith("/onboarding?page=2", { scroll: false });
     },
   );
 
   onBoardingTest("should increment github repositories page number sequentially", () => {
-    vi.mocked(usePathname).mockReturnValue("/onboarding?=page2")
+    const searchParams = new URLSearchParams("page=2") as ReadonlyURLSearchParams;
+    vi.mocked(useSearchParams).mockReturnValue(searchParams);
     renderHook(() => useInfiniteScroll(true));
-    expect(mockReplace).toHaveBeenCalledWith("/onboarding?page=3", { scroll: false });
+    expect(mockReplace).toHaveBeenLastCalledWith("/onboarding?page=3", { scroll: false });
   });
 });
