@@ -40,10 +40,10 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
 
     const handleLogs = (e: MessageEvent) => {
       const data = JSON.parse(e.data);
-      setSseData({
+      setSseData((prev) => ({
         step: data.jobName,
-        logs: data.logs,
-      });
+        logs: prev.logs ? `${prev.logs}\n${data.logs}` : data.logs,
+      }));
     };
 
     eventSource.addEventListener(`${repoName}-build-logs`, handleLogs);
