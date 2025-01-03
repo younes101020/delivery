@@ -5,7 +5,7 @@ on:
     workflows: ["Running UT/E2E and IT tests"]
     types:
       - completed
-    branches: ["main"]
+    branches: ["main", "next"]
 
 jobs:
   push-to-registry:
