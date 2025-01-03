@@ -10,7 +10,7 @@ export interface JobDataMap {
   };
   build: { repoName: string; env?: string; port: string };
 }
-export interface JobParam<T extends JobName> extends Omit<Job<JobDataMap[T]>, "data"> {
+export interface JobParam<T extends JobName> extends Partial<Omit<Job<JobDataMap[T]>, "data">> {
   data: JobDataMap[T];
 }
 export type JobName = "clone" | "build";
