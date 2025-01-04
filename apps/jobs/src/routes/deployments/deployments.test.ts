@@ -9,6 +9,7 @@ import env from "@/env";
 import { ZOD_ERROR_MESSAGES } from "@/lib/constants";
 import createApp from "@/lib/create-app";
 import { clone } from "@/lib/tasks/deploy/jobs/clone";
+import { parseAppHost } from "@/lib/tasks/deploy/utils";
 
 import router from "./deployments.index";
 
@@ -92,6 +93,20 @@ describe("deployments routes", () => {
 
         expect(() => insertDeploymentSchema.parse(input)).toThrow(ZodError);
       });
+    });
+
+    it("should append application name to hostname", () => {
+      expect(parseAppHost("weatherapp", "https://younes.fr")).toBe("weatherapp.younes.fr");
+    });
+
+    it("should throw DeploymentError instance for invalid host name URL", () => {
+      expect(parseAppHost("weatherapp", "invalid-hostname")).toThrow(
+        expect.objectContaining({
+          name: "BUILD_APP_ERROR",
+          code: "The provided host name is not a valid URL",
+          cause: expect.any(Error),
+        }),
+      );
     });
   });
 });

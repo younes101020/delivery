@@ -42,7 +42,7 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
       const data = JSON.parse(e.data);
       setSseData((prev) => ({
         step: data.jobName,
-        logs: prev.logs ? `${prev.logs}\n${data.logs}` : data.logs,
+        logs: prev.logs ? `${prev.logs}${data.logs}` : data.logs,
       }));
     };
 

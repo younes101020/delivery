@@ -69,6 +69,7 @@ const deployments = {
 const job = {
   data: deployments.clone,
   updateProgress: async () => Promise.resolve(),
+  remove: async () => Promise.resolve(),
 };
 
 export const it = base.extend<Fixtures>({
