@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import { APPLICATIONS_PATH } from "@/lib/constants";
+import { DeploymentError } from "@/lib/error";
 import sshClient from "@/lib/ssh";
 import { parseAppHost } from "@/lib/tasks/deploy/utils";
 
@@ -16,7 +17,17 @@ export const build: JobFn<"build"> = async (job) => {
     await job.remove();
   }
 
-  const appUrl = parseAppHost(repoName, hostName as string);
+  let appUrl;
+  try {
+    appUrl = parseAppHost(repoName, hostName as string);
+  }
+  catch (error) {
+    if (error instanceof DeploymentError) {
+      job.updateProgress({ logs: error.message });
+      await job.remove();
+    }
+  }
+
   const ssh = await sshClient();
   await ssh.execCommand(
     `nixpacks build ./ --name ${repoName} --label "traefik.http.routers.${repoName}.rule=Host(\`${appUrl}\`)" --label "traefik.http.routers.${repoName}.entrypoints=web" && docker run ${port} ${env} --network host_network -d ${repoName}`,
