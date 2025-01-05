@@ -4,11 +4,17 @@ import { useState } from "react";
 
 import { useEffect } from "react";
 
+type SSEMessage<T> = {
+  jobName: T extends { step: infer S } ? S : never;
+  logs: string;
+  completed?: boolean;
+};
+
 type SseProps<T> = {
   type: string;
   eventUrl: string;
   initialState: T;
-  onMessage?: (prev: T, data: any) => T;
+  onMessage?: (prev: T, data: SSEMessage<T>) => T;
 };
 
 export function useEventSource<T>({ initialState, eventUrl, type, onMessage }: SseProps<T>): T {
