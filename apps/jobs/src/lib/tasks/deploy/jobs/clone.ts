@@ -2,6 +2,7 @@ import { createAppAuth } from "@octokit/auth-app";
 import { Buffer } from "node:buffer";
 
 import { APPLICATIONS_PATH } from "@/lib/constants";
+import { DeploymentError } from "@/lib/error";
 import sshClient from "@/lib/ssh";
 import { decryptSecret } from "@/lib/utils";
 
@@ -37,9 +38,22 @@ export const clone: JobFn<"clone"> = async (job) => {
   );
 
   const ssh = await sshClient();
-  await ssh.execCommand(`git clone ${formattedRepoUrl}`, {
-    cwd: APPLICATIONS_PATH,
-    onStderr: chunk => job.updateProgress({ logs: chunk.toString() }),
-    onStdout: chunk => job.updateProgress({ logs: chunk.toString() }),
-  });
+  try {
+    await ssh.execCommand(`git clone ${formattedRepoUrl}`, {
+      cwd: APPLICATIONS_PATH,
+      onStderr: chunk => job.updateProgress({ logs: chunk.toString() }),
+      onStdout: (chunk) => {
+        throw new DeploymentError({
+          name: "CLONE_APP_ERROR",
+          message: chunk.toString(),
+        });
+      },
+    });
+  }
+  catch (error) {
+    if (error instanceof DeploymentError) {
+      job.updateProgress({ logs: error.message });
+      await job.remove();
+    }
+  }
 };

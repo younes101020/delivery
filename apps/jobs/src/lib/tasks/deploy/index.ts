@@ -13,16 +13,24 @@ export async function startDeploy(jobsData: JobDataMap) {
   const flowProducer = new FlowProducer({ connection });
 
   const jobs = await flowProducer.add({
-    name: "build",
-    data: jobsData.build,
+    name: "configure",
+    data: jobsData.configure,
     queueName: jobsData.build.repoName,
     opts: { removeOnComplete: true, removeOnFail: true },
     children: [
       {
-        name: "clone",
-        data: jobsData.clone,
-        queueName: jobsData.clone.repoName,
-        opts: { removeOnComplete: true, failParentOnFailure: true, removeOnFail: true },
+        name: "build",
+        data: jobsData.build,
+        queueName: jobsData.build.repoName,
+        opts: { removeOnComplete: true, removeOnFail: true },
+        children: [
+          {
+            name: "clone",
+            data: jobsData.clone,
+            queueName: jobsData.clone.repoName,
+            opts: { removeOnComplete: true, failParentOnFailure: true, removeOnFail: true },
+          },
+        ],
       },
     ],
   });

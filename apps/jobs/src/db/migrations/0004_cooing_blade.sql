@@ -1,0 +1,1 @@
+ALTER TABLE "applications" DROP COLUMN IF EXISTS "github_app_name";

@@ -11,6 +11,6 @@ class ErrorBase<T extends string> extends Error {
   }
 }
 
-type ErrorName = "BUILD_APP_ERROR";
+type ErrorName = "BUILD_APP_ERROR" | "CLONE_APP_ERROR" | "CONFIGURE_APP_ERROR";
 
 export class DeploymentError extends ErrorBase<ErrorName> {}
