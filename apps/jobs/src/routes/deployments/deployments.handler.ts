@@ -33,11 +33,12 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
     );
   }
 
-  const repoName = basename(deployment.repoUrl, ".git");
+  const queueRef = basename(deployment.repoUrl, ".git");
 
   const tracking = await startDeploy({
-    clone: { ...githubApp, repoUrl: deployment.repoUrl, repoName },
-    build: { repoName, port: deployment.port, env: deployment.env },
+    clone: { ...githubApp, repoUrl: deployment.repoUrl, repoName: queueRef },
+    build: { repoName: queueRef, port: deployment.port, env: deployment.env },
+    configure: { port: deployment.port },
   });
 
   return c.json(tracking, HttpStatusCodes.OK);
@@ -49,31 +50,37 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
 
     const queue = new Queue(slug, { connection: connection.duplicate() });
     const queueEvents = new QueueEvents(slug, { connection: connection.duplicate() });
+    const activeJobsCount = await queue.getActiveCount();
+    if (activeJobsCount === 0 || !activeJobsCount) {
+      stream.close();
+    }
+
+    const activeJobs = await queue.getJobs("active");
+    const activeJob = activeJobs[0];
+    await stream.writeSSE({
+      data: JSON.stringify({ jobName: activeJob.name }),
+      event: `${slug}-deployment-logs`,
+    });
+
     async function progressHandler({ data, jobId }: { data: number | object; jobId: string }) {
       const jobState = await Job.fromId(queue, jobId);
       const sseData = JSON.stringify({
         jobName: jobState?.name,
         ...(typeof data === "object" && "logs" in data ? { logs: data.logs } : {}),
       });
-      switch (jobState?.name) {
-        case "clone":
-          await stream.writeSSE({
-            data: sseData,
-            event: `${jobState.data.repoName}-build-logs`,
-          });
-          break;
-        case "build":
-          await stream.writeSSE({
-            data: sseData,
-            event: `${jobState.data.repoName}-build-logs`,
-          });
-          break;
-      }
+      await stream.writeSSE({
+        data: sseData,
+        event: `${slug}-deployment-logs`,
+      });
     }
+
     async function completeHandler(job: { jobId: string }) {
       const jobState = await Job.fromId(queue, job.jobId);
-      if (jobState?.name === "build") {
-        stream.close();
+      if (jobState?.name === "configure") {
+        await stream.writeSSE({
+          data: JSON.stringify({ completed: true }),
+          event: `${slug}-deployment-logs`,
+        });
       }
     }
     queueEvents.on("progress", progressHandler);

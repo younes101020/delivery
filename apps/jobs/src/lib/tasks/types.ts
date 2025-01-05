@@ -1,6 +1,10 @@
 import type { Job, JobNode, Queue, Worker } from "bullmq";
 
-import type { SelectedGithubAppSecretSchema, SelectedGithubAppsSchema } from "@/db/dto";
+import type {
+  InsertApplicationSchema,
+  SelectedGithubAppSecretSchema,
+  SelectedGithubAppsSchema,
+} from "@/db/dto";
 
 export interface JobDataMap {
   clone: SelectedGithubAppsSchema & {
@@ -9,12 +13,16 @@ export interface JobDataMap {
     repoName: string;
   };
   build: { repoName: string; env?: string; port: string };
+  configure: Pick<InsertApplicationSchema, "port">;
 }
-export interface JobParam<T extends JobName> {
+export interface JobParam<T extends JobName>
+  extends Partial<Omit<Job<JobDataMap[T]>, "data" | "updateProgress">> {
   data: JobDataMap[T];
-  updateProgress: (progress: number | object) => void;
+  updateProgress: Job<JobDataMap[T]>["updateProgress"];
+  remove: Job<JobDataMap[T]>["remove"];
+  getChildrenValues: Job<JobDataMap[T]>["getChildrenValues"];
 }
-export type JobName = "clone" | "build";
+export type JobName = keyof JobDataMap;
 export type JobFn<T extends JobName> = (job: JobParam<T>) => Promise<unknown>;
 export type Jobs = { [K in JobName]: JobFn<K> };
 

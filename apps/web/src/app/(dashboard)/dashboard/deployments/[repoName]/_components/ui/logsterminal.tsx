@@ -16,7 +16,7 @@ export function LogsTerminal({ logs, children }: LogsTerminalProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent>
+      <DialogContent className="lg:max-w-screen-lg overflow-y-scroll max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Build logs</DialogTitle>
         </DialogHeader>

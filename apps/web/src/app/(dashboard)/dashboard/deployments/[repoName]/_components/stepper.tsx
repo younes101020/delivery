@@ -2,7 +2,8 @@
 
 import { Nullable } from "@/lib/utils";
 import { ExternalLink as ExternalLinkIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEventSource } from "../_hooks/use-event-source";
 import BoxReveal from "./ui/box-reveal";
 import { LogsTerminal } from "./ui/logsterminal";
 import Ripple from "./ui/ripple";
@@ -12,61 +13,58 @@ interface StepperProps {
   repoName: string;
 }
 
-const DEPLOYMENTMETADATA = {
-  clone: {
-    phrase: "We clone your GitHub repo to your server",
-    position: "1 / 2",
-  },
-  build: {
-    phrase: "We deploy your application",
-    position: "2 / 2",
-  },
-};
-
-type SseData = Nullable<{
-  step: "clone" | "build";
+export type SseData = Nullable<{
+  step: keyof typeof DEPLOYMENTMETADATA;
   logs: string;
 }>;
 
+export const DEPLOYMENTMETADATA = {
+  clone: {
+    phrase: "We clone your GitHub repo to your server",
+    position: "1 / 3",
+  },
+  build: {
+    phrase: "We deploy your application",
+    position: "2 / 3",
+  },
+  configure: {
+    phrase: "We configure your application",
+    position: "3 / 3",
+  },
+};
+
 export function Stepper({ repoName, baseUrl }: StepperProps) {
-  const [sseData, setSseData] = useState<SseData>({
-    step: null,
-    logs: null,
-  });
-
-  useEffect(() => {
-    const url = `${baseUrl}/api/deployments/logs/${repoName}`;
-    const eventSource = new EventSource(url);
-
-    const handleLogs = (e: MessageEvent) => {
-      const data = JSON.parse(e.data);
-      setSseData({
+  const router = useRouter();
+  const { step, logs } = useEventSource<SseData>({
+    type: `${repoName}-deployment-logs`,
+    eventUrl: `${baseUrl}/api/deployments/logs/${repoName}`,
+    initialState: {
+      step: null,
+      logs: null,
+    },
+    onMessage: (prev, data) => {
+      if (data.completed) {
+        router.replace(`/dashboard/applications/${repoName}`);
+        return prev;
+      }
+      return {
         step: data.jobName,
-        logs: data.logs,
-      });
-    };
-
-    eventSource.addEventListener(`${repoName}-build-logs`, handleLogs);
-
-    return () => {
-      eventSource.removeEventListener(`${repoName}-build-logs`, handleLogs);
-      eventSource.close();
-    };
-  }, [baseUrl, repoName]);
+        logs: prev.logs ? `${prev.logs}${data.logs}` : data.logs,
+      };
+    },
+  });
 
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden">
       <BoxReveal duration={0.5}>
         <p className="text-xl font-semibold">
-          {sseData.step && DEPLOYMENTMETADATA[sseData.step].phrase}
+          {step && DEPLOYMENTMETADATA[step].phrase}
           <span className="text-primary">.</span>
         </p>
       </BoxReveal>
       <div className="flex gap-2">
-        <p className="text-xs text-primary">
-          {sseData.step && DEPLOYMENTMETADATA[sseData.step].position}
-        </p>
-        <LogsTerminalButton step={sseData.step} logs={sseData.logs} />
+        <p className="text-xs text-primary">{step && DEPLOYMENTMETADATA[step].position}</p>
+        <LogsTerminalButton step={step} logs={logs} />
       </div>
       <Ripple />
     </div>
@@ -74,11 +72,11 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
 }
 
 function LogsTerminalButton({ step, logs }: SseData) {
-  if (step !== "build" || !logs) return null;
+  if (step === "clone" || !logs) return null;
 
   return (
     <LogsTerminal logs={logs}>
-      <ExternalLinkIcon />
+      <ExternalLinkIcon className="text-primary cursor-pointer" size={15} />
     </LogsTerminal>
   );
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "applications" ADD COLUMN "port" text NOT NULL;

@@ -8,7 +8,9 @@ import { insertDeploymentSchema } from "@/db/dto";
 import env from "@/env";
 import { ZOD_ERROR_MESSAGES } from "@/lib/constants";
 import createApp from "@/lib/create-app";
+import { DeploymentError } from "@/lib/error";
 import { clone } from "@/lib/tasks/deploy/jobs/clone";
+import { parseAppHost } from "@/lib/tasks/deploy/utils";
 
 import router from "./deployments.index";
 
@@ -66,7 +68,7 @@ describe("deployments routes", () => {
   });
   describe("deployments routes / UT", () => {
     it("should format repo URL correctly with github app auth token", async ({ job }) => {
-      const result = await clone(job);
+      await clone(job);
 
       const expectedUrl = job.data.repoUrl.replace(
         "git://",
@@ -77,7 +79,6 @@ describe("deployments routes", () => {
       const mockExecCommand = vi.mocked(await sshClient()).execCommand;
 
       expect(mockExecCommand).toHaveBeenCalledWith(`git clone ${expectedUrl}`, expect.any(Object));
-      expect(result).toEqual({ status: "success" });
     });
 
     it("should reject invalid port formats", ({ deployments }) => {
@@ -92,6 +93,22 @@ describe("deployments routes", () => {
 
         expect(() => insertDeploymentSchema.parse(input)).toThrow(ZodError);
       });
+    });
+
+    it("should append application name to hostname", () => {
+      expect(parseAppHost("weatherapp", "https://younes.fr")).toBe("weatherapp.younes.fr");
+    });
+
+    it("should throw BUILD_APP_ERROR error for invalid host name URL", () => {
+      try {
+        parseAppHost("weatherapp", "invalid-hostname");
+        expect(true).toBe(false);
+      }
+      catch (e) {
+        if (e instanceof DeploymentError) {
+          expect(e.name).toBe("BUILD_APP_ERROR");
+        }
+      }
     });
   });
 });

@@ -2,14 +2,15 @@ import { createAppAuth } from "@octokit/auth-app";
 import { Buffer } from "node:buffer";
 
 import { APPLICATIONS_PATH } from "@/lib/constants";
+import { DeploymentError } from "@/lib/error";
 import sshClient from "@/lib/ssh";
 import { decryptSecret } from "@/lib/utils";
 
 import type { JobFn } from "../../types";
 
 export const clone: JobFn<"clone"> = async (job) => {
-  job.updateProgress(0);
   const { secret, appId, clientId, clientSecret, installationId, repoUrl } = job.data;
+  job.updateProgress({ logs: "Github repository will be fetched..." });
 
   const privateKey = await decryptSecret({
     encryptedData: Buffer.from(secret.encryptedData, "base64"),
@@ -37,9 +38,22 @@ export const clone: JobFn<"clone"> = async (job) => {
   );
 
   const ssh = await sshClient();
-  await ssh.execCommand(`git clone ${formattedRepoUrl}`, {
-    cwd: APPLICATIONS_PATH,
-  });
-
-  return { status: "success" };
+  try {
+    await ssh.execCommand(`git clone ${formattedRepoUrl}`, {
+      cwd: APPLICATIONS_PATH,
+      onStderr: chunk => job.updateProgress({ logs: chunk.toString() }),
+      onStdout: (chunk) => {
+        throw new DeploymentError({
+          name: "CLONE_APP_ERROR",
+          message: chunk.toString(),
+        });
+      },
+    });
+  }
+  catch (error) {
+    if (error instanceof DeploymentError) {
+      job.updateProgress({ logs: error.message });
+      await job.remove();
+    }
+  }
 };
