@@ -50,13 +50,17 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
 
     const queue = new Queue(slug, { connection: connection.duplicate() });
     const queueEvents = new QueueEvents(slug, { connection: connection.duplicate() });
+
     const activeJobsCount = await queue.getActiveCount();
-    if (activeJobsCount === 0 || !activeJobsCount) {
+    if (activeJobsCount === 0 || !activeJobsCount)
       stream.close();
-    }
 
     const activeJobs = await queue.getJobs("active");
     const activeJob = activeJobs[0];
+
+    if (activeJob.name !== slug)
+      stream.close();
+
     await stream.writeSSE({
       data: JSON.stringify({ jobName: activeJob.name }),
       event: `${slug}-deployment-logs`,
@@ -78,7 +82,7 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
       const jobState = await Job.fromId(queue, job.jobId);
       if (jobState?.name === "configure") {
         await stream.writeSSE({
-          data: JSON.stringify({ completed: true }),
+          data: JSON.stringify({ completed: true, id: appId }),
           event: `${slug}-deployment-logs`,
         });
       }
