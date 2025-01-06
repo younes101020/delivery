@@ -1,11 +1,9 @@
 import { Deployment } from "@/app/(onboarding)/onboarding/_components/deployment";
 import { GithubAppForm } from "@/app/(onboarding)/onboarding/_components/github-app-form";
-import { useInfiniteScroll } from "@/app/(onboarding)/onboarding/_hooks/use-infinite-scroll";
 import { Login } from "@/app/_components/login-form";
 import { publicEnv } from "@/env";
-import { cleanup, render, renderHook, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { afterEach, beforeAll, describe, expect, vi } from "vitest";
 import { onBoardingTest } from "./fixtures";
 
@@ -95,8 +93,8 @@ describe("Onboarding process", () => {
 
   onBoardingTest(
     "submit input should be disabled when no repository is selected",
-    ({ repositories }) => {
-      setup(<Deployment repositories={repositories} />);
+    ({ installations }) => {
+      setup(<Deployment installations={installations} />);
       const form = within(screen.getByRole("form"));
       expect(form.getByLabelText("submit")).toHaveProperty("disabled", true);
     },
@@ -104,29 +102,12 @@ describe("Onboarding process", () => {
 
   onBoardingTest(
     "submit input should be enabled when repository is selected",
-    async ({ repositories }) => {
-      const { userAction } = setup(<Deployment repositories={repositories} />);
+    async ({ installations }) => {
+      const { userAction } = setup(<Deployment installations={installations} />);
       const form = within(screen.getByRole("form"));
       const repoCard = screen.getByTestId("1-repo-card");
       await userAction.click(repoCard);
       expect(form.getByLabelText("submit")).toHaveProperty("disabled", false);
     },
   );
-
-  onBoardingTest(
-    "when search params isn't present it should increment github repositories page number sequentially",
-    () => {
-      const searchParams = new URLSearchParams("") as ReadonlyURLSearchParams;
-    vi.mocked(useSearchParams).mockReturnValue(searchParams);
-      renderHook(() => useInfiniteScroll(true));
-      expect(mockReplace).toHaveBeenLastCalledWith("/onboarding?page=2", { scroll: false });
-    },
-  );
-
-  onBoardingTest("should increment github repositories page number sequentially", () => {
-    const searchParams = new URLSearchParams("page=2") as ReadonlyURLSearchParams;
-    vi.mocked(useSearchParams).mockReturnValue(searchParams);
-    renderHook(() => useInfiniteScroll(true));
-    expect(mockReplace).toHaveBeenLastCalledWith("/onboarding?page=3", { scroll: false });
-  });
 });

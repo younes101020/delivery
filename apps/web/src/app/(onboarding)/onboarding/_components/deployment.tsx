@@ -8,7 +8,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import { ActionState } from "@/lib/auth/middleware";
-import type { Repository } from "@/lib/github";
+import type { Repository } from "@/lib/github/types";
+import { Installation } from "@/lib/github/types";
 import type { Nullable } from "@/lib/utils";
 import { Check, Loader2, Rocket } from "lucide-react";
 import { motion } from "motion/react";
@@ -24,33 +25,13 @@ type SelectedRepositoryProps = Nullable<{
 }>;
 
 interface RepositorySectionProps {
-  repo: Repository & { githubAppId: number };
+  repo: Repository;
+  githubAppId: Installation["githubAppId"];
   selected: SelectedRepositoryProps;
   setSelected: (repository: SelectedRepositoryProps) => void;
 }
 
-function useInfiniteScroll(isIntersecting: boolean) {
-  const searchParams = useSearchParams();
-  const params = new URLSearchParams(searchParams);
-  const pathname = usePathname();
-  const { replace } = useRouter();
-
-  useEffect(() => {
-    if (isIntersecting) {
-      const repoPage = params.get("page");
-      if (!repoPage) {
-        params.set("page", "2");
-      } else {
-        let updatedRepoPage = parseInt(repoPage);
-        updatedRepoPage++;
-        params.set("page", `${updatedRepoPage}`);
-      }
-      replace(`${pathname}?${params.toString()}`, { scroll: false });
-    }
-  }, [isIntersecting, params, pathname, replace]);
-}
-
-function RepositorySection({ repo, setSelected, selected }: RepositorySectionProps) {
+function RepositorySection({ repo, setSelected, selected, githubAppId }: RepositorySectionProps) {
   const isSelected = selected.name === repo.full_name;
   return (
     <motion.section
@@ -58,11 +39,10 @@ function RepositorySection({ repo, setSelected, selected }: RepositorySectionPro
       whileTap={{ scale: 0.9 }}
       className="cursor-pointer"
       onClick={() => {
-        console.log(repo.git_url);
         setSelected({
           name: repo.full_name,
           id: repo.id,
-          githubAppId: repo.githubAppId,
+          githubAppId: githubAppId,
           gitUrl: repo.git_url,
         });
       }}
@@ -84,20 +64,41 @@ function RepositorySection({ repo, setSelected, selected }: RepositorySectionPro
 }
 
 interface DeploymentProps {
-  repositories: (Repository & { githubAppId: number })[];
+  installations: Installation[];
 }
 
-export function Deployment({ repositories }: DeploymentProps) {
+export function Deployment({ installations }: DeploymentProps) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(deploy, { error: "" });
-  const { isIntersecting, ref } = useIntersectionObserver();
+  const { isIntersecting, ref } = useIntersectionObserver({ threshold: 0.5 });
   const [selected, setSelected] = useState<SelectedRepositoryProps>({
     name: null,
     id: null,
     githubAppId: null,
     gitUrl: null,
   });
+  const searchParams = useSearchParams();
+  const params = new URLSearchParams(searchParams);
+  const pathname = usePathname();
+  const { replace } = useRouter();
+  const [hasTriggered, setHasTriggered] = useState(false);
+  console.log(installations[0].repositories)
 
-  useInfiniteScroll(isIntersecting);
+  useEffect(() => {
+    if (isIntersecting && !hasTriggered) {
+      setHasTriggered(true);
+      const repoPage = params.get("page");
+      if (!repoPage) {
+        params.set("page", "2");
+      } else {
+        let updatedRepoPage = parseInt(repoPage);
+        updatedRepoPage++;
+        params.set("page", `${updatedRepoPage}`);
+      }
+      replace(`${pathname}?${params.toString()}`, { scroll: false });
+    } else if (!isIntersecting) {
+      setHasTriggered(false);
+    }
+  }, [isIntersecting, params, pathname, replace, hasTriggered]);
 
   return (
     <>
@@ -139,17 +140,21 @@ export function Deployment({ repositories }: DeploymentProps) {
         </div>
         <ScrollArea className="h-80 my-4">
           <div className="max-h-96 grid grid-cols-1 md:grid-cols-2 gap-2">
-            {repositories.map((repo) => (
+            {installations[0].repositories.map((repo) => (
               <RepositorySection
                 repo={repo}
+                githubAppId={installations[0].githubAppId}
                 key={repo.id}
                 setSelected={setSelected}
                 selected={selected}
               />
             ))}
-            <div ref={ref}>
-              <Skeleton className="w-full h-40" />
-            </div>
+
+            {installations[0].hasMore && (
+              <div ref={ref}>
+                <Skeleton className="w-full h-40" />
+              </div>
+            )}
           </div>
         </ScrollArea>
         <div className="flex justify-end">

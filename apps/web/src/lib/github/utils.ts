@@ -1,21 +1,6 @@
 import { createAppAuth } from "@octokit/auth-app";
 import { Octokit } from "@octokit/rest";
-
-export type RepositoriesResult = Awaited<
-  ReturnType<Octokit["apps"]["listReposAccessibleToInstallation"]>
->["data"]["repositories"];
-
-type SuccessResult = {
-  success: true;
-  repositories: RepositoriesResult;
-  totalCount: number;
-};
-
-type ErrorResult = {
-  success: false;
-  error: string;
-};
-type ListInstallationRepositoriesResult = SuccessResult | ErrorResult;
+import type { ListInstallationRepositoriesResult } from "./types";
 
 export async function listInstallationRepositories({
   appId,
@@ -51,16 +36,21 @@ export async function listInstallationRepositories({
       auth: token,
     });
 
-    const { data } = await installationOctokit.apps.listReposAccessibleToInstallation({
-      per_page: repoPerPage,
-      page: repoPage,
-      type,
-    });
+    const reposPromises = Array.from({ length: repoPage }, (_, pageIndex) =>
+      installationOctokit.apps.listReposAccessibleToInstallation({
+        per_page: repoPerPage,
+        page: pageIndex + 1,
+        type,
+      }),
+    );
+    const iteratedRepos = await Promise.all(reposPromises);
+    const repositories = iteratedRepos.map((repo) => repo.data.repositories.reverse()).flat();
+    const hasMore = repoPerPage * repoPage < iteratedRepos[0].data.total_count;
 
     return {
       success: true,
-      repositories: data.repositories.reverse(),
-      totalCount: data.total_count,
+      repositories,
+      hasMore,
     };
   } catch (error) {
     if (error instanceof Error) {

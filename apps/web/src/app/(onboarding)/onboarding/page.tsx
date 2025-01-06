@@ -16,13 +16,15 @@ interface StepChildrenProps {
 }
 
 async function GithubRepositoriesStep(props: StepChildrenProps) {
+  
   const searchParams = await props.searchParams;
   if (!searchParams || searchParams.step != 4) {
     return null;
   }
-  const repositories = await getAllInstallReposForEachRepoPage(searchParams.page ?? 1);
-  if (!repositories || repositories.length <= 0) redirect("/onboarding/?step=3");
-  return <Deployment repositories={repositories} />;
+  
+  const installations = await getAllInstallReposForEachRepoPage(searchParams.page ?? 1);
+  if (!installations) redirect("/onboarding/?step=3");
+  return <Deployment installations={installations} />;
 }
 
 async function GithubAppStep(props: StepChildrenProps) {

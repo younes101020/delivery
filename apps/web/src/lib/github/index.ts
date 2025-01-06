@@ -1,39 +1,21 @@
 import { client } from "@/lib/http";
 import { GithubInstallation } from "@delivery/jobs/types";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
+import type { FailedInstallation, Installation } from "./types";
 import { listInstallationRepositories } from "./utils";
 
-export type Repository = {
-  id: number;
-  full_name: string;
-  git_url: string;
-  description: string | null;
-};
-
-export type Installation = {
-  githubAppId: number;
-  githubInstallationName: string;
-  repositories: Repository[];
-};
-
 /**
- * This function iterates through all repository pages up to maxIteration to fetch GitHub installations with repos
- * This function fetches repositories page by page to handle pagination of GitHub API results
+ * Fetches GitHub repositories for all installations, handling pagination.
  */
-export async function getAllInstallReposForEachRepoPage(maxIteration: number) {
-  const promises = Array.from({ length: maxIteration }, (_, i) =>
-    getAllInstallationsWithRepos({ repoPage: i + 1 }),
-  );
-  const results = await Promise.all(promises);
-  return results.flat().flatMap<Repository & { githubAppId: number }>((e) => {
-    if (!e?.githubAppId) {
-      return [];
-    }
-    return e.repositories.map((repo) => ({
-      ...repo,
-      githubAppId: e.githubAppId,
-    }));
-  });
+export async function getAllInstallReposForEachRepoPage(iteration: number) {
+  const installations = await getAllInstallationsWithRepos({ repoPage: iteration });
+  if (!installations) return null;
+  const nonNullInstallations = installations
+    .filter(
+      (installation): installation is NonNullable<typeof installation> => installation !== null,
+    )
+    .flat();
+  return nonNullInstallations.length <= 0 ? null : nonNullInstallations;
 }
 
 export async function getAllInstallations(): Promise<
@@ -49,11 +31,13 @@ export async function getAllInstallations(): Promise<
   return result;
 }
 
-export async function getAllInstallationsWithRepos({
-  repoPage,
-}: {
-  repoPage: number;
-}): Promise<Installation[] | null> {
+function isSuccessful(
+  installation: Installation | FailedInstallation,
+): installation is Installation {
+  return !("failed" in installation);
+}
+
+export async function getAllInstallationsWithRepos({ repoPage }: { repoPage: number }) {
   const result = await getAllInstallations();
   if (!result) {
     return null;
@@ -61,28 +45,31 @@ export async function getAllInstallationsWithRepos({
 
   const installations = await Promise.all(
     result.map(async (installation: GithubInstallation & { privateKey: string }) => {
-      const repos = await listInstallationRepositories({
+      const repositoriesResponse = await listInstallationRepositories({
         appId: installation.appId.toString(),
         privateKey: installation.privateKey,
         installationId: installation.installationId.toString(),
-        repoPage,
+        repoPage: repoPage,
       });
 
-      if (!repos.success) {
-        return null;
+      if (!repositoriesResponse.success) {
+        return { failed: true } as FailedInstallation;
       }
+
+      const { repositories, hasMore } = repositoriesResponse;
 
       return {
         githubAppId: installation.appId,
-        repositories: repos.repositories.map((repo) => ({
+        repositories: repositories.map((repo) => ({
           id: repo.id,
           full_name: repo.full_name,
           git_url: repo.git_url,
           description: repo.description,
         })),
-      };
+        hasMore: hasMore,
+      } as Installation;
     }),
   );
 
-  return installations.filter(Boolean) as Installation[];
+  return installations.filter(isSuccessful);
 }
