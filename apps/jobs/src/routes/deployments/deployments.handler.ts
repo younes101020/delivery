@@ -81,8 +81,9 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
     async function completeHandler(job: { jobId: string }) {
       const jobState = await Job.fromId(queue, job.jobId);
       if (jobState?.name === "configure") {
+        const { applicationId } = jobState.returnvalue;
         await stream.writeSSE({
-          data: JSON.stringify({ completed: true, id: appId }),
+          data: JSON.stringify({ completed: true, id: applicationId }),
           event: `${slug}-deployment-logs`,
         });
       }

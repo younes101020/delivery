@@ -21,4 +21,5 @@ export const configure: JobFn<"configure"> = async (job) => {
     .returning();
 
   job.updateProgress({ logs: `${inserted.name} configuration saved to database` });
+  return { applicationId: inserted.id };
 };

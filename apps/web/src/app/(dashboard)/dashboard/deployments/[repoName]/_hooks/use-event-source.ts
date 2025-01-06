@@ -8,6 +8,7 @@ type SSEMessage<T> = {
   jobName: T extends { step: infer S } ? S : never;
   logs: string;
   completed?: boolean;
+  id?: string;
 };
 
 type SseProps<T> = {

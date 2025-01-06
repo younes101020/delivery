@@ -43,8 +43,8 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
       logs: null,
     },
     onMessage: (prev, data) => {
-      if (data.completed) {
-        router.replace(`/dashboard/applications/${repoName}`);
+      if (data.completed && data.id) {
+        router.replace(`/dashboard/applications/${data.id}`);
         return prev;
       }
       return {
