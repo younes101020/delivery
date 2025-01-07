@@ -38,34 +38,48 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const tracking = await startDeploy({
     clone: { ...githubApp, repoUrl: deployment.repoUrl, repoName: queueRef },
     build: { repoName: queueRef, port: deployment.port, env: deployment.env },
-    configure: { port: deployment.port },
+    configure: { port: deployment.port, githubAppId: deployment.githubAppId },
   });
 
   return c.json(tracking, HttpStatusCodes.OK);
 };
 
+const queueEventsMap = new Map<string, QueueEvents>();
+
 export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
+  const { slug } = c.req.valid("param");
+
+  const queue = new Queue(slug, { connection: connection.duplicate() });
+
+  let queueEvents = queueEventsMap.get(slug);
+  if (!queueEvents) {
+    queueEvents = new QueueEvents(slug, { connection: connection.duplicate() });
+    queueEventsMap.set(slug, queueEvents);
+  }
+  const activeJobsCount = await queue.getActiveCount();
+  const activeJobs = await queue.getJobs("active");
+
+  if (activeJobsCount === 0 || !activeJobsCount) {
+    return c.json(
+      {
+        message: HttpStatusPhrases.NOT_FOUND,
+      },
+      HttpStatusCodes.NOT_FOUND,
+    );
+  }
+
+  if (queue.name !== slug) {
+    return c.json(
+      {
+        message: HttpStatusPhrases.UNPROCESSABLE_ENTITY,
+      },
+      HttpStatusCodes.UNPROCESSABLE_ENTITY,
+    );
+  }
+
+  const activeJobName = activeJobs[0].name;
+
   return streamSSE(c, async (stream) => {
-    const { slug } = c.req.valid("param");
-
-    const queue = new Queue(slug, { connection: connection.duplicate() });
-    const queueEvents = new QueueEvents(slug, { connection: connection.duplicate() });
-
-    const activeJobsCount = await queue.getActiveCount();
-    if (activeJobsCount === 0 || !activeJobsCount)
-      stream.close();
-
-    const activeJobs = await queue.getJobs("active");
-    const activeJob = activeJobs[0];
-
-    if (activeJob.name !== slug)
-      stream.close();
-
-    await stream.writeSSE({
-      data: JSON.stringify({ jobName: activeJob.name }),
-      event: `${slug}-deployment-logs`,
-    });
-
     async function progressHandler({ data, jobId }: { data: number | object; jobId: string }) {
       const jobState = await Job.fromId(queue, jobId);
       const sseData = JSON.stringify({
@@ -88,12 +102,20 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
         });
       }
     }
+
     queueEvents.on("progress", progressHandler);
     queueEvents.on("completed", completeHandler);
+
     stream.onAbort(() => {
       queueEvents.removeListener("progress", progressHandler);
       queueEvents.removeListener("completed", completeHandler);
     });
+
+    await stream.writeSSE({
+      data: JSON.stringify({ jobName: activeJobName }),
+      event: `${slug}-deployment-logs`,
+    });
+
     while (true) {
       await stream.sleep(4000);
     }

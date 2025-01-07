@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS "applications" (
 	"name" text NOT NULL,
 	"fqdn" text NOT NULL,
 	"logs" text,
+	"port" text NOT NULL,
 	"github_app_id" serial NOT NULL,
-	"github_app_name" text NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now(),
 	"deleted_at" timestamp,
@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS "github_app" (
 	"webhook_secret" text NOT NULL,
 	"client_id" text NOT NULL,
 	"client_secret" text NOT NULL,
+	"installation_id" serial NOT NULL,
 	"app_id" serial NOT NULL,
 	"secret_id" serial NOT NULL
 );
@@ -44,10 +45,11 @@ CREATE TABLE IF NOT EXISTS "github_app_secret" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "system_config" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"onboarding_completed" boolean DEFAULT false,
 	"onboarding_completed_at" timestamp,
-	"completed_by_user_id" text
+	"completed_by_user_id" text,
+	"domain_name" text
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "users" (

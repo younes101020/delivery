@@ -18,11 +18,15 @@ export const insertDeploymentSchema = z.object({
       return str
         .trim()
         .split(/\s+/)
-        .map(v => `-e ${v}`)
+        .map(envVar => `-e ${envVar}`)
         .join(" ");
     })
     .optional()
     .describe("Environment variables in KEY=value format, separated by spaces"),
+});
+
+export const slugParamsSchema = z.object({
+  slug: z.string().describe("Repository name identifier for the deployment"),
 });
 
 export const deploymentTrackerIdentifier = z.object({

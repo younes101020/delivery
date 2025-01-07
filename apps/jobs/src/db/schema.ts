@@ -8,7 +8,7 @@ import { selectGithubAppsSchema } from "./dto/githubapps.dto";
 import { selectUsersSchema } from "./dto/users.dto";
 
 export const systemConfig = pgTable("system_config", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: serial("id").primaryKey(),
   onboardingCompleted: boolean("onboarding_completed").default(false),
   onboardingCompletedAt: timestamp("onboarding_completed_at"),
   completedByUserId: text("completed_by_user_id"),

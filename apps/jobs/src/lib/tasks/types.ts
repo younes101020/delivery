@@ -13,7 +13,7 @@ export interface JobDataMap {
     repoName: string;
   };
   build: { repoName: string; env?: string; port: string };
-  configure: Pick<InsertApplicationSchema, "port">;
+  configure: Pick<InsertApplicationSchema, "port" | "githubAppId">;
 }
 export interface JobParam<T extends JobName>
   extends Partial<Omit<Job<JobDataMap[T]>, "data" | "updateProgress">> {

@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Dialog,
   DialogContent,
@@ -5,7 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ReactNode } from "react";
+import { ReactNode, useRef, useEffect } from "react";
 
 interface LogsTerminalProps {
   logs: string;
@@ -13,6 +15,14 @@ interface LogsTerminalProps {
 }
 
 export function LogsTerminal({ logs, children }: LogsTerminalProps) {
+  const preRef = useRef<HTMLPreElement | null>(null);
+
+  useEffect(() => {
+    if (preRef.current) {
+      preRef.current.scrollTop = preRef.current.scrollHeight;
+    }
+  }, [logs]);
+  
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -20,7 +30,7 @@ export function LogsTerminal({ logs, children }: LogsTerminalProps) {
         <DialogHeader>
           <DialogTitle>Build logs</DialogTitle>
         </DialogHeader>
-        <p>{logs}</p>
+        <pre className="font-mono text-sm w-full overflow-x-auto">{logs}</pre>
       </DialogContent>
     </Dialog>
   );

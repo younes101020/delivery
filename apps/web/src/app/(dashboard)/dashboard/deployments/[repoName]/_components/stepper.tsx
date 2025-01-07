@@ -3,7 +3,8 @@
 import { Nullable } from "@/lib/utils";
 import { ExternalLink as ExternalLinkIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEventSource } from "../_hooks/use-event-source";
+import { useCallback } from "react";
+import { type SSEMessage, useEventSource } from "../_hooks/use-event-source";
 import BoxReveal from "./ui/box-reveal";
 import { LogsTerminal } from "./ui/logsterminal";
 import Ripple from "./ui/ripple";
@@ -33,16 +34,12 @@ export const DEPLOYMENTMETADATA = {
   },
 };
 
+const DEFAULT_STATE = { step: null, logs: null };
+
 export function Stepper({ repoName, baseUrl }: StepperProps) {
   const router = useRouter();
-  const { step, logs } = useEventSource<SseData>({
-    type: `${repoName}-deployment-logs`,
-    eventUrl: `${baseUrl}/api/deployments/logs/${repoName}`,
-    initialState: {
-      step: null,
-      logs: null,
-    },
-    onMessage: (prev, data) => {
+  const onMessage = useCallback(
+    (prev: SseData, data: SSEMessage<SseData>) => {
       if (data.completed && data.id) {
         router.replace(`/dashboard/applications/${data.id}`);
         return prev;
@@ -52,6 +49,13 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
         logs: prev.logs ? `${prev.logs}${data.logs}` : data.logs,
       };
     },
+    [router],
+  );
+  const { step, logs } = useEventSource<SseData>({
+    type: `${repoName}-deployment-logs`,
+    eventUrl: `${baseUrl}/api/deployments/logs/${repoName}`,
+    initialState: DEFAULT_STATE,
+    onMessage,
   });
 
   return (

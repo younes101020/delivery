@@ -3,7 +3,7 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, SlugParamsSchema } from "stoker/openapi/schemas";
 
-import { deploymentTrackerIdentifier, insertDeploymentSchema } from "@/db/dto";
+import { deploymentTrackerIdentifier, insertDeploymentSchema, slugParamsSchema } from "@/db/dto";
 import { notFoundSchema } from "@/lib/constants";
 
 const tags = ["Deployments"];
@@ -44,6 +44,11 @@ export const streamLog = createRoute({
       },
       description: "The build process logs of the Docker image",
     },
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "No active deployment found"),
+    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
+      createErrorSchema(slugParamsSchema),
+      "No active deployment found for this repository name",
+    ),
   },
 });
 

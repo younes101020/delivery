@@ -10,7 +10,7 @@ import type { JobFn } from "../../types";
 
 export const clone: JobFn<"clone"> = async (job) => {
   const { secret, appId, clientId, clientSecret, installationId, repoUrl } = job.data;
-  job.updateProgress({ logs: "Github repository will be fetched..." });
+  await job.updateProgress({ logs: "Github repository will be fetched..." });
 
   const privateKey = await decryptSecret({
     encryptedData: Buffer.from(secret.encryptedData, "base64"),
@@ -38,22 +38,15 @@ export const clone: JobFn<"clone"> = async (job) => {
   );
 
   const ssh = await sshClient();
-  try {
-    await ssh.execCommand(`git clone ${formattedRepoUrl}`, {
-      cwd: APPLICATIONS_PATH,
-      onStderr: chunk => job.updateProgress({ logs: chunk.toString() }),
-      onStdout: (chunk) => {
-        throw new DeploymentError({
-          name: "CLONE_APP_ERROR",
-          message: chunk.toString(),
-        });
-      },
-    });
-  }
-  catch (error) {
-    if (error instanceof DeploymentError) {
-      job.updateProgress({ logs: error.message });
-      await job.remove();
-    }
-  }
+
+  await ssh.execCommand(`git clone ${formattedRepoUrl}`, {
+    cwd: APPLICATIONS_PATH,
+    onStderr: chunk => job.updateProgress({ logs: chunk.toString() }),
+    onStdout: (chunk) => {
+      throw new DeploymentError({
+        name: "CLONE_APP_ERROR",
+        message: chunk.toString(),
+      });
+    },
+  });
 };

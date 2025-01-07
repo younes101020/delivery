@@ -21,5 +21,10 @@ export async function createWorker(queueName: string) {
       connection,
     },
   );
+  worker.on("error", (error) => {
+    if (error instanceof Error) {
+      console.error("Worker error: ", error.message);
+    }
+  });
   return worker;
 }

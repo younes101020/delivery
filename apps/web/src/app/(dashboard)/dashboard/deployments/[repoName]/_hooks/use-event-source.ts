@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { useEffect } from "react";
-
-type SSEMessage<T> = {
-  jobName: T extends { step: infer S } ? S : never;
-  logs: string;
-  completed?: boolean;
-  id?: string;
-};
+export type SSEMessage<T> = T extends { step: any }
+  ? {
+      jobName: T["step"];
+      logs: string;
+      completed?: boolean;
+      id?: string;
+    }
+  : never;
 
 type SseProps<T> = {
   type: string;
@@ -19,28 +19,38 @@ type SseProps<T> = {
 };
 
 export function useEventSource<T>({ initialState, eventUrl, type, onMessage }: SseProps<T>): T {
-  const [sseData, setSseData] = useState(initialState);
+  const [sseData, setSseData] = useState<T>(() => initialState);
 
   useEffect(() => {
-    const eventSource = new EventSource(eventUrl);
-
+    let mounted = true;
     const handleLogs = (e: MessageEvent) => {
-      const data = JSON.parse(e.data);
-      if (onMessage) {
-        setSseData((prev) => {
-          const state = onMessage(prev, data);
-          return state;
-        });
+      if (!mounted) return;
+
+      try {
+        const data = JSON.parse(e.data);
+        if (onMessage) {
+          setSseData((prev) => onMessage(prev, data));
+        }
+      } catch (error) {
+        console.error("Failed to parse SSE data:", error);
       }
     };
 
+    const eventSource = new EventSource(eventUrl, { withCredentials: true });
     eventSource.addEventListener(type, handleLogs);
+    eventSource.addEventListener("error", (e) => {
+      console.error("EventSource error:", e);
+      if (mounted) {
+        eventSource.close();
+      }
+    });
 
     return () => {
+      mounted = false;
       eventSource.removeEventListener(type, handleLogs);
       eventSource.close();
     };
-  }, [eventUrl, onMessage]);
+  }, [eventUrl, type]);
 
   return sseData;
 }

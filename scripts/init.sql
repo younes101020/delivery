@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS system_config (
     id SERIAL PRIMARY KEY,
     onboarding_completed BOOLEAN DEFAULT FALSE,
     onboarding_completed_at TIMESTAMP,
-    completed_by_user_id TEXT
+    completed_by_user_id TEXT,
+    domain_name TEXT
 );
 
 DO $$
