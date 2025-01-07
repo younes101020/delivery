@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import { APPLICATIONS_PATH } from "@/lib/constants";
+import { DeploymentError } from "@/lib/error";
 import sshClient from "@/lib/ssh";
 import { parseAppHost } from "@/lib/tasks/deploy/utils";
 
@@ -23,11 +24,16 @@ export const build: JobFn<"build"> = async (job) => {
       --name ${repoName} \
       --label "traefik.http.routers.${repoName}.rule=Host(\\\`${fqdn}\\\`)" \
       --label "traefik.http.routers.${repoName}.entrypoints=web" \
-      && docker run ${port} ${env} --network host_network -d ${repoName}`,
+      && docker run ${port} ${env ?? ""} --network host_network -d ${repoName}`,
     {
       cwd: `${APPLICATIONS_PATH}/${repoName}`,
       onStdout: chunk => job.updateProgress({ logs: chunk.toString() }),
-      onStderr: chunk => job.updateProgress({ logs: chunk.toString() }),
+      onStderr: (chunk) => {
+        throw new DeploymentError({
+          name: "BUILD_APP_ERROR",
+          message: chunk.toString(),
+        });
+      },
     },
   );
   await job.updateProgress({ logs: "Your application is now online! 🚀" });

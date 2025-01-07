@@ -13,5 +13,6 @@ export const ZOD_ERROR_CODES = {
 
 export const notFoundSchema = createMessageObjectSchema(HttpStatusPhrases.NOT_FOUND);
 export const unauthorizedSchema = createMessageObjectSchema(HttpStatusPhrases.UNAUTHORIZED);
+export const goneSchema = createMessageObjectSchema(HttpStatusPhrases.GONE);
 
 export const APPLICATIONS_PATH = "/data/delivery/applications";

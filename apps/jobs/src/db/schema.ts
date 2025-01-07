@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { boolean, pgTable, serial, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 // eslint-disable-next-line ts/consistent-type-imports
 import { z } from "zod";
 // eslint-disable-next-line ts/consistent-type-imports

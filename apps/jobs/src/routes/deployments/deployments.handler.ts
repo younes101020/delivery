@@ -7,7 +7,9 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 import type { AppRouteHandler } from "@/lib/types";
 
 import { db } from "@/db";
+import { getApplicationByName } from "@/db/queries";
 import { startDeploy } from "@/lib/tasks/deploy";
+import { transformEnvVars } from "@/lib/tasks/deploy/utils";
 import { connection } from "@/lib/tasks/worker";
 
 import type { CreateRoute, StreamRoute } from "./deployments.routes";
@@ -34,11 +36,19 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
   }
 
   const queueRef = basename(deployment.repoUrl, ".git");
+  const environmentVariables = transformEnvVars(deployment.env);
 
   const tracking = await startDeploy({
     clone: { ...githubApp, repoUrl: deployment.repoUrl, repoName: queueRef },
-    build: { repoName: queueRef, port: deployment.port, env: deployment.env },
-    configure: { port: deployment.port, githubAppId: deployment.githubAppId },
+    build: {
+      repoName: queueRef,
+      port: deployment.port,
+      env: environmentVariables && environmentVariables.cmdEnvVars,
+    },
+    configure: {
+      application: { port: deployment.port, githubAppId: githubApp.id },
+      environmentVariable: environmentVariables && environmentVariables.persistedEnvVars,
+    },
   });
 
   return c.json(tracking, HttpStatusCodes.OK);
@@ -58,22 +68,22 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
   }
   const activeJobsCount = await queue.getActiveCount();
   const activeJobs = await queue.getJobs("active");
-
+console.log(activeJobs,"kfkfk")
   if (activeJobsCount === 0 || !activeJobsCount) {
+    const hasBeenDeployed = await getApplicationByName(slug);
+    if (hasBeenDeployed) {
+      return c.json(
+        {
+          message: HttpStatusPhrases.GONE,
+        },
+        HttpStatusCodes.GONE,
+      );
+    }
     return c.json(
       {
         message: HttpStatusPhrases.NOT_FOUND,
       },
       HttpStatusCodes.NOT_FOUND,
-    );
-  }
-
-  if (queue.name !== slug) {
-    return c.json(
-      {
-        message: HttpStatusPhrases.UNPROCESSABLE_ENTITY,
-      },
-      HttpStatusCodes.UNPROCESSABLE_ENTITY,
     );
   }
 

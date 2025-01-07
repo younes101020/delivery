@@ -2,14 +2,12 @@
 
 import { useEffect, useState } from "react";
 
-export type SSEMessage<T> = T extends { step: any }
-  ? {
-      jobName: T["step"];
-      logs: string;
-      completed?: boolean;
-      id?: string;
-    }
-  : never;
+export type SSEMessage<T> = {
+  jobName: T extends { step: infer S } ? S : never;
+  logs: string;
+  completed?: boolean;
+  id?: string;
+};
 
 type SseProps<T> = {
   type: string;
@@ -36,7 +34,7 @@ export function useEventSource<T>({ initialState, eventUrl, type, onMessage }: S
       }
     };
 
-    const eventSource = new EventSource(eventUrl, { withCredentials: true });
+    const eventSource = new EventSource(eventUrl);
     eventSource.addEventListener(type, handleLogs);
     eventSource.addEventListener("error", (e) => {
       console.error("EventSource error:", e);

@@ -23,7 +23,14 @@ export async function createWorker(queueName: string) {
   );
   worker.on("error", (error) => {
     if (error instanceof Error) {
-      console.error("Worker error: ", error.message);
+      console.error("Error: ", error);
+    }
+  });
+  worker.on("failed", (job, error) => {
+    if (error instanceof Error) {
+      if (job)
+        job?.updateProgress({ logs: error.message, isError: true });
+      console.error("Job failed: ", error);
     }
   });
   return worker;

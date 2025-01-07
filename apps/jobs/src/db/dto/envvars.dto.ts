@@ -1,4 +1,6 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+// eslint-disable-next-line ts/consistent-type-imports
+import { z } from "zod";
 
 import { applicationEnvironmentVariables, environmentVariables } from "../schema";
 
@@ -28,3 +30,5 @@ export const insertApplicationEnvironmentVariablesSchema = createInsertSchema(
   .omit({
     id: true,
   });
+
+export type InsertEnvironmentVariablesSchema = z.infer<typeof insertEnvironmentVariablesSchema>;

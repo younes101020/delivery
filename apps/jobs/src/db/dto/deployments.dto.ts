@@ -11,16 +11,6 @@ export const insertDeploymentSchema = z.object({
   env: z
     .string()
     .regex(/^(?:\w+=[\w.-]+(?:\s+|$))*$/)
-    .transform((str) => {
-      if (!str) {
-        return str;
-      }
-      return str
-        .trim()
-        .split(/\s+/)
-        .map(envVar => `-e ${envVar}`)
-        .join(" ");
-    })
     .optional()
     .describe("Environment variables in KEY=value format, separated by spaces"),
 });

@@ -2,6 +2,7 @@ import type { Job, JobNode, Queue, Worker } from "bullmq";
 
 import type {
   InsertApplicationSchema,
+  InsertEnvironmentVariablesSchema,
   SelectedGithubAppSecretSchema,
   SelectedGithubAppsSchema,
 } from "@/db/dto";
@@ -13,7 +14,10 @@ export interface JobDataMap {
     repoName: string;
   };
   build: { repoName: string; env?: string; port: string };
-  configure: Pick<InsertApplicationSchema, "port" | "githubAppId">;
+  configure: {
+    application: Pick<InsertApplicationSchema, "port" | "githubAppId">;
+    environmentVariable: InsertEnvironmentVariablesSchema[] | undefined;
+  };
 }
 export interface JobParam<T extends JobName>
   extends Partial<Omit<Job<JobDataMap[T]>, "data" | "updateProgress">> {

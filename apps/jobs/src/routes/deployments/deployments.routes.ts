@@ -4,7 +4,7 @@ import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, SlugParamsSchema } from "stoker/openapi/schemas";
 
 import { deploymentTrackerIdentifier, insertDeploymentSchema, slugParamsSchema } from "@/db/dto";
-import { notFoundSchema } from "@/lib/constants";
+import { goneSchema, notFoundSchema } from "@/lib/constants";
 
 const tags = ["Deployments"];
 
@@ -45,10 +45,7 @@ export const streamLog = createRoute({
       description: "The build process logs of the Docker image",
     },
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "No active deployment found"),
-    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(slugParamsSchema),
-      "No active deployment found for this repository name",
-    ),
+    [HttpStatusCodes.GONE]: jsonContent(goneSchema, "Deployment has already been processed"),
   },
 });
 

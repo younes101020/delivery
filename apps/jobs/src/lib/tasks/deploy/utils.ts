@@ -1,5 +1,7 @@
 import { Queue } from "bullmq";
 
+import type { InsertDeploymentSchema } from "@/db/dto/deployments.dto";
+
 import { DeploymentError } from "@/lib/error";
 
 /**
@@ -34,4 +36,32 @@ export function parseAppHost(appName: string, hostName: string) {
   }
   url.hostname = `${appName}.${url.hostname}`;
   return url.host;
+}
+
+export function transformEnvVars(envs: InsertDeploymentSchema["env"]) {
+  if (!envs) {
+    return undefined;
+  }
+
+  const cmdEnvVars = envs
+    .trim()
+    .split(/\s+/)
+    .map(env => `-e ${env}`)
+    .join(" ");
+
+  const persistedEnvVars = envs
+    .trim()
+    .split(/\s+/)
+    .map((env) => {
+      const [key, value] = env.split("=");
+      return {
+        key,
+        value,
+      };
+    });
+
+  return {
+    cmdEnvVars,
+    persistedEnvVars,
+  };
 }
