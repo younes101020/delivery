@@ -5,7 +5,7 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import { db } from "@/db";
+import { createGithubApp, createGithubAppSecret, getGithubAppById, getGithubApps, updateGithubApp } from "@/db/queries";
 import { githubApp, githubAppSecret } from "@/db/schema";
 import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
 import { decryptSecret, encryptSecret } from "@/lib/utils";
@@ -13,11 +13,7 @@ import { decryptSecret, encryptSecret } from "@/lib/utils";
 import type { CreateRoute, GetOneRoute, ListRoute, PatchRoute } from "./githubapps.routes";
 
 export const list: AppRouteHandler<ListRoute> = async (c) => {
-  const githubApps = await db.query.githubApp.findMany({
-    with: {
-      secret: true,
-    },
-  });
+  const githubApps = await getGithubApps();
 
   const githubAppsWithPrivateKey = await Promise.all(
     githubApps.map(async (app) => {
@@ -43,22 +39,15 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const newGithubApp = c.req.valid("json");
   const secret = await encryptSecret(newGithubApp.privateKey);
-  const [insertedSecret] = await db.insert(githubAppSecret).values(secret).returning();
+  const insertedSecret = await createGithubAppSecret(secret);
   newGithubApp.secretId = insertedSecret.id;
-  const [insertedGithubApp] = await db.insert(githubApp).values(newGithubApp).returning();
+  const insertedGithubApp = await createGithubApp(newGithubApp);
   return c.json(insertedGithubApp, HttpStatusCodes.OK);
 };
 
 export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   const { id } = c.req.valid("param");
-  const githubApp = await db.query.githubApp.findFirst({
-    where(fields, operators) {
-      return operators.eq(fields.id, id);
-    },
-    with: {
-      secret: true,
-    },
-  });
+  const githubApp = await getGithubAppById(id);
   if (!githubApp) {
     return c.json(
       {
@@ -103,11 +92,7 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
     );
   }
 
-  const [githubapp] = await db
-    .update(githubApp)
-    .set(updates)
-    .where(eq(githubApp.appId, id))
-    .returning();
+  const githubapp = await updateGithubApp(id, updates);
 
   if (!githubapp) {
     return c.json(

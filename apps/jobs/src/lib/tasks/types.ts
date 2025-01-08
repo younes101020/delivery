@@ -13,10 +13,12 @@ export interface JobDataMap {
     repoUrl: string;
     repoName: string;
   };
-  build: { repoName: string; env?: string; port: string };
+  build: { repoName: string; env?: string; port: string; fqdn: string };
   configure: {
     application: Pick<InsertApplicationSchema, "port" | "githubAppId">;
     environmentVariable: InsertEnvironmentVariablesSchema[] | undefined;
+    repoName: string;
+    fqdn: string;
   };
 }
 export interface JobParam<T extends JobName>

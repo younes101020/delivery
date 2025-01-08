@@ -426,6 +426,7 @@ __metadata:
     "@types/ioredis": "npm:^5.0.0"
     "@types/node": "npm:^22.10.2"
     "@types/pg": "npm:^8.11.10"
+    "@types/ssh2": "npm:^1.15.3"
     bullmq: "npm:^5.34.5"
     cross-env: "npm:^7.0.3"
     dockerode: "npm:^4.0.2"
@@ -440,11 +441,11 @@ __metadata:
     hono: "npm:^4.6.6"
     hono-pino: "npm:^0.4.0"
     ioredis: "npm:^5.4.1"
-    node-ssh: "npm:^13.2.0"
     pg: "npm:^8.13.1"
     pino: "npm:^9.5.0"
     pino-pretty: "npm:^11.3.0"
     postgres: "npm:^3.4.5"
+    ssh2: "npm:^1.16.0"
     stoker: "npm:^1.2.7"
     tsc-alias: "npm:^1.8.10"
     tsx: "npm:^4.19.1"
@@ -4013,6 +4014,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node@npm:^18.11.18":
+  version: 18.19.70
+  resolution: "@types/node@npm:18.19.70"
+  dependencies:
+    undici-types: "npm:~5.26.4"
+  checksum: 10c0/68866e53b92be60d8840f5c93232d3ae39c71663101decc1d4f1870d9236c3c89e74177b616c2a2cabce116b1356f3e89c57df3e969c9f9b0e0b5c59b5f790f7
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:^20":
   version: 20.17.6
   resolution: "@types/node@npm:20.17.6"
@@ -4079,6 +4089,15 @@ __metadata:
   version: 7.5.8
   resolution: "@types/semver@npm:7.5.8"
   checksum: 10c0/8663ff927234d1c5fcc04b33062cb2b9fcfbe0f5f351ed26c4d1e1581657deebd506b41ff7fdf89e787e3d33ce05854bc01686379b89e9c49b564c4cfa988efa
+  languageName: node
+  linkType: hard
+
+"@types/ssh2@npm:^1.15.3":
+  version: 1.15.3
+  resolution: "@types/ssh2@npm:1.15.3"
+  dependencies:
+    "@types/node": "npm:^18.11.18"
+  checksum: 10c0/277cafe07111e3191c10cf2ce686b7950343662c9661871127d905f3db736b49202618b94e3f2fbde129ebc7032da2b62d130107f877e2d0216955488c355667
   languageName: node
   linkType: hard
 
@@ -8776,13 +8795,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"is-stream@npm:^2.0.0":
-  version: 2.0.1
-  resolution: "is-stream@npm:2.0.1"
-  checksum: 10c0/7c284241313fc6efc329b8d7f08e16c0efeb6baab1b4cd0ba579eb78e5af1aa5da11e68559896a2067cd6c526bd29241dda4eb1225e627d5aa1a89a76d4635a5
-  languageName: node
-  linkType: hard
-
 "is-stream@npm:^3.0.0":
   version: 3.0.0
   resolution: "is-stream@npm:3.0.0"
@@ -9560,15 +9572,6 @@ __metadata:
   dependencies:
     "@jridgewell/sourcemap-codec": "npm:^1.5.0"
   checksum: 10c0/a275faeca1564c545019b4742c38a42ca80226c8c9e0805c32d1a1cc58b0e6ff7bbd914ed885fd10043858a7da0f732cb8f49c8975c3ecebde9cad4b57db5115
-  languageName: node
-  linkType: hard
-
-"make-dir@npm:^3.1.0":
-  version: 3.1.0
-  resolution: "make-dir@npm:3.1.0"
-  dependencies:
-    semver: "npm:^6.0.0"
-  checksum: 10c0/56aaafefc49c2dfef02c5c95f9b196c4eb6988040cf2c712185c7fe5c99b4091591a7fc4d4eafaaefa70ff763a26f6ab8c3ff60b9e75ea19876f49b18667ecaa
   languageName: node
   linkType: hard
 
@@ -10689,20 +10692,6 @@ __metadata:
   version: 2.0.18
   resolution: "node-releases@npm:2.0.18"
   checksum: 10c0/786ac9db9d7226339e1dc84bbb42007cb054a346bd9257e6aa154d294f01bc6a6cddb1348fa099f079be6580acbb470e3c048effd5f719325abd0179e566fd27
-  languageName: node
-  linkType: hard
-
-"node-ssh@npm:^13.2.0":
-  version: 13.2.0
-  resolution: "node-ssh@npm:13.2.0"
-  dependencies:
-    is-stream: "npm:^2.0.0"
-    make-dir: "npm:^3.1.0"
-    sb-promise-queue: "npm:^2.1.0"
-    sb-scandir: "npm:^3.1.0"
-    shell-escape: "npm:^0.2.0"
-    ssh2: "npm:^1.14.0"
-  checksum: 10c0/55a0f1d6fbc740625ba892ce955e8500068d1439532551047072639365e79e0e2c81a7231b64b0ef380a12fa9b5b0d882d4cab5f5382f0891be10586279b5925
   languageName: node
   linkType: hard
 
@@ -12791,22 +12780,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sb-promise-queue@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "sb-promise-queue@npm:2.1.0"
-  checksum: 10c0/76ee74af0c7c4db89fac2acf12615c1801f2c2848fd8028a97b515d13adcc680f68f353ebb6ddc7f4253619326e62b7cf5f1afc6a675b1470d4df30b726452ed
-  languageName: node
-  linkType: hard
-
-"sb-scandir@npm:^3.1.0":
-  version: 3.1.0
-  resolution: "sb-scandir@npm:3.1.0"
-  dependencies:
-    sb-promise-queue: "npm:^2.1.0"
-  checksum: 10c0/550ac637d8e4a5c05ab8220bd9d2978f6f69a32f7096200474450684d54245fed76182976b6d1348939365d6ac60b65c24be2a35715b5c694e3c36d93d00f41f
-  languageName: node
-  linkType: hard
-
 "scheduler@npm:0.25.0-rc-66855b96-20241106":
   version: 0.25.0-rc-66855b96-20241106
   resolution: "scheduler@npm:0.25.0-rc-66855b96-20241106"
@@ -12896,7 +12869,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^6.0.0, semver@npm:^6.3.1":
+"semver@npm:^6.3.1":
   version: 6.3.1
   resolution: "semver@npm:6.3.1"
   bin:
@@ -13022,13 +12995,6 @@ __metadata:
   version: 3.0.0
   resolution: "shebang-regex@npm:3.0.0"
   checksum: 10c0/1dbed0726dd0e1152a92696c76c7f06084eb32a90f0528d11acd764043aacf76994b2fb30aa1291a21bd019d6699164d048286309a278855ee7bec06cf6fb690
-  languageName: node
-  linkType: hard
-
-"shell-escape@npm:^0.2.0":
-  version: 0.2.0
-  resolution: "shell-escape@npm:0.2.0"
-  checksum: 10c0/501616713d13fd053b3858da18b613d83bfcdc8368e62be393dc563cc9fe2550492d403f73211e9a84429f39c8b9617f1e016dabee177b0ebdcb298fa47fc612
   languageName: node
   linkType: hard
 
@@ -13278,7 +13244,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ssh2@npm:^1.14.0, ssh2@npm:^1.15.0":
+"ssh2@npm:^1.15.0, ssh2@npm:^1.16.0":
   version: 1.16.0
   resolution: "ssh2@npm:1.16.0"
   dependencies:
@@ -14296,6 +14262,13 @@ __metadata:
     has-symbols: "npm:^1.0.3"
     which-boxed-primitive: "npm:^1.0.2"
   checksum: 10c0/81ca2e81134167cc8f75fa79fbcc8a94379d6c61de67090986a2273850989dd3bae8440c163121b77434b68263e34787a675cbdcb34bb2f764c6b9c843a11b66
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~5.26.4":
+  version: 5.26.5
+  resolution: "undici-types@npm:5.26.5"
+  checksum: 10c0/bb673d7876c2d411b6eb6c560e0c571eef4a01c1c19925175d16e3a30c4c428181fb8d7ae802a261f283e4166a0ac435e2f505743aa9e45d893f9a3df017b501
   languageName: node
   linkType: hard
 

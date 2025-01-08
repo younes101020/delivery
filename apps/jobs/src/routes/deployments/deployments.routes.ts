@@ -1,7 +1,7 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
-import { createErrorSchema, SlugParamsSchema } from "stoker/openapi/schemas";
+import { createErrorSchema } from "stoker/openapi/schemas";
 
 import { deploymentTrackerIdentifier, insertDeploymentSchema, slugParamsSchema } from "@/db/dto";
 import { goneSchema, notFoundSchema } from "@/lib/constants";
@@ -33,7 +33,7 @@ export const streamLog = createRoute({
   method: "get",
   tags,
   request: {
-    params: SlugParamsSchema,
+    params: slugParamsSchema,
   },
   responses: {
     [HttpStatusCodes.OK]: {

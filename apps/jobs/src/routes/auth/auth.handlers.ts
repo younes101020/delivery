@@ -3,7 +3,7 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import { db } from "@/db";
+import { getUserByEmail } from "@/db/queries";
 import { verifyPassword } from "@/lib/auth";
 
 import type { VerifyRoute } from "./auth.routes";
@@ -11,11 +11,7 @@ import type { VerifyRoute } from "./auth.routes";
 export const verify: AppRouteHandler<VerifyRoute> = async (c) => {
   const { email, passwordHash: password } = c.req.valid("json");
 
-  const user = await db.query.users.findFirst({
-    where(fields, operators) {
-      return operators.eq(fields.email, email);
-    },
-  });
+  const user = await getUserByEmail(email);
 
   if (!user) {
     return c.json(

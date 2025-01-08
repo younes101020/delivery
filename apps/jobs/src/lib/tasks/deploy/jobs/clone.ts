@@ -3,7 +3,7 @@ import { Buffer } from "node:buffer";
 
 import { APPLICATIONS_PATH } from "@/lib/constants";
 import { DeploymentError } from "@/lib/error";
-import sshClient from "@/lib/ssh";
+import { ssh } from "@/lib/ssh";
 import { decryptSecret } from "@/lib/utils";
 
 import type { JobFn } from "../../types";
@@ -36,17 +36,16 @@ export const clone: JobFn<"clone"> = async (job) => {
     "git://",
     `https://x-access-token:${installationAuthentication.token}@`,
   );
-
-  const ssh = await sshClient();
-
-  await ssh.execCommand(`git clone ${formattedRepoUrl}`, {
-    cwd: APPLICATIONS_PATH,
-    onStderr: chunk => job.updateProgress({ logs: chunk.toString() }),
-    onStdout: (chunk) => {
-      throw new DeploymentError({
-        name: "CLONE_APP_ERROR",
-        message: chunk.toString(),
-      });
-    },
-  });
+  try {
+    await ssh(`git clone ${formattedRepoUrl}`, {
+      cwd: APPLICATIONS_PATH,
+      onStdout: chunk => job.updateProgress({ logs: chunk }),
+    });
+  }
+  catch (error) {
+    throw new DeploymentError({
+      name: "CLONE_APP_ERROR",
+      message: error instanceof Error ? error.message : "Unexpected error",
+    });
+  }
 };

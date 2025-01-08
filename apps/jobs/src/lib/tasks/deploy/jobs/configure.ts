@@ -4,12 +4,9 @@ import { DeploymentError } from "@/lib/error";
 import type { JobFn } from "../../types";
 
 export const configure: JobFn<"configure"> = async (job) => {
-  const { application, environmentVariable } = job.data;
-  await job.updateProgress({ logs: "We configure your application..." });
-
-  const childrenJobsValues = await job.getChildrenValues<{ fqdn: string; repoName: string }>();
-  const fqdn = Object.values(childrenJobsValues)[0].fqdn;
-  const repoName = Object.values(childrenJobsValues)[0].repoName;
+  const { application, environmentVariable, fqdn, repoName } = job.data;
+  await job.updateProgress({ logs: "\nWe configure your application..." });
+  let applicationId;
 
   try {
     const persistedApplication = await createApplication(
@@ -17,9 +14,9 @@ export const configure: JobFn<"configure"> = async (job) => {
       environmentVariable,
     );
     await job.updateProgress({
-      logs: `${persistedApplication.name} configuration saved to database`,
+      logs: `\n${persistedApplication.name} configuration saved to database`,
     });
-    return { applicationId: persistedApplication.id };
+    applicationId = persistedApplication.id;
   }
   catch (error) {
     const isKnownError = error instanceof Error;
@@ -29,4 +26,5 @@ export const configure: JobFn<"configure"> = async (job) => {
       cause: isKnownError ? error.cause : "Unexpected cause",
     });
   }
+  return applicationId;
 };

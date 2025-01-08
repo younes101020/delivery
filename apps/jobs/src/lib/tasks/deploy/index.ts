@@ -2,32 +2,33 @@ import { FlowProducer } from "bullmq";
 
 import type { JobDataMap } from "../types";
 
-import { connection, createWorker } from "../worker";
+import { connection, createWorker } from "../";
 
 /**
  * Creates and starts deployment jobs.
  * Returns a queue name reference that can be used to track the deployment state.
  */
 export async function startDeploy(jobsData: JobDataMap) {
-  await createWorker(jobsData.build.repoName);
+  const queueName = jobsData.build.repoName;
+  await createWorker(queueName);
   const flowProducer = new FlowProducer({ connection });
 
   const jobs = await flowProducer.add({
     name: "configure",
     data: jobsData.configure,
-    queueName: jobsData.build.repoName,
-    opts: { removeOnComplete: true, removeOnFail: true },
+    queueName,
+    opts: { removeOnFail: true },
     children: [
       {
         name: "build",
         data: jobsData.build,
-        queueName: jobsData.build.repoName,
-        opts: { removeOnComplete: true, removeOnFail: true },
+        queueName,
+        opts: { removeOnComplete: true, removeOnFail: true, failParentOnFailure: true },
         children: [
           {
             name: "clone",
             data: jobsData.clone,
-            queueName: jobsData.clone.repoName,
+            queueName,
             opts: { removeOnComplete: true, failParentOnFailure: true, removeOnFail: true },
           },
         ],

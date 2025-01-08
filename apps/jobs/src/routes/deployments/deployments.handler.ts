@@ -1,32 +1,23 @@
 import { Job, Queue, QueueEvents } from "bullmq";
 import { streamSSE } from "hono/streaming";
-import { basename } from "node:path";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import { db } from "@/db";
 import { getApplicationByName } from "@/db/queries";
+import { connection } from "@/lib/tasks";
 import { startDeploy } from "@/lib/tasks/deploy";
-import { transformEnvVars } from "@/lib/tasks/deploy/utils";
-import { connection } from "@/lib/tasks/worker";
+import { prepareDataForProcessing } from "@/lib/tasks/deploy/jobs";
 
 import type { CreateRoute, StreamRoute } from "./deployments.routes";
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const deployment = c.req.valid("json");
 
-  const githubApp = await db.query.githubApp.findFirst({
-    where(fields, operators) {
-      return operators.eq(fields.appId, deployment.githubAppId);
-    },
-    with: {
-      secret: true,
-    },
-  });
+  const data = await prepareDataForProcessing(deployment);
 
-  if (!githubApp) {
+  if (!data) {
     return c.json(
       {
         message: HttpStatusPhrases.NOT_FOUND,
@@ -35,23 +26,9 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
     );
   }
 
-  const queueRef = basename(deployment.repoUrl, ".git");
-  const environmentVariables = transformEnvVars(deployment.env);
+  const queueName = await startDeploy(data);
 
-  const tracking = await startDeploy({
-    clone: { ...githubApp, repoUrl: deployment.repoUrl, repoName: queueRef },
-    build: {
-      repoName: queueRef,
-      port: deployment.port,
-      env: environmentVariables && environmentVariables.cmdEnvVars,
-    },
-    configure: {
-      application: { port: deployment.port, githubAppId: githubApp.id },
-      environmentVariable: environmentVariables && environmentVariables.persistedEnvVars,
-    },
-  });
-
-  return c.json(tracking, HttpStatusCodes.OK);
+  return c.json(queueName, HttpStatusCodes.OK);
 };
 
 const queueEventsMap = new Map<string, QueueEvents>();
@@ -68,7 +45,7 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
   }
   const activeJobsCount = await queue.getActiveCount();
   const activeJobs = await queue.getJobs("active");
-console.log(activeJobs,"kfkfk")
+
   if (activeJobsCount === 0 || !activeJobsCount) {
     const hasBeenDeployed = await getApplicationByName(slug);
     if (hasBeenDeployed) {
@@ -105,7 +82,7 @@ console.log(activeJobs,"kfkfk")
     async function completeHandler(job: { jobId: string }) {
       const jobState = await Job.fromId(queue, job.jobId);
       if (jobState?.name === "configure") {
-        const { applicationId } = jobState.returnvalue;
+        const applicationId = jobState.returnvalue;
         await stream.writeSSE({
           data: JSON.stringify({ completed: true, id: applicationId }),
           event: `${slug}-deployment-logs`,
