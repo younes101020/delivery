@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 
-import { ActionState } from "@/lib/auth/middleware";
+import { ActionState } from "@/lib/form-middleware";
 
 import { Input } from "@/components/ui/input";
 

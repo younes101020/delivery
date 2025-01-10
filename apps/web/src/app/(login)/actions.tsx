@@ -1,7 +1,7 @@
 "use server";
 
-import { validatedAction } from "@/lib/auth/middleware";
 import { setSession } from "@/lib/auth/session";
+import { validatedAction } from "@/lib/form-middleware";
 import { client } from "@/lib/http";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -25,7 +25,7 @@ export const signIn = validatedAction(signInSchema, async (data) => {
     },
   });
   if (response.status !== 200) {
-    return { error: "Invalid email or password. Please try again.", email, passwordHash };
+    return { error: "Invalid email or password. Please try again.", inputs: data };
   }
   const user = await response.json();
   await setSession(user);

@@ -20,3 +20,20 @@ export function parseSetCookie(header: string) {
 export type Nullable<T> = {
   [K in keyof T]: T[K] | null;
 };
+
+export function transformEnvVars(envs: string) {
+  if (!envs) {
+    return [];
+  }
+
+  return envs
+    .trim()
+    .split(/\s+/)
+    .map((env) => {
+      const [key, value] = env.split("=");
+      return {
+        key,
+        value,
+      };
+    });
+}

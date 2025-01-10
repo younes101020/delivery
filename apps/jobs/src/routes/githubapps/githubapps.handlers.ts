@@ -1,12 +1,16 @@
-import { eq } from "drizzle-orm";
 import { Buffer } from "node:buffer";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import { createGithubApp, createGithubAppSecret, getGithubAppById, getGithubApps, updateGithubApp } from "@/db/queries";
-import { githubApp, githubAppSecret } from "@/db/schema";
+import {
+  createGithubApp,
+  createGithubAppSecret,
+  getGithubAppById,
+  getGithubApps,
+  updateGithubApp,
+} from "@/db/queries";
 import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
 import { decryptSecret, encryptSecret } from "@/lib/utils";
 

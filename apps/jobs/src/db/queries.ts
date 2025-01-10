@@ -6,7 +6,10 @@ import type {
   InsertServerConfigSchema,
   InsertUsersSchema,
 } from "./dto";
-import type { InsertApplicationSchema } from "./dto/applications.dto";
+import type {
+  InsertApplicationSchemaWithSharedEnv,
+  PatchApplicationSchema,
+} from "./dto/applications.dto";
 import type { InsertEnvironmentVariablesSchema } from "./dto/envvars.dto";
 
 import { db } from ".";
@@ -20,12 +23,12 @@ import {
   users,
 } from "./schema";
 
-export async function createApplication(
-  applicationData: InsertApplicationSchema,
-  envVars: InsertEnvironmentVariablesSchema[] | undefined,
-) {
+export async function createApplication(application: InsertApplicationSchemaWithSharedEnv) {
+  const { applicationData, envVars } = application;
   return await db.transaction(async (tx) => {
-    const [application] = await tx.insert(applications).values(applicationData).returning();
+    const [application] = await tx.insert(applications).values(applicationData).returning({
+      id: applications.id,
+    });
 
     if (envVars) {
       const envVarRecords = await tx.insert(environmentVariables).values(envVars).returning();
@@ -162,4 +165,62 @@ export async function getUserById(id: number) {
       return null;
     });
   return user;
+}
+
+export async function getApplications() {
+  return await db.query.applications.findMany();
+}
+
+export async function getApplicationById(id: number) {
+  return await db.query.applications.findFirst({
+    where: eq(applications.id, id),
+    with: {
+      environmentVariables: {
+        with: {
+          environmentVariable: true,
+        },
+      },
+    },
+  });
+}
+export async function patchApplication(id: number, updates: PatchApplicationSchema) {
+  return await db.transaction(async (tx) => {
+    const { applicationData, envVars } = updates;
+
+    if (Object.keys(applicationData).length > 0) {
+      await tx
+        .update(applications)
+        .set({ ...applicationData, updatedAt: new Date() })
+        .where(eq(applications.id, id));
+    }
+
+    if (envVars?.length) {
+      await Promise.all(
+        envVars.map(async (envVar) => {
+          // PATCH ENV CASE
+          if ("id" in envVar && envVar.id) {
+            await tx
+              .update(environmentVariables)
+              .set({ ...envVar, updatedAt: new Date() })
+              .where(eq(environmentVariables.id, envVar.id));
+          }
+          // INSERT ENV CASE
+          else if (envVar.key && envVar.value) {
+            const { key, value } = envVar;
+            const [newEnvVar] = await tx
+              .insert(environmentVariables)
+              .values({ key, value })
+              .returning({ id: environmentVariables.id });
+
+            await tx.insert(applicationEnvironmentVariables).values({
+              applicationId: id,
+              environmentVariableId: newEnvVar.id,
+            });
+          }
+        }),
+      );
+    }
+
+    return await getApplicationById(id);
+  });
 }

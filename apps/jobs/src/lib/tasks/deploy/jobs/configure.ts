@@ -3,18 +3,21 @@ import { DeploymentError } from "@/lib/error";
 
 import type { JobFn } from "../../types";
 
+import { extractPortCmd } from "./utils";
+
 export const configure: JobFn<"configure"> = async (job) => {
-  const { application, environmentVariable, fqdn, repoName } = job.data;
+  const { application, environmentVariable, fqdn } = job.data;
+  const port = extractPortCmd(application.port);
   await job.updateProgress({ logs: "\nWe configure your application..." });
   let applicationId;
 
   try {
-    const persistedApplication = await createApplication(
-      { ...application, fqdn, name: repoName },
-      environmentVariable,
-    );
+    const persistedApplication = await createApplication({
+      applicationData: { ...application, fqdn, port },
+      envVars: environmentVariable,
+    });
     await job.updateProgress({
-      logs: `\n${persistedApplication.name} configuration saved to database`,
+      logs: `\nApplication configuration saved to database 🗄️`,
     });
     applicationId = persistedApplication.id;
   }

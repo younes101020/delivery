@@ -45,3 +45,15 @@ export function transformEnvVars(envs: InsertDeploymentSchema["env"]) {
     persistedEnvVars,
   };
 }
+
+export function extractPortCmd(portCmd: string) {
+  const portMatch = portCmd.match(/-p\s*(\d+:\d+)/);
+  if (!portMatch) {
+    throw new DeploymentError({
+      name: "CONFIGURE_APP_ERROR",
+      message: "Invalid port command format",
+      cause: "Port command must be in format: -p host:container",
+    });
+  }
+  return portMatch[1];
+}

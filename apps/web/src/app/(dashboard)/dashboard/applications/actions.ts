@@ -1,0 +1,39 @@
+"use server";
+
+import { getFormChangesAction, validatedAction } from "@/lib/form-middleware";
+import { client } from "@/lib/http";
+import { transformEnvVars } from "@/lib/utils";
+import { z } from "zod";
+
+const editApplicationSchema = z
+  .object({
+    fqdn: z.string(),
+    port: z.string(),
+    environmentVariables: z.string(),
+    id: z.coerce.number(),
+  })
+  .partial()
+  .required({ id: true });
+
+export const editApplication = validatedAction(
+  editApplicationSchema,
+  async (data, _, prevState) => {
+    const changes = getFormChangesAction(data, prevState);
+    const { environmentVariables, ...applicationData } = changes;
+    const response = await client.applications[":id"].$patch({
+      param: { id: changes.id },
+      json: {
+        applicationData,
+        envVars: transformEnvVars(environmentVariables),
+      },
+    });
+    if (response.status !== 200) {
+      console.log(data)
+      return {
+        error: "Impossible to update your application configuration. Please try again.",
+        inputs: data,
+      };
+    }
+    return { success: "Application updated successfully.", inputs: data };
+  },
+);

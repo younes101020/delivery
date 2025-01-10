@@ -1,11 +1,11 @@
-import { relations } from "drizzle-orm";
+import { relations, sql, type SQL } from "drizzle-orm";
 import { boolean, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 // eslint-disable-next-line ts/consistent-type-imports
 import { z } from "zod";
 // eslint-disable-next-line ts/consistent-type-imports
 import { selectGithubAppsSchema } from "./dto/githubapps.dto";
 // eslint-disable-next-line ts/consistent-type-imports
-import { selectUsersSchema } from "./dto/users.dto";
+import { selectUsersSchema } from "./dto";
 
 export const systemConfig = pgTable("system_config", {
   id: serial("id").primaryKey(),
@@ -48,7 +48,9 @@ export const githubApp = pgTable("github_app", {
 
 export const applications = pgTable("applications", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull(),
+  name: text("name").notNull().generatedAlwaysAs(
+    (): SQL => sql`split_part(${applications.fqdn}, '.', 1)`,
+  ),
   fqdn: text("fqdn").notNull().unique(),
   logs: text("logs"),
   port: text("port").notNull(),
@@ -82,6 +84,25 @@ export const githubAppRelations = relations(githubApp, ({ one }) => ({
   secret: one(githubAppSecret, {
     fields: [githubApp.secretId],
     references: [githubAppSecret.id],
+  }),
+}));
+
+export const applicationRelations = relations(applications, ({ many, one }) => ({
+  environmentVariables: many(applicationEnvironmentVariables),
+  githubApp: one(githubApp, {
+    fields: [applications.githubAppId],
+    references: [githubApp.id],
+  }),
+}));
+
+export const applicationEnvironmentVariablesRelations = relations(applicationEnvironmentVariables, ({ one }) => ({
+  application: one(applications, {
+    fields: [applicationEnvironmentVariables.applicationId],
+    references: [applications.id],
+  }),
+  environmentVariable: one(environmentVariables, {
+    fields: [applicationEnvironmentVariables.environmentVariableId],
+    references: [environmentVariables.id],
   }),
 }));
 

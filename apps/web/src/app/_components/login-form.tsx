@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ActionState } from "@/lib/auth/middleware";
+import { ActionState } from "@/lib/form-middleware";
 import { Loader2 } from "lucide-react";
 import { useActionState } from "react";
 import { signIn } from "../(login)/actions";
@@ -13,7 +13,7 @@ import { signUp } from "../(onboarding)/onboarding/actions";
 export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
     mode === "signin" ? signIn : signUp,
-    { error: "" },
+    { error: "", inputs: {} },
   );
 
   return (
@@ -33,7 +33,7 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
             maxLength={50}
             className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
             placeholder="Enter your email"
-            defaultValue={state.email ?? ""}
+            defaultValue={state.inputs.email ?? ""}
           />
         </div>
       </div>
@@ -54,7 +54,7 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
             maxLength={100}
             className="appearance-none relative block w-full px-3 py-2 border focus:outline-none focus:z-10 sm:text-sm"
             placeholder="Enter your password"
-            defaultValue={state.passwordHash ?? ""}
+            defaultValue={state.inputs.passwordHash ?? ""}
           />
         </div>
       </div>

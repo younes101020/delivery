@@ -1,12 +1,13 @@
 import type { Job, JobNode, Queue, Worker } from "bullmq";
 
 import type {
-  InsertApplicationSchema,
+  InsertApplicationSchemaWithSharedEnv,
   InsertEnvironmentVariablesSchema,
   SelectedGithubAppSecretSchema,
   SelectedGithubAppsSchema,
 } from "@/db/dto";
 
+type Application = InsertApplicationSchemaWithSharedEnv["applicationData"];
 export interface JobDataMap {
   clone: SelectedGithubAppsSchema & {
     secret: SelectedGithubAppSecretSchema;
@@ -15,7 +16,7 @@ export interface JobDataMap {
   };
   build: { repoName: string; env?: string; port: string; fqdn: string };
   configure: {
-    application: Pick<InsertApplicationSchema, "port" | "githubAppId">;
+    application: Pick<Application, "port" | "githubAppId">;
     environmentVariable: InsertEnvironmentVariablesSchema[] | undefined;
     repoName: string;
     fqdn: string;

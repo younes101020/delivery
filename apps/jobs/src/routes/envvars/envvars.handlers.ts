@@ -3,7 +3,6 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import type { AppRouteHandler } from "@/lib/types";
 
 import { createEnvironmentVariable } from "@/db/queries";
-import { environmentVariables } from "@/db/schema";
 
 import type { CreateRoute } from "./envvars.routes";
 

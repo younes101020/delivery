@@ -8,6 +8,13 @@
       "when": 1736209094364,
       "tag": "0000_ambitious_sheva_callister",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1736524217860,
+      "tag": "0001_funny_alex_power",
+      "breakpoints": true
     }
   ]
 }

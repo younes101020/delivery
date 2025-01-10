@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { publicEnv } from "@/env";
 import { getAllInstallations, getAllInstallReposForEachRepoPage } from "@/lib/github";
-import { getServerConfiguration } from "@/lib/server";
+import { getServerConfiguration } from "@/lib/server/queries";
 import { getUser } from "@/lib/users";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";

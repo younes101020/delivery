@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
-import { ActionState } from "@/lib/auth/middleware";
+import { ActionState } from "@/lib/form-middleware";
 import type { Repository } from "@/lib/github/types";
 import { Installation } from "@/lib/github/types";
 import type { Nullable } from "@/lib/utils";
@@ -68,7 +68,7 @@ interface DeploymentProps {
 }
 
 export function Deployment({ installations }: DeploymentProps) {
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(deploy, { error: "" });
+  const [state, formAction, pending] = useActionState<ActionState, FormData>(deploy, { error: "", inputs: {} });
   const { isIntersecting, ref } = useIntersectionObserver({ threshold: 0.5 });
   const [selected, setSelected] = useState<SelectedRepositoryProps>({
     name: null,
@@ -81,7 +81,7 @@ export function Deployment({ installations }: DeploymentProps) {
   const pathname = usePathname();
   const { replace } = useRouter();
   const [hasTriggered, setHasTriggered] = useState(false);
-  console.log(installations[0].repositories)
+  console.log(installations[0].repositories);
 
   useEffect(() => {
     if (isIntersecting && !hasTriggered) {

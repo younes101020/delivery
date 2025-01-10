@@ -1,0 +1,2 @@
+ALTER TABLE "applications" drop column "name";--> statement-breakpoint
+ALTER TABLE "applications" ADD COLUMN "name" text GENERATED ALWAYS AS (split_part("applications"."fqdn", '.', 1)) STORED NOT NULL;

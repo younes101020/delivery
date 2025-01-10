@@ -1,7 +1,7 @@
 "use server";
 
-import { validatedAction } from "@/lib/auth/middleware";
 import { setSession } from "@/lib/auth/session";
+import { validatedAction } from "@/lib/form-middleware";
 import { client } from "@/lib/http";
 import { getUser } from "@/lib/users";
 import { cookies } from "next/headers";
@@ -24,7 +24,7 @@ export const signUp = validatedAction(signUpSchema, async (data) => {
   });
 
   // Non explicit error message to end-user to prevent from enumeration attack
-  if (response.status !== 200) return { error: "Impossible to sign up" };
+  if (response.status !== 200) return { error: "Impossible to sign up", inputs: data };
   const createdUser = await response.json();
   await setSession(createdUser);
 
@@ -54,7 +54,7 @@ export const deploy = validatedAction(deploySchema, async (data) => {
     json: data,
   });
   if (deploymentResponse.status !== 200) {
-    return { error: "Impossible to start the deployment." };
+    return { error: "Impossible to start the deployment.", inputs: data };
   }
   const response = await client.serverconfig.$patch({
     json: {
@@ -63,7 +63,7 @@ export const deploy = validatedAction(deploySchema, async (data) => {
     },
   });
   if (response.status !== 200) {
-    return { error: "Something went wrong, please retry later." };
+    return { error: "Something went wrong, please retry later.", inputs: data };
   }
   (await cookies()).set("skiponboarding", "true", {
     maxAge: 60 * 60 * 24 * 7,
@@ -84,7 +84,7 @@ export const domainName = validatedAction(domainNameSchema, async (data) => {
     },
   });
   if (response.status !== 200) {
-    return { error: "Something went wrong, please retry later." };
+    return { error: "Something went wrong, please retry later.", inputs: data };
   }
   redirect("/onboarding?step=3");
 });
