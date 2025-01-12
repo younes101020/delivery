@@ -10,7 +10,7 @@ export const selectApplicationsSchemaWithSharedEnv = createSelectSchema(applicat
 });
 export const selectApplicationsSchema = createSelectSchema(applications);
 
-const insertApplicationsSchema = createInsertSchema(applications);
+const insertApplicationsSchema = createInsertSchema(applications).omit({ name: true });
 export const insertApplicationWithSharedEnv = z.object({
   applicationData: insertApplicationsSchema,
   envVars: z.array(insertEnvironmentVariablesSchema).optional(),

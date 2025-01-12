@@ -1,8 +1,15 @@
+import { WithBannerBadge } from "@/components/banner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getApplicationById } from "@/lib/application/queries";
+import { getApplicationById, getApplicationSreenshotUrl } from "@/lib/application/queries";
+import { formatDate } from "@/lib/utils";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { AppForm } from "./_components/app-form";
+
+interface AppProps {
+  id: string;
+}
 
 function GetApplicationLoadingScreen() {
   return (
@@ -13,25 +20,89 @@ function GetApplicationLoadingScreen() {
   );
 }
 
+async function AppPreviewImage({ id }: AppProps) {
+  const appPreviewImg = await getApplicationSreenshotUrl(parseInt(id));
+  if (!appPreviewImg) return null;
+
+  return (
+    <WithBannerBadge badgeText="preview" className="col-span-4 md:col-span-1 lg:col-span-2 2xl:col-span-1">
+      <Image
+        width={1920}
+        height={1080}
+        src={appPreviewImg}
+        alt="Screenshot of the first rendering ui of your application"
+        className="w-full h-full rounded-xl"
+      />
+    </WithBannerBadge>
+  );
+}
+
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const id = (await params).id;
+
+  if (!parseInt(id)) redirect("/dashboard/applications");
+
   const application = await getApplicationById(id);
 
   if (!application) redirect("/dashboard/applications");
 
-  const rawEnvs = application.environmentVariables?.map(({ key, value }) => `${key}=${value}`).filter(rawEnv => !(rawEnv.length <= 1)).join(" ");
+  const rawEnvs = application.environmentVariables
+    ?.map(({ key, value }) => `${key}=${value}`)
+    .filter((rawEnv) => !(rawEnv.length <= 1))
+    .join(" ");
 
   return (
-    <section className="p-5 bg-background/50">
-      <h1 className="text-2xl underline decoration-primary underline-offset-4">Application configuration</h1>
-      <Suspense fallback={<GetApplicationLoadingScreen />}>
-        <AppForm
-          fqdn={application.fqdn}
-          port={application.port}
-          environmentVariables={rawEnvs}
-          id={application.id}
-        />
-      </Suspense>
+    <section className="p-5 bg-background border border-muted">
+      <h1 className="text-3xl font-bold">Application configuration</h1>
+      <div className="mt-8 grid grid-cols-4 gap-4">
+        <Suspense fallback={<p>Loading...</p>}>
+          <AppPreviewImage id={id} />
+        </Suspense>
+
+        <div className="text-xs col-span-4 md:col-span-3 lg:col-span-2 2xl:col-span-3 space-y-2">
+          <dl>
+            <dt className="text-muted-foreground">Application name</dt>
+            <Suspense fallback={<Skeleton className="h-8 w-full" />}>
+              <dd>{application.name}</dd>
+            </Suspense>
+          </dl>
+          <dl>
+            <dt className="text-muted-foreground">Fully qualified domain name</dt>
+            <dd className="underline">
+              <a href={`http://${application.fqdn}`} target="_blank" rel="noopener noreferrer">
+                {application.fqdn}
+              </a>
+            </dd>
+          </dl>
+          <dl>
+            <dt className="text-muted-foreground">Port</dt>
+            <dd>{application.port}</dd>
+          </dl>
+          <dl>
+            <dt className="text-muted-foreground">Environment variables count</dt>
+            <dd>{application.environmentVariables?.length || 0}</dd>
+          </dl>
+          <dl>
+            <dt className="text-muted-foreground">Creation date</dt>
+            <dd>{formatDate(application.createdAt)}</dd>
+          </dl>
+          <dl>
+            <dt className="text-muted-foreground">Last updated</dt>
+            <dd>{formatDate(application.updatedAt)}</dd>
+          </dl>
+        </div>
+        <div className="col-span-4 mt-4">
+          <h2 className="text-xl font-bold mb-2">Update application details</h2>
+          <Suspense fallback={<GetApplicationLoadingScreen />}>
+            <AppForm
+              fqdn={application.fqdn}
+              port={application.port}
+              environmentVariables={rawEnvs}
+              id={application.id}
+            />
+          </Suspense>
+        </div>
+      </div>
     </section>
   );
 }

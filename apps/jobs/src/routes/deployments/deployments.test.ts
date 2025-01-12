@@ -10,7 +10,7 @@ import { ZOD_ERROR_MESSAGES } from "@/lib/constants";
 import createApp from "@/lib/create-app";
 import { DeploymentError } from "@/lib/error";
 import { clone } from "@/lib/tasks/deploy/jobs/clone";
-import { parseAppHost } from "@/lib/tasks/deploy/utils";
+import { parseAppHost } from "@/lib/tasks/deploy/jobs/utils";
 
 import router from "./deployments.index";
 
@@ -75,10 +75,9 @@ describe("deployments routes", () => {
         "https://x-access-token:mocked-token@",
       );
 
-      const sshClient = (await import("@/lib/ssh")).default;
-      const mockExecCommand = vi.mocked(await sshClient()).execCommand;
+      const ssh = (await import("@/lib/ssh")).ssh;
 
-      expect(mockExecCommand).toHaveBeenCalledWith(`git clone ${expectedUrl}`, expect.any(Object));
+      expect(ssh).toHaveBeenCalledWith(`git clone ${expectedUrl}`, expect.any(Object));
     });
 
     it("should reject invalid port formats", ({ deployments }) => {

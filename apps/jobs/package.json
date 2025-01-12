@@ -46,6 +46,8 @@
     "pino": "^9.5.0",
     "pino-pretty": "^11.3.0",
     "postgres": "^3.4.5",
+    "puppeteer": "^24.0.0",
+    "sharp": "^0.33.5",
     "ssh2": "^1.16.0",
     "stoker": "^1.2.7",
     "uuid": "^11.0.3",
@@ -62,6 +64,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^9.13.0",
     "eslint-plugin-format": "^0.1.2",
+    "minio": "^8.0.3",
     "tsc-alias": "^1.8.10",
     "tsx": "^4.19.1",
     "typescript": "^5.6.3"

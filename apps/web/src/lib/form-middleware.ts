@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+  /* eslint-disable  @typescript-eslint/no-explicit-any */
 export type ActionState<PrevState extends object = Record<string, any>> = {
   error?: string;
   success?: string;

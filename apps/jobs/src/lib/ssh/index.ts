@@ -31,7 +31,7 @@ export async function ssh(command: string, { onStdout, cwd }: Ssh) {
               resolve(result);
             })
             .on("data", (data: string) => {
-              console.log("SSH DATA: ", data);
+              console.log("o");
               onStdout(data);
               result.push({ logs: data });
             })

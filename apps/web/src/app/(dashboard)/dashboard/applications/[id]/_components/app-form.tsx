@@ -33,7 +33,7 @@ export function AppForm(applicationData: AppFormProps) {
   );
 
   return (
-    <form className="flex flex-col gap-4 pt-4" action={formAction} aria-label="form">
+    <form className="w-full flex flex-col gap-4 pt-4" action={formAction} aria-label="form">
       <div>
         <Label htmlFor="fqdn">Domain name</Label>
         <Input

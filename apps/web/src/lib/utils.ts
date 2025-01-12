@@ -37,3 +37,17 @@ export function transformEnvVars(envs: string) {
       };
     });
 }
+
+export function formatDate(date: string | null) {
+  if (!date) return null;
+  const dateObj = typeof date === "string" ? new Date(date) : date;
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+  });
+  return formatter.format(dateObj);
+}

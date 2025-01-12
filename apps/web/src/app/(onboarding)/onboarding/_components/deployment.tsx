@@ -51,7 +51,7 @@ function RepositorySection({ repo, setSelected, selected, githubAppId }: Reposit
       <Card className={`h-40 overflow-hidden relative ${isSelected && "border-primary"}`}>
         {isSelected && (
           <div className="absolute top-0 right-0">
-            <Check className="bg-primary" />
+            <Check className="bg-primary text-primary-foreground" />
           </div>
         )}
         <CardHeader>

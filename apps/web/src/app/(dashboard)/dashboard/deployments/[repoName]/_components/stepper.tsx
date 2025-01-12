@@ -41,7 +41,7 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
   const onMessage = useCallback(
     (prev: SseData, data: SSEMessage<SseData>) => {
       if (data.completed && data.id) {
-        router.replace(`/dashboard/applications/${data.id}`);
+        router.push(`/dashboard/applications/${data.id}`);
         return prev;
       }
       return {

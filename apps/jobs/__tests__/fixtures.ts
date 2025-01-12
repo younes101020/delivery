@@ -61,17 +61,24 @@ const deployments = {
   build: {
     repoName: faker.system.fileName(),
     port: faker.internet.port().toString(),
+    fqdn: faker.internet.domainName(),
     env: `KEY=${faker.string.sample()}`,
     token: faker.string.uuid(),
   },
   configure: {
     id: faker.number.int(),
     name: faker.system.fileName(),
-    fqdn: faker.internet.domainName(),
     port: faker.internet.port().toString(),
     githubAppId: 1,
+    fqdn: faker.internet.domainName(),
     githubAppName: faker.system.fileName(),
+    application: {
+      githubAppId: 1,
+      port: faker.internet.port().toString(),
+    },
+    environmentVariable: undefined,
     logs: faker.lorem.sentence(),
+    repoName: faker.system.fileName(),
   },
 };
 
