@@ -5,13 +5,14 @@ import type { AppRouteHandler } from "@/lib/types";
 
 import {
   createApplication,
+  deleteApplicationById,
   getApplicationById,
   getApplications,
   patchApplication,
 } from "@/db/queries";
 import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
 
-import type { CreateRoute, GetOneRoute, ListRoute, PatchRoute } from "./applications.routes";
+import type { CreateRoute, GetOneRoute, ListRoute, PatchRoute, RemoveRoute } from "./applications.routes";
 
 export const list: AppRouteHandler<ListRoute> = async (c) => {
   const applications = await getApplications();
@@ -104,4 +105,20 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
     },
     HttpStatusCodes.OK,
   );
+};
+
+export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
+  const { id } = c.req.valid("param");
+  const result = await deleteApplicationById(id);
+
+  if (!result) {
+    return c.json(
+      {
+        message: HttpStatusPhrases.NOT_FOUND,
+      },
+      HttpStatusCodes.NOT_FOUND,
+    );
+  }
+
+  return c.body(null, HttpStatusCodes.NO_CONTENT);
 };

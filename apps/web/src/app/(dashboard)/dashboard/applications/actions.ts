@@ -28,7 +28,7 @@ export const editApplication = validatedAction(
       },
     });
     if (response.status !== 200) {
-      console.log(data)
+      console.log(data);
       return {
         error: "Impossible to update your application configuration. Please try again.",
         inputs: data,
@@ -37,3 +37,17 @@ export const editApplication = validatedAction(
     return { success: "Application updated successfully.", inputs: data };
   },
 );
+
+export async function removeApplication(id: string) {
+  const response = await client.applications[":id"].$delete({
+    param: { id },
+  });
+  if (response.status !== 204) {
+    return {
+      success: false,
+    };
+  }
+  return {
+    success: true,
+  };
+}

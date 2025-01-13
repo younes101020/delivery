@@ -3,7 +3,12 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 
-import { insertApplicationWithSharedEnv, patchApplicationsSchema, selectApplicationsSchema, selectApplicationsSchemaWithSharedEnv } from "@/db/dto";
+import {
+  insertApplicationWithSharedEnv,
+  patchApplicationsSchema,
+  selectApplicationsSchema,
+  selectApplicationsSchemaWithSharedEnv,
+} from "@/db/dto";
 import { notFoundSchema } from "@/lib/constants";
 
 const tags = ["Applications"];
@@ -44,7 +49,10 @@ export const getOne = createRoute({
   },
   tags,
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(selectApplicationsSchemaWithSharedEnv, "The requested application"),
+    [HttpStatusCodes.OK]: jsonContent(
+      selectApplicationsSchemaWithSharedEnv,
+      "The requested application",
+    ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Application not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
@@ -62,7 +70,10 @@ export const patch = createRoute({
   },
   tags,
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(selectApplicationsSchemaWithSharedEnv, "The updated application"),
+    [HttpStatusCodes.OK]: jsonContent(
+      selectApplicationsSchemaWithSharedEnv,
+      "The updated application",
+    ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Application not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(patchApplicationsSchema).or(createErrorSchema(IdParamsSchema)),
@@ -71,7 +82,27 @@ export const patch = createRoute({
   },
 });
 
+export const remove = createRoute({
+  path: "/applications/{id}",
+  method: "delete",
+  request: {
+    params: IdParamsSchema,
+  },
+  tags,
+  responses: {
+    [HttpStatusCodes.NO_CONTENT]: {
+      description: "Application deleted",
+    },
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Application not found"),
+    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
+      createErrorSchema(IdParamsSchema),
+      "Invalid id error",
+    ),
+  },
+});
+
 export type ListRoute = typeof list;
 export type PatchRoute = typeof patch;
 export type CreateRoute = typeof create;
 export type GetOneRoute = typeof getOne;
+export type RemoveRoute = typeof remove;

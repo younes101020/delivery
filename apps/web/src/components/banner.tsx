@@ -20,7 +20,7 @@ export function WithBannerBadge({
       {children}
       <div
         className={cn(
-          "absolute -right-12 top-6 rotate-45 transform px-12 py-1 text-center text-xs text-primary-foreground font-thin",
+          "absolute -right-10 top-6 rotate-45 transform px-12 py-1 text-center text-xs text-primary-foreground",
           badgeColor,
         )}
       >

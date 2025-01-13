@@ -224,3 +224,7 @@ export async function patchApplication(id: number, updates: PatchApplicationSche
     return await getApplicationById(id);
   });
 }
+
+export async function deleteApplicationById(id: number) {
+  return await db.delete(applications).where(eq(applications.id, id));
+}

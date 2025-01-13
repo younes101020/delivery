@@ -6,6 +6,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { AppForm } from "./_components/app-form";
+import DeleteAppForm from "./_components/delete-app-form";
 
 interface AppProps {
   id: string;
@@ -25,7 +26,10 @@ async function AppPreviewImage({ id }: AppProps) {
   if (!appPreviewImg) return null;
 
   return (
-    <WithBannerBadge badgeText="preview" className="col-span-4 md:col-span-1 lg:col-span-2 2xl:col-span-1">
+    <WithBannerBadge
+      badgeText="preview"
+      className="col-span-4 md:col-span-1 lg:col-span-2 2xl:col-span-1"
+    >
       <Image
         width={1920}
         height={1080}
@@ -55,7 +59,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     <section className="p-5 bg-background border border-muted">
       <h1 className="text-3xl font-bold">Application configuration</h1>
       <div className="mt-8 grid grid-cols-4 gap-4">
-        <Suspense fallback={<p>Loading...</p>}>
+        <Suspense fallback={<Skeleton className="rounded-xl h-full w-full bg-secondary" />}>
           <AppPreviewImage id={id} />
         </Suspense>
 
@@ -101,6 +105,12 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
               id={application.id}
             />
           </Suspense>
+          <div className="p-3 text-destructive border border-dashed border-destructive">
+            <h3 className="text-lg font-bold mb-4">Danger zone</h3>
+            <Suspense fallback={<p>Loading...</p>}>
+              <DeleteAppForm id={application.id.toString()} />
+            </Suspense>
+          </div>
         </div>
       </div>
     </section>

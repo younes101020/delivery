@@ -48,13 +48,13 @@ export const githubApp = pgTable("github_app", {
 
 export const applications = pgTable("applications", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull().generatedAlwaysAs(
-    (): SQL => sql`split_part(${applications.fqdn}, '.', 1)`,
-  ),
+  name: text("name")
+    .notNull()
+    .generatedAlwaysAs((): SQL => sql`split_part(${applications.fqdn}, '.', 1)`),
   fqdn: text("fqdn").notNull().unique(),
   logs: text("logs"),
   port: text("port").notNull(),
-  githubAppId: serial("github_app_id").references(() => githubApp.id),
+  githubAppId: serial("github_app_id").references(() => githubApp.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   deletedAt: timestamp("deleted_at"),
@@ -74,7 +74,7 @@ export const applicationEnvironmentVariables = pgTable("application_environment_
   id: serial("id").primaryKey(),
   applicationId: serial("application_id")
     .notNull()
-    .references(() => applications.id),
+    .references(() => applications.id, { onDelete: "cascade" }),
   environmentVariableId: serial("environment_variable_id")
     .notNull()
     .references(() => environmentVariables.id),
@@ -95,16 +95,19 @@ export const applicationRelations = relations(applications, ({ many, one }) => (
   }),
 }));
 
-export const applicationEnvironmentVariablesRelations = relations(applicationEnvironmentVariables, ({ one }) => ({
-  application: one(applications, {
-    fields: [applicationEnvironmentVariables.applicationId],
-    references: [applications.id],
+export const applicationEnvironmentVariablesRelations = relations(
+  applicationEnvironmentVariables,
+  ({ one }) => ({
+    application: one(applications, {
+      fields: [applicationEnvironmentVariables.applicationId],
+      references: [applications.id],
+    }),
+    environmentVariable: one(environmentVariables, {
+      fields: [applicationEnvironmentVariables.environmentVariableId],
+      references: [environmentVariables.id],
+    }),
   }),
-  environmentVariable: one(environmentVariables, {
-    fields: [applicationEnvironmentVariables.environmentVariableId],
-    references: [environmentVariables.id],
-  }),
-}));
+);
 
 // Shared types
 // workaround to https://github.com/honojs/hono/issues/1800
