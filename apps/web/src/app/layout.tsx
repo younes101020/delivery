@@ -28,7 +28,7 @@ export default function RootLayout({
 }>) {
   const userPromise = getUser();
   return (
-    <html lang="en" className="">
+    <html lang="en">
       <body
         className={`${geistSans.className} ${geistMono.className} antialiased absolute inset-0 h-full w-full bg-background bg-[linear-gradient(to_right,rgb(156_163_175_/_0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgb(156_163_175_/_0.1)_1px,transparent_1px)] bg-[size:24px_24px]`}
       >

@@ -8,9 +8,7 @@ interface Ssh {
 }
 
 // TODO: persist resolved data (logs) into db
-interface Chunk {
-  logs: string;
-}
+type Chunk = string;
 
 export async function ssh(command: string, { onStdout, cwd }: Ssh) {
   const conn = new Client();
@@ -31,16 +29,20 @@ export async function ssh(command: string, { onStdout, cwd }: Ssh) {
               resolve(result);
             })
             .on("data", (data: string) => {
-              console.log("o");
               onStdout(data);
-              result.push({ logs: data });
+              result.push(data);
             })
             .stderr
             .setEncoding("utf-8")
             .on("data", (data: string) => {
+              if (data.includes("already exists")) {
+                resolve(result);
+              }
               if (data.includes("fatal:") || data.includes("error:")) {
                 reject(new Error(data));
               }
+              onStdout(data);
+              result.push(data);
             });
         });
       })

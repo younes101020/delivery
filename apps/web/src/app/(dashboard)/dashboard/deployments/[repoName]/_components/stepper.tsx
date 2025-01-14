@@ -2,7 +2,7 @@
 
 import { Nullable } from "@/lib/utils";
 import { ExternalLink as ExternalLinkIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { type SSEMessage, useEventSource } from "../_hooks/use-event-source";
 import BoxReveal from "./ui/box-reveal";
@@ -41,8 +41,7 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
   const onMessage = useCallback(
     (prev: SseData, data: SSEMessage<SseData>) => {
       if (data.completed && data.id) {
-        router.push(`/dashboard/applications/${data.id}`);
-        return prev;
+        redirect(`/dashboard/applications/${data.id}`)
       }
       return {
         step: data.jobName,

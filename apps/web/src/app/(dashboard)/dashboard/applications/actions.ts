@@ -3,6 +3,7 @@
 import { getFormChangesAction, validatedAction } from "@/lib/form-middleware";
 import { client } from "@/lib/http";
 import { transformEnvVars } from "@/lib/utils";
+import { revalidateTag } from "next/cache";
 import { z } from "zod";
 
 const editApplicationSchema = z
@@ -28,12 +29,12 @@ export const editApplication = validatedAction(
       },
     });
     if (response.status !== 200) {
-      console.log(data);
       return {
         error: "Impossible to update your application configuration. Please try again.",
         inputs: data,
       };
     }
+    revalidateTag(`application-${data.id}`)
     return { success: "Application updated successfully.", inputs: data };
   },
 );
@@ -47,6 +48,7 @@ export async function removeApplication(id: string) {
       success: false,
     };
   }
+  revalidateTag(`application-${id}`)
   return {
     success: true,
   };

@@ -8,7 +8,7 @@ import { ActionState } from "@/lib/form-middleware";
 import { Loader2 } from "lucide-react";
 import { useActionState } from "react";
 import { signIn } from "../(login)/actions";
-import { signUp } from "../(onboarding)/onboarding/actions";
+import { signUp } from "../actions";
 
 export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(

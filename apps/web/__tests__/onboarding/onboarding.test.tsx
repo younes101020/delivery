@@ -1,4 +1,4 @@
-import { Deployment } from "@/app/(onboarding)/onboarding/_components/deployment";
+
 import { GithubAppForm } from "@/app/(onboarding)/onboarding/_components/github-app-form";
 import { Login } from "@/app/_components/login-form";
 import { publicEnv } from "@/env";
@@ -6,6 +6,7 @@ import { cleanup, render, screen, waitFor, within } from "@testing-library/react
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeAll, describe, expect, vi } from "vitest";
 import { onBoardingTest } from "./fixtures";
+import { Deployment } from "@/app/_components/deployment";
 
 function setup(jsx: React.ReactElement) {
   return {
@@ -94,7 +95,7 @@ describe("Onboarding process", () => {
   onBoardingTest(
     "submit input should be disabled when no repository is selected",
     ({ installations }) => {
-      setup(<Deployment installations={installations} />);
+      setup(<Deployment installations={installations} isOnboarding={true} />);
       const form = within(screen.getByRole("form"));
       expect(form.getByLabelText("submit")).toHaveProperty("disabled", true);
     },
@@ -103,7 +104,7 @@ describe("Onboarding process", () => {
   onBoardingTest(
     "submit input should be enabled when repository is selected",
     async ({ installations }) => {
-      const { userAction } = setup(<Deployment installations={installations} />);
+      const { userAction } = setup(<Deployment installations={installations} isOnboarding={true} />);
       const form = within(screen.getByRole("form"));
       const repoCard = screen.getByTestId("1-repo-card");
       await userAction.click(repoCard);

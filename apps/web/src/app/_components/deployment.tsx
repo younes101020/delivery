@@ -48,7 +48,7 @@ function RepositorySection({ repo, setSelected, selected, githubAppId }: Reposit
       }}
       data-testid={`${repo.id}-repo-card`}
     >
-      <Card className={`h-40 overflow-hidden relative ${isSelected && "border-primary"}`}>
+      <Card className={`h-28 overflow-hidden relative ${isSelected && "border-primary"}`}>
         {isSelected && (
           <div className="absolute top-0 right-0">
             <Check className="bg-primary text-primary-foreground" />
@@ -65,10 +65,14 @@ function RepositorySection({ repo, setSelected, selected, githubAppId }: Reposit
 
 interface DeploymentProps {
   installations: Installation[];
+  isOnboarding?: boolean;
 }
 
-export function Deployment({ installations }: DeploymentProps) {
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(deploy, { error: "", inputs: {} });
+export function Deployment({ installations, isOnboarding = false }: DeploymentProps) {
+  const [state, formAction, pending] = useActionState<ActionState, FormData>(deploy, {
+    error: "",
+    inputs: {},
+  });
   const { isIntersecting, ref } = useIntersectionObserver({ threshold: 0.5 });
   const [selected, setSelected] = useState<SelectedRepositoryProps>({
     name: null,
@@ -102,7 +106,7 @@ export function Deployment({ installations }: DeploymentProps) {
 
   return (
     <>
-      <form action={formAction} className="px-5 space-y-4" aria-label="form">
+      <form action={formAction} className="px-5 space-y-8" aria-label="form">
         <div>
           <Label htmlFor="port" className="block text-sm font-medium">
             Exposed or mapped port
@@ -138,7 +142,7 @@ export function Deployment({ installations }: DeploymentProps) {
             These variables will be injected into the container environment.
           </p>
         </div>
-        <ScrollArea className="h-80 my-4">
+        <ScrollArea className="h-80 mt-4">
           <div className="max-h-96 grid grid-cols-1 md:grid-cols-2 gap-2">
             {installations[0].repositories.map((repo) => (
               <RepositorySection
@@ -157,6 +161,9 @@ export function Deployment({ installations }: DeploymentProps) {
             )}
           </div>
         </ScrollArea>
+        <p className="text-muted-foreground text-xs">
+          This GitHub repository will be the source of your application.
+        </p>
         <div className="flex justify-end">
           <input type="hidden" name="repoUrl" id="repoUrl" value={selected.gitUrl ?? "no-url"} />
           <input
@@ -165,6 +172,9 @@ export function Deployment({ installations }: DeploymentProps) {
             id="githubAppId"
             value={selected.githubAppId ?? "no-github-app-id"}
           />
+          {isOnboarding && (
+            <input type="hidden" name="isOnboarding" id="isOnboarding" value={"true"} />
+          )}
           {state?.error && <div className="text-destructive text-sm">{state.error}</div>}
           <Button type="submit" disabled={!selected.name || pending} aria-label="submit">
             {pending ? (

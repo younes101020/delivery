@@ -7,12 +7,20 @@ import {
   createApplication,
   deleteApplicationById,
   getApplicationById,
+  getApplicationNameById,
   getApplications,
   patchApplication,
 } from "@/db/queries";
-import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
+import { APPLICATIONS_PATH, ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
+import { ssh } from "@/lib/ssh";
 
-import type { CreateRoute, GetOneRoute, ListRoute, PatchRoute, RemoveRoute } from "./applications.routes";
+import type {
+  CreateRoute,
+  GetOneRoute,
+  ListRoute,
+  PatchRoute,
+  RemoveRoute,
+} from "./applications.routes";
 
 export const list: AppRouteHandler<ListRoute> = async (c) => {
   const applications = await getApplications();
@@ -119,6 +127,13 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
       HttpStatusCodes.NOT_FOUND,
     );
   }
+
+  const repoName = await getApplicationNameById(id);
+
+  await ssh(`rm -Rvf ${repoName}`, {
+    cwd: `${APPLICATIONS_PATH}`,
+    onStdout: chunk => chunk,
+  });
 
   return c.body(null, HttpStatusCodes.NO_CONTENT);
 };

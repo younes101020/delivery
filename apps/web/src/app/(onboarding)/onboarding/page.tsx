@@ -1,3 +1,4 @@
+import { Deployment } from "@/app/_components/deployment";
 import { Skeleton } from "@/components/ui/skeleton";
 import { publicEnv } from "@/env";
 import { getAllInstallations, getAllInstallReposForEachRepoPage } from "@/lib/github";
@@ -6,7 +7,6 @@ import { getUser } from "@/lib/users";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Login } from "../../_components/login-form";
-import { Deployment } from "./_components/deployment";
 import { DomainNameForm } from "./_components/domain-name-form";
 import { GithubAppForm } from "./_components/github-app-form";
 import { StepProvider } from "./_components/step";
@@ -16,15 +16,14 @@ interface StepChildrenProps {
 }
 
 async function GithubRepositoriesStep(props: StepChildrenProps) {
-  
   const searchParams = await props.searchParams;
   if (!searchParams || searchParams.step != 4) {
     return null;
   }
-  
+
   const installations = await getAllInstallReposForEachRepoPage(searchParams.page ?? 1);
   if (!installations) redirect("/onboarding/?step=3");
-  return <Deployment installations={installations} />;
+  return <Deployment installations={installations} isOnboarding={true} />;
 }
 
 async function GithubAppStep(props: StepChildrenProps) {

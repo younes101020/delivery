@@ -10,11 +10,12 @@ import { Label } from "@/components/ui/label";
 
 import { Loader2 } from "lucide-react";
 import { useActionState } from "react";
-import { domainName } from "../actions";
+import { domainName } from "../../../actions";
 
 export function DomainNameForm() {
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(domainName, {
+  const [state, formAction, pending] = useActionState<ActionState<{}>, FormData>(domainName, {
     error: "",
+    inputs: {},
   });
 
   return (

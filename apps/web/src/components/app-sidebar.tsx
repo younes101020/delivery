@@ -26,17 +26,17 @@ const data = {
   navMain: [
     {
       title: "Applications",
-      url: "#",
+      url: "/dashboard/applications",
       icon: Package,
       isActive: true,
       items: [
         {
-          title: "Starred",
+          title: "Settings",
           url: "#",
         },
         {
-          title: "Settings",
-          url: "#",
+          title: "New",
+          url: "/dashboard/applications/new",
         },
       ],
     },

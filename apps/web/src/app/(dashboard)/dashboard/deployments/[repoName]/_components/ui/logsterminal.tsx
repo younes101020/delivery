@@ -30,7 +30,7 @@ export function LogsTerminal({ logs, children }: LogsTerminalProps) {
         <DialogHeader>
           <DialogTitle>Build logs</DialogTitle>
         </DialogHeader>
-        <pre className="font-mono text-sm w-full overflow-x-auto">{logs}</pre>
+        <pre className="font-mono text-sm w-full overflow-x-auto bg-black text-white p-2 rounded-lg">{logs}</pre>
       </DialogContent>
     </Dialog>
   );

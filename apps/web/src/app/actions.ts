@@ -38,6 +38,7 @@ export async function signOut() {
 const deploySchema = z.object({
   repoUrl: z.string(),
   githubAppId: z.coerce.number(),
+  isOnboarding: z.coerce.boolean(),
   port: z
     .string()
     .regex(/^\d+(?::\d+)?$/)
@@ -56,19 +57,23 @@ export const deploy = validatedAction(deploySchema, async (data) => {
   if (deploymentResponse.status !== 200) {
     return { error: "Impossible to start the deployment.", inputs: data };
   }
-  const response = await client.serverconfig.$patch({
-    json: {
-      completedByUserId: user?.id.toString(),
-      onboardingCompleted: true,
-    },
-  });
-  if (response.status !== 200) {
-    return { error: "Something went wrong, please retry later.", inputs: data };
+  
+  if (data.isOnboarding) {
+    const response = await client.serverconfig.$patch({
+      json: {
+        completedByUserId: user?.id.toString(),
+        onboardingCompleted: true,
+      },
+    });
+    if (response.status !== 200) {
+      return { error: "Something went wrong, please retry later.", inputs: data };
+    }
+    (await cookies()).set("skiponboarding", "true", {
+      maxAge: 60 * 60 * 24 * 7,
+      path: "/",
+    });
   }
-  (await cookies()).set("skiponboarding", "true", {
-    maxAge: 60 * 60 * 24 * 7,
-    path: "/",
-  });
+
   const result = await deploymentResponse.json();
   redirect(`/dashboard/deployments/${result.queueName}`);
 });
