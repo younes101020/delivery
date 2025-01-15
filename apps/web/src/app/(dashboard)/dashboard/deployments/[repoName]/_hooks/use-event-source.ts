@@ -37,7 +37,6 @@ export function useEventSource<T>({ initialState, eventUrl, type, onMessage }: S
     const eventSource = new EventSource(eventUrl);
     eventSource.addEventListener(type, handleLogs);
     eventSource.addEventListener("error", (e) => {
-      console.error("EventSource error:", e);
       if (mounted) {
         eventSource.close();
       }

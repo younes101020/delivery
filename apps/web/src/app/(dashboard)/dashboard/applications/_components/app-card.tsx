@@ -15,7 +15,7 @@ interface AppCardProps {
   status?: "Ready" | "Building" | "Error";
 }
 
-export function AppCard({ name, fqdn, firstDeploymentAt, status = "Ready", id }: AppCardProps) {
+export function AppCard({ name, fqdn, firstDeploymentAt, status = "Error", id }: AppCardProps) {
   return (
     <Link href={`/dashboard/applications/${id}`} className="block">
       <Card className="w-full transition-all">

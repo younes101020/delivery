@@ -12,11 +12,20 @@ import { Loader2 } from "lucide-react";
 import { useActionState } from "react";
 import { domainName } from "../../../actions";
 
+interface DomainNameState {
+  domainName: string;
+}
+
 export function DomainNameForm() {
-  const [state, formAction, pending] = useActionState<ActionState<{}>, FormData>(domainName, {
-    error: "",
-    inputs: {},
-  });
+  const [state, formAction, pending] = useActionState<ActionState<DomainNameState>, FormData>(
+    domainName,
+    {
+      error: "",
+      inputs: {
+        domainName: "",
+      },
+    },
+  );
 
   return (
     <>

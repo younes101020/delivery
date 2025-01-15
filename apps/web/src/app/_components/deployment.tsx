@@ -2,16 +2,18 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import { ActionState } from "@/lib/form-middleware";
 import type { Repository } from "@/lib/github/types";
 import { Installation } from "@/lib/github/types";
 import type { Nullable } from "@/lib/utils";
-import { Check, Loader2, Rocket } from "lucide-react";
+import { Check, Info, Loader2, Rocket } from "lucide-react";
 import { motion } from "motion/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
@@ -71,7 +73,11 @@ interface DeploymentProps {
 export function Deployment({ installations, isOnboarding = false }: DeploymentProps) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(deploy, {
     error: "",
-    inputs: {},
+    inputs: {
+      port: "",
+      env: "",
+      cache: true,
+    },
   });
   const { isIntersecting, ref } = useIntersectionObserver({ threshold: 0.5 });
   const [selected, setSelected] = useState<SelectedRepositoryProps>({
@@ -85,7 +91,6 @@ export function Deployment({ installations, isOnboarding = false }: DeploymentPr
   const pathname = usePathname();
   const { replace } = useRouter();
   const [hasTriggered, setHasTriggered] = useState(false);
-  console.log(installations[0].repositories);
 
   useEffect(() => {
     if (isIntersecting && !hasTriggered) {
@@ -117,6 +122,7 @@ export function Deployment({ installations, isOnboarding = false }: DeploymentPr
               name="port"
               type="text"
               required
+              defaultValue={state.inputs.port}
               className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
               placeholder="ex: 3000 or 5695:3000"
             />
@@ -126,7 +132,7 @@ export function Deployment({ installations, isOnboarding = false }: DeploymentPr
           </p>
         </div>
         <div>
-          <Label htmlFor="env" className="block text-sm font-medium">
+          <Label htmlFor="env" className="block">
             Environment variables
           </Label>
           <div className="mt-1">
@@ -134,6 +140,7 @@ export function Deployment({ installations, isOnboarding = false }: DeploymentPr
               id="env"
               name="env"
               type="text"
+              defaultChecked={state.inputs.env}
               className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
               placeholder="ex: KEY1=value1 KEY2=value2"
             />
@@ -142,28 +149,52 @@ export function Deployment({ installations, isOnboarding = false }: DeploymentPr
             These variables will be injected into the container environment.
           </p>
         </div>
-        <ScrollArea className="h-80 mt-4">
-          <div className="max-h-96 grid grid-cols-1 md:grid-cols-2 gap-2">
-            {installations[0].repositories.map((repo) => (
-              <RepositorySection
-                repo={repo}
-                githubAppId={installations[0].githubAppId}
-                key={repo.id}
-                setSelected={setSelected}
-                selected={selected}
-              />
-            ))}
+        <div>
+          <p className="block text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 pb-2">
+            Application source
+          </p>
+          <ScrollArea className="max-h-80">
+            <div className="max-h-96 grid grid-cols-1 md:grid-cols-2 gap-2">
+              {installations[0].repositories.map((repo) => (
+                <RepositorySection
+                  repo={repo}
+                  githubAppId={installations[0].githubAppId}
+                  key={repo.id}
+                  setSelected={setSelected}
+                  selected={selected}
+                />
+              ))}
 
-            {installations[0].hasMore && (
-              <div ref={ref}>
-                <Skeleton className="w-full h-40" />
-              </div>
-            )}
-          </div>
-        </ScrollArea>
+              {installations[0].hasMore && (
+                <div ref={ref}>
+                  <Skeleton className="w-full h-40" />
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+        </div>
         <p className="text-muted-foreground text-xs">
           This GitHub repository will be the source of your application.
         </p>
+        <div className="flex items-center space-x-2">
+          <Checkbox id="cache" name="cache" defaultValue={state.inputs.cache} />
+          <label
+            htmlFor="terms"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Smart caching
+          </label>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info size={12} className="block" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Unchanged dependencies will not be reinstalled</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <div className="flex justify-end">
           <input type="hidden" name="repoUrl" id="repoUrl" value={selected.gitUrl ?? "no-url"} />
           <input

@@ -39,6 +39,7 @@ const deploySchema = z.object({
   repoUrl: z.string(),
   githubAppId: z.coerce.number(),
   isOnboarding: z.coerce.boolean(),
+  cache: z.coerce.boolean(),
   port: z
     .string()
     .regex(/^\d+(?::\d+)?$/)
@@ -50,7 +51,9 @@ const deploySchema = z.object({
 });
 
 export const deploy = validatedAction(deploySchema, async (data) => {
-  const user = await getUser();
+  console.log(data.cache, data.port)
+  return { inputs: data }
+  /*const user = await getUser();
   const deploymentResponse = await client.deployments.$post({
     json: data,
   });
@@ -75,7 +78,7 @@ export const deploy = validatedAction(deploySchema, async (data) => {
   }
 
   const result = await deploymentResponse.json();
-  redirect(`/dashboard/deployments/${result.queueName}`);
+  redirect(`/dashboard/deployments/${result.queueName}`);*/
 });
 
 const domainNameSchema = z.object({
