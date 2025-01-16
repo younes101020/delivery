@@ -15,12 +15,14 @@ interface LogsTerminalProps {
 }
 
 export function LogsTerminal({ logs, children }: LogsTerminalProps) {
-  const preRef = useRef<HTMLPreElement | null>(null);
+  const logsEndRef = useRef<null | HTMLDivElement>(null)
+
+  const scrollToBottom = () => {
+    logsEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
 
   useEffect(() => {
-    if (preRef.current) {
-      preRef.current.scrollTop = preRef.current.scrollHeight;
-    }
+    scrollToBottom()
   }, [logs]);
   
   return (
@@ -31,6 +33,7 @@ export function LogsTerminal({ logs, children }: LogsTerminalProps) {
           <DialogTitle>Build logs</DialogTitle>
         </DialogHeader>
         <pre className="font-mono text-sm w-full overflow-x-auto text-white p-2 rounded-lg">{logs}</pre>
+        <div ref={logsEndRef} />
       </DialogContent>
     </Dialog>
   );

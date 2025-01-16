@@ -130,10 +130,23 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
 
   const repoName = await getApplicationNameById(id);
 
-  await ssh(`rm -Rvf ${repoName}`, {
-    cwd: `${APPLICATIONS_PATH}`,
-    onStdout: chunk => chunk,
-  });
+  try {
+    await ssh(
+      `rm -Rvf ${repoName} && sudo docker rm -f $(docker ps -a -q --filter ancestor=${repoName}) && docker rmi ${repoName}`,
+      {
+        cwd: `${APPLICATIONS_PATH}`,
+        onStdout: chunk => chunk,
+      },
+    );
+  }
+  catch (e) {
+    return c.json(
+      {
+        message: e instanceof Error ? e.message : HttpStatusPhrases.INTERNAL_SERVER_ERROR,
+      },
+      HttpStatusCodes.INTERNAL_SERVER_ERROR,
+    );
+  }
 
   return c.body(null, HttpStatusCodes.NO_CONTENT);
 };

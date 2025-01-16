@@ -14,7 +14,7 @@ interface StepperProps {
   repoName: string;
 }
 
-export type SseData = Nullable<{
+export type DeploymentData = Nullable<{
   step: keyof typeof DEPLOYMENTMETADATA;
   logs: string;
 }>;
@@ -39,7 +39,7 @@ const DEFAULT_STATE = { step: null, logs: null };
 export function Stepper({ repoName, baseUrl }: StepperProps) {
   const router = useRouter();
   const onMessage = useCallback(
-    (prev: SseData, data: SSEMessage<SseData>) => {
+    (prev: DeploymentData, data: SSEMessage<DeploymentData>) => {
       if (data.completed && data.id) {
         redirect(`/dashboard/applications/${data.id}`)
       }
@@ -50,7 +50,7 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
     },
     [router],
   );
-  const { step, logs } = useEventSource<SseData>({
+  const { step, logs } = useEventSource<DeploymentData>({
     type: `${repoName}-deployment-logs`,
     eventUrl: `${baseUrl}/api/deployments/logs/${repoName}`,
     initialState: DEFAULT_STATE,
@@ -74,7 +74,7 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
   );
 }
 
-function LogsTerminalButton({ step, logs }: SseData) {
+function LogsTerminalButton({ step, logs }: DeploymentData) {
   if (step === "clone" || !logs) return null;
 
   return (

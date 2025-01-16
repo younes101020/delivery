@@ -14,7 +14,14 @@ export interface JobDataMap {
     repoUrl: string;
     repoName: string;
   };
-  build: { repoName: string; env?: string; port: string; fqdn: string; cache: boolean };
+  build: {
+    repoName: string;
+    env?: string;
+    port: string;
+    fqdn: string;
+    cache: boolean;
+    logs?: string;
+  };
   configure: {
     application: Pick<Application, "port" | "githubAppId">;
     environmentVariable: InsertEnvironmentVariablesSchema[] | undefined;
@@ -26,6 +33,7 @@ export interface JobParam<T extends JobName>
   extends Partial<Omit<Job<JobDataMap[T]>, "data" | "updateProgress">> {
   data: JobDataMap[T];
   updateProgress: Job<JobDataMap[T]>["updateProgress"];
+  updateData: Job<JobDataMap[T]>["updateData"];
   remove: Job<JobDataMap[T]>["remove"];
   getChildrenValues: Job<JobDataMap[T]>["getChildrenValues"];
 }

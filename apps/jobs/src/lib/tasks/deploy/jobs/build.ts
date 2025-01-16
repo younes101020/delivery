@@ -13,7 +13,10 @@ export const build: JobFn<"build"> = async (job) => {
       `nixpacks build ./ --name ${repoName} ${!cache ? "--no-cache" : ""} --label "traefik.http.routers.${repoName}.rule=Host(\\\`${fqdn}\\\`)" --label "traefik.http.routers.${repoName}.entrypoints=web" && docker run ${port} ${env ?? ""} --network host_network -d ${repoName}`,
       {
         cwd: `${APPLICATIONS_PATH}/${repoName}`,
-        onStdout: chunk => job.updateProgress({ logs: chunk }),
+        onStdout: ({ chunk, chunks }) => {
+          job.updateData({ ...job.data, logs: chunks?.join() });
+          job.updateProgress({ logs: chunk });
+        },
       },
     );
   }

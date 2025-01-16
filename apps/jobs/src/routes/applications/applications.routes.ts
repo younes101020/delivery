@@ -9,7 +9,7 @@ import {
   selectApplicationsSchema,
   selectApplicationsSchemaWithSharedEnv,
 } from "@/db/dto";
-import { notFoundSchema } from "@/lib/constants";
+import { internalServerSchema, notFoundSchema } from "@/lib/constants";
 
 const tags = ["Applications"];
 
@@ -97,6 +97,10 @@ export const remove = createRoute({
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
       "Invalid id error",
+    ),
+    [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(
+      internalServerSchema,
+      "Failed to clean up application files and Docker resources via SSH",
     ),
   },
 });

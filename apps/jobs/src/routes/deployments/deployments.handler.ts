@@ -65,8 +65,14 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
   }
 
   const activeJobName = activeJobs[0].name;
+  const activeJobData = activeJobs[0].data;
 
   return streamSSE(c, async (stream) => {
+    await stream.writeSSE({
+      data: JSON.stringify({ jobName: activeJobName, logs: activeJobData.logs }),
+      event: `${slug}-deployment-logs`,
+    });
+
     async function progressHandler({ data, jobId }: { data: number | object; jobId: string }) {
       const jobState = await Job.fromId(queue, jobId);
       const sseData = JSON.stringify({
@@ -96,11 +102,6 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
     stream.onAbort(() => {
       queueEvents.removeListener("progress", progressHandler);
       queueEvents.removeListener("completed", completeHandler);
-    });
-
-    await stream.writeSSE({
-      data: JSON.stringify({ jobName: activeJobName }),
-      event: `${slug}-deployment-logs`,
     });
 
     while (true) {

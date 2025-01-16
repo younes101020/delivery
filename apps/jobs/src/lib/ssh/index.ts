@@ -2,13 +2,13 @@ import { Client } from "ssh2";
 
 import { loadConfig } from "./utils";
 
-interface Ssh {
-  onStdout: (output: string) => void;
-  cwd?: string;
-}
-
 // TODO: persist resolved data (logs) into db
 type Chunk = string;
+
+interface Ssh {
+  onStdout: ({ chunks, chunk }: { chunks?: Chunk[]; chunk: Chunk }) => void;
+  cwd?: string;
+}
 
 export async function ssh(command: string, { onStdout, cwd }: Ssh) {
   const conn = new Client();
@@ -29,21 +29,20 @@ export async function ssh(command: string, { onStdout, cwd }: Ssh) {
               resolve(result);
             })
             .on("data", (data: string) => {
-              onStdout(data);
               result.push(data);
+              onStdout({ chunk: data, chunks: result });
             })
             .stderr
             .setEncoding("utf-8")
             .on("data", (data: string) => {
-              console.log(data)
               if (data.includes("already exists")) {
                 resolve(result);
               }
               if (data.includes("fatal:") || data.includes("error:")) {
                 reject(new Error(data));
               }
-              onStdout(data);
               result.push(data);
+              onStdout({ chunk: data, chunks: result });
             });
         });
       })
