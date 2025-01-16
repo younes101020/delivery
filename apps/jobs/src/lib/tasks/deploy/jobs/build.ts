@@ -5,12 +5,12 @@ import { ssh } from "@/lib/ssh";
 import type { JobFn } from "../../types";
 
 export const build: JobFn<"build"> = async (job) => {
-  const { repoName, port, env, fqdn } = job.data;
+  const { repoName, port, env, fqdn, cache } = job.data;
   await job.updateProgress({ logs: "\nImage will be built..." });
 
   try {
     await ssh(
-      `nixpacks build ./ --name ${repoName} --label "traefik.http.routers.${repoName}.rule=Host(\\\`${fqdn}\\\`)" --label "traefik.http.routers.${repoName}.entrypoints=web" && docker run ${port} ${env ?? ""} --network host_network -d ${repoName}`,
+      `nixpacks build ./ --name ${repoName} ${!cache ? "--no-cache" : ""} --label "traefik.http.routers.${repoName}.rule=Host(\\\`${fqdn}\\\`)" --label "traefik.http.routers.${repoName}.entrypoints=web" && docker run ${port} ${env ?? ""} --network host_network -d ${repoName}`,
       {
         cwd: `${APPLICATIONS_PATH}/${repoName}`,
         onStdout: chunk => job.updateProgress({ logs: chunk }),

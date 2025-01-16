@@ -14,7 +14,7 @@ export interface JobDataMap {
     repoUrl: string;
     repoName: string;
   };
-  build: { repoName: string; env?: string; port: string; fqdn: string };
+  build: { repoName: string; env?: string; port: string; fqdn: string; cache: boolean };
   configure: {
     application: Pick<Application, "port" | "githubAppId">;
     environmentVariable: InsertEnvironmentVariablesSchema[] | undefined;

@@ -5,7 +5,7 @@ export const insertDeploymentSchema = z.object({
   githubAppId: z.number(),
   port: z
     .string()
-    .regex(/^\d+(?::\d+)?$/)
+    .regex(/^\d+(?::\d+)?$/, { message: "The port format is invalid" })
     .transform(port => `-p ${port}`)
     .describe("Port number or port mapping in format port:port"),
   env: z
@@ -13,6 +13,7 @@ export const insertDeploymentSchema = z.object({
     .regex(/^(?:\w+=[\w.-]+(?:\s+|$))*$/)
     .optional()
     .describe("Environment variables in KEY=value format, separated by spaces"),
+  cache: z.coerce.boolean(),
 });
 
 export const slugParamsSchema = z.object({

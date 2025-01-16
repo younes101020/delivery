@@ -40,6 +40,7 @@ const deployments = {
   repoUrl: "git://github.com/user/repo",
   githubAppId: 1,
   port: faker.internet.port().toString(),
+  cache: faker.datatype.boolean(),
   clone: {
     id: 1,
     appId: 1,
@@ -64,6 +65,7 @@ const deployments = {
     fqdn: faker.internet.domainName(),
     env: `KEY=${faker.string.sample()}`,
     token: faker.string.uuid(),
+    cache: faker.datatype.boolean(),
   },
   configure: {
     id: faker.number.int(),

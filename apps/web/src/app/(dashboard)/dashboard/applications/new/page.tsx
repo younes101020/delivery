@@ -9,7 +9,7 @@ async function ApplicationForm({ searchParamsPromise }: ApplicationFormProps) {
   const searchParams = await searchParamsPromise;
   const githubRepoPage = searchParams && searchParams.page;
   const installations = await getAllInstallReposForEachRepoPage(githubRepoPage ?? 1);
-  if (!installations) return <p>No repository found</p>;
+  if (!installations) return <p className="mt-5">No repository found</p>;
   return <Deployment installations={installations} />;
 }
 

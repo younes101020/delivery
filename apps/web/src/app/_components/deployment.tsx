@@ -7,13 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import { ActionState } from "@/lib/form-middleware";
 import type { Repository } from "@/lib/github/types";
 import { Installation } from "@/lib/github/types";
 import type { Nullable } from "@/lib/utils";
-import { Check, Info, Loader2, Rocket } from "lucide-react";
+import { Check, Loader2, Rocket } from "lucide-react";
 import { motion } from "motion/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
@@ -111,7 +110,7 @@ export function Deployment({ installations, isOnboarding = false }: DeploymentPr
 
   return (
     <>
-      <form action={formAction} className="px-5 space-y-8" aria-label="form">
+      <form action={formAction} className="px-5 space-y-8 mt-8" aria-label="form">
         <div>
           <Label htmlFor="port" className="block text-sm font-medium">
             Exposed or mapped port
@@ -140,7 +139,7 @@ export function Deployment({ installations, isOnboarding = false }: DeploymentPr
               id="env"
               name="env"
               type="text"
-              defaultChecked={state.inputs.env}
+              defaultValue={state.inputs.env}
               className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
               placeholder="ex: KEY1=value1 KEY2=value2"
             />
@@ -177,25 +176,25 @@ export function Deployment({ installations, isOnboarding = false }: DeploymentPr
           This GitHub repository will be the source of your application.
         </p>
         <div className="flex items-center space-x-2">
-          <Checkbox id="cache" name="cache" defaultValue={state.inputs.cache} />
-          <label
-            htmlFor="terms"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            Smart caching
-          </label>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Info size={12} className="block" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Unchanged dependencies will not be reinstalled</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Checkbox
+            id="cache"
+            name="cache"
+            defaultChecked={state.inputs.cache === "on" || state.inputs.cache ? true : false}
+            key={state.inputs.cache}
+          />
+          <div className="flex flex-col">
+            <label
+              htmlFor="terms"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Enable caching
+            </label>
+            <p className="block text-xs text-muted-foreground">
+              Unchanged dependencies will not be reinstalled
+            </p>
+          </div>
         </div>
-        <div className="flex justify-end">
+        <div className={`flex ${state.error ? "justify-between" : "justify-end"}`}>
           <input type="hidden" name="repoUrl" id="repoUrl" value={selected.gitUrl ?? "no-url"} />
           <input
             type="hidden"
@@ -206,7 +205,11 @@ export function Deployment({ installations, isOnboarding = false }: DeploymentPr
           {isOnboarding && (
             <input type="hidden" name="isOnboarding" id="isOnboarding" value={"true"} />
           )}
-          {state?.error && <div className="text-destructive text-sm">{state.error}</div>}
+          {state?.error && (
+            <p className="text-destructive bg-destructive/15 p-2 text-sm border border-destructive">
+              {state.error}
+            </p>
+          )}
           <Button type="submit" disabled={!selected.name || pending} aria-label="submit">
             {pending ? (
               <>

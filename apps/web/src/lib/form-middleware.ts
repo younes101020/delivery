@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 export type ActionState<PrevState extends object = Record<string, any>> = {
   error?: string;
   success?: string;
@@ -22,9 +22,10 @@ export function validatedAction<S extends z.ZodType<any, any>, T>(
   action: ValidatedActionFunction<S, T>,
 ) {
   return async (prevState: ActionState, formData: FormData): Promise<T> => {
-    const result = schema.safeParse(Object.fromEntries(formData));
+    const data = Object.fromEntries(formData);
+    const result = schema.safeParse(data);
     if (!result.success) {
-      return { error: result.error.errors[0].message } as T;
+      return { error: result.error.errors[0].message, inputs: data } as T;
     }
     return action(result.data, formData, prevState);
   };

@@ -35,6 +35,7 @@ export async function ssh(command: string, { onStdout, cwd }: Ssh) {
             .stderr
             .setEncoding("utf-8")
             .on("data", (data: string) => {
+              console.log(data)
               if (data.includes("already exists")) {
                 resolve(result);
               }

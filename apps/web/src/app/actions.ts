@@ -42,7 +42,7 @@ const deploySchema = z.object({
   cache: z.coerce.boolean(),
   port: z
     .string()
-    .regex(/^\d+(?::\d+)?$/)
+    .regex(/^\d+(?::\d+)?$/, { message: "The port format is invalid" })
     .transform((port) => {
       const [first, second] = port.split(":");
       return second ? port : `${first}:${first}`;
@@ -51,9 +51,7 @@ const deploySchema = z.object({
 });
 
 export const deploy = validatedAction(deploySchema, async (data) => {
-  console.log(data.cache, data.port)
-  return { inputs: data }
-  /*const user = await getUser();
+  const user = await getUser();
   const deploymentResponse = await client.deployments.$post({
     json: data,
   });
@@ -78,7 +76,7 @@ export const deploy = validatedAction(deploySchema, async (data) => {
   }
 
   const result = await deploymentResponse.json();
-  redirect(`/dashboard/deployments/${result.queueName}`);*/
+  redirect(`/dashboard/deployments/${result.queueName}`);
 });
 
 const domainNameSchema = z.object({

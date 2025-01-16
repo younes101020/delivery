@@ -34,6 +34,7 @@ export async function prepareDataForProcessing(deployment: InsertDeploymentSchem
       repoName,
       port: deployment.port,
       env: environmentVariables && environmentVariables.cmdEnvVars,
+      cache: deployment.cache,
       fqdn,
     },
     configure: {

@@ -26,11 +26,11 @@ export function LogsTerminal({ logs, children }: LogsTerminalProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="lg:max-w-screen-lg overflow-y-scroll max-h-[90vh]">
+      <DialogContent className="lg:max-w-screen-lg overflow-y-scroll max-h-[90vh] bg-black text-primary">
         <DialogHeader>
           <DialogTitle>Build logs</DialogTitle>
         </DialogHeader>
-        <pre className="font-mono text-sm w-full overflow-x-auto bg-black text-white p-2 rounded-lg">{logs}</pre>
+        <pre className="font-mono text-sm w-full overflow-x-auto text-white p-2 rounded-lg">{logs}</pre>
       </DialogContent>
     </Dialog>
   );
