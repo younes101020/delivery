@@ -9,7 +9,8 @@
   "repository": "https://github.com/younes101020/delivery",
   "main": "index.js",
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "packages/*"
   ],
   "scripts": {
     "deploy": "sh ./scripts/delivery.sh deploy",
@@ -25,10 +26,9 @@
     "migrate": "turbo run migrate --filter=@delivery/jobs"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^3.14.0",
-    "eslint": "^9.18.0",
-    "eslint-plugin-format": "^1.0.1",
+    "@types/node": "^20.11.30",
     "semantic-release": "^24.2.0",
-    "turbo": "^2.3.3"
+    "turbo": "^2.3.3",
+    "typescript": "^5.4.3"
   }
 }

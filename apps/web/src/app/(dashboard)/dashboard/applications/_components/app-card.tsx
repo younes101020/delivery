@@ -1,10 +1,11 @@
 "use client";
 
+import { ExternalLink, GitBranch, MoreHorizontal } from "lucide-react";
+import Link from "next/link";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { ExternalLink, GitBranch, MoreHorizontal } from "lucide-react";
-import Link from "next/link";
 
 interface AppCardProps {
   id: number;
@@ -26,7 +27,7 @@ export function AppCard({ name, fqdn, firstDeploymentAt, status = "Error", id }:
               variant="ghost"
               size="icon"
               aria-label="More options"
-              onClick={(e) => e.preventDefault()}
+              onClick={e => e.preventDefault()}
             >
               <MoreHorizontal className="h-5 w-5" />
             </Button>

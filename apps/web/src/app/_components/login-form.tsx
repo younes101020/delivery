@@ -1,12 +1,15 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
+import { useActionState } from "react";
+
+import type { ActionState } from "@/lib/form-middleware";
+
 import { Button } from "@/components/ui/button";
 import { CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ActionState } from "@/lib/form-middleware";
-import { Loader2 } from "lucide-react";
-import { useActionState } from "react";
+
 import { signIn } from "../(login)/actions";
 import { signUp } from "../actions";
 
@@ -63,16 +66,20 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
 
       <CardFooter className="flex px-0 pt-8">
         <Button type="submit" disabled={pending} aria-label="submit" className="w-full">
-          {pending ? (
-            <>
-              <Loader2 className="animate-spin mr-2 h-4 w-4" />
-              Loading...
-            </>
-          ) : mode === "signin" ? (
-            "Sign in"
-          ) : (
-            "Sign up"
-          )}
+          {pending
+            ? (
+                <>
+                  <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                  Loading...
+                </>
+              )
+            : mode === "signin"
+              ? (
+                  "Sign in"
+                )
+              : (
+                  "Sign up"
+                )}
         </Button>
       </CardFooter>
     </form>

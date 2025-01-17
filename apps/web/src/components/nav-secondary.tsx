@@ -1,4 +1,5 @@
-import { type LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
 import * as React from "react";
 
 import {
@@ -8,6 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+
 import { Spinner } from "./ui/spinner";
 
 function DeploymentTracker() {
@@ -34,7 +36,7 @@ export function NavSecondary({
       <SidebarGroupContent>
         <DeploymentTracker />
         <SidebarMenu>
-          {items.map((item) => (
+          {items.map(item => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild size="sm">
                 <a href={item.url}>

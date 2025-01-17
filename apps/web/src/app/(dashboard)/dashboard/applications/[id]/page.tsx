@@ -1,10 +1,12 @@
+import Image from "next/image";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
+
 import { WithBannerBadge } from "@/components/banner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getApplicationById, getApplicationSreenshotUrl } from "@/lib/application/queries";
 import { formatDate } from "@/lib/utils";
-import Image from "next/image";
-import { redirect } from "next/navigation";
-import { Suspense } from "react";
+
 import { AppForm } from "./_components/app-form";
 import DeleteAppForm from "./_components/delete-app-form";
 
@@ -22,8 +24,9 @@ function GetApplicationLoadingScreen() {
 }
 
 async function AppPreviewImage({ id }: AppProps) {
-  const appPreviewImg = await getApplicationSreenshotUrl(parseInt(id));
-  if (!appPreviewImg) return null;
+  const appPreviewImg = await getApplicationSreenshotUrl(Number.parseInt(id));
+  if (!appPreviewImg)
+    return null;
 
   return (
     <WithBannerBadge
@@ -43,7 +46,8 @@ async function AppPreviewImage({ id }: AppProps) {
 
 async function AppDetails({ id }: AppProps) {
   const application = await getApplicationById(id);
-  if (!application) redirect("/dashboard/applications");
+  if (!application)
+    redirect("/dashboard/applications");
 
   return (
     <div className="text-xs col-span-4 md:col-span-3 lg:col-span-2 2xl:col-span-3 space-y-2">
@@ -81,10 +85,11 @@ async function AppDetails({ id }: AppProps) {
 
 async function AppConfiguration({ id }: AppProps) {
   const application = await getApplicationById(id);
-  if (!application) redirect("/dashboard/applications");
+  if (!application)
+    redirect("/dashboard/applications");
   const rawEnvs = application.environmentVariables
     ?.map(({ key, value }) => `${key}=${value}`)
-    .filter((rawEnv) => !(rawEnv.length <= 1))
+    .filter(rawEnv => !(rawEnv.length <= 1))
     .join(" ");
 
   return (
@@ -100,18 +105,19 @@ async function AppConfiguration({ id }: AppProps) {
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const id = (await params).id;
 
-  if (!parseInt(id)) redirect("/dashboard/applications");
+  if (!Number.parseInt(id))
+    redirect("/dashboard/applications");
 
   return (
     <section className="p-5 bg-background/50 border">
       <h1 className="text-3xl font-bold bg-primary text-primary-foreground px-2 py-1 w-fit">Application configuration</h1>
       <div className="mt-8 grid grid-cols-4 gap-4">
         <Suspense
-          fallback={
+          fallback={(
             <Skeleton className="flex justify-center items-center rounded-xl h-full w-full bg-secondary col-span-4 md:col-span-1 lg:col-span-2 2xl:col-span-1">
               <p>Screenshot in progress...</p>
             </Skeleton>
-          }
+          )}
         >
           <AppPreviewImage id={id} />
         </Suspense>

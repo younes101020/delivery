@@ -1,11 +1,13 @@
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
+
 import { Deployment } from "@/app/_components/deployment";
 import { Skeleton } from "@/components/ui/skeleton";
 import { publicEnv } from "@/env";
 import { getAllInstallations, getAllInstallReposForEachRepoPage } from "@/lib/github";
 import { getServerConfiguration } from "@/lib/server/queries";
 import { getUser } from "@/lib/users";
-import { redirect } from "next/navigation";
-import { Suspense } from "react";
+
 import { Login } from "../../_components/login-form";
 import { DomainNameForm } from "./_components/domain-name-form";
 import { GithubAppForm } from "./_components/github-app-form";
@@ -17,32 +19,35 @@ interface StepChildrenProps {
 
 async function GithubRepositoriesStep(props: StepChildrenProps) {
   const searchParams = await props.searchParams;
-  if (!searchParams || searchParams.step != 4) {
+  if (!searchParams || searchParams.step !== 4) {
     return null;
   }
 
   const installations = await getAllInstallReposForEachRepoPage(searchParams.page ?? 1);
-  if (!installations) redirect("/onboarding/?step=3");
+  if (!installations)
+    redirect("/onboarding/?step=3");
   return <Deployment installations={installations} isOnboarding={true} />;
 }
 
 async function GithubAppStep(props: StepChildrenProps) {
   const searchParams = await props.searchParams;
-  if (!searchParams || searchParams.step != 3) {
+  if (!searchParams || searchParams.step !== 3) {
     return null;
   }
   const allGithubInstallations = await getAllInstallations();
-  if (allGithubInstallations && allGithubInstallations.length > 0) redirect("/onboarding/?step=4");
+  if (allGithubInstallations && allGithubInstallations.length > 0)
+    redirect("/onboarding/?step=4");
   return <GithubAppForm baseUrl={publicEnv.NEXT_PUBLIC_BASEURL} />;
 }
 
 async function DomainNameStep(props: StepChildrenProps) {
   const searchParams = await props.searchParams;
-  if (!searchParams || searchParams.step != 2) {
+  if (!searchParams || searchParams.step !== 2) {
     return null;
   }
   const serverConfig = await getServerConfiguration();
-  if (serverConfig?.domainName) redirect("/onboarding/?step=3");
+  if (serverConfig?.domainName)
+    redirect("/onboarding/?step=3");
   return <DomainNameForm />;
 }
 
@@ -61,7 +66,9 @@ async function LoginStep(props: StepChildrenProps) {
 function CheckStepStatusLoadingScreen() {
   return (
     <Skeleton className="flex justify-center items-center h-52 w-full">
-      Check step status <span className=" text-primary">...</span>
+      Check step status
+      {" "}
+      <span className=" text-primary">...</span>
     </Skeleton>
   );
 }
@@ -69,7 +76,7 @@ function CheckStepStatusLoadingScreen() {
 export default async function OnboardingPage(props: {
   searchParams?: Promise<{ step: number; page: number }>;
 }) {
-  const searchParams = props.searchParams?.then((sp) => ({ step: sp.step, page: sp.page }));
+  const searchParams = props.searchParams?.then(sp => ({ step: sp.step, page: sp.page }));
   return (
     <div className="flex justify-center items-center h-full *:lg:w-[70%] *:w-[90%]">
       <StepProvider>

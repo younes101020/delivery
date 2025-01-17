@@ -1,8 +1,11 @@
-import { UserProvider } from "@/lib/auth";
-import { getUser } from "@/lib/users";
 import type { Metadata } from "next";
+
 import localFont from "next/font/local";
 import { Suspense } from "react";
+
+import { UserProvider } from "@/lib/auth";
+import { getUser } from "@/lib/users";
+
 import "./globals.css";
 
 const geistSans = localFont({

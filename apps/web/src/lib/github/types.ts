@@ -1,17 +1,17 @@
 import type { Octokit } from "@octokit/rest";
 
-export type Repository = {
+export interface Repository {
   id: number;
   full_name: string;
   git_url: string;
   description: string | null;
-};
+}
 
-export type Installation = {
+export interface Installation {
   githubAppId: number;
   repositories: Repository[];
   hasMore: boolean;
-};
+}
 
 export interface FailedInstallation {
   failed: true;
@@ -21,15 +21,15 @@ export type RepositoriesResult = Awaited<
   ReturnType<Octokit["apps"]["listReposAccessibleToInstallation"]>
 >["data"]["repositories"];
 
-type SuccessResult = {
+interface SuccessResult {
   success: true;
   repositories: RepositoriesResult;
   hasMore: boolean;
-};
+}
 
-type ErrorResult = {
+interface ErrorResult {
   success: false;
   error: string;
-};
+}
 
 export type ListInstallationRepositoriesResult = SuccessResult | ErrorResult;

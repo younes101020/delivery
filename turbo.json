@@ -16,7 +16,9 @@
       "dependsOn": ["^build"],
       "env": ["AUTH_SECRET", "JOBS_BEARER_TOKEN", "JOBS_API_BASEURL", "DATABASE_URL"]
     },
-    "lint": {},
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
     "migrate": {
       "outputs": [],
       "env": ["LOG_LEVEL", "DATABASE_URL", "BEARER_TOKEN"]

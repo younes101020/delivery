@@ -1,5 +1,7 @@
-import { publicEnv } from "@/env";
 import { Suspense } from "react";
+
+import { publicEnv } from "@/env";
+
 import { Stepper } from "./_components/stepper";
 
 export default function DeploymentsPage({ params }: { params: Promise<{ repoName: string }> }) {

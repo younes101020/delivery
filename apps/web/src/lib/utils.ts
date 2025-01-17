@@ -1,4 +1,4 @@
-import { clsx, type ClassValue } from "clsx";
+import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -39,7 +39,8 @@ export function transformEnvVars(envs: string) {
 }
 
 export function formatDate(date: string | null) {
-  if (!date) return null;
+  if (!date)
+    return null;
   const dateObj = typeof date === "string" ? new Date(date) : date;
   const formatter = new Intl.DateTimeFormat("en-US", {
     weekday: "long",

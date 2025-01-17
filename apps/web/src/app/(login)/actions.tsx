@@ -1,11 +1,12 @@
 "use server";
 
-import { setSession } from "@/lib/auth/session";
-import { validatedAction } from "@/lib/form-middleware";
-import { client } from "@/lib/http";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+
+import { setSession } from "@/lib/auth/session";
+import { validatedAction } from "@/lib/form-middleware";
+import { client } from "@/lib/http";
 
 export async function signOut() {
   (await cookies()).delete("session");
@@ -29,5 +30,5 @@ export const signIn = validatedAction(signInSchema, async (data) => {
   }
   const user = await response.json();
   await setSession(user);
-  redirect("/dashboard");
+  redirect("/dashboard/applications");
 });

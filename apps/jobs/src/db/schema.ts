@@ -1,12 +1,10 @@
+import type { z } from "zod";
+
 import { relations, sql, type SQL } from "drizzle-orm";
 import { boolean, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
-// eslint-disable-next-line ts/consistent-type-imports
-import { z } from "zod";
 
-// eslint-disable-next-line ts/consistent-type-imports
-import { selectUsersSchema } from "./dto";
-// eslint-disable-next-line ts/consistent-type-imports
-import { selectGithubAppsSchema } from "./dto/githubapps.dto";
+import type { selectUsersSchema } from "./dto";
+import type { selectGithubAppsSchema } from "./dto/githubapps.dto";
 
 export const systemConfig = pgTable("system_config", {
   id: serial("id").primaryKey(),

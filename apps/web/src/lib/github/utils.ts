@@ -1,5 +1,6 @@
 import { createAppAuth } from "@octokit/auth-app";
 import { Octokit } from "@octokit/rest";
+
 import type { ListInstallationRepositoriesResult } from "./types";
 
 export async function listInstallationRepositories({
@@ -41,10 +42,9 @@ export async function listInstallationRepositories({
         per_page: repoPerPage,
         page: pageIndex + 1,
         type,
-      }),
-    );
+      }));
     const iteratedRepos = await Promise.all(reposPromises);
-    const repositories = iteratedRepos.map((repo) => repo.data.repositories.reverse()).flat();
+    const repositories = iteratedRepos.map(repo => repo.data.repositories.reverse()).flat();
     const hasMore = repoPerPage * repoPage < iteratedRepos[0].data.total_count;
 
     return {
@@ -52,7 +52,8 @@ export async function listInstallationRepositories({
       repositories,
       hasMore,
     };
-  } catch (error) {
+  }
+  catch (error) {
     if (error instanceof Error) {
       return {
         success: false,

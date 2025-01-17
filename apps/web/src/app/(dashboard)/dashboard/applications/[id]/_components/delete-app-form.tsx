@@ -1,5 +1,9 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,9 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+
 import { removeApplication } from "../../actions";
 
 interface DeleteAppProps {
@@ -47,17 +49,21 @@ export default function DeleteAppForm({ id }: DeleteAppProps) {
             onClick={async () => {
               setIsLoading(true);
               const { success } = await removeApplication(id);
-              if (success) router.push("/dashboard/applications");
+              if (success)
+                router.push("/dashboard/applications");
               setIsLoading(false);
-            }}>
-            {isLoading ? (
-              <>
-                <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                Loading...
-              </>
-            ) : (
-              "Yes, delete"
-            )}
+            }}
+          >
+            {isLoading
+              ? (
+                  <>
+                    <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                    Loading...
+                  </>
+                )
+              : (
+                  "Yes, delete"
+                )}
           </Button>
         </DialogFooter>
       </DialogContent>

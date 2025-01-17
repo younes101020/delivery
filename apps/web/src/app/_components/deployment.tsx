@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
+import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 
 import { deploy } from "../actions";
 
@@ -88,12 +88,12 @@ export function Deployment({ installations, isOnboarding = false }: DeploymentPr
     gitUrl: null,
   });
   const searchParams = useSearchParams();
-  const params = new URLSearchParams(searchParams);
   const pathname = usePathname();
   const { replace } = useRouter();
   const [hasTriggered, setHasTriggered] = useState(false);
 
   useEffect(() => {
+    const params = new URLSearchParams(searchParams);
     if (isIntersecting && !hasTriggered) {
       setHasTriggered(true);
       const repoPage = params.get("page");
@@ -110,7 +110,7 @@ export function Deployment({ installations, isOnboarding = false }: DeploymentPr
     else if (!isIntersecting) {
       setHasTriggered(false);
     }
-  }, [isIntersecting, params, pathname, replace, hasTriggered]);
+  }, [isIntersecting, pathname, replace, hasTriggered, searchParams]);
 
   return (
     <>

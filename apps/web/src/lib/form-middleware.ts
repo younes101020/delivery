@@ -1,22 +1,21 @@
-import { z } from "zod";
+import type { NewUser as User } from "@delivery/jobs/types";
+import type { z } from "zod";
 
-/* eslint-disable  @typescript-eslint/no-explicit-any */
-export type ActionState<PrevState extends object = Record<string, any>> = {
+import { getUser } from "./users";
+
+export interface ActionState<PrevState extends object = Record<string, any>> {
   error?: string;
   success?: string;
   inputs: PrevState;
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
   [key: string]: any; // This allows for additional properties
 };
 
-/* eslint-disable  @typescript-eslint/no-explicit-any */
 type ValidatedActionFunction<S extends z.ZodType<any, any>, T> = (
   data: z.infer<S>,
   formData: FormData,
   prevState: ActionState,
 ) => Promise<T>;
 
-/* eslint-disable  @typescript-eslint/no-explicit-any */
 export function validatedAction<S extends z.ZodType<any, any>, T>(
   schema: S,
   action: ValidatedActionFunction<S, T>,
@@ -31,14 +30,39 @@ export function validatedAction<S extends z.ZodType<any, any>, T>(
   };
 }
 
-/* eslint-disable  @typescript-eslint/no-explicit-any */
+type ValidatedActionWithUserFunction<S extends z.ZodType<any, any>, T> = (
+  data: z.infer<S>,
+  formData: FormData,
+  prevState: ActionState,
+  user: User
+) => Promise<T>;
+
+export function validatedActionWithUser<S extends z.ZodType<any, any>, T>(
+  schema: S,
+  action: ValidatedActionWithUserFunction<S, T>,
+) {
+  return async (prevState: ActionState, formData: FormData): Promise<T> => {
+    const user = await getUser();
+    if (!user) {
+      throw new Error("User is not authenticated");
+    }
+
+    const result = schema.safeParse(Object.fromEntries(formData));
+    if (!result.success) {
+      return { error: result.error.errors[0].message } as T;
+    }
+
+    return action(result.data, formData, prevState, user);
+  };
+}
+
 export function getFormChangesAction<S extends z.ZodType<any, any>>(
   data: z.infer<S>,
   prevState: ActionState,
 ) {
   const changes = new Set(Object.keys(data));
   const result = Array.from(changes)
-    .filter((key) => prevState.inputs.hasOwnProperty(key) && prevState.inputs[key] !== data[key])
+    .filter(key => Object.prototype.hasOwnProperty.call(prevState.inputs, key) && prevState.inputs[key] !== data[key])
     .reduce<z.infer<S>>((diff, key) => {
       diff[key] = data[key];
       return diff;

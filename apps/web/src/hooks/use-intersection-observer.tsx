@@ -1,18 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 
-type State = {
+interface State {
   isIntersecting: boolean;
   entry?: IntersectionObserverEntry;
-};
+}
 
-type UseIntersectionObserverOptions = {
+interface UseIntersectionObserverOptions {
   root?: Element | Document | null;
   rootMargin?: string;
   threshold?: number | number[];
   freezeOnceVisible?: boolean;
   onChange?: (isIntersecting: boolean, entry: IntersectionObserverEntry) => void;
   initialIsIntersecting?: boolean;
-};
+}
 
 type IntersectionReturn = [
   (node?: Element | null) => void,
@@ -47,13 +47,16 @@ export function useIntersectionObserver({
 
   useEffect(() => {
     // Ensure we have a ref to observe
-    if (!ref) return;
+    if (!ref)
+      return;
 
     // Ensure the browser supports the Intersection Observer API
-    if (!("IntersectionObserver" in window)) return;
+    if (!("IntersectionObserver" in window))
+      return;
 
     // Skip if frozen
-    if (frozen) return;
+    if (frozen)
+      return;
 
     let unobserve: (() => void) | undefined;
 
@@ -63,10 +66,10 @@ export function useIntersectionObserver({
           ? observer.thresholds
           : [observer.thresholds];
 
-        entries.forEach(entry => {
-          const isIntersecting =
-            entry.isIntersecting &&
-            thresholds.some(threshold => entry.intersectionRatio >= threshold);
+        entries.forEach((entry) => {
+          const isIntersecting
+            = entry.isIntersecting
+              && thresholds.some(threshold => entry.intersectionRatio >= threshold);
 
           setState({ isIntersecting, entry });
 
@@ -105,11 +108,11 @@ export function useIntersectionObserver({
 
   useEffect(() => {
     if (
-      !ref &&
-      state.entry?.target &&
-      !freezeOnceVisible &&
-      !frozen &&
-      prevRef.current !== state.entry.target
+      !ref
+      && state.entry?.target
+      && !freezeOnceVisible
+      && !frozen
+      && prevRef.current !== state.entry.target
     ) {
       prevRef.current = state.entry.target;
       setState({ isIntersecting: initialIsIntersecting, entry: undefined });

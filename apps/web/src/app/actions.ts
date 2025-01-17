@@ -1,16 +1,17 @@
 "use server";
 
-import { setSession } from "@/lib/auth/session";
-import { validatedAction } from "@/lib/form-middleware";
-import { client } from "@/lib/http";
-import { getUser } from "@/lib/users";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { setSession } from "@/lib/auth/session";
+import { validatedAction } from "@/lib/form-middleware";
+import { client } from "@/lib/http";
+import { getUser } from "@/lib/users";
+
 const signUpSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
 export const signUp = validatedAction(signUpSchema, async (data) => {
@@ -24,7 +25,8 @@ export const signUp = validatedAction(signUpSchema, async (data) => {
   });
 
   // Non explicit error message to end-user to prevent from enumeration attack
-  if (response.status !== 200) return { error: "Impossible to sign up", inputs: data };
+  if (response.status !== 200)
+    return { error: "Impossible to sign up", inputs: data };
   const createdUser = await response.json();
   await setSession(createdUser);
 
@@ -58,7 +60,7 @@ export const deploy = validatedAction(deploySchema, async (data) => {
   if (deploymentResponse.status !== 200) {
     return { error: "Impossible to start the deployment.", inputs: data };
   }
-  
+
   if (data.isOnboarding) {
     const response = await client.serverconfig.$patch({
       json: {

@@ -1,7 +1,10 @@
-import { client } from "@/lib/http";
+import type { NextRequest } from "next/server";
+
 import { redirect } from "next/navigation";
-import { NextRequest } from "next/server";
-import { GithubAppResponse } from "../types";
+
+import { client } from "@/lib/http";
+
+import type { GithubAppResponse } from "../types";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;

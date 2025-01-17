@@ -1,13 +1,14 @@
 "use client";
 
+import { Info } from "lucide-react";
+import { useMemo, useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Info } from "lucide-react";
-import { useMemo, useState } from "react";
 
 export function GithubAppForm({ baseUrl }: { baseUrl: string }) {
   const [url, setUrl] = useState("https://github.com/settings/apps/new");

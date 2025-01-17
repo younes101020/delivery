@@ -1,15 +1,14 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-
-import { ActionState } from "@/lib/form-middleware";
-
-import { Input } from "@/components/ui/input";
-
-import { Label } from "@/components/ui/label";
-
 import { Loader2 } from "lucide-react";
 import { useActionState } from "react";
+
+import type { ActionState } from "@/lib/form-middleware";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
 import { domainName } from "../../../actions";
 
 interface DomainNameState {
@@ -51,14 +50,16 @@ export function DomainNameForm() {
         {state?.error && <div className="text-destructive text-sm">{state.error}</div>}
         <div className="flex justify-end">
           <Button type="submit" disabled={pending} aria-label="submit">
-            {pending ? (
-              <>
-                <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                Loading...
-              </>
-            ) : (
-              "Next"
-            )}
+            {pending
+              ? (
+                  <>
+                    <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                    Loading...
+                  </>
+                )
+              : (
+                  "Next"
+                )}
           </Button>
         </div>
       </form>

@@ -167,6 +167,17 @@ export async function getUserById(id: number) {
   return user;
 }
 
+export async function updateUser(id: number, updates: Partial<InsertUsersSchema>) {
+  const [updatedUser] = await db
+    .update(users)
+    .set(updates)
+    .where(eq(users.id, id))
+    .returning({
+      id: users.id,
+    });
+  return updatedUser;
+}
+
 export async function getApplications() {
   return await db.query.applications.findMany();
 }

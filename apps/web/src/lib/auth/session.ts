@@ -1,17 +1,18 @@
-import { NewUser } from "@delivery/jobs/types";
-import { SignJWT, jwtVerify } from "jose";
+import type { NewUser } from "@delivery/jobs/types";
+
+import { jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
 
 // TODO: wait for nextjs middleware to be nodejs compatible (https://github.com/vercel/next.js/discussions/71727) to use `serverEnv.AUTH_SECRET`
+// eslint-disable-next-line node/no-process-env
 const key = new TextEncoder().encode(process.env.AUTH_SECRET);
 
-type SessionData = {
+interface SessionData {
   user: { id: number };
   expires: string;
-};
-
+}
 export async function signToken(payload: SessionData) {
-  return await new SignJWT(payload)
+  return await new SignJWT({ ...payload } as unknown as Record<string, unknown>)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("1 day from now")
@@ -22,12 +23,13 @@ export async function verifyToken(input: string) {
   const { payload } = await jwtVerify(input, key, {
     algorithms: ["HS256"],
   });
-  return payload as SessionData;
+  return payload as unknown as SessionData;
 }
 
 export async function getSession() {
   const session = (await cookies()).get("session")?.value;
-  if (!session) return null;
+  if (!session)
+    return null;
   return await verifyToken(session);
 }
 

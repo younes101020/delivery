@@ -1,9 +1,11 @@
 "use client";
 
-import { Nullable } from "@/lib/utils";
 import { ExternalLink as ExternalLinkIcon } from "lucide-react";
 import { redirect, useRouter } from "next/navigation";
 import { useCallback } from "react";
+
+import type { Nullable } from "@/lib/utils";
+
 import { type SSEMessage, useEventSource } from "../_hooks/use-event-source";
 import BoxReveal from "./ui/box-reveal";
 import { LogsTerminal } from "./ui/logsterminal";
@@ -41,7 +43,7 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
   const onMessage = useCallback(
     (prev: DeploymentData, data: SSEMessage<DeploymentData>) => {
       if (data.completed && data.id) {
-        redirect(`/dashboard/applications/${data.id}`)
+        redirect(`/dashboard/applications/${data.id}`);
       }
       return {
         step: data.jobName,
@@ -75,7 +77,8 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
 }
 
 function LogsTerminalButton({ step, logs }: DeploymentData) {
-  if (step === "clone" || !logs) return null;
+  if (step === "clone" || !logs)
+    return null;
 
   return (
     <LogsTerminal logs={logs}>

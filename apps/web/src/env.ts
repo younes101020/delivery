@@ -1,3 +1,4 @@
+/* eslint-disable node/no-process-env */
 import { config } from "dotenv";
 import { expand } from "dotenv-expand";
 import path from "node:path";
@@ -14,8 +15,8 @@ const publicEnvSchema = z.object({
   NEXT_PUBLIC_BASEURL: z.string(),
 });
 
-let publicEnv: z.infer<typeof publicEnvSchema>;
-let serverEnv: z.infer<typeof serverEnvSchema>;
+let publicEnvResult;
+let serverEnvResult;
 
 const envValidation = process.env.NEXT_RUNTIME === "nodejs" || process.env.NODE_ENV === "test";
 
@@ -26,23 +27,31 @@ if (envValidation) {
     }),
   );
 
-  const serverEnvResult = serverEnvSchema.safeParse(process.env);
-  if (serverEnvResult.success) {
-    serverEnv = serverEnvResult.data;
-  } else {
+  const serverEnvParse = serverEnvSchema.safeParse(process.env);
+  if (serverEnvParse.success) {
+    serverEnvResult = serverEnvParse.data;
+  }
+  else {
     console.error("❌ Invalid server env vars:");
-    console.error(JSON.stringify(serverEnvResult.error.flatten().fieldErrors, null, 2));
+    console.error(JSON.stringify(serverEnvParse.error.flatten().fieldErrors, null, 2));
     process.exit(1);
   }
 
-  const publicEnvResult = publicEnvSchema.safeParse(process.env);
-  if (publicEnvResult.success) {
-    publicEnv = publicEnvResult.data;
-  } else {
+  const publicEnvParse = publicEnvSchema.safeParse(process.env);
+  if (publicEnvParse.success) {
+    publicEnvResult = publicEnvParse.data;
+  }
+  else {
     console.error("❌ Invalid public env vars:");
-    console.error(JSON.stringify(publicEnvResult.error.flatten().fieldErrors, null, 2));
+    console.error(JSON.stringify(publicEnvParse.error.flatten().fieldErrors, null, 2));
     process.exit(1);
   }
 }
 
-export { publicEnv, serverEnv };
+const publicEnv = publicEnvResult as unknown as z.infer<typeof publicEnvSchema>;
+const serverEnv = serverEnvResult as unknown as z.infer<typeof serverEnvSchema>;
+
+export {
+  publicEnv,
+  serverEnv,
+};

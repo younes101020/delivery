@@ -8,7 +8,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ event: str
     headers: {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache, no-transform",
-      Connection: "keep-alive",
+      "Connection": "keep-alive",
     },
   });
 }

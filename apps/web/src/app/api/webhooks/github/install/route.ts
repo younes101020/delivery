@@ -1,7 +1,9 @@
-import { client } from "@/lib/http";
+import type { NextRequest } from "next/server";
+
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
-import { NextRequest } from "next/server";
+
+import { client } from "@/lib/http";
 
 export async function GET(req: NextRequest) {
   const installationId = req.nextUrl.searchParams.get("installation_id");
@@ -19,10 +21,11 @@ export async function GET(req: NextRequest) {
         id: stateObj.appId,
       },
       json: {
-        installationId: parseInt(installationId),
+        installationId: Number.parseInt(installationId),
       },
     });
-  } catch (error) {
+  }
+  catch (error) {
     console.error(error);
     redirect("/onboarding/?step=3");
   }

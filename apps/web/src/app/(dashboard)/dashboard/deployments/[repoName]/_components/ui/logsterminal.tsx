@@ -1,5 +1,9 @@
 "use client";
 
+import type { ReactNode } from "react";
+
+import { useEffect, useRef } from "react";
+
 import {
   Dialog,
   DialogContent,
@@ -7,7 +11,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ReactNode, useRef, useEffect } from "react";
 
 interface LogsTerminalProps {
   logs: string;
@@ -15,16 +18,16 @@ interface LogsTerminalProps {
 }
 
 export function LogsTerminal({ logs, children }: LogsTerminalProps) {
-  const logsEndRef = useRef<null | HTMLDivElement>(null)
+  const logsEndRef = useRef<null | HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    logsEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
+    logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
-    scrollToBottom()
+    scrollToBottom();
   }, [logs]);
-  
+
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>

@@ -15,14 +15,10 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+
 import { Logo } from "./ui/logo";
 
 const data = {
-  user: {
-    name: "youyou",
-    email: "m@example.com",
-    avatar: "/avatars/youyou.jpg",
-  },
   navMain: [
     {
       title: "Applications",
@@ -30,10 +26,6 @@ const data = {
       icon: Package,
       isActive: true,
       items: [
-        {
-          title: "Settings",
-          url: "#",
-        },
         {
           title: "New",
           url: "/dashboard/applications/new",
@@ -66,7 +58,7 @@ const data = {
       items: [
         {
           title: "General",
-          url: "#",
+          url: "/dashboard/settings/general",
         },
         {
           title: "Team",
@@ -105,7 +97,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   );

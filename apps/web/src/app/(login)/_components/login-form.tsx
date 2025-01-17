@@ -1,6 +1,7 @@
 import { Login } from "@/app/_components/login-form";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+
 import { Cobe } from "../../../components/ui/cobeglobe";
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
@@ -13,8 +14,11 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
                 <p className="text-balance text-muted-foreground">
-                  Login to your{" "}
-                  <span className="underline underline-offset-2 italic">Delivery</span> account
+                  Login to your
+                  {" "}
+                  <span className="underline underline-offset-2 italic">Delivery</span>
+                  {" "}
+                  account
                 </p>
               </div>
               <Login mode="signin" />

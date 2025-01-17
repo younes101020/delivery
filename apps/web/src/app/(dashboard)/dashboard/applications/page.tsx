@@ -1,10 +1,12 @@
+import { PackagePlus } from "lucide-react";
+import Link from "next/link";
+import { Suspense } from "react";
+
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getApplications } from "@/lib/application/queries";
 import { formatDate } from "@/lib/utils";
-import { PackagePlus } from "lucide-react";
-import Link from "next/link";
-import { Suspense } from "react";
+
 import { AppCard } from "./_components/app-card";
 
 function NoApplicationsScreen() {
@@ -17,10 +19,11 @@ function NoApplicationsScreen() {
 
 async function ApplicationList() {
   const applications = await getApplications();
-  if (!applications) return <NoApplicationsScreen />;
+  if (!applications)
+    return <NoApplicationsScreen />;
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      {applications.map((application) => (
+      {applications.map(application => (
         <AppCard
           key={application.id}
           id={application.id}
@@ -37,7 +40,7 @@ export default async function ApplicationsPage() {
   return (
     <section className="p-5 bg-background/50 border">
       <div className="flex justify-between gap-2">
-        <h1 className="text-3xl font-bold bg-primary text-primary-foreground px-2 py-1 w-fit italic">Applications list</h1>
+        <h1 className="text-3xl font-bold bg-primary text-primary-foreground px-2 py-1 w-fit">Applications list</h1>
         <Link href="/dashboard/applications/new" className={buttonVariants({ variant: "outline" })}>
           New application
           <PackagePlus className="ml-1 mt-[.1rem]" />

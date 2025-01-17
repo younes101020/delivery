@@ -1,4 +1,5 @@
 import { unstable_cacheTag } from "next/cache";
+
 import { client } from "../http";
 
 export async function getApplicationById(id: string) {

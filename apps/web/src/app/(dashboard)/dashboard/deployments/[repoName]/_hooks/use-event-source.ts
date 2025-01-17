@@ -2,19 +2,19 @@
 
 import { useEffect, useState } from "react";
 
-export type SSEMessage<T> = {
+export interface SSEMessage<T> {
   jobName: T extends { step: infer S } ? S : never;
   logs: string;
   completed?: boolean;
   id?: string;
-};
+}
 
-type SseProps<T> = {
+interface SseProps<T> {
   type: string;
   eventUrl: string;
   initialState: T;
   onMessage?: (prev: T, data: SSEMessage<T>) => T;
-};
+}
 
 export function useEventSource<T>({ initialState, eventUrl, type, onMessage }: SseProps<T>): T {
   const [sseData, setSseData] = useState<T>(() => initialState);
@@ -22,14 +22,16 @@ export function useEventSource<T>({ initialState, eventUrl, type, onMessage }: S
   useEffect(() => {
     let mounted = true;
     const handleLogs = (e: MessageEvent) => {
-      if (!mounted) return;
+      if (!mounted)
+        return;
 
       try {
         const data = JSON.parse(e.data);
         if (onMessage) {
-          setSseData((prev) => onMessage(prev, data));
+          setSseData(prev => onMessage(prev, data));
         }
-      } catch (error) {
+      }
+      catch (error) {
         console.error("Failed to parse SSE data:", error);
       }
     };

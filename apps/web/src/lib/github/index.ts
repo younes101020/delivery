@@ -1,7 +1,11 @@
-import { client } from "@/lib/http";
-import { GithubInstallation } from "@delivery/jobs/types";
+import type { GithubInstallation } from "@delivery/jobs/types";
+
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
+
+import { client } from "@/lib/http";
+
 import type { FailedInstallation, Installation } from "./types";
+
 import { listInstallationRepositories } from "./utils";
 
 /**
@@ -9,7 +13,8 @@ import { listInstallationRepositories } from "./utils";
  */
 export async function getAllInstallReposForEachRepoPage(iteration: number) {
   const installations = await getAllInstallationsWithRepos({ repoPage: iteration });
-  if (!installations) return null;
+  if (!installations)
+    return null;
   const nonNullInstallations = installations
     .filter(
       (installation): installation is NonNullable<typeof installation> => installation !== null,
@@ -49,7 +54,7 @@ export async function getAllInstallationsWithRepos({ repoPage }: { repoPage: num
         appId: installation.appId.toString(),
         privateKey: installation.privateKey,
         installationId: installation.installationId.toString(),
-        repoPage: repoPage,
+        repoPage,
       });
 
       if (!repositoriesResponse.success) {
@@ -60,13 +65,13 @@ export async function getAllInstallationsWithRepos({ repoPage }: { repoPage: num
 
       return {
         githubAppId: installation.appId,
-        repositories: repositories.map((repo) => ({
+        repositories: repositories.map(repo => ({
           id: repo.id,
           full_name: repo.full_name,
           git_url: repo.git_url,
           description: repo.description,
         })),
-        hasMore: hasMore,
+        hasMore,
       } as Installation;
     }),
   );

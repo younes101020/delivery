@@ -1,13 +1,16 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
+import { useActionState } from "react";
+
+import type { ActionState } from "@/lib/form-middleware";
+
 import { Button } from "@/components/ui/button";
 import { CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ActionState } from "@/lib/form-middleware";
-import { Loader2 } from "lucide-react";
-import { useActionState } from "react";
+
 import { editApplication } from "../../actions";
 
 interface AppFormProps {
@@ -75,14 +78,16 @@ export function AppForm(applicationData: AppFormProps) {
 
       <CardFooter className="flex px-0 pt-8 col-span-2">
         <Button type="submit" disabled={pending} aria-label="submit" className="w-full">
-          {pending ? (
-            <>
-              <Loader2 className="animate-spin mr-2 h-4 w-4" />
-              Loading...
-            </>
-          ) : (
-            "Save"
-          )}
+          {pending
+            ? (
+                <>
+                  <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                  Loading...
+                </>
+              )
+            : (
+                "Save"
+              )}
         </Button>
       </CardFooter>
     </form>
