@@ -7,7 +7,6 @@ import {
   createApplication,
   deleteApplicationById,
   getApplicationById,
-  getApplicationNameById,
   getApplications,
   patchApplication,
 } from "@/db/queries";
@@ -66,9 +65,9 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const updates = c.req.valid("json");
 
-  const noUpdates = Object.keys(updates.applicationData).length === 0 && (!Array.isArray(updates.envVars) || Object.keys(updates.envVars[0]).length === 0);
+  const noUpdatesFound = Object.keys(updates.applicationData).length === 0 && (!Array.isArray(updates.envVars) || Object.keys(updates.envVars[0]).length === 0);
 
-  if (noUpdates) {
+  if (noUpdatesFound) {
     return c.json(
       {
         success: false,
@@ -117,9 +116,9 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
 
 export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
   const { id } = c.req.valid("param");
-  const result = await deleteApplicationById(id);
+  const repoName = await deleteApplicationById(id);
 
-  if (!result) {
+  if (!repoName) {
     return c.json(
       {
         message: HttpStatusPhrases.NOT_FOUND,
@@ -127,8 +126,6 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
       HttpStatusCodes.NOT_FOUND,
     );
   }
-
-  const repoName = await getApplicationNameById(id);
 
   try {
     await ssh(

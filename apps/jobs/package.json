@@ -55,15 +55,12 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^3.8.0",
     "@faker-js/faker": "^9.3.0",
     "@types/ioredis": "^5.0.0",
     "@types/node": "^22.10.2",
     "@types/pg": "^8.11.10",
     "@types/ssh2": "^1.15.3",
     "cross-env": "^7.0.3",
-    "eslint": "^9.13.0",
-    "eslint-plugin-format": "^0.1.2",
     "minio": "^8.0.3",
     "tsc-alias": "^1.8.10",
     "tsx": "^4.19.1",

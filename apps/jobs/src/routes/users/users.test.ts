@@ -1,5 +1,4 @@
-/* eslint-disable ts/ban-ts-comment */
-import { it } from "@/../__tests__";
+import { it } from "__tests__";
 import { testClient } from "hono/testing";
 import { describe, expect } from "vitest";
 
@@ -27,7 +26,7 @@ describe("users routes / E2E", () => {
     const { email } = users[0];
     const response = await client.users.$post(
       {
-        // @ts-expect-error
+        // @ts-expect-error testing purpose
         json: {
           email,
         },

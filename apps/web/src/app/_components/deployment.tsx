@@ -1,5 +1,14 @@
 "use client";
 
+import { Check, Loader2, Rocket } from "lucide-react";
+import { motion } from "motion/react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useActionState, useEffect, useState } from "react";
+
+import type { ActionState } from "@/lib/form-middleware";
+import type { Installation, Repository } from "@/lib/github/types";
+import type { Nullable } from "@/lib/utils";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -8,14 +17,7 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
-import { ActionState } from "@/lib/form-middleware";
-import type { Repository } from "@/lib/github/types";
-import { Installation } from "@/lib/github/types";
-import type { Nullable } from "@/lib/utils";
-import { Check, Loader2, Rocket } from "lucide-react";
-import { motion } from "motion/react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+
 import { deploy } from "../actions";
 
 type SelectedRepositoryProps = Nullable<{
@@ -43,7 +45,7 @@ function RepositorySection({ repo, setSelected, selected, githubAppId }: Reposit
         setSelected({
           name: repo.full_name,
           id: repo.id,
-          githubAppId: githubAppId,
+          githubAppId,
           gitUrl: repo.git_url,
         });
       }}
@@ -97,13 +99,15 @@ export function Deployment({ installations, isOnboarding = false }: DeploymentPr
       const repoPage = params.get("page");
       if (!repoPage) {
         params.set("page", "2");
-      } else {
-        let updatedRepoPage = parseInt(repoPage);
+      }
+      else {
+        let updatedRepoPage = Number.parseInt(repoPage);
         updatedRepoPage++;
         params.set("page", `${updatedRepoPage}`);
       }
       replace(`${pathname}?${params.toString()}`, { scroll: false });
-    } else if (!isIntersecting) {
+    }
+    else if (!isIntersecting) {
       setHasTriggered(false);
     }
   }, [isIntersecting, params, pathname, replace, hasTriggered]);
@@ -154,7 +158,7 @@ export function Deployment({ installations, isOnboarding = false }: DeploymentPr
           </p>
           <ScrollArea className="max-h-80">
             <div className="max-h-96 grid grid-cols-1 md:grid-cols-2 gap-2">
-              {installations[0].repositories.map((repo) => (
+              {installations[0].repositories.map(repo => (
                 <RepositorySection
                   repo={repo}
                   githubAppId={installations[0].githubAppId}
@@ -179,7 +183,7 @@ export function Deployment({ installations, isOnboarding = false }: DeploymentPr
           <Checkbox
             id="cache"
             name="cache"
-            defaultChecked={state.inputs.cache === "on" || state.inputs.cache ? true : false}
+            defaultChecked={!!(state.inputs.cache === "on" || state.inputs.cache)}
             key={state.inputs.cache}
           />
           <div className="flex flex-col">
@@ -203,7 +207,7 @@ export function Deployment({ installations, isOnboarding = false }: DeploymentPr
             value={selected.githubAppId ?? "no-github-app-id"}
           />
           {isOnboarding && (
-            <input type="hidden" name="isOnboarding" id="isOnboarding" value={"true"} />
+            <input type="hidden" name="isOnboarding" id="isOnboarding" value="true" />
           )}
           {state?.error && (
             <p className="text-destructive bg-destructive/15 p-2 text-sm border border-destructive">
@@ -211,16 +215,20 @@ export function Deployment({ installations, isOnboarding = false }: DeploymentPr
             </p>
           )}
           <Button type="submit" disabled={!selected.name || pending} aria-label="submit">
-            {pending ? (
-              <>
-                <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                Loading...
-              </>
-            ) : (
-              <>
-                <Rocket /> | Deploy
-              </>
-            )}
+            {pending
+              ? (
+                  <>
+                    <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                    Loading...
+                  </>
+                )
+              : (
+                  <>
+                    <Rocket />
+                    {" "}
+                    | Deploy
+                  </>
+                )}
           </Button>
         </div>
       </form>

@@ -34,7 +34,7 @@ export const editApplication = validatedAction(
         inputs: data,
       };
     }
-    revalidateTag(`application-${data.id}`)
+    revalidateTag(`application-${data.id}`);
     return { success: "Application updated successfully.", inputs: data };
   },
 );
@@ -48,7 +48,7 @@ export async function removeApplication(id: string) {
       success: false,
     };
   }
-  revalidateTag(`application-${id}`)
+  revalidateTag(`application-${id}`);
   return {
     success: true,
   };

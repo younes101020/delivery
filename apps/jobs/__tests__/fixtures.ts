@@ -1,13 +1,12 @@
 import { faker } from "@faker-js/faker";
 import { it as base } from "vitest";
 
-import type { JobDataMap, JobParam } from "@/lib/tasks/types";
-
 import type {
   InsertDeploymentSchema,
   InsertGithubAppsSchema,
   InsertUsersSchema,
-} from "../src/db/dto";
+} from "@/db/dto";
+import type { JobDataMap, JobParam } from "@/lib/tasks/types";
 
 interface Fixtures {
   githubApps: InsertGithubAppsSchema[];
@@ -87,6 +86,7 @@ const deployments = {
 const job = {
   data: deployments.clone,
   updateProgress: async () => Promise.resolve(),
+  updateData: async () => Promise.resolve(),
   remove: async () => Promise.resolve(),
   getChildrenValues: async () => Promise.resolve({}),
 };

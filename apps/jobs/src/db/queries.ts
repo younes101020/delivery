@@ -226,7 +226,11 @@ export async function patchApplication(id: number, updates: PatchApplicationSche
 }
 
 export async function deleteApplicationById(id: number) {
-  return await db.delete(applications).where(eq(applications.id, id));
+  const [result] = await db
+    .delete(applications)
+    .where(eq(applications.id, id))
+    .returning({ name: applications.name });
+  return result?.name;
 }
 
 export async function getApplicationNameById(id: number) {

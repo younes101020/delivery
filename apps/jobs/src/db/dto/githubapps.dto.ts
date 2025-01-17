@@ -1,5 +1,4 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-// eslint-disable-next-line ts/consistent-type-imports
 import { z } from "zod";
 
 import { githubApp, githubAppSecret } from "../schema";
