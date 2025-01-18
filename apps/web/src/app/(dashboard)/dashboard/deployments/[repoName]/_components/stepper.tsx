@@ -6,6 +6,8 @@ import { useCallback } from "react";
 
 import type { Nullable } from "@/lib/utils";
 
+import { Button } from "@/components/ui/button";
+
 import { type SSEMessage, useEventSource } from "../_hooks/use-event-source";
 import BoxReveal from "./ui/box-reveal";
 import { LogsTerminal } from "./ui/logsterminal";
@@ -19,6 +21,7 @@ interface StepperProps {
 export type DeploymentData = Nullable<{
   step: keyof typeof DEPLOYMENTMETADATA;
   logs: string;
+  isCriticalError?: boolean;
 }>;
 
 export const DEPLOYMENTMETADATA = {
@@ -39,7 +42,6 @@ export const DEPLOYMENTMETADATA = {
 const DEFAULT_STATE = { step: null, logs: null };
 
 export function Stepper({ repoName, baseUrl }: StepperProps) {
-  const router = useRouter();
   const onMessage = useCallback(
     (prev: DeploymentData, data: SSEMessage<DeploymentData>) => {
       if (data.completed && data.id) {
@@ -48,11 +50,12 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
       return {
         step: data.jobName,
         logs: prev.logs ? `${prev.logs}${data.logs}` : data.logs,
+        isCriticalError: data.isCriticalError,
       };
     },
-    [router],
+    [],
   );
-  const { step, logs } = useEventSource<DeploymentData>({
+  const { step, logs, isCriticalError } = useEventSource<DeploymentData>({
     type: `${repoName}-deployment-logs`,
     eventUrl: `${baseUrl}/api/deployments/logs/${repoName}`,
     initialState: DEFAULT_STATE,
@@ -60,7 +63,7 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
   });
 
   return (
-    <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden">
+    <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden gap-4">
       <BoxReveal duration={0.5}>
         <p className="text-xl font-semibold">
           {step && DEPLOYMENTMETADATA[step].phrase}
@@ -71,6 +74,13 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
         <p className="text-xs text-primary">{step && DEPLOYMENTMETADATA[step].position}</p>
         <LogsTerminalButton step={step} logs={logs} />
       </div>
+      {true && (
+        <div className="flex flex-col gap-2 text-center items-center">
+          <p className="text-destructive font-semibold">We were unable to deploy your application</p>
+          <p className="text-xs text-destructive">Once you think you have resolved the issue, you can redeploy.</p>
+          <Button variant={"outline"} className="w-fit">Redeploy</Button>
+        </div>
+      )}
       <Ripple />
     </div>
   );

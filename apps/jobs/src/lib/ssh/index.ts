@@ -6,7 +6,7 @@ import { loadConfig } from "./utils";
 type Chunk = string;
 
 interface Ssh {
-  onStdout: ({ chunks, chunk }: { chunks?: Chunk[]; chunk: Chunk }) => void;
+  onStdout: ({ chunks, chunk, isCriticalError }: { chunks?: Chunk[]; chunk: Chunk; isCriticalError?: boolean }) => void;
   cwd?: string;
 }
 
@@ -35,14 +35,16 @@ export async function ssh(command: string, { onStdout, cwd }: Ssh) {
             .stderr
             .setEncoding("utf-8")
             .on("data", (data: string) => {
-              if (data.includes("already exists")) {
+              const errorMessage = data.toLowerCase();
+              const isCriticalError = /fatal:|error:/i.test(errorMessage);
+              result.push(data);
+              onStdout({ chunk: data, chunks: result, isCriticalError });
+              if (/already exists/i.test(errorMessage)) {
                 resolve(result);
               }
-              if (data.includes("fatal:") || data.includes("error:")) {
+              if (isCriticalError) {
                 reject(new Error(data));
               }
-              result.push(data);
-              onStdout({ chunk: data, chunks: result });
             });
         });
       })

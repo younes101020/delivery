@@ -69,7 +69,7 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
 
   return streamSSE(c, async (stream) => {
     await stream.writeSSE({
-      data: JSON.stringify({ jobName: activeJobName, logs: activeJobData.logs }),
+      data: JSON.stringify({ jobName: activeJobName, logs: activeJobData.logs, isCriticalError: activeJobData.isCriticalError }),
       event: `${slug}-deployment-logs`,
     });
 
@@ -78,6 +78,7 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
       const sseData = JSON.stringify({
         jobName: jobState?.name,
         ...(typeof data === "object" && "logs" in data ? { logs: data.logs } : {}),
+        ...(typeof data === "object" && "isCriticalError" in data ? { isCriticalError: data.isCriticalError } : {}),
       });
       await stream.writeSSE({
         data: sseData,

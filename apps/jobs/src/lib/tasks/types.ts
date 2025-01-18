@@ -21,6 +21,7 @@ export interface JobDataMap {
     fqdn: string;
     cache: boolean;
     logs?: string;
+    isCriticalError?: boolean;
   };
   configure: {
     application: Pick<Application, "port" | "githubAppId">;

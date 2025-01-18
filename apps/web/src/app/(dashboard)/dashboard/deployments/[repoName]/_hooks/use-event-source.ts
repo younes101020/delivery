@@ -6,6 +6,7 @@ export interface SSEMessage<T> {
   jobName: T extends { step: infer S } ? S : never;
   logs: string;
   completed?: boolean;
+  isCriticalError?: boolean;
   id?: string;
 }
 
