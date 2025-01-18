@@ -24,7 +24,7 @@ export async function prepareDataForProcessing(deployment: InsertDeploymentSchem
   const hostName = await getSystemDomainName();
   if (!hostName)
     return null;
-  const repoName = basename(deployment.repoUrl, ".git");
+  const repoName = basename(deployment.repoUrl, ".git").toLowerCase();
   const fqdn = parseAppHost(repoName, hostName);
   const environmentVariables = transformEnvVars(deployment.env);
 
