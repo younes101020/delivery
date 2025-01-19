@@ -39,7 +39,9 @@ export const clone: JobFn<"clone"> = async (job) => {
   try {
     await ssh(`git clone ${formattedRepoUrl} ${repoName}`, {
       cwd: APPLICATIONS_PATH,
-      onStdout: ({ chunk, isCriticalError }) => job.updateProgress({ logs: chunk, isCriticalError }),
+      onStdout: ({ chunk, isCriticalError }) => {
+        job.updateProgress({ logs: chunk, isCriticalError, jobId: job.id });
+      },
     });
   }
   catch (error) {

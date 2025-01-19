@@ -10,7 +10,7 @@ import { connection } from "@/lib/tasks";
 import { startDeploy } from "@/lib/tasks/deploy";
 import { prepareDataForProcessing } from "@/lib/tasks/deploy/jobs";
 
-import type { CreateRoute, StreamRoute } from "./deployments.routes";
+import type { CreateRoute, RetryRoute, StreamRoute } from "./deployments.routes";
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const deployment = c.req.valid("json");
@@ -64,12 +64,15 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
     );
   }
 
-  const activeJobName = activeJobs[0].name;
-  const activeJobData = activeJobs[0].data;
+  const queueEvents = new QueueEvents(slug, { connection: connection.duplicate() });
+
+  const job = await queue.getJobs(["active", "failed"]).then(jobs => jobs[0]);
+
+  const { name, data, id } = job;
 
   return streamSSE(c, async (stream) => {
     await stream.writeSSE({
-      data: JSON.stringify({ jobName: activeJobName, logs: activeJobData.logs, isCriticalError: activeJobData.isCriticalError }),
+      data: JSON.stringify({ jobName: name, logs: data.logs, isCriticalError: data.isCriticalError, jobId: id }),
       event: `${slug}-deployment-logs`,
     });
 
@@ -97,8 +100,16 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
       }
     }
 
+    async function failedHandler({ jobId }: { jobId: string }) {
+      await stream.writeSSE({
+        data: JSON.stringify({ jobId }),
+        event: `${slug}-deployment-logs`,
+      });
+    }
+
     queueEvents.on("progress", progressHandler);
     queueEvents.on("completed", completeHandler);
+    queueEvents.on("failed", failedHandler);
 
     stream.onAbort(() => {
       queueEvents.removeListener("progress", progressHandler);
@@ -110,4 +121,27 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
     }
     // casting cause: no typescript support for sse in hono https://github.com/honojs/hono/issues/3309
   }) as any;
+};
+
+export const retryJob: AppRouteHandler<RetryRoute> = async (c) => {
+  const { id } = c.req.valid("param");
+  const { slug: queueName } = c.req.valid("json");
+  const queue = new Queue(queueName, { connection: connection.duplicate() });
+  const faileJob = await Job.fromId(queue, id.toString());
+
+  if (!faileJob) {
+    return c.json(
+      {
+        message: HttpStatusPhrases.NOT_FOUND,
+      },
+      HttpStatusCodes.NOT_FOUND,
+    );
+  }
+
+  const response = await faileJob?.retry();
+
+  return c.json(
+    { response },
+    HttpStatusCodes.OK,
+  );
 };

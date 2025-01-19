@@ -1,10 +1,10 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
-import { createErrorSchema } from "stoker/openapi/schemas";
+import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 
 import { deploymentTrackerIdentifier, insertDeploymentSchema, slugParamsSchema } from "@/db/dto";
-import { goneSchema, notFoundSchema } from "@/lib/constants";
+import { goneSchema, notFoundSchema, okSchema } from "@/lib/constants";
 
 const tags = ["Deployments"];
 
@@ -49,5 +49,28 @@ export const streamLog = createRoute({
   },
 });
 
+export const retryJob = createRoute({
+  path: "/deployments/jobs/retry/{id}",
+  method: "post",
+  tags,
+  request: {
+    params: IdParamsSchema,
+    body: jsonContentRequired(
+      slugParamsSchema,
+      "The queue name to which the job belongs",
+    ),
+  },
+  description: "Retry launching a failed or completed job",
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(okSchema, "Job retry attempted"),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "No failed or completed job found"),
+    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
+      createErrorSchema(slugParamsSchema).or(createErrorSchema(IdParamsSchema)),
+      "The validation error(s)",
+    ),
+  },
+});
+
 export type StreamRoute = typeof streamLog;
 export type CreateRoute = typeof create;
+export type RetryRoute = typeof retryJob;

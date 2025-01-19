@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export interface SSEMessage<T> {
   jobName: T extends { step: infer S } ? S : never;
   logs: string;
   completed?: boolean;
   isCriticalError?: boolean;
-  id?: string;
+  appId?: string;
+  jobId?: string;
 }
 
 interface SseProps<T> {
@@ -17,40 +18,57 @@ interface SseProps<T> {
   onMessage?: (prev: T, data: SSEMessage<T>) => T;
 }
 
-export function useEventSource<T>({ initialState, eventUrl, type, onMessage }: SseProps<T>): T {
+export function useEventSource<T>({ initialState, eventUrl, type, onMessage }: SseProps<T>) {
   const [sseData, setSseData] = useState<T>(() => initialState);
+  const eventSourceRef = useRef<EventSource | null>(null);
 
-  useEffect(() => {
-    let mounted = true;
+  const handleMessage = useCallback((prev: T, data: SSEMessage<T>) => {
+    if (onMessage) {
+      return onMessage(prev, data);
+    }
+    return prev;
+  }, [onMessage]);
+
+  const connect = useCallback(() => {
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+    }
+
+    const newEventSource = new EventSource(eventUrl);
+    eventSourceRef.current = newEventSource;
+
     const handleLogs = (e: MessageEvent) => {
-      if (!mounted)
-        return;
-
       try {
         const data = JSON.parse(e.data);
-        if (onMessage) {
-          setSseData(prev => onMessage(prev, data));
-        }
+        setSseData(prev => handleMessage(prev, data));
       }
       catch (error) {
         console.error("Failed to parse SSE data:", error);
       }
     };
 
-    const eventSource = new EventSource(eventUrl);
-    eventSource.addEventListener(type, handleLogs);
-    eventSource.addEventListener("error", () => {
-      if (mounted) {
-        eventSource.close();
-      }
+    newEventSource.addEventListener(type, handleLogs);
+    newEventSource.addEventListener("error", () => {
+      newEventSource.close();
     });
 
     return () => {
-      mounted = false;
-      eventSource.removeEventListener(type, handleLogs);
-      eventSource.close();
+      newEventSource.removeEventListener(type, handleLogs);
+      newEventSource.close();
+      eventSourceRef.current = null;
     };
-  }, [eventUrl, type]);
+  }, [eventUrl, type, handleMessage]);
 
-  return sseData;
+  useEffect(() => {
+    const cleanup = connect();
+    return () => {
+      cleanup();
+    };
+  }, [connect]);
+
+  const reconnect = useCallback(() => {
+    connect();
+  }, [connect]);
+
+  return { ...sseData, reconnect };
 }

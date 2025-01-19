@@ -5,6 +5,7 @@ import * as routes from "./deployments.routes";
 
 const router = createRouter()
   .openapi(routes.create, handlers.create)
-  .openapi(routes.streamLog, handlers.streamLog);
+  .openapi(routes.streamLog, handlers.streamLog)
+  .openapi(routes.retryJob, handlers.retryJob);
 
 export default router;

@@ -81,6 +81,26 @@ export const deploy = validatedAction(deploySchema, async (data) => {
   redirect(`/dashboard/deployments/${result.queueName}`);
 });
 
+const retryDeploySchema = z.object({
+  repoName: z.string(),
+  jobId: z.string().min(1),
+});
+
+export const retryDeploy = validatedAction(retryDeploySchema, async (data) => {
+  const response = await client.deployments.jobs.retry[":id"].$post({
+    param: {
+      id: data.jobId,
+    },
+    json: {
+      slug: data.repoName,
+    },
+  });
+  if (response.status !== 200) {
+    return { error: "Impossible to retry deployment, please retry later.", inputs: data };
+  }
+  return { success: "Deployment retry attempted", inputs: data };
+});
+
 const domainNameSchema = z.object({
   domainName: z.string().url(),
 });

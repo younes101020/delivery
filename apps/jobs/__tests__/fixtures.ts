@@ -44,6 +44,7 @@ const deployments = {
     id: 1,
     appId: 1,
     clientId: "1",
+    jobId: faker.number.int().toString(),
     clientSecret: faker.internet.password(),
     webhookSecret: faker.internet.password(),
     secretId: 4,
@@ -59,6 +60,7 @@ const deployments = {
     token: faker.string.uuid(),
   },
   build: {
+    jobId: faker.number.int().toString(),
     repoName: faker.system.fileName(),
     port: faker.internet.port().toString(),
     fqdn: faker.internet.domainName(),
@@ -67,6 +69,7 @@ const deployments = {
     cache: faker.datatype.boolean(),
   },
   configure: {
+    jobId: faker.number.int().toString(),
     id: faker.number.int(),
     name: faker.system.fileName(),
     port: faker.internet.port().toString(),

@@ -13,6 +13,7 @@ export interface JobDataMap {
     secret: SelectedGithubAppSecretSchema;
     repoUrl: string;
     repoName: string;
+    jobId?: string;
   };
   build: {
     repoName: string;
@@ -20,6 +21,7 @@ export interface JobDataMap {
     port: string;
     fqdn: string;
     cache: boolean;
+    jobId?: string;
     logs?: string;
     isCriticalError?: boolean;
   };
@@ -28,11 +30,13 @@ export interface JobDataMap {
     environmentVariable: InsertEnvironmentVariablesSchema[] | undefined;
     repoName: string;
     fqdn: string;
+    jobId?: string;
   };
 }
 export interface JobParam<T extends JobName>
   extends Partial<Omit<Job<JobDataMap[T]>, "data" | "updateProgress">> {
   data: JobDataMap[T];
+  id?: Job<JobDataMap[T]>["id"];
   updateProgress: Job<JobDataMap[T]>["updateProgress"];
   updateData: Job<JobDataMap[T]>["updateData"];
   remove: Job<JobDataMap[T]>["remove"];

@@ -1,4 +1,10 @@
-class ErrorBase<T extends string> extends Error {
+import { UnrecoverableError } from "bullmq";
+
+/**
+ * We extend UnrecoverableError to tell BullMQ that we want to handle the retry strategy ourselves,
+ * rather than using BullMQ's built-in retry mechanism.
+ */
+class ErrorBase<T extends string> extends UnrecoverableError {
   name: T;
   message: string;
   cause: any;

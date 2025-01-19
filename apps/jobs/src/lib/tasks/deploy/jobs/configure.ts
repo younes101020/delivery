@@ -18,15 +18,23 @@ export const configure: JobFn<"configure"> = async (job) => {
     });
     await job.updateProgress({
       logs: `\nApplication configuration saved to database 🗄️`,
+      jobId: job.id,
     });
     applicationId = persistedApplication.id;
   }
   catch (error) {
-    const isKnownError = error instanceof Error;
+    const expectedError = error instanceof Error;
+    const message = expectedError ? error.message : "Unexpected error";
+    const cause = expectedError ? error.cause : "Unexpected cause";
+    await job.updateProgress({
+      logs: `\n${message}`,
+      isCriticalError: true,
+      jobId: job.id,
+    });
     throw new DeploymentError({
       name: "CONFIGURE_APP_ERROR",
-      message: isKnownError ? error.message : "Unexpected error",
-      cause: isKnownError ? error.cause : "Unexpected cause",
+      message,
+      cause,
     });
   }
   return applicationId;

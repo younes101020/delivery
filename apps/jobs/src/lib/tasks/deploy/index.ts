@@ -17,19 +17,19 @@ export async function startDeploy(jobsData: JobDataMap) {
     name: "configure",
     data: jobsData.configure,
     queueName,
-    opts: { removeOnFail: true },
+    opts: { removeOnComplete: true },
     children: [
       {
         name: "build",
         data: jobsData.build,
         queueName,
-        opts: { removeOnComplete: true, removeOnFail: true, failParentOnFailure: true },
+        opts: { removeOnComplete: true },
         children: [
           {
             name: "clone",
             data: jobsData.clone,
             queueName,
-            opts: { removeOnComplete: true, failParentOnFailure: true, removeOnFail: true },
+            opts: { removeOnComplete: true },
           },
         ],
       },
