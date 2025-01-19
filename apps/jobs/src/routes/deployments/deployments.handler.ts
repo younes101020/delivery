@@ -31,24 +31,19 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
   return c.json(queueName, HttpStatusCodes.OK);
 };
 
-const queueEventsMap = new Map<string, QueueEvents>();
-
 export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
   const { slug } = c.req.valid("param");
 
   const queue = new Queue(slug, { connection: connection.duplicate() });
 
-  let queueEvents = queueEventsMap.get(slug);
-  if (!queueEvents) {
-    queueEvents = new QueueEvents(slug, { connection: connection.duplicate() });
-    queueEventsMap.set(slug, queueEvents);
-  }
   const activeJobsCount = await queue.getActiveCount();
-  const activeJobs = await queue.getJobs("active");
+  const failedJobsCount = await queue.getFailedCount();
 
-  if (activeJobsCount === 0 || !activeJobsCount) {
-    const hasBeenDeployed = await getApplicationByName(slug);
-    if (hasBeenDeployed) {
+  const ongoingDeploymentExist = activeJobsCount > 0 || failedJobsCount > 0;
+
+  if (!ongoingDeploymentExist) {
+    const hasAlreadyBeenDeployed = await getApplicationByName(slug);
+    if (hasAlreadyBeenDeployed) {
       return c.json(
         {
           message: HttpStatusPhrases.GONE,
@@ -94,7 +89,7 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
       if (jobState?.name === "configure") {
         const applicationId = jobState.returnvalue;
         await stream.writeSSE({
-          data: JSON.stringify({ completed: true, id: applicationId }),
+          data: JSON.stringify({ completed: true, appId: applicationId }),
           event: `${slug}-deployment-logs`,
         });
       }

@@ -17,7 +17,7 @@ export const insertDeploymentSchema = z.object({
 });
 
 export const slugParamsSchema = z.object({
-  slug: z.string().describe("Repository name identifier for the deployment"),
+  slug: z.string().describe("Repository name identifier for the deployment, act as the queue name"),
 });
 
 export const deploymentTrackerIdentifier = z.object({
