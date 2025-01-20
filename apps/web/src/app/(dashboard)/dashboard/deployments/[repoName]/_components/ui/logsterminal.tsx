@@ -2,8 +2,6 @@
 
 import type { ReactNode } from "react";
 
-import { useEffect, useRef } from "react";
-
 import {
   Dialog,
   DialogContent,
@@ -18,15 +16,9 @@ interface LogsTerminalProps {
 }
 
 export function LogsTerminal({ logs, children }: LogsTerminalProps) {
-  const logsEndRef = useRef<null | HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const scroller = (node: HTMLDivElement | null) => {
+    node?.scrollIntoView({ behavior: "smooth" });
   };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [logs]);
 
   return (
     <Dialog>
@@ -36,7 +28,7 @@ export function LogsTerminal({ logs, children }: LogsTerminalProps) {
           <DialogTitle>Build logs</DialogTitle>
         </DialogHeader>
         <pre className="font-mono text-sm w-full overflow-x-auto text-white p-2 rounded-lg">{logs}</pre>
-        <div ref={logsEndRef} />
+        <div ref={scroller} />
       </DialogContent>
     </Dialog>
   );

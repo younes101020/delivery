@@ -57,20 +57,10 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
     };
   };
   const { step, logs, isCriticalError, jobId, reconnect } = useEventSource<DeploymentData>({
-    type: `${repoName}-deployment-logs`,
     eventUrl: `${baseUrl}/api/deployments/logs/${repoName}`,
     initialState: DEFAULT_STATE,
     onMessage,
   });
-  const [state, formAction, isPending] = useActionState<ActionState, FormData>(
-    retryDeploy,
-    { error: "", success: "", inputs: { repoName, jobId } },
-  );
-
-  useEffect(() => {
-    if (state.success)
-      reconnect();
-  }, [state, reconnect]);
 
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden gap-4">
@@ -88,35 +78,53 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
         <div className="flex flex-col gap-2 text-center items-center">
           <p className="text-destructive font-semibold">We were unable to deploy your application</p>
           <p className="text-xs text-destructive">Once you think you have resolved the issue, you can redeploy.</p>
-          {state.error && <p className="text-xs text-destructive">{state.error}</p>}
-          <form>
-            <input type="hidden" name="repoName" defaultValue={state.inputs.repoName} />
-            <input type="hidden" name="jobId" value={state.inputs.jobId ?? ""} />
-            <Button
-              variant="outline"
-              className="w-fit"
-              formAction={formAction}
-            >
-              {isPending
-                ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Redeployment...
-                    </>
-                  )
-                : (
-                    <>
-                      <RotateCcw />
-                      Retry
-                    </>
-                  )}
-            </Button>
-          </form>
-
+          {jobId && <RetryDeploymentButton repoName={repoName} jobId={jobId} reconnect={reconnect} />}
         </div>
       )}
       <Ripple />
     </div>
+  );
+}
+
+function RetryDeploymentButton({ jobId, repoName, reconnect }: { jobId: string; repoName: string; reconnect: () => void }) {
+  const [state, formAction, isPending] = useActionState<ActionState, FormData>(
+    retryDeploy,
+    { error: "", success: "", inputs: { repoName, jobId } },
+  );
+
+  useEffect(() => {
+    if (state.success)
+      reconnect();
+  }, [state, reconnect]);
+
+  return (
+    <div className="flex flex-col gap-2">
+      {state.error && <p className="text-xs text-destructive">{state.error}</p>}
+      <form>
+        <input type="hidden" name="repoName" defaultValue={state.inputs.repoName} />
+        <input type="hidden" name="jobId" defaultValue={state.inputs.jobId ?? ""} />
+        <Button
+          variant="outline"
+          className="w-fit"
+          formAction={formAction}
+        >
+          {isPending
+            ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Redeployment...
+                </>
+              )
+            : (
+                <>
+                  <RotateCcw />
+                  Retry
+                </>
+              )}
+        </Button>
+      </form>
+    </div>
+
   );
 }
 

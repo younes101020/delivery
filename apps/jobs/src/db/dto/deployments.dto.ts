@@ -24,4 +24,11 @@ export const deploymentTrackerIdentifier = z.object({
   queueName: z.string(),
 });
 
+export const jobSchema = z.object({
+  stacktrace: z.array(z.string()).optional(),
+  id: z.number(),
+  name: z.string()
+})
+
+
 export type InsertDeploymentSchema = z.infer<typeof insertDeploymentSchema>;

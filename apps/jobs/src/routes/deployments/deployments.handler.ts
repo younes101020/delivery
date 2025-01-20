@@ -6,11 +6,13 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 import type { AppRouteHandler } from "@/lib/types";
 
 import { getApplicationByName } from "@/db/queries";
-import { connection } from "@/lib/tasks";
+import { createWorker } from "@/lib/tasks";
 import { startDeploy } from "@/lib/tasks/deploy";
 import { prepareDataForProcessing } from "@/lib/tasks/deploy/jobs";
+import { fetchQueueTitles } from "@/lib/tasks/deploy/utils";
+import { connection, getBullConnection } from "@/lib/tasks/utils";
 
-import type { CreateRoute, RetryRoute, StreamRoute } from "./deployments.routes";
+import type { CreateRoute, ListRoute, RetryRoute, StreamRoute } from "./deployments.routes";
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const deployment = c.req.valid("json");
@@ -34,7 +36,7 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
 export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
   const { slug } = c.req.valid("param");
 
-  const queue = new Queue(slug, { connection: connection.duplicate() });
+  const queue = new Queue(slug, { connection: getBullConnection(connection) });
 
   const activeJobsCount = await queue.getActiveCount();
   const failedJobsCount = await queue.getFailedCount();
@@ -59,7 +61,7 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
     );
   }
 
-  const queueEvents = new QueueEvents(slug, { connection: connection.duplicate() });
+  const queueEvents = new QueueEvents(slug, { connection: getBullConnection(connection) });
 
   const job = await queue.getJobs(["active", "failed"]).then(jobs => jobs[0]);
 
@@ -68,7 +70,6 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
   return streamSSE(c, async (stream) => {
     await stream.writeSSE({
       data: JSON.stringify({ jobName: name, logs: data.logs, isCriticalError: data.isCriticalError, jobId: id }),
-      event: `${slug}-deployment-logs`,
     });
 
     async function progressHandler({ data, jobId }: { data: number | object; jobId: string }) {
@@ -80,7 +81,6 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
       });
       await stream.writeSSE({
         data: sseData,
-        event: `${slug}-deployment-logs`,
       });
     }
 
@@ -90,7 +90,6 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
         const applicationId = jobState.returnvalue;
         await stream.writeSSE({
           data: JSON.stringify({ completed: true, appId: applicationId }),
-          event: `${slug}-deployment-logs`,
         });
       }
     }
@@ -98,7 +97,7 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
     async function failedHandler({ jobId }: { jobId: string }) {
       await stream.writeSSE({
         data: JSON.stringify({ jobId }),
-        event: `${slug}-deployment-logs`,
+
       });
     }
 
@@ -118,11 +117,34 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
   }) as any;
 };
 
+export const list: AppRouteHandler<ListRoute> = async (c) => {
+  const queueTitles = await fetchQueueTitles(connection);
+  const allJobs = [];
+
+  for (const item of queueTitles) {
+    const queue = new Queue(item.queueName, { connection: getBullConnection(connection) });
+    const jobs = await queue.getJobs(["active", "failed"]) || [];
+
+    for (const job of jobs) {
+      allJobs.push({
+        id: job.id,
+        name: job.name,
+        timestamp: job.timestamp,
+        stacktrace: job.stacktrace,
+        repoName: item.queueName,
+        status: "active",
+      });
+    }
+  }
+
+  return c.json(allJobs);
+};
+
 export const retryJob: AppRouteHandler<RetryRoute> = async (c) => {
-  const { id } = c.req.valid("param");
+  const { slug: jobId } = c.req.valid("param");
   const { slug: queueName } = c.req.valid("json");
   const queue = new Queue(queueName, { connection: connection.duplicate() });
-  const faileJob = await Job.fromId(queue, id.toString());
+  const faileJob = await Job.fromId(queue, jobId);
 
   if (!faileJob) {
     return c.json(
@@ -134,6 +156,7 @@ export const retryJob: AppRouteHandler<RetryRoute> = async (c) => {
   }
 
   const response = await faileJob?.retry();
+  await createWorker(queueName);
 
   return c.json(
     { response },

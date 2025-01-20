@@ -3,7 +3,7 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 
-import { deploymentTrackerIdentifier, insertDeploymentSchema, slugParamsSchema } from "@/db/dto";
+import { deploymentTrackerIdentifier, insertDeploymentSchema, jobSchema, slugParamsSchema } from "@/db/dto";
 import { goneSchema, notFoundSchema, okSchema } from "@/lib/constants";
 
 const tags = ["Deployments"];
@@ -49,12 +49,26 @@ export const streamLog = createRoute({
   },
 });
 
+export const list = createRoute({
+  path: "/deployments/jobs",
+  method: "get",
+  tags,
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      z.array(
+        z.any()//jobSchema
+      ),
+      "The list of  failed and active jobs",
+    ),
+  },
+});
+
 export const retryJob = createRoute({
-  path: "/deployments/jobs/retry/{id}",
+  path: "/deployments/jobs/retry/{slug}",
   method: "post",
   tags,
   request: {
-    params: IdParamsSchema,
+    params: slugParamsSchema,
     body: jsonContentRequired(
       slugParamsSchema,
       "The queue name to which the job belongs",
@@ -74,3 +88,4 @@ export const retryJob = createRoute({
 export type StreamRoute = typeof streamLog;
 export type CreateRoute = typeof create;
 export type RetryRoute = typeof retryJob;
+export type ListRoute = typeof list;

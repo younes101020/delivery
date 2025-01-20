@@ -12,13 +12,12 @@ export interface SSEMessage<T> {
 }
 
 interface SseProps<T> {
-  type: string;
   eventUrl: string;
   initialState: T;
   onMessage?: (prev: T, data: SSEMessage<T>) => T;
 }
 
-export function useEventSource<T>({ initialState, eventUrl, type, onMessage }: SseProps<T>) {
+export function useEventSource<T>({ initialState, eventUrl, onMessage }: SseProps<T>) {
   const [sseData, setSseData] = useState<T>(() => initialState);
   const eventSourceRef = useRef<EventSource | null>(null);
 
@@ -37,7 +36,7 @@ export function useEventSource<T>({ initialState, eventUrl, type, onMessage }: S
     const newEventSource = new EventSource(eventUrl);
     eventSourceRef.current = newEventSource;
 
-    const handleLogs = (e: MessageEvent) => {
+    newEventSource.onmessage = (e: MessageEvent) => {
       try {
         const data = JSON.parse(e.data);
         setSseData(prev => handleMessage(prev, data));
@@ -47,17 +46,15 @@ export function useEventSource<T>({ initialState, eventUrl, type, onMessage }: S
       }
     };
 
-    newEventSource.addEventListener(type, handleLogs);
-    newEventSource.addEventListener("error", () => {
+    newEventSource.onerror = () => {
       newEventSource.close();
-    });
+    };
 
     return () => {
-      newEventSource.removeEventListener(type, handleLogs);
       newEventSource.close();
       eventSourceRef.current = null;
     };
-  }, [eventUrl, type, handleMessage]);
+  }, [eventUrl]);
 
   useEffect(() => {
     const cleanup = connect();

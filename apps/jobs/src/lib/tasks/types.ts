@@ -1,4 +1,6 @@
 import type { Job, JobNode, Queue, Worker } from "bullmq";
+import type Redis from "ioredis";
+import type { RedisOptions } from "ioredis";
 
 import type {
   InsertApplicationSchemaWithSharedEnv,
@@ -54,3 +56,4 @@ export interface StartTaskReturn {
   queueName: JobNode["job"]["queueName"];
 }
 export type { Job };
+export type RedisType = RedisOptions | Redis;

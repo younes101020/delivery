@@ -2,7 +2,8 @@ import { FlowProducer } from "bullmq";
 
 import type { JobDataMap } from "../types";
 
-import { connection, createWorker } from "../";
+import { createWorker } from "../";
+import { connection, getBullConnection } from "../utils";
 
 /**
  * Creates and starts deployment jobs.
@@ -11,7 +12,7 @@ import { connection, createWorker } from "../";
 export async function startDeploy(jobsData: JobDataMap) {
   const queueName = jobsData.build.repoName;
   await createWorker(queueName);
-  const flowProducer = new FlowProducer({ connection });
+  const flowProducer = new FlowProducer({ connection: getBullConnection(connection) });
 
   const jobs = await flowProducer.add({
     name: "configure",

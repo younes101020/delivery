@@ -87,9 +87,9 @@ const retryDeploySchema = z.object({
 });
 
 export const retryDeploy = validatedAction(retryDeploySchema, async (data) => {
-  const response = await client.deployments.jobs.retry[":id"].$post({
+  const response = await client.deployments.jobs.retry[":slug"].$post({
     param: {
-      id: data.jobId,
+      slug: data.jobId,
     },
     json: {
       slug: data.repoName,

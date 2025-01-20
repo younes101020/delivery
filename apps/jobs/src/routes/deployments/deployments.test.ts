@@ -1,6 +1,7 @@
 /* eslint-disable ts/ban-ts-comment */
 import { it } from "__tests__";
 import { testClient } from "hono/testing";
+import Redis from "ioredis";
 import { describe, expect, vi } from "vitest";
 import { ZodError } from "zod";
 
@@ -11,6 +12,7 @@ import createApp from "@/lib/create-app";
 import { DeploymentError } from "@/lib/error";
 import { clone } from "@/lib/tasks/deploy/jobs/clone";
 import { parseAppHost } from "@/lib/tasks/deploy/jobs/utils";
+import { connection, getBullConnection } from "@/lib/tasks/utils";
 
 import router from "./deployments.index";
 
@@ -67,6 +69,19 @@ describe("deployments routes", () => {
     }
   });
   describe("deployments routes / UT", () => {
+    it("should return cached redis connection if exists", () => {
+      const connection1 = getBullConnection(connection);
+      const connection2 = getBullConnection(connection);
+
+      expect(connection1).toBe(connection2);
+    });
+
+    it("should return redis instance if redis is passed", () => {
+      const connection1 = getBullConnection(connection);
+
+      expect(connection1).toBe(Redis);
+    });
+
     it("should format repo URL correctly with github app auth token", async ({ job }) => {
       await clone(job);
 

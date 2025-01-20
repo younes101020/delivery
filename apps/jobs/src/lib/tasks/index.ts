@@ -1,15 +1,14 @@
 import { Worker } from "bullmq";
-import IORedis from "ioredis";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const processorFile = join(dirname(fileURLToPath(import.meta.url)), "worker.ts");
+import { connection, getBullConnection } from "./utils";
 
-export const connection = new IORedis({ maxRetriesPerRequest: null });
+const processorFile = join(dirname(fileURLToPath(import.meta.url)), "worker.ts");
 
 export async function createWorker(queueName: string) {
   const worker = new Worker(queueName, processorFile, {
-    connection,
+    connection: getBullConnection(connection),
   });
 
   worker.on("error", (error) => {
