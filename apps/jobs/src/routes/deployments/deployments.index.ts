@@ -7,6 +7,7 @@ const router = createRouter()
   .openapi(routes.create, handlers.create)
   .openapi(routes.streamLog, handlers.streamLog)
   .openapi(routes.retryJob, handlers.retryJob)
-  .openapi(routes.list, handlers.list);
+  .openapi(routes.list, handlers.list)
+  .openapi(routes.cancelJob, handlers.cancelJob);
 
 export default router;

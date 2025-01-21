@@ -1,10 +1,17 @@
 import { APPLICATIONS_PATH } from "@/lib/constants";
-import { DeploymentError } from "@/lib/error";
+import { DeploymentError, DEPLOYMENTERRORNAME } from "@/lib/error";
 import { ssh } from "@/lib/ssh";
 
 import type { JobFn } from "../../types";
 
-export const build: JobFn<"build"> = async (job) => {
+export const build: JobFn<"build"> = async (job, signal) => {
+  const createDeployAbortListener = () => {
+    throw new DeploymentError({
+      name: DEPLOYMENTERRORNAME.build,
+      message: "Job aborted",
+    });
+  };
+  signal.addEventListener("abort", createDeployAbortListener);
   const { repoName, port, env, fqdn, cache } = job.data;
   await job.updateProgress({ logs: "\nImage will be built..." });
 
@@ -28,4 +35,5 @@ export const build: JobFn<"build"> = async (job) => {
   }
 
   await job.updateProgress({ logs: "Your application is now online! 🚀" });
+  signal.removeEventListener("abort", createDeployAbortListener);
 };

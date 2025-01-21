@@ -10,9 +10,9 @@ import { createWorker } from "@/lib/tasks";
 import { startDeploy } from "@/lib/tasks/deploy";
 import { prepareDataForProcessing } from "@/lib/tasks/deploy/jobs/utils";
 import { fetchQueueTitles } from "@/lib/tasks/deploy/utils";
-import { connection, getBullConnection } from "@/lib/tasks/utils";
+import { connection, getBullConnection, jobCanceler } from "@/lib/tasks/utils";
 
-import type { CreateRoute, ListRoute, RetryRoute, StreamRoute } from "./deployments.routes";
+import type { CancelRoute, CreateRoute, ListRoute, RetryRoute, StreamRoute } from "./deployments.routes";
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const deployment = c.req.valid("json");
@@ -164,4 +164,24 @@ export const retryJob: AppRouteHandler<RetryRoute> = async (c) => {
     { response },
     HttpStatusCodes.OK,
   );
+};
+
+export const cancelJob: AppRouteHandler<CancelRoute> = async (c) => {
+  const { jobId } = c.req.valid("param");
+  const { queueName } = c.req.valid("json");
+  const queue = new Queue(queueName, { connection: getBullConnection(connection) });
+  const job = await Job.fromId(queue, jobId);
+
+  if (!job) {
+    return c.json(
+      {
+        message: HttpStatusPhrases.NOT_FOUND,
+      },
+      HttpStatusCodes.NOT_FOUND,
+    );
+  }
+
+  jobCanceler.cancel(jobId);
+
+  return c.body(null, HttpStatusCodes.NO_CONTENT);
 };
