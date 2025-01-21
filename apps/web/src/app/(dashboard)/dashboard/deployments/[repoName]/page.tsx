@@ -4,7 +4,7 @@ import { publicEnv } from "@/env";
 
 import { Stepper } from "./_components/stepper";
 
-export default function DeploymentsPage({ params }: { params: Promise<{ repoName: string }> }) {
+export default function DeploymentPage({ params }: { params: Promise<{ repoName: string }> }) {
   return (
     <Suspense>
       <SuspensedDeploymentsPage params={params} />

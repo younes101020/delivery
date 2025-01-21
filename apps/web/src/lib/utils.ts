@@ -38,7 +38,7 @@ export function transformEnvVars(envs: string) {
     });
 }
 
-export function formatDate(date: string | null) {
+export function formatDate(date: string | null | Date) {
   if (!date)
     return null;
   const dateObj = typeof date === "string" ? new Date(date) : date;

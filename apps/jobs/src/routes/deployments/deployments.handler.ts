@@ -8,7 +8,7 @@ import type { AppRouteHandler } from "@/lib/types";
 import { getApplicationByName } from "@/db/queries";
 import { createWorker } from "@/lib/tasks";
 import { startDeploy } from "@/lib/tasks/deploy";
-import { prepareDataForProcessing } from "@/lib/tasks/deploy/jobs";
+import { prepareDataForProcessing } from "@/lib/tasks/deploy/jobs/utils";
 import { fetchQueueTitles } from "@/lib/tasks/deploy/utils";
 import { connection, getBullConnection } from "@/lib/tasks/utils";
 
@@ -34,9 +34,9 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
 };
 
 export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
-  const { slug } = c.req.valid("param");
+  const { queueName } = c.req.valid("param");
 
-  const queue = new Queue(slug, { connection: getBullConnection(connection) });
+  const queue = new Queue(queueName, { connection: getBullConnection(connection) });
 
   const activeJobsCount = await queue.getActiveCount();
   const failedJobsCount = await queue.getFailedCount();
@@ -44,7 +44,7 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
   const ongoingDeploymentExist = activeJobsCount > 0 || failedJobsCount > 0;
 
   if (!ongoingDeploymentExist) {
-    const hasAlreadyBeenDeployed = await getApplicationByName(slug);
+    const hasAlreadyBeenDeployed = await getApplicationByName(queueName);
     if (hasAlreadyBeenDeployed) {
       return c.json(
         {
@@ -61,7 +61,7 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
     );
   }
 
-  const queueEvents = new QueueEvents(slug, { connection: getBullConnection(connection) });
+  const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection) });
 
   const job = await queue.getJobs(["active", "failed"]).then(jobs => jobs[0]);
 
@@ -123,27 +123,29 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
 
   for (const item of queueTitles) {
     const queue = new Queue(item.queueName, { connection: getBullConnection(connection) });
-    const jobs = await queue.getJobs(["active", "failed"]) || [];
+    const jobs = (await queue.getJobs(["active", "failed"]) || []) as Job[];
 
     for (const job of jobs) {
       allJobs.push({
-        id: job.id,
-        name: job.name,
-        timestamp: job.timestamp,
+        id: job.id!,
+        step: job.name,
         stacktrace: job.stacktrace,
+        timestamp: new Date(job.timestamp),
+        status: await job.getState(),
         repoName: item.queueName,
-        status: "active",
       });
     }
   }
 
-  return c.json(allJobs);
+  const deployments = allJobs.length > 0 ? allJobs : null;
+
+  return c.json(deployments);
 };
 
 export const retryJob: AppRouteHandler<RetryRoute> = async (c) => {
-  const { slug: jobId } = c.req.valid("param");
-  const { slug: queueName } = c.req.valid("json");
-  const queue = new Queue(queueName, { connection: connection.duplicate() });
+  const { jobId } = c.req.valid("param");
+  const { queueName } = c.req.valid("json");
+  const queue = new Queue(queueName, { connection: getBullConnection(connection) });
   const faileJob = await Job.fromId(queue, jobId);
 
   if (!faileJob) {

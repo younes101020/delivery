@@ -14,8 +14,8 @@ export const build: JobFn<"build"> = async (job) => {
       {
         cwd: `${APPLICATIONS_PATH}/${repoName}`,
         onStdout: ({ chunk, chunks, isCriticalError }) => {
-          job.updateData({ ...job.data, logs: chunks?.join(), isCriticalError });
           job.updateProgress({ logs: chunk, isCriticalError, jobId: job.id });
+          job.updateData({ ...job.data, logs: chunks?.join(), isCriticalError });
         },
       },
     );

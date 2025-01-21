@@ -45,7 +45,8 @@ export interface JobParam<T extends JobName>
   getChildrenValues: Job<JobDataMap[T]>["getChildrenValues"];
 }
 export type JobName = keyof JobDataMap;
-export type JobFn<T extends JobName> = (job: JobParam<T>) => Promise<unknown>;
+export type JobParamIntersection = JobParam<"clone"> & JobParam<"build"> & JobParam<"configure">;
+export type JobFn<T extends JobName> = (job: JobParam<T>, signal: AbortSignal) => Promise<unknown>;
 export type Jobs = { [K in JobName]: JobFn<K> };
 
 export type JobWorker = Worker<JobDataMap[JobName], any, JobName>;

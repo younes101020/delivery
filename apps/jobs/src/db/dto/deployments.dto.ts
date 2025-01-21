@@ -16,8 +16,12 @@ export const insertDeploymentSchema = z.object({
   cache: z.coerce.boolean(),
 });
 
-export const slugParamsSchema = z.object({
-  slug: z.string().describe("Repository name identifier for the deployment, act as the queue name"),
+export const queueSchema = z.object({
+  queueName: z.string(),
+});
+
+export const jobIdParamsSchema = z.object({
+  jobId: z.string(),
 });
 
 export const deploymentTrackerIdentifier = z.object({
@@ -25,10 +29,12 @@ export const deploymentTrackerIdentifier = z.object({
 });
 
 export const jobSchema = z.object({
-  stacktrace: z.array(z.string()).optional(),
-  id: z.number(),
-  name: z.string()
-})
-
+  id: z.string(),
+  step: z.string(),
+  timestamp: z.string(),
+  repoName: z.string(),
+  status: z.enum(["completed", "failed", "active", "delayed", "prioritized", "waiting", "waiting-children", "unknown"]),
+  stacktrace: z.array(z.string().optional()),
+});
 
 export type InsertDeploymentSchema = z.infer<typeof insertDeploymentSchema>;

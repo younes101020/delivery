@@ -1,9 +1,9 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
-import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
+import { createErrorSchema } from "stoker/openapi/schemas";
 
-import { deploymentTrackerIdentifier, insertDeploymentSchema, jobSchema, slugParamsSchema } from "@/db/dto";
+import { deploymentTrackerIdentifier, insertDeploymentSchema, jobIdParamsSchema, jobSchema, queueSchema } from "@/db/dto";
 import { goneSchema, notFoundSchema, okSchema } from "@/lib/constants";
 
 const tags = ["Deployments"];
@@ -29,11 +29,11 @@ export const create = createRoute({
 });
 
 export const streamLog = createRoute({
-  path: "/deployments/logs/{slug}",
+  path: "/deployments/logs/{queueName}",
   method: "get",
   tags,
   request: {
-    params: slugParamsSchema,
+    params: queueSchema,
   },
   responses: {
     [HttpStatusCodes.OK]: {

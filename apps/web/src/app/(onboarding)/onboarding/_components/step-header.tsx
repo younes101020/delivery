@@ -1,3 +1,4 @@
+import { Bounce } from "@/app/_components/bounce";
 import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
@@ -22,15 +23,6 @@ const headerData = [
     description: "This step should deploy your application over the internet.",
   },
 ];
-
-function Bounce() {
-  return (
-    <span className="relative flex h-2 w-2 pt-[.25rem]">
-      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-    </span>
-  );
-}
 
 export function StepsHeader({ className }: { className?: string }) {
   const { currentStep } = useStep();

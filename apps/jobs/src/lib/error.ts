@@ -1,22 +1,29 @@
 import { UnrecoverableError } from "bullmq";
 
-/**
- * We extend UnrecoverableError to tell BullMQ that we want to handle the retry strategy ourselves,
- * rather than using BullMQ's built-in retry mechanism.
- */
-class ErrorBase<T extends string> extends UnrecoverableError {
-  name: T;
-  message: string;
-  cause: any;
+export const DEPLOYMENTERRORNAME = {
+  clone: "CLONE_APP_ERROR",
+  build: "BUILD_APP_ERROR",
+  configure: "CONFIGURE_APP_ERROR",
+} as const;
 
-  constructor({ name, message, cause }: { name: T; message: string; cause?: any }) {
-    super();
+export type ErrorNameType = typeof DEPLOYMENTERRORNAME[keyof typeof DEPLOYMENTERRORNAME];
+
+/**
+ * Custom error class that extends UnrecoverableError to handle deployment errors
+ * with custom retry strategy rather than using BullMQ's built-in mechanism.
+ */
+export class DeploymentError extends UnrecoverableError {
+  constructor({
+    name,
+    message,
+    cause,
+  }: {
+    name: ErrorNameType;
+    message: string;
+    cause?: unknown;
+  }) {
+    super(message);
     this.name = name;
     this.cause = cause;
-    this.message = message;
   }
 }
-
-type ErrorName = "BUILD_APP_ERROR" | "CLONE_APP_ERROR" | "CONFIGURE_APP_ERROR";
-
-export class DeploymentError extends ErrorBase<ErrorName> {}
