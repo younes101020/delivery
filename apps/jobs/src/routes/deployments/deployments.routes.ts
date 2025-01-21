@@ -55,22 +55,20 @@ export const list = createRoute({
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      z.array(
-        z.any()//jobSchema
-      ),
+      z.array(jobSchema).nullable(),
       "The list of  failed and active jobs",
     ),
   },
 });
 
 export const retryJob = createRoute({
-  path: "/deployments/jobs/retry/{slug}",
+  path: "/deployments/jobs/retry/{jobId}",
   method: "post",
   tags,
   request: {
-    params: slugParamsSchema,
+    params: jobIdParamsSchema,
     body: jsonContentRequired(
-      slugParamsSchema,
+      queueSchema,
       "The queue name to which the job belongs",
     ),
   },
