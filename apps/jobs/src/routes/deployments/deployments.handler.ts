@@ -6,7 +6,7 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 import type { AppRouteHandler } from "@/lib/types";
 
 import { getApplicationByName } from "@/db/queries";
-import { createWorker } from "@/lib/tasks";
+import { subscribeWorkerTo } from "@/lib/tasks";
 import { startDeploy } from "@/lib/tasks/deploy";
 import { prepareDataForProcessing } from "@/lib/tasks/deploy/jobs/utils";
 import { fetchQueueTitles } from "@/lib/tasks/deploy/utils";
@@ -158,7 +158,7 @@ export const retryJob: AppRouteHandler<RetryRoute> = async (c) => {
   }
 
   const response = await faileJob?.retry();
-  await createWorker(queueName);
+  await subscribeWorkerTo(queueName);
 
   return c.json(
     { response },

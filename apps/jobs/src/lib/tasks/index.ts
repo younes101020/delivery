@@ -6,7 +6,7 @@ import { connection, getBullConnection } from "./utils";
 
 const processorFile = join(dirname(fileURLToPath(import.meta.url)), "worker.ts");
 
-export async function createWorker(queueName: string) {
+export async function subscribeWorkerTo(queueName: string) {
   const worker = new Worker(queueName, processorFile, {
     connection: getBullConnection(connection),
   });
