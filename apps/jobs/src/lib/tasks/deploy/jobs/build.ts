@@ -2,9 +2,8 @@ import { APPLICATIONS_PATH } from "@/lib/constants";
 import { DeploymentError } from "@/lib/error";
 import { ssh } from "@/lib/ssh";
 
-import type { JobFn } from "../../types";
+import type { QueueDeploymentJob } from "../types";
 
-export const build: JobFn<"build"> = async (job, signal) => {
 export type Chunk = string;
 
 export interface ISSH {
@@ -12,6 +11,7 @@ export interface ISSH {
   cwd?: string;
 }
 
+export async function build(job: QueueDeploymentJob<"build">) {
   const { repoName, port, env, fqdn, cache } = job.data;
   await job.updateProgress({ logs: "\nImage will be built..." });
 
@@ -35,5 +35,4 @@ export interface ISSH {
   }
 
   await job.updateProgress({ logs: "Your application is now online! 🚀" });
-};
 }

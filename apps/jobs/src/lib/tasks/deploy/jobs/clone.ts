@@ -6,9 +6,9 @@ import { DeploymentError } from "@/lib/error";
 import { ssh } from "@/lib/ssh";
 import { decryptSecret } from "@/lib/utils";
 
-import type { JobFn } from "../../types";
+import type { QueueDeploymentJob } from "../types";
 
-export const clone: JobFn<"clone"> = async (job) => {
+export async function clone(job: QueueDeploymentJob<"clone">) {
   const { secret, appId, clientId, clientSecret, installationId, repoUrl, repoName } = job.data;
   await job.updateProgress({ logs: "Github repository will be fetched...\n" });
 
@@ -50,4 +50,4 @@ export const clone: JobFn<"clone"> = async (job) => {
       message: error instanceof Error ? error.message : "Unexpected error",
     });
   }
-};
+}

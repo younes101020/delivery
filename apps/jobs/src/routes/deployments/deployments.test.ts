@@ -5,6 +5,8 @@ import Redis from "ioredis";
 import { describe, expect, vi } from "vitest";
 import { ZodError } from "zod";
 
+import type { QueueDeploymentJob } from "@/lib/tasks/deploy/types";
+
 import { insertDeploymentSchema } from "@/db/dto";
 import env from "@/env";
 import { ZOD_ERROR_MESSAGES } from "@/lib/constants";
@@ -83,9 +85,9 @@ describe("deployments routes", () => {
     });
 
     it("should format repo URL correctly with github app auth token", async ({ job }) => {
-      await clone(job);
+      await clone(job as QueueDeploymentJob<"clone">);
 
-      const expectedUrl = job.data.repoUrl.replace(
+      const expectedUrl = job.data?.repoUrl.replace(
         "git://",
         "https://x-access-token:mocked-token@",
       );

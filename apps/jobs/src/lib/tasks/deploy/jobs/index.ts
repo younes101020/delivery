@@ -1,10 +1,10 @@
-import type { Jobs } from "../../types";
+import type { QueueDeploymentJobFns } from "../types";
 
 import { build } from "./build";
 import { clone } from "./clone";
 import { configure } from "./configure";
 
-export const jobs: Jobs = {
+export const jobs: QueueDeploymentJobFns = {
   clone,
   build,
   configure,

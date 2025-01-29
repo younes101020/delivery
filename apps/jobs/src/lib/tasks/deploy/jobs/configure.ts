@@ -1,11 +1,11 @@
 import { createApplication } from "@/db/queries";
 import { DeploymentError } from "@/lib/error";
 
-import type { JobFn } from "../../types";
+import type { QueueDeploymentJob } from "../types";
 
 import { extractPortCmd } from "./utils";
 
-export const configure: JobFn<"configure"> = async (job) => {
+export async function configure(job: QueueDeploymentJob<"configure">) {
   const { application, environmentVariable, fqdn } = job.data;
   const port = extractPortCmd(application.port);
   await job.updateProgress({ logs: "\nWe configure your application..." });
@@ -38,4 +38,4 @@ export const configure: JobFn<"configure"> = async (job) => {
     });
   }
   return applicationId;
-};
+}
