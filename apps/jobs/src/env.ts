@@ -22,11 +22,10 @@ const EnvSchema = z.object({
   MINIO_ROOT_USER: z.string(),
   MINIO_ROOT_PASSWORD: z.string(),
   MINIO_BUCKETS: z.string().default("screenshots"),
-  DATABASE_AUTH_TOKEN: z.string().optional(),
   SSH_HOST: z.string().default("host.docker.internal"),
   BEARER_TOKEN: z.string(),
 }).superRefine((input, ctx) => {
-  if (input.NODE_ENV === "production" && !input.DATABASE_AUTH_TOKEN) {
+  if (input.NODE_ENV === "production") {
     ctx.addIssue({
       code: z.ZodIssueCode.invalid_type,
       expected: "string",
