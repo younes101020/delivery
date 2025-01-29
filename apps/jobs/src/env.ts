@@ -30,7 +30,7 @@ const EnvSchema = z.object({
       code: z.ZodIssueCode.invalid_type,
       expected: "string",
       received: "undefined",
-      path: ["DATABASE_AUTH_TOKEN"],
+      path: ["MINIO_ROOT_USER", "MINIO_ROOT_PASSWORD"],
       message: "Must be set when NODE_ENV is on 'production'",
     });
   }
