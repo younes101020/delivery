@@ -40,6 +40,7 @@ const deployments = {
   githubAppId: 1,
   port: faker.internet.port().toString(),
   cache: faker.datatype.boolean(),
+  timeout: 50000,
   repoName: faker.system.fileName(),
   clone: {
     id: 1,

@@ -74,6 +74,8 @@ export async function prepareDataForProcessing(deployment: InsertDeploymentSchem
 
   return {
     clone: { ...githubApp, repoUrl: deployment.repoUrl, repoName },
+    // 20min job abort threshold when caching is enabled, otherwise 40min
+    timeout: deployment.cache ? 1200000 : 2400000,
     repoName,
     build: {
       port: deployment.port,
