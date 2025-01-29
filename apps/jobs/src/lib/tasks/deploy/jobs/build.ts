@@ -12,6 +12,13 @@ export const build: JobFn<"build"> = async (job, signal) => {
     });
   };
   signal.addEventListener("abort", createDeployAbortListener);
+export type Chunk = string;
+
+export interface ISSH {
+  onStdout: ({ chunks, chunk, isCriticalError }: { chunks?: Chunk[]; chunk: Chunk; isCriticalError?: boolean }) => void;
+  cwd?: string;
+}
+
   const { repoName, port, env, fqdn, cache } = job.data;
   await job.updateProgress({ logs: "\nImage will be built..." });
 

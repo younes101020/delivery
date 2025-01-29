@@ -1,16 +1,10 @@
 import { Client } from "ssh2";
 
+import type { Chunk, ISSH } from "../tasks/deploy/jobs/build";
+
 import { loadConfig } from "./utils";
 
-// TODO: persist resolved data (logs) into db
-type Chunk = string;
-
-interface Ssh {
-  onStdout: ({ chunks, chunk, isCriticalError }: { chunks?: Chunk[]; chunk: Chunk; isCriticalError?: boolean }) => void;
-  cwd?: string;
-}
-
-export async function ssh(command: string, { onStdout, cwd }: Ssh) {
+export async function ssh(command: string, { onStdout, cwd }: ISSH) {
   const conn = new Client();
   const config = await loadConfig();
   const fullCommand = cwd ? `cd ${cwd} && ${command}` : command;
