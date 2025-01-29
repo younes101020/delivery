@@ -6,13 +6,13 @@ import type {
   InsertGithubAppsSchema,
   InsertUsersSchema,
 } from "@/db/dto";
-import type { JobDataMap, JobParam } from "@/lib/tasks/types";
+import type { QueueDeploymentJob, QueueDeploymentJobData } from "@/lib/tasks/deploy/types";
 
 interface Fixtures {
   githubApps: InsertGithubAppsSchema[];
   users: InsertUsersSchema[];
-  deployments: InsertDeploymentSchema & JobDataMap;
-  job: JobParam<"clone">;
+  deployments: InsertDeploymentSchema & QueueDeploymentJobData;
+  job: Partial<QueueDeploymentJob<"clone">>;
 }
 
 const githubApps = faker.helpers.multiple(
@@ -40,6 +40,7 @@ const deployments = {
   githubAppId: 1,
   port: faker.internet.port().toString(),
   cache: faker.datatype.boolean(),
+  repoName: faker.system.fileName(),
   clone: {
     id: 1,
     appId: 1,
@@ -56,12 +57,10 @@ const deployments = {
       key: faker.string.alphanumeric(32),
     },
     repoUrl: faker.internet.url(),
-    repoName: faker.system.fileName(),
     token: faker.string.uuid(),
   },
   build: {
     jobId: faker.number.int().toString(),
-    repoName: faker.system.fileName(),
     port: faker.internet.port().toString(),
     fqdn: faker.internet.domainName(),
     env: `KEY=${faker.string.sample()}`,
@@ -82,12 +81,11 @@ const deployments = {
     },
     environmentVariable: undefined,
     logs: faker.lorem.sentence(),
-    repoName: faker.system.fileName(),
   },
 };
 
 const job = {
-  data: deployments.clone,
+  data: { ...deployments.clone, timeout: 50000, repoName: faker.system.fileName() },
   updateProgress: async () => Promise.resolve(),
   updateData: async () => Promise.resolve(),
   remove: async () => Promise.resolve(),

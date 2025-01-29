@@ -74,8 +74,8 @@ export async function prepareDataForProcessing(deployment: InsertDeploymentSchem
 
   return {
     clone: { ...githubApp, repoUrl: deployment.repoUrl, repoName },
+    repoName,
     build: {
-      repoName,
       port: deployment.port,
       env: environmentVariables && environmentVariables.cmdEnvVars,
       cache: deployment.cache,
@@ -84,7 +84,6 @@ export async function prepareDataForProcessing(deployment: InsertDeploymentSchem
     configure: {
       application: { port: deployment.port, githubAppId: githubApp.id },
       environmentVariable: environmentVariables && environmentVariables.persistedEnvVars,
-      repoName,
       fqdn,
     },
   };
