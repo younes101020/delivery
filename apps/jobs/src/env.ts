@@ -19,13 +19,13 @@ const EnvSchema = z.object({
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]),
   DATABASE_URL: z.string(),
   MINIO_PUBLIC_DOMAIN: z.string().default("http://localhost:9000"),
-  MINIO_ROOT_USER: z.string(),
-  MINIO_ROOT_PASSWORD: z.string(),
+  MINIO_ROOT_USER: z.string().optional(),
+  MINIO_ROOT_PASSWORD: z.string().optional(),
   MINIO_BUCKETS: z.string().default("screenshots"),
   SSH_HOST: z.string().default("host.docker.internal"),
   BEARER_TOKEN: z.string(),
 }).superRefine((input, ctx) => {
-  if (input.NODE_ENV === "production") {
+  if (input.NODE_ENV !== "test" && (!input.MINIO_ROOT_USER || !input.MINIO_ROOT_PASSWORD)) {
     ctx.addIssue({
       code: z.ZodIssueCode.invalid_type,
       expected: "string",
