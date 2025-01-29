@@ -9,8 +9,7 @@ export const DEPLOYMENTERRORNAME = {
 export type ErrorNameType = typeof DEPLOYMENTERRORNAME[keyof typeof DEPLOYMENTERRORNAME];
 
 /**
- * Custom error class that extends UnrecoverableError to handle deployment errors
- * with custom retry strategy rather than using BullMQ's built-in mechanism.
+ * By extending UnrecoverableError, jobs that throw this error will not be retried and will be marked as failed.
  */
 export class DeploymentError extends UnrecoverableError {
   constructor({
