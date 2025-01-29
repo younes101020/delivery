@@ -73,10 +73,10 @@ export async function prepareDataForProcessing(deployment: InsertDeploymentSchem
   const environmentVariables = transformEnvVars(deployment.env);
 
   return {
-    clone: { ...githubApp, repoUrl: deployment.repoUrl, repoName },
     // 20min job abort threshold when caching is enabled, otherwise 40min
     timeout: deployment.cache ? 1200000 : 2400000,
     repoName,
+    clone: { ...githubApp, repoUrl: deployment.repoUrl },
     build: {
       port: deployment.port,
       env: environmentVariables && environmentVariables.cmdEnvVars,
