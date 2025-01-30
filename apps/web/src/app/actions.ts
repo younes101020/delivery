@@ -20,7 +20,7 @@ export const signUp = validatedAction(signUpSchema, async (data) => {
   const response = await client.auth.register.$post({
     json: {
       email,
-      passwordHash: password,
+      password,
     },
   });
 

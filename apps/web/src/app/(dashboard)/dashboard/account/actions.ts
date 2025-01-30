@@ -43,7 +43,7 @@ export const updateSecuritySettings = validatedActionWithUser(
   async (data, _, prevState, user) => {
     const response = await client.users[":id"].$patch({
       param: { id: user.id.toString() },
-      json: { passwordHash: data.password },
+      json: { password: data.password },
     });
 
     if (response.status !== 200) {

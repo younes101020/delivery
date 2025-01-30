@@ -48,8 +48,8 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
     );
   }
 
-  if (updates.passwordHash) {
-    updates.passwordHash = await hashPassword(updates.passwordHash);
+  if (updates.password) {
+    updates.password = await hashPassword(updates.password);
   }
 
   const updatedUser = await updateUser(id, updates);

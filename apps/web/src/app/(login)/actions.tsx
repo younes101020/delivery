@@ -22,7 +22,7 @@ export const signIn = validatedAction(signInSchema, async (data) => {
   const response = await client.auth.verify.$post({
     json: {
       email,
-      passwordHash,
+      password,
     },
   });
   if (response.status !== 200) {
