@@ -3,7 +3,7 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import { getApplicationById } from "@/db/queries";
+import { getApplicationNameById } from "@/db/queries";
 import { screenPage } from "@/lib/screenshots/screen-page";
 import { upload } from "@/lib/screenshots/upload";
 
@@ -11,9 +11,9 @@ import type { GetImageUrl } from "./screenshots.routes";
 
 export const getImageUrl: AppRouteHandler<GetImageUrl> = async (c) => {
   const { url, applicationId } = c.req.valid("json");
-  const application = await getApplicationById(applicationId);
+  const applicationName = await getApplicationNameById(applicationId);
 
-  if (!application) {
+  if (!applicationName) {
     return c.json(
       {
         message: HttpStatusPhrases.NOT_FOUND,
@@ -23,7 +23,7 @@ export const getImageUrl: AppRouteHandler<GetImageUrl> = async (c) => {
   }
 
   const screenshotPngBuffer = await screenPage(url);
-  const imageUrl = await upload(application.name, screenshotPngBuffer);
+  const imageUrl = await upload(applicationName, screenshotPngBuffer);
 
   return c.json({ imageUrl }, HttpStatusCodes.OK);
 };
