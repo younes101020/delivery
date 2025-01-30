@@ -28,6 +28,7 @@ export function SecurityForm() {
           type="password"
           autoComplete="new-password"
           required
+          minLength={8}
         />
       </div>
       <div>
@@ -37,6 +38,7 @@ export function SecurityForm() {
           name="repeat-password"
           type="password"
           autoComplete="new-password"
+          minLength={8}
           required
         />
       </div>

@@ -54,7 +54,6 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
             autoComplete={mode === "signin" ? "current-password" : "new-password"}
             required
             minLength={8}
-            maxLength={100}
             className="appearance-none relative block w-full px-3 py-2 border focus:outline-none focus:z-10 sm:text-sm"
             placeholder="Enter your password"
             defaultValue={state.inputs.passwordHash ?? ""}
