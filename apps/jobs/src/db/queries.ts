@@ -191,11 +191,11 @@ export async function getApplications() {
   return await db.query.applications.findMany();
 }
 
-export async function getApplicationById(id: number) {
+export async function getApplicationWithEnvVarsById(id: number) {
   return await db.query.applications.findFirst({
     where: eq(applications.id, id),
     with: {
-      environmentVariables: {
+      applicationEnvironmentVariables: {
         with: {
           environmentVariable: true,
         },
@@ -241,7 +241,7 @@ export async function patchApplication(id: number, updates: PatchApplicationSche
       );
     }
 
-    return await getApplicationById(id);
+    return await getApplicationWithEnvVarsById(id);
   });
 }
 

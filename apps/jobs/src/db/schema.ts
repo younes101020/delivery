@@ -1,7 +1,7 @@
 import type { z } from "zod";
 
 import { relations, sql, type SQL } from "drizzle-orm";
-import { boolean, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, integer, pgTable, primaryKey, serial, text, timestamp } from "drizzle-orm/pg-core";
 
 import type { selectUserSchema } from "./dto";
 import type { selectGithubAppsSchema } from "./dto/githubapps.dto";
@@ -41,7 +41,7 @@ export const githubApp = pgTable("github_app", {
   clientId: text("client_id").notNull(),
   clientSecret: text("client_secret").notNull(),
   installationId: serial("installation_id"),
-  appId: serial("app_id").notNull(),
+  appId: integer("app_id").notNull(),
   secretId: serial("secret_id").references(() => githubAppSecret.id),
 });
 
@@ -70,29 +70,13 @@ export const environmentVariables = pgTable("environment_variables", {
 });
 
 export const applicationEnvironmentVariables = pgTable("application_environment_variables", {
-  id: serial("id").primaryKey(),
-  applicationId: serial("application_id")
+  applicationId: integer("application_id")
     .notNull()
-    .references(() => applications.id, { onDelete: "cascade" }),
-  environmentVariableId: serial("environment_variable_id")
+    .references(() => applications.id),
+  environmentVariableId: integer("environment_variable_id")
     .notNull()
     .references(() => environmentVariables.id),
-});
-
-export const githubAppRelations = relations(githubApp, ({ one }) => ({
-  secret: one(githubAppSecret, {
-    fields: [githubApp.secretId],
-    references: [githubAppSecret.id],
-  }),
-}));
-
-export const applicationRelations = relations(applications, ({ many, one }) => ({
-  environmentVariables: many(applicationEnvironmentVariables),
-  githubApp: one(githubApp, {
-    fields: [applications.githubAppId],
-    references: [githubApp.id],
-  }),
-}));
+}, t => [primaryKey({ columns: [t.applicationId, t.environmentVariableId] })]);
 
 export const applicationEnvironmentVariablesRelations = relations(
   applicationEnvironmentVariables,
@@ -107,6 +91,30 @@ export const applicationEnvironmentVariablesRelations = relations(
     }),
   }),
 );
+
+export const applicationRelations = relations(applications, ({ many, one }) => ({
+  applicationEnvironmentVariables: many(applicationEnvironmentVariables),
+  githubApp: one(githubApp, {
+    fields: [applications.githubAppId],
+    references: [githubApp.id],
+  }),
+}));
+
+export const environmentVariablesRelations = relations(environmentVariables, ({ many }) => ({
+  applicationEnvironmentVariables: many(applicationEnvironmentVariables),
+}));
+
+export const githubAppRelations = relations(githubApp, ({ one, many }) => ({
+  secret: one(githubAppSecret, {
+    fields: [githubApp.secretId],
+    references: [githubAppSecret.id],
+  }),
+  applications: many(applications),
+}));
+
+export const githubAppSecretRelations = relations(githubAppSecret, ({ one }) => ({
+  githubApp: one(githubApp),
+}));
 
 // Shared types
 // workaround to https://github.com/honojs/hono/issues/1800

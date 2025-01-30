@@ -6,8 +6,8 @@ import type { AppRouteHandler } from "@/lib/types";
 import {
   createApplication,
   deleteApplicationById,
-  getApplicationById,
   getApplications,
+  getApplicationWithEnvVarsById,
   patchApplication,
 } from "@/db/queries";
 import { APPLICATIONS_PATH, ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
@@ -34,7 +34,7 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
 
 export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   const { id } = c.req.valid("param");
-  const application = await getApplicationById(id);
+  const application = await getApplicationWithEnvVarsById(id);
   if (!application) {
     return c.json(
       {
@@ -47,7 +47,7 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   return c.json(
     {
       ...application,
-      environmentVariables: application.environmentVariables.map(ev => ({
+      environmentVariables: application.applicationEnvironmentVariables.map(ev => ({
         id: ev.environmentVariable.id,
         key: ev.environmentVariable.key,
         value: ev.environmentVariable.value,
@@ -100,7 +100,7 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
   return c.json(
     {
       ...application,
-      environmentVariables: application.environmentVariables.map(ev => ({
+      environmentVariables: application.applicationEnvironmentVariables.map(ev => ({
         id: ev.environmentVariable.id,
         key: ev.environmentVariable.key,
         value: ev.environmentVariable.value,

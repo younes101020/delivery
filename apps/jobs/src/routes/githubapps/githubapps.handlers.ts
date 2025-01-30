@@ -36,7 +36,6 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
       return { ...app, privateKey };
     }),
   );
-
   return c.json(githubAppsWithPrivateKey);
 };
 

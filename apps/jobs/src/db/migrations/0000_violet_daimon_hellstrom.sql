@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS "application_environment_variables" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"application_id" serial NOT NULL,
-	"environment_variable_id" serial NOT NULL
+	"application_id" integer NOT NULL,
+	"environment_variable_id" integer NOT NULL,
+	CONSTRAINT "application_environment_variables_application_id_environment_variable_id_pk" PRIMARY KEY("application_id","environment_variable_id")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "applications" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"name" text NOT NULL,
+	"name" text GENERATED ALWAYS AS (split_part("applications"."fqdn", '.', 1)) STORED NOT NULL,
 	"fqdn" text NOT NULL,
 	"logs" text,
 	"port" text NOT NULL,
@@ -80,7 +80,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "applications" ADD CONSTRAINT "applications_github_app_id_github_app_id_fk" FOREIGN KEY ("github_app_id") REFERENCES "public"."github_app"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "applications" ADD CONSTRAINT "applications_github_app_id_github_app_id_fk" FOREIGN KEY ("github_app_id") REFERENCES "public"."github_app"("id") ON DELETE set null ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

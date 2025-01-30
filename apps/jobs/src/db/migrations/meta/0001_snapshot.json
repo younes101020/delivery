@@ -1,6 +1,6 @@
 {
-  "id": "6d39cdbb-8db8-4887-8b60-0c3834bc9534",
-  "prevId": "d6a9d300-b997-416d-b2e3-d3d211bc8670",
+  "id": "a311c705-de58-402b-8ef7-ba4fa82877ae",
+  "prevId": "2a64bcb2-4f37-453d-9fa6-11a8244d8ada",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -8,21 +8,15 @@
       "name": "application_environment_variables",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
         "application_id": {
           "name": "application_id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
         "environment_variable_id": {
           "name": "environment_variable_id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         }
@@ -56,7 +50,15 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "application_environment_variables_application_id_environment_variable_id_pk": {
+          "name": "application_environment_variables_application_id_environment_variable_id_pk",
+          "columns": [
+            "application_id",
+            "environment_variable_id"
+          ]
+        }
+      },
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
@@ -139,7 +141,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -251,7 +253,7 @@
         },
         "app_id": {
           "name": "app_id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
