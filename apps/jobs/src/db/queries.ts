@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm";
 
 import type {
-  InsertGithubAppsSchema,
+  AuthRegisterSchema,
+  InsertGithubAppSchema,
   InsertGithubAppsSecretSchema,
   InsertServerConfigSchema,
   InsertUsersSchema,
@@ -78,6 +79,14 @@ export async function getGithubAppByAppId(appId: number) {
 
 export async function getSystemConfig() {
   return await db.query.systemConfig.findFirst();
+}
+
+export async function setUser(user: Omit<AuthRegisterSchema, "password">, passwordHash: string) {
+  const [inserted] = await db
+    .insert(users)
+    .values({ ...user, passwordHash })
+    .returning();
+  return inserted;
 }
 
 export async function getUserByEmail(email: string) {

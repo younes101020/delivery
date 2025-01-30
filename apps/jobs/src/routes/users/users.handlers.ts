@@ -3,18 +3,11 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import { createUser, getUserById, updateUser } from "@/db/queries";
+import { getUserById, updateUser } from "@/db/queries";
 import { hashPassword } from "@/lib/auth";
 import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
 
-import type { CreateRoute, GetOneRoute, PatchRoute } from "./users.routes";
-
-export const create: AppRouteHandler<CreateRoute> = async (c) => {
-  const user = c.req.valid("json");
-  const passwordHash = await hashPassword(user.passwordHash);
-  const inserted = await createUser(user, passwordHash);
-  return c.json(inserted, HttpStatusCodes.OK);
-};
+import type { GetOneRoute, PatchRoute } from "./users.routes";
 
 export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   const { id } = c.req.valid("param");

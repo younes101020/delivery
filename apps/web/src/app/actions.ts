@@ -17,7 +17,7 @@ const signUpSchema = z.object({
 export const signUp = validatedAction(signUpSchema, async (data) => {
   const { email, password } = data;
 
-  const response = await client.users.$post({
+  const response = await client.auth.register.$post({
     json: {
       email,
       passwordHash: password,

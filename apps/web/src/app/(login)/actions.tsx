@@ -18,8 +18,8 @@ const signInSchema = z.object({
 });
 
 export const signIn = validatedAction(signInSchema, async (data) => {
-  const { email, password: passwordHash } = data;
-  const response = await client.auth.$post({
+  const { email, password } = data;
+  const response = await client.auth.verify.$post({
     json: {
       email,
       passwordHash,

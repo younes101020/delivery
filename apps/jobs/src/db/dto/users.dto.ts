@@ -1,15 +1,19 @@
-import type { z } from "zod";
-
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
 
 import { users } from "../schema";
 
-export const selectUsersSchema = createSelectSchema(users).omit({
+export const selectUserSchema = createSelectSchema(users).omit({
   passwordHash: true,
 });
-export const insertUsersSchema = createInsertSchema(users, {
-  name: schema => schema.name.min(1).max(500),
-});
-export const patchUsersSchema = insertUsersSchema.partial();
+export const insertUserSchema = createInsertSchema(users)
+  .omit({
+    passwordHash: true,
+  })
+  .extend({
+    password: z.string().min(8).max(100),
+  });
+export const patchUserSchema = insertUserSchema.partial();
 
-export type InsertUsersSchema = z.infer<typeof insertUsersSchema>;
+export type InsertUserSchema = z.infer<typeof insertUserSchema>;
+export type SelectUserSchema = z.infer<typeof selectUserSchema>;

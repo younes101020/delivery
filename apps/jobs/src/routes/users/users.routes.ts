@@ -3,26 +3,10 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 
-import { insertUsersSchema, patchUsersSchema, selectUsersSchema } from "@/db/dto/users.dto";
+import { patchUserSchema, selectUserSchema } from "@/db/dto/users.dto";
 import { notFoundSchema } from "@/lib/constants";
 
 const tags = ["Users"];
-
-export const create = createRoute({
-  path: "/users",
-  method: "post",
-  request: {
-    body: jsonContentRequired(insertUsersSchema, "The user to create"),
-  },
-  tags,
-  responses: {
-    [HttpStatusCodes.OK]: jsonContent(selectUsersSchema, "The created user"),
-    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(insertUsersSchema),
-      "The validation error(s)",
-    ),
-  },
-});
 
 export const getOne = createRoute({
   path: "/users/{id}",
