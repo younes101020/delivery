@@ -1,7 +1,7 @@
 /* eslint-disable ts/ban-ts-comment */
 import { testClient } from "hono/testing";
 import Redis from "ioredis";
-import { describe, expect, vi } from "vitest";
+import { describe, expect } from "vitest";
 import { ZodError } from "zod";
 
 import type { QueueDeploymentJob } from "@/lib/tasks/deploy/types";

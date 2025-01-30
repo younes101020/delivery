@@ -3,7 +3,6 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import { db } from "@/db";
 import { getUserByEmail, setUser } from "@/db/queries";
 import { hashPassword, verifyPassword } from "@/lib/auth";
 
