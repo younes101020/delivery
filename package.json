@@ -23,7 +23,7 @@
     "test": "turbo run test",
     "lint": "turbo run lint",
     "build": "turbo run build",
-    "migrate": "turbo run migrate --filter=@delivery/jobs"
+    "db:migrate": "turbo run db:migrate --filter=@delivery/jobs"
   },
   "devDependencies": {
     "@types/node": "^20.11.30",

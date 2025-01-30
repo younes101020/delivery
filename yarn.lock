@@ -451,7 +451,7 @@ __metadata:
     dotenv-expand: "npm:^12.0.1"
     drizzle-kit: "npm:^0.28.1"
     drizzle-orm: "npm:0.36.4"
-    drizzle-seed: "npm:^0.1.1"
+    drizzle-seed: "npm:^0.3.1"
     drizzle-zod: "npm:^0.5.1"
     eslint: "npm:^9.18.0"
     hono: "npm:^4.6.6"
@@ -6341,9 +6341,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"drizzle-seed@npm:^0.1.1":
-  version: 0.1.1
-  resolution: "drizzle-seed@npm:0.1.1"
+"drizzle-seed@npm:^0.3.1":
+  version: 0.3.1
+  resolution: "drizzle-seed@npm:0.3.1"
   dependencies:
     pure-rand: "npm:^6.1.0"
   peerDependencies:
@@ -6351,7 +6351,7 @@ __metadata:
   peerDependenciesMeta:
     drizzle-orm:
       optional: true
-  checksum: 10c0/0772cc3dde8e346711d1dd89f02c9f5cf16d40098bbece74c04be114a2219ade8bf3858c92785e50637fc47bf4d43fc73b1af8d98e6240cc1ccbb95c3bc67c08
+  checksum: 10c0/013d474931adf2f5cdd4bbfc23c1dd01817f8177ed3bc7cfb60e276b9039f9112c05f78e285614881cd9da9b0906bb0b23e80347204170862dd493797b65a31a
   languageName: node
   linkType: hard
 

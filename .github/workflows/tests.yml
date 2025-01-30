@@ -51,7 +51,7 @@ jobs:
         run: yarn run build
 
       - name: Migrate database
-        run: yarn run migrate
+        run: yarn run db:migrate
 
       - name: Run e2e/unit tests
         run: yarn run test
