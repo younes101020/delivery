@@ -3,7 +3,7 @@ import type { z } from "zod";
 import { relations, sql, type SQL } from "drizzle-orm";
 import { boolean, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 
-import type { selectUsersSchema } from "./dto";
+import type { selectUserSchema } from "./dto";
 import type { selectGithubAppsSchema } from "./dto/githubapps.dto";
 
 export const systemConfig = pgTable("system_config", {
@@ -111,7 +111,7 @@ export const applicationEnvironmentVariablesRelations = relations(
 // Shared types
 // workaround to https://github.com/honojs/hono/issues/1800
 type NewUserWithoutDateTypes = Omit<
-  z.infer<typeof selectUsersSchema>,
+  z.infer<typeof selectUserSchema>,
   "createdAt" | "updatedAt" | "deletedAt" | "emailVerificationTokenExpiresAt"
 >;
 export type NewUser = NewUserWithoutDateTypes & {

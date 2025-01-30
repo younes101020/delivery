@@ -4,7 +4,7 @@ import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 
 import {
-  insertGithubAppsSchema,
+  insertGithubAppSchema,
   patchGithubAppsSchema,
   selectGithubAppsSchema,
 } from "@/db/dto/githubapps.dto";
@@ -28,13 +28,13 @@ export const create = createRoute({
   path: "/githubapps",
   method: "post",
   request: {
-    body: jsonContentRequired(insertGithubAppsSchema, "The github app to create"),
+    body: jsonContentRequired(insertGithubAppSchema, "The github app to create"),
   },
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(selectGithubAppsSchema, "The created github app"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(insertGithubAppsSchema),
+      createErrorSchema(insertGithubAppSchema),
       "The validation error(s)",
     ),
   },

@@ -5,7 +5,7 @@ import type {
   InsertGithubAppSchema,
   InsertGithubAppsSecretSchema,
   InsertServerConfigSchema,
-  InsertUsersSchema,
+  InsertUserSchema,
 } from "./dto";
 import type {
   InsertApplicationSchemaWithSharedEnv,
@@ -121,12 +121,12 @@ export async function createGithubAppSecret(secret: InsertGithubAppsSecretSchema
   return insertedSecret;
 }
 
-export async function createGithubApp(newGithubApp: InsertGithubAppsSchema) {
+export async function createGithubApp(newGithubApp: InsertGithubAppSchema) {
   const [insertedGithubApp] = await db.insert(githubApp).values(newGithubApp).returning();
   return insertedGithubApp;
 }
 
-export async function updateGithubApp(id: number, updates: Partial<InsertGithubAppsSchema>) {
+export async function updateGithubApp(id: number, updates: Partial<InsertGithubAppSchema>) {
   const [updatedGithubApp] = await db
     .update(githubApp)
     .set(updates)
@@ -151,7 +151,7 @@ export async function updateSystemConfig(updates: Partial<InsertServerConfigSche
   return updatedConfig;
 }
 
-export async function createUser(user: InsertUsersSchema, passwordHash: string) {
+export async function createUser(user: InsertUserSchema, passwordHash: string) {
   const [inserted] = await db
     .insert(users)
     .values({ ...user, passwordHash })
@@ -176,7 +176,7 @@ export async function getUserById(id: number) {
   return user;
 }
 
-export async function updateUser(id: number, updates: Partial<InsertUsersSchema>) {
+export async function updateUser(id: number, updates: Partial<InsertUserSchema>) {
   const [updatedUser] = await db
     .update(users)
     .set(updates)

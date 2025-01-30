@@ -16,7 +16,7 @@ export const getOne = createRoute({
   },
   tags,
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(selectUsersSchema, "The requested user"),
+    [HttpStatusCodes.OK]: jsonContent(selectUserSchema, "The requested user"),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "User not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
@@ -30,19 +30,18 @@ export const patch = createRoute({
   method: "patch",
   request: {
     params: IdParamsSchema,
-    body: jsonContentRequired(patchUsersSchema, "The user updates"),
+    body: jsonContentRequired(patchUserSchema, "The user updates"),
   },
   tags,
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(selectUsersSchema.pick({ id: true }), "The updated user id"),
+    [HttpStatusCodes.OK]: jsonContent(selectUserSchema.pick({ id: true }), "The updated user id"),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "User not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(patchUsersSchema).or(createErrorSchema(IdParamsSchema)),
+      createErrorSchema(patchUserSchema).or(createErrorSchema(IdParamsSchema)),
       "The validation error(s)",
     ),
   },
 });
 
-export type CreateRoute = typeof create;
 export type GetOneRoute = typeof getOne;
 export type PatchRoute = typeof patch;
