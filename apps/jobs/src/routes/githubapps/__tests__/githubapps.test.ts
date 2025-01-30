@@ -1,5 +1,4 @@
 /* eslint-disable ts/ban-ts-comment */
-import { it } from "__tests__";
 import { testClient } from "hono/testing";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
 import { describe, expect, expectTypeOf } from "vitest";
@@ -8,7 +7,8 @@ import env from "@/env";
 import { ZOD_ERROR_MESSAGES } from "@/lib/constants";
 import createApp from "@/lib/create-app";
 
-import router from "./githubapps.index";
+import router from "../githubapps.index";
+import { it } from "./fixtures";
 
 if (env.NODE_ENV !== "test") {
   throw new Error("NODE_ENV must be 'test'");
@@ -20,17 +20,12 @@ const httpOptions = {
 };
 
 describe("applications routes / E2E", () => {
-  it("post /githubapps validates the body when creating", async ({ githubApps }) => {
-    const { clientId, appId, clientSecret, webhookSecret } = githubApps[0];
+  it("post /githubapps validates the body when creating", async ({ githubAppPayload }) => {
+    const { clientId, clientSecret, webhookSecret, appId } = githubAppPayload;
     const response = await client.githubapps.$post(
       {
         // @ts-expect-error
-        json: {
-          clientId,
-          appId,
-          clientSecret,
-          webhookSecret,
-        },
+        json: { clientId, clientSecret, webhookSecret, appId },
       },
       httpOptions,
     );
@@ -42,15 +37,14 @@ describe("applications routes / E2E", () => {
     }
   });
 
-  it("post /githubapps creates a githubapps", async ({ githubApps }) => {
-    const githubApp = githubApps[0];
+  it("post /githubapps creates a githubapps", async ({ githubAppPayload }) => {
     const response = await client.githubapps.$post({
-      json: githubApp,
+      json: githubAppPayload,
     });
     expect(response.status).toBe(200);
     if (response.status === 200) {
       const json = await response.json();
-      expect(json.appId).toBe(githubApp.appId);
+      expect(json.appId).toBe(githubAppPayload.appId);
     }
   });
 
@@ -60,14 +54,14 @@ describe("applications routes / E2E", () => {
     if (response.status === 200) {
       const json = await response.json();
       expectTypeOf(json).toBeArray();
-      expect(json.length).toBe(1);
+      expect(json.length).toBeGreaterThan(1);
     }
   });
 
   it("get /githubapps/{id} returns 404 when githubapps not found", async () => {
     const response = await client.githubapps[":id"].$get({
       param: {
-        id: "2",
+        id: "100000000000000",
       },
     });
     expect(response.status).toBe(404);
@@ -77,17 +71,16 @@ describe("applications routes / E2E", () => {
     }
   });
 
-  it("get /githubapps/{id} gets a single githubapp", async ({ githubApps }) => {
-    const { privateKey } = githubApps[0];
+  it("get /githubapps/{id} gets a single githubapp", async ({ registeredGithubAppId }) => {
     const response = await client.githubapps[":id"].$get({
       param: {
-        id: "1",
+        id: registeredGithubAppId,
       },
     });
     expect(response.status).toBe(200);
     if (response.status === 200) {
       const json = await response.json();
-      expect(json.privateKey).toBe(privateKey);
+      expect(json.id).toBe(registeredGithubAppId);
     }
   });
 });
