@@ -1,7 +1,6 @@
 import { testClient } from "hono/testing";
 import { describe, expect } from "vitest";
 
-import env from "@/env";
 import createApp from "@/lib/create-app";
 
 import router from "../users.index";
