@@ -5,7 +5,7 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import { getApplicationByName } from "@/db/queries";
+import { getApplicationByName } from "@/db/queries/queries";
 import { subscribeWorkerTo } from "@/lib/tasks";
 import { startDeploy } from "@/lib/tasks/deploy";
 import { prepareDataForProcessing } from "@/lib/tasks/deploy/jobs/utils";

@@ -2,7 +2,7 @@ import { basename } from "node:path";
 
 import type { InsertDeploymentSchema } from "@/db/dto";
 
-import { getGithubAppByAppId, getSystemDomainName } from "@/db/queries";
+import { getGithubAppByAppId, getSystemDomainName } from "@/db/queries/queries";
 import { DeploymentError } from "@/lib/error";
 
 export function parseAppHost(appName: string, hostName: string) {

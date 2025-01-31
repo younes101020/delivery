@@ -3,7 +3,7 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import { getUserById, updateUser } from "@/db/queries";
+import { getUserById, updateUser } from "@/db/queries/queries";
 import { hashPassword } from "@/lib/auth";
 import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
 

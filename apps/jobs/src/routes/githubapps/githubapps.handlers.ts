@@ -10,7 +10,7 @@ import {
   getGithubAppById,
   getGithubApps,
   updateGithubApp,
-} from "@/db/queries";
+} from "@/db/queries/queries";
 import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
 import { decryptSecret, encryptSecret } from "@/lib/utils";
 

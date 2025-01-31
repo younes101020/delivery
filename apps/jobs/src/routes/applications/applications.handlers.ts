@@ -4,17 +4,15 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 import type { AppRouteHandler } from "@/lib/types";
 
 import {
-  createApplication,
   deleteApplicationById,
   getApplications,
   getApplicationWithEnvVarsById,
   patchApplication,
-} from "@/db/queries";
+} from "@/db/queries/queries";
 import { APPLICATIONS_PATH, ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
 import { ssh } from "@/lib/ssh";
 
 import type {
-  CreateRoute,
   GetOneRoute,
   ListRoute,
   PatchRoute,

@@ -2,7 +2,7 @@ import type { Context, Next } from "hono";
 
 import { getCookie, setCookie } from "hono/cookie";
 
-import { getSystemConfig } from "@/db/queries";
+import { getSystemConfig } from "@/db/queries/queries";
 
 export async function onboardingFlag(c: Context, next: Next) {
   const onboardingCookie = getCookie(c, "skiponboarding");
