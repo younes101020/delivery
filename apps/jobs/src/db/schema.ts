@@ -76,7 +76,7 @@ export const applicationEnvironmentVariables = pgTable("application_environment_
   environmentVariableId: integer("environment_variable_id")
     .notNull()
     .references(() => environmentVariables.id),
-}, t => [primaryKey({ columns: [t.applicationId, t.environmentVariableId] })]);
+}, (t) => { return [{ pk: primaryKey({ columns: [t.applicationId, t.environmentVariableId] }) }]; });
 
 export const applicationEnvironmentVariablesRelations = relations(
   applicationEnvironmentVariables,
