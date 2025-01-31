@@ -61,6 +61,13 @@ export function extractPortCmd(portCmd: string) {
   return portMatch[1];
 }
 
+export function convertGitToAuthenticatedUrl(gitUrl: string, token: string) {
+  return gitUrl.replace(
+    "git://",
+    `https://x-access-token:${token}@`,
+  );
+}
+
 export async function prepareDataForProcessing(deployment: InsertDeploymentSchema) {
   const githubApp = await getGithubAppByAppId(deployment.githubAppId);
   if (!githubApp)

@@ -8,6 +8,8 @@ import { decryptSecret } from "@/lib/utils";
 
 import type { QueueDeploymentJob } from "../types";
 
+import { convertGitToAuthenticatedUrl } from "./utils";
+
 export async function clone(job: QueueDeploymentJob<"clone">) {
   const { secret, appId, clientId, clientSecret, installationId, repoUrl, repoName } = job.data;
   await job.updateProgress({ logs: "Github repository will be fetched...\n" });
@@ -32,12 +34,10 @@ export async function clone(job: QueueDeploymentJob<"clone">) {
     installationId,
   });
 
-  const formattedRepoUrl = repoUrl.replace(
-    "git://",
-    `https://x-access-token:${installationAuthentication.token}@`,
-  );
+  const authenticatedUrl = convertGitToAuthenticatedUrl(repoUrl, installationAuthentication.token);
+
   try {
-    await ssh(`git clone ${formattedRepoUrl} ${repoName}`, {
+    await ssh(`git clone ${authenticatedUrl} ${repoName}`, {
       cwd: APPLICATIONS_PATH,
       onStdout: ({ chunk, isCriticalError }) => {
         job.updateProgress({ logs: chunk, isCriticalError, jobId: job.id });
