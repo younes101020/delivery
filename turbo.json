@@ -19,7 +19,7 @@
     "lint": {
       "dependsOn": ["^lint"]
     },
-    "migrate": {
+    "db:migrate": {
       "outputs": [],
       "env": ["LOG_LEVEL", "DATABASE_URL", "BEARER_TOKEN"]
     },
