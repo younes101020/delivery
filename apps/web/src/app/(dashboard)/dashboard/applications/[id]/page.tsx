@@ -69,7 +69,7 @@ async function AppDetails({ id }: AppProps) {
       </dl>
       <dl>
         <dt className="text-muted-foreground">Environment variables count</dt>
-        <dd>{application.environmentVariables?.length || 0}</dd>
+        <dd>{application.environmentVariable?.length || 0}</dd>
       </dl>
       <dl>
         <dt className="text-muted-foreground">Creation date</dt>
@@ -87,7 +87,7 @@ async function AppConfiguration({ id }: AppProps) {
   const application = await getApplicationById(id);
   if (!application)
     redirect("/dashboard/applications");
-  const rawEnvs = application.environmentVariables
+  const rawEnvs = application.environmentVariable
     ?.map(({ key, value }) => `${key}=${value}`)
     .filter(rawEnv => !(rawEnv.length <= 1))
     .join(" ");
