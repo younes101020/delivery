@@ -24,12 +24,6 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   return c.json(applications);
 };
 
-export const create: AppRouteHandler<CreateRoute> = async (c) => {
-  const { applicationData, envVars } = c.req.valid("json");
-  const insertedApplication = await createApplication({ applicationData, envVars });
-  return c.json(insertedApplication, HttpStatusCodes.OK);
-};
-
 export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const application = await getApplicationWithEnvVarsById(id);

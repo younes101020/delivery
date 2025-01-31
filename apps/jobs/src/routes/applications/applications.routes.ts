@@ -4,7 +4,6 @@ import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 
 import {
-  insertApplicationWithSharedEnv,
   patchApplicationsSchema,
   selectApplicationsSchema,
   selectApplicationsSchemaWithSharedEnv,
@@ -21,22 +20,6 @@ export const list = createRoute({
     [HttpStatusCodes.OK]: jsonContent(
       z.array(selectApplicationsSchema),
       "The list of applications",
-    ),
-  },
-});
-
-export const create = createRoute({
-  path: "/applications",
-  method: "post",
-  request: {
-    body: jsonContentRequired(insertApplicationWithSharedEnv, "The application to create"),
-  },
-  tags,
-  responses: {
-    [HttpStatusCodes.OK]: jsonContent(IdParamsSchema, "The created application identifier"),
-    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(insertApplicationWithSharedEnv),
-      "The validation error(s)",
     ),
   },
 });
@@ -107,6 +90,5 @@ export const remove = createRoute({
 
 export type ListRoute = typeof list;
 export type PatchRoute = typeof patch;
-export type CreateRoute = typeof create;
 export type GetOneRoute = typeof getOne;
 export type RemoveRoute = typeof remove;
