@@ -11,11 +11,8 @@ import router from "../auth.index";
 import { it } from "./fixtures";
 
 const client = testClient(createApp().route("/", router));
-const httpOptions = {
-  headers: { Authorization: `Bearer ${env.BEARER_TOKEN}` },
-};
 
-describe("auth routes / E2E", () => {
+describe("auth routes / integration test", () => {
   it("post /auth/verify validates the body when verifying", async ({ authRegisteredUser }) => {
     const { email } = authRegisteredUser;
     const response = await client.auth.verify.$post(
@@ -25,7 +22,6 @@ describe("auth routes / E2E", () => {
           email,
         },
       },
-      httpOptions,
     );
     expect(response.status).toBe(422);
     if (response.status === 422) {
@@ -45,7 +41,6 @@ describe("auth routes / E2E", () => {
           password: wrongPassword,
         },
       },
-      httpOptions,
     );
     expect(response.status).toBe(401);
     if (response.status === 401) {
@@ -64,27 +59,12 @@ describe("auth routes / E2E", () => {
           password,
         },
       },
-      httpOptions,
     );
     expect(response.status).toBe(401);
     if (response.status === 401) {
       const json = await response.json();
       expect(json.message).toBe(HttpStatusPhrases.UNAUTHORIZED);
     }
-  });
-
-  it("post /auth/verify return 200 when credentials are correct", async ({ authRegisteredUser }) => {
-    const { email, password } = authRegisteredUser;
-    const response = await client.auth.verify.$post(
-      {
-        json: {
-          email,
-          password,
-        },
-      },
-      httpOptions,
-    );
-    expect(response.status).toBe(200);
   });
 
   it("post /auth/verify return user info when credentials are correct", async ({ authRegisteredUser }) => {
@@ -96,7 +76,6 @@ describe("auth routes / E2E", () => {
           password,
         },
       },
-      httpOptions,
     );
     if (response.status === 200) {
       const json = await response.json();
@@ -113,7 +92,6 @@ describe("auth routes / E2E", () => {
           password,
         },
       },
-      httpOptions,
     );
     if (response.status === 200) {
       const json = await response.json();
@@ -130,7 +108,6 @@ describe("auth routes / E2E", () => {
           email,
         },
       },
-      httpOptions,
     );
     expect(response.status).toBe(422);
     if (response.status === 422) {

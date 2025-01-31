@@ -1,4 +1,4 @@
-name: Running UT/E2E and IT tests
+name: Running unit/integration tests
 
 on:
   push:
@@ -31,6 +31,7 @@ jobs:
       LOG_LEVEL: silent
       JOBS_API_BASEURL: http://localhost:3090
       NEXT_PUBLIC_BASEURL: http://localhost:3000
+      TEST_USERS_PASSWORD: younes
 
     steps:
       - name: Checkout repository
@@ -53,5 +54,5 @@ jobs:
       - name: Migrate database
         run: yarn run db:migrate
 
-      - name: Run e2e/unit tests
+      - name: Run integration and unit tests
         run: yarn run test

@@ -10,16 +10,9 @@ import createApp from "@/lib/create-app";
 import router from "../githubapps.index";
 import { it } from "./fixtures";
 
-if (env.NODE_ENV !== "test") {
-  throw new Error("NODE_ENV must be 'test'");
-}
-
 const client = testClient(createApp().route("/", router));
-const httpOptions = {
-  headers: { Authorization: `Bearer ${env.BEARER_TOKEN}` },
-};
 
-describe("applications routes / E2E", () => {
+describe("applications routes / integration test", () => {
   it("post /githubapps validates the body when creating", async ({ githubAppPayload }) => {
     const { clientId, clientSecret, webhookSecret, appId } = githubAppPayload;
     const response = await client.githubapps.$post(
@@ -27,7 +20,6 @@ describe("applications routes / E2E", () => {
         // @ts-expect-error
         json: { clientId, clientSecret, webhookSecret, appId },
       },
-      httpOptions,
     );
     expect(response.status).toBe(422);
     if (response.status === 422) {
@@ -61,7 +53,7 @@ describe("applications routes / E2E", () => {
   it("get /githubapps/{id} returns 404 when githubapps not found", async () => {
     const response = await client.githubapps[":id"].$get({
       param: {
-        id: "100000000000000",
+        id: "100000",
       },
     });
     expect(response.status).toBe(404);
@@ -80,7 +72,7 @@ describe("applications routes / E2E", () => {
     expect(response.status).toBe(200);
     if (response.status === 200) {
       const json = await response.json();
-      expect(json.id).toBe(registeredGithubAppId);
+      expect(json.id).toBe(Number.parseInt(registeredGithubAppId));
     }
   });
 });

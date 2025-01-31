@@ -25,15 +25,10 @@ export const it = base.extend<Fixtures>({
 });
 
 async function getGithubAppPayload() {
-  const [githubAppPayload] = await db.select({
-    webhookSecret: githubApp.webhookSecret,
-    clientId: githubApp.clientId,
-    clientSecret: githubApp.clientSecret,
-    appId: githubApp.appId,
-  }).from(githubApp).limit(1);
-
+  const [githubAppPayload] = await db.select().from(githubApp).limit(1);
+  const { id, ...rest } = githubAppPayload;
   return {
-    ...githubAppPayload,
+    ...rest,
     privateKey: faker.string.hexadecimal({ length: 64, prefix: "" }),
   };
 }

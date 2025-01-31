@@ -6,7 +6,7 @@ import type { AuthRegisterSchema, AuthVerifySchema } from "@/db/dto";
 
 import { db } from "@/db";
 import { users } from "@/db/schema";
-import { TEST_USERS_PASSWORD } from "@/db/seed";
+import env from "@/env";
 
 interface Fixtures {
   authRegisteredUser: AuthVerifySchema;
@@ -15,7 +15,7 @@ interface Fixtures {
 
 const authRegisteredUser = {
   email: "",
-  password: TEST_USERS_PASSWORD,
+  password: env.TEST_USERS_PASSWORD!,
 };
 
 const authUnregisteredUser = {

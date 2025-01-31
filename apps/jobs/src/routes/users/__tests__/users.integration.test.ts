@@ -8,18 +8,14 @@ import router from "../users.index";
 import { it } from "./fixtures";
 
 const client = testClient(createApp().route("/", router));
-const httpOptions = {
-  headers: { Authorization: `Bearer ${env.BEARER_TOKEN}` },
-};
 
-describe("users routes / E2E", () => {
+describe("users routes / integration test", () => {
   it("get /users/{id} return 422 when id params is missing", async () => {
     const response = await client.users[":id"].$get(
       {
         // @ts-expect-error testing purpose
         param: {},
       },
-      httpOptions,
     );
     expect(response.status).toBe(422);
   });
@@ -34,7 +30,6 @@ describe("users routes / E2E", () => {
           email: userPayload.email,
         },
       },
-      httpOptions,
     );
     expect(response.status).toBe(200);
   });
