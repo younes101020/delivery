@@ -90,18 +90,7 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
   }
 
   return c.json(
-    {
-      ...application,
-      environmentVariables: application.applicationEnvironmentVariables.map(ev => ({
-        id: ev.environmentVariable.id,
-        key: ev.environmentVariable.key,
-        value: ev.environmentVariable.value,
-        isBuildTime: ev.environmentVariable.isBuildTime,
-        createdAt: ev.environmentVariable.createdAt,
-        deletedAt: ev.environmentVariable.deletedAt,
-        updatedAt: ev.environmentVariable.updatedAt,
-      })),
-    },
+    { ...updatedField.applicationData, environmentVariable: updatedField.environmentVariable },
     HttpStatusCodes.OK,
   );
 };
