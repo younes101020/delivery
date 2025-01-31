@@ -63,7 +63,7 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const updates = c.req.valid("json");
 
-  const noUpdatesFound = Object.keys(updates.applicationData).length === 0 && (!Array.isArray(updates.envVars) || Object.keys(updates.envVars[0]).length === 0);
+  const noUpdatesFound = Object.keys(updates.applicationData).length === 0 && (!Array.isArray(updates.environmentVariable) || Object.keys(updates.environmentVariable[0]).length === 0);
 
   if (noUpdatesFound) {
     return c.json(
@@ -84,9 +84,9 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
     );
   }
 
-  const application = await patchApplication(id, updates);
+  const updatedField = await patchApplication(id, updates);
 
-  if (!application) {
+  if (!updatedField) {
     return c.json(
       {
         message: HttpStatusPhrases.NOT_FOUND,

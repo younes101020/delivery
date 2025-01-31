@@ -71,7 +71,7 @@ export const patch = createRoute({
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      selectApplicationsSchemaWithSharedEnv,
+      selectApplicationsSchemaWithSharedEnv.deepPartial(),
       "The updated application",
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Application not found"),

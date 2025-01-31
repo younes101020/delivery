@@ -26,7 +26,7 @@ export const editApplication = validatedAction(
       param: { id: changes.id },
       json: {
         applicationData,
-        envVars: transformEnvVars(environmentVariables),
+        environmentVariable: transformEnvVars(environmentVariables),
       },
     });
     if (response.status !== 200) {
