@@ -27,7 +27,6 @@ export default function createApp() {
   );
   app.use(serveEmojiFavicon("📝"));
   app.use(pinoLogger());
-  app.use("/^(?!/(doc|reference)).*$/", bearerAuth({ token: env.BEARER_TOKEN }));
   app.use(onboardingFlag);
 
   app.notFound(notFound);
