@@ -42,7 +42,7 @@ export const githubAppSecret = pgTable("github_app_secret", {
   encryptedData: text("encrypted_data").notNull(),
   iv: text("iv").notNull(),
   key: text("key").notNull(),
-  githubAppId: integer("github_app_id").references(() => githubApp.id, { onDelete: "set null" }),
+  githubAppId: integer("github_app_id").notNull().references(() => githubApp.id),
 });
 
 export const applications = pgTable("applications", {
@@ -53,7 +53,7 @@ export const applications = pgTable("applications", {
   fqdn: text("fqdn").notNull().unique(),
   logs: text("logs"),
   port: text("port").notNull(),
-  githubAppId: integer("github_app_id").references(() => githubApp.id, { onDelete: "set null" }),
+  githubAppId: integer("github_app_id").notNull().references(() => githubApp.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   deletedAt: timestamp("deleted_at"),

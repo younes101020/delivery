@@ -116,11 +116,11 @@ export async function getGithubAppById(id: number) {
   });
 }
 
-export async function createGithubAppWithSecret(newGithubApp: InsertGithubAppSchema, secret: InsertGithubAppsSecretSchema) {
+export async function createGithubAppWithSecret(newGithubApp: InsertGithubAppSchema, secret: Omit<InsertGithubAppsSecretSchema, "githubAppId">) {
   return db.transaction(async (tx) => {
     const [insertedGithubApp] = await tx.insert(githubApp).values(newGithubApp).returning();
-    secret.githubAppId = insertedGithubApp.id;
-    await tx.insert(githubAppSecret).values(secret);
+    const secretWithGithubAppId = { ...secret, githubAppId: insertedGithubApp.id };
+    await tx.insert(githubAppSecret).values([secretWithGithubAppId]);
     return insertedGithubApp;
   });
 }
