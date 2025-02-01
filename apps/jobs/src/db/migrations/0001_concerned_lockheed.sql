@@ -1,1 +1,0 @@
-ALTER TABLE "github_app" ALTER COLUMN "app_id" SET DATA TYPE integer;
