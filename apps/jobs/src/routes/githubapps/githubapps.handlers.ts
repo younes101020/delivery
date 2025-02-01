@@ -40,9 +40,8 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const newGithubApp = c.req.valid("json");
-  const l = c.get("logger");
   const secret = await encryptSecret(newGithubApp.privateKey);
-  const insertedGithubApp = await createGithubAppWithSecret(newGithubApp, secret, l);
+  const insertedGithubApp = await createGithubAppWithSecret(newGithubApp, secret);
   return c.json(insertedGithubApp, HttpStatusCodes.OK);
 };
 

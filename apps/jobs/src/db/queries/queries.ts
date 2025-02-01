@@ -116,37 +116,18 @@ export async function getGithubAppById(id: number) {
   });
 }
 
-export async function createGithubAppSecret(secret: InsertGithubAppsSecretSchema, l?: any) {
-  try {
-    const [insertedSecret] = await db.insert(githubAppSecret).values(secret).returning();
-    return insertedSecret;
-  }
-  catch (error) {
-    if (l)
-      l.error(error);
-    throw error;
-  }
-}
-
 export async function createGithubAppWithSecret(newGithubApp: InsertGithubAppSchema, secret: {
   encryptedData: string;
   iv: string;
   key: string;
-}, l?: any) {
-  try {
-    return db.transaction(async (tx) => {
-      const [insertedSecret] = await db.insert(githubAppSecret).values(secret).returning({ id: githubAppSecret.id });
-      newGithubApp.secretId = insertedSecret.id;
+}) {
+  return db.transaction(async (tx) => {
+    const [insertedSecret] = await tx.insert(githubAppSecret).values(secret).returning({ id: githubAppSecret.id });
+    newGithubApp.secretId = insertedSecret.id;
 
-      const [insertedGithubApp] = await tx.insert(githubApp).values(newGithubApp).returning();
-      return insertedGithubApp;
-    });
-  }
-  catch (error) {
-    if (l)
-      l.error(error);
-    throw error;
-  }
+    const [insertedGithubApp] = await tx.insert(githubApp).values(newGithubApp).returning();
+    return insertedGithubApp;
+  });
 }
 
 export async function updateGithubApp(id: number, updates: Partial<InsertGithubAppSchema>) {
