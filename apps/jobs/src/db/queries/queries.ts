@@ -123,7 +123,7 @@ export async function createGithubAppSecret(secret: InsertGithubAppsSecretSchema
   }
   catch (error) {
     if (l)
-      l.error(error, error instanceof Error ? error.stack : "");
+      l.error("hello world");
     throw error;
   }
 }
