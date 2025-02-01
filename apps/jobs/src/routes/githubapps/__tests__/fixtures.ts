@@ -11,17 +11,19 @@ interface Fixtures {
   registeredGithubAppId: string;
 }
 
+const sensitiveValue = faker.string.hexadecimal({ length: 64, prefix: "" });
+const githubAppPayload = {
+  webhookSecret: sensitiveValue,
+  clientId: "1",
+  clientSecret: sensitiveValue,
+  appId: 1,
+  privateKey: sensitiveValue,
+  id: 5000,
+};
+
 export const it = base.extend<Fixtures>({
   // eslint-disable-next-line no-empty-pattern
   githubAppPayload: async ({}, use) => {
-    const sensitiveValue = faker.string.hexadecimal({ length: 64, prefix: "" });
-    const githubAppPayload = {
-      webhookSecret: sensitiveValue,
-      clientId: "1",
-      clientSecret: sensitiveValue,
-      appId: 1,
-      privateKey: sensitiveValue,
-    };
     await use(githubAppPayload);
   },
   // eslint-disable-next-line no-empty-pattern
