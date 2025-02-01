@@ -34,7 +34,8 @@ export async function encryptSecret(secretKey: string, l?: any) {
     };
   }
   catch (error) {
-    if (l) l.error(error);
+    if (l)
+      l.error(error);
     throw error;
   }
 }
