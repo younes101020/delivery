@@ -121,7 +121,7 @@ export async function createGithubAppWithSecret(newGithubApp: InsertGithubAppSch
   key: string;
 }) {
   return db.transaction(async (tx) => {
-    console.log(secret, "SECRET");
+    console.log(secret, newGithubApp, "SECRET");
     const [insertedSecret] = await tx.insert(githubAppSecret).values(secret).returning({ id: githubAppSecret.id });
     newGithubApp.secretId = insertedSecret.id;
     console.log(newGithubApp, "githubapp");
