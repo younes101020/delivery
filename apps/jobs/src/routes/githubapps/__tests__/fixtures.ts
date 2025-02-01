@@ -11,10 +11,19 @@ interface Fixtures {
   registeredGithubAppId: string;
 }
 
+const sensitiveValue = faker.string.hexadecimal({ length: 64, prefix: "" });
+
+const githubAppPayload = {
+  webhookSecret: sensitiveValue,
+  clientId: "1",
+  clientSecret: sensitiveValue,
+  appId: 1,
+  privateKey: sensitiveValue,
+};
+
 export const it = base.extend<Fixtures>({
   // eslint-disable-next-line no-empty-pattern
   githubAppPayload: async ({}, use) => {
-    const githubAppPayload = await getGithubAppPayload();
     await use(githubAppPayload);
   },
   // eslint-disable-next-line no-empty-pattern
@@ -23,15 +32,6 @@ export const it = base.extend<Fixtures>({
     await use(registeredGithubAppId);
   },
 });
-
-async function getGithubAppPayload() {
-  const [githubAppPayload] = await db.select().from(githubApp).limit(1);
-  const { id, ...rest } = githubAppPayload;
-  return {
-    ...rest,
-    privateKey: faker.string.hexadecimal({ length: 64, prefix: "" }),
-  };
-}
 
 async function getRandomRegisteredGithubAppId() {
   const [registeredGithubApp] = await db.select({ id: githubApp.id }).from(githubApp).limit(1);
