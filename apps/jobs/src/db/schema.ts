@@ -42,7 +42,7 @@ export const githubApp = pgTable("github_app", {
   clientSecret: text("client_secret").notNull(),
   installationId: serial("installation_id"),
   appId: integer("app_id").notNull(),
-  secretId: serial("secret_id").references(() => githubAppSecret.id),
+  secretId: serial("secret_id").references(() => githubAppSecret.id, { onDelete: "set null" }),
 });
 
 export const applications = pgTable("applications", {
