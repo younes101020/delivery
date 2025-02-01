@@ -123,21 +123,14 @@ export async function createGithubAppSecret(secret: InsertGithubAppsSecretSchema
   }
   catch (error) {
     if (l)
-      l.error(error);
+      l.error(error, error instanceof Error ? error.stack : "");
     throw error;
   }
 }
 
-export async function createGithubApp(newGithubApp: InsertGithubAppSchema, l?: any) {
-  try {
-    const [insertedGithubApp] = await db.insert(githubApp).values(newGithubApp).returning();
-    return insertedGithubApp;
-  }
-  catch (error) {
-    if (l)
-      l.error(error);
-    throw error;
-  }
+export async function createGithubApp(newGithubApp: InsertGithubAppSchema) {
+  const [insertedGithubApp] = await db.insert(githubApp).values(newGithubApp).returning();
+  return insertedGithubApp;
 }
 
 export async function updateGithubApp(id: number, updates: Partial<InsertGithubAppSchema>) {
