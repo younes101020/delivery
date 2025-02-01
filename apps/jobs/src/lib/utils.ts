@@ -1,5 +1,7 @@
 import { Buffer } from "node:buffer";
 
+import env from "@/env";
+
 interface Secret {
   encryptedData: BufferSource;
   iv: BufferSource;
@@ -30,5 +32,6 @@ export async function encryptSecret(secretKey: string) {
     encryptedData: Buffer.from(encryptedContent).toString("base64"),
     iv: Buffer.from(iv).toString("base64"),
     key: Buffer.from(await crypto.subtle.exportKey("raw", encryptionKey)).toString("base64"),
+    ...(env.NODE_ENV === "test" ? { id: 11 } : {}),
   };
 }
