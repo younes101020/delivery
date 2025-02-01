@@ -24,7 +24,7 @@ export async function getAllInstallReposForEachRepoPage(iteration: number) {
 }
 
 export async function getAllInstallations(): Promise<
-  (GithubInstallation & { privateKey: string })[] | null
+  (GithubInstallation & { privateKey: string | null })[] | null
 > {
   "use cache";
   cacheTag("github-app-installations-creds");
@@ -49,7 +49,7 @@ export async function getAllInstallationsWithRepos({ repoPage }: { repoPage: num
   }
 
   const installations = await Promise.all(
-    result.map(async (installation: GithubInstallation & { privateKey: string }) => {
+    result.map(async (installation: GithubInstallation & { privateKey: string | null }) => {
       const repositoriesResponse = await listInstallationRepositories({
         appId: installation.appId.toString(),
         privateKey: installation.privateKey,

@@ -12,7 +12,7 @@ export async function listInstallationRepositories({
   type = "all",
 }: {
   appId: string;
-  privateKey: string;
+  privateKey: string | null;
   installationId: string;
   type?: string;
   repoPerPage?: number;
