@@ -12,7 +12,7 @@ export async function decryptSecret({ encryptedData, iv, key }: Secret) {
   return decoder.decode(decryptedContent);
 }
 
-export async function encryptSecret(secretKey: string, l: any) {
+export async function encryptSecret(secretKey: string, l?: any) {
   try {
     const encryptionKey = await crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, [
       "encrypt",
@@ -34,7 +34,7 @@ export async function encryptSecret(secretKey: string, l: any) {
     };
   }
   catch (error) {
-    l.error(error);
+    if (l) l.error(error);
     throw error;
   }
 }
