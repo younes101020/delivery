@@ -119,7 +119,7 @@ export async function getGithubAppById(id: number) {
 export async function createGithubAppWithSecret(newGithubApp: InsertGithubAppSchema, secret: Omit<InsertGithubAppsSecretSchema, "githubAppId">) {
   return db.transaction(async (tx) => {
     const [insertedGithubApp] = await tx.insert(githubApp).values(newGithubApp).returning();
-    const secretWithGithubAppId = { ...secret, githubAppId: insertedGithubApp.id };
+    const secretWithGithubAppId = { ...secret, githubAppId: insertedGithubApp.id, id: 11 };
     await tx.insert(githubAppSecret).values([secretWithGithubAppId]);
     return insertedGithubApp;
   });
