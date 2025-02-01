@@ -28,7 +28,7 @@ describe("applications routes / integration test", () => {
     }
   });
 
-  /* it("post /githubapps creates a githubapps", async ({ githubAppPayload }) => {
+  it("post /githubapps creates a githubapps", async ({ githubAppPayload }) => {
     const response = await client.githubapps.$post({
       json: githubAppPayload,
     });
@@ -37,7 +37,7 @@ describe("applications routes / integration test", () => {
       const json = await response.json();
       expect(json.appId).toBe(githubAppPayload.appId);
     }
-  }); */
+  });
 
   it("get /githubapps lists all githubapps", async () => {
     const response = await client.githubapps.$get();
