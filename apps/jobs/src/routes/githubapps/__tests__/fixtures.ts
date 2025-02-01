@@ -11,8 +11,6 @@ interface Fixtures {
   registeredGithubAppId: string;
 }
 
-
-
 export const it = base.extend<Fixtures>({
   // eslint-disable-next-line no-empty-pattern
   githubAppPayload: async ({}, use) => {
