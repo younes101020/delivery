@@ -40,7 +40,7 @@ const SECRET = await encryptSecret(GITHUB_APP_PRIVATE_KEY);
 async function main() {
   const db = drizzle(env.DATABASE_URL);
   const passwordHash = await hashPassword(env.TEST_USERS_PASSWORD!);
-  await seed(db, schema).refine(f => ({
+  await seed(db, schema, { seed: 8475 }).refine(f => ({
     users: {
       columns: {
         passwordHash: f.default({ defaultValue: passwordHash }),
