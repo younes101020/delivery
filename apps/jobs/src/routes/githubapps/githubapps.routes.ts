@@ -18,7 +18,7 @@ export const list = createRoute({
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      z.array(selectGithubAppsSchema.extend({ privateKey: z.string() })),
+      z.array(selectGithubAppsSchema.extend({ privateKey: z.string().nullable() })),
       "The list of githubapps",
     ),
   },
@@ -49,7 +49,7 @@ export const getOne = createRoute({
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      selectGithubAppsSchema.extend({ privateKey: z.string() }),
+      selectGithubAppsSchema.extend({ privateKey: z.string().nullable() }),
       "The requested github app",
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Github app not found"),

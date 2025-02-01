@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import type {
   AuthRegisterSchema,
   InsertGithubAppSchema,
+  InsertGithubAppsSecretSchema,
   InsertServerConfigSchema,
   InsertUserSchema,
 } from "../dto";
@@ -115,17 +116,11 @@ export async function getGithubAppById(id: number) {
   });
 }
 
-export async function createGithubAppWithSecret(newGithubApp: InsertGithubAppSchema, secret: {
-  encryptedData: string;
-  iv: string;
-  key: string;
-}) {
+export async function createGithubAppWithSecret(newGithubApp: InsertGithubAppSchema, secret: InsertGithubAppsSecretSchema) {
   return db.transaction(async (tx) => {
-    console.log(secret, newGithubApp, "SECRET");
-    const [insertedSecret] = await tx.insert(githubAppSecret).values(secret).returning({ id: githubAppSecret.id });
-    newGithubApp.secretId = insertedSecret.id;
-    console.log(newGithubApp, "githubapp");
     const [insertedGithubApp] = await tx.insert(githubApp).values(newGithubApp).returning();
+    secret.githubAppId = insertedGithubApp.id;
+    await tx.insert(githubAppSecret).values(secret);
     return insertedGithubApp;
   });
 }

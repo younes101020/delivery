@@ -21,17 +21,19 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   const githubAppsWithPrivateKey = await Promise.all(
     githubApps.map(async (app) => {
       const { secret } = app;
-      const privateKey = await decryptSecret({
-        encryptedData: Buffer.from(secret.encryptedData, "base64"),
-        iv: Buffer.from(secret.iv, "base64"),
-        key: await crypto.subtle.importKey(
-          "raw",
-          Buffer.from(secret.key, "base64"),
-          "AES-GCM",
-          true,
-          ["decrypt"],
-        ),
-      });
+      const privateKey = secret
+        ? await decryptSecret({
+          encryptedData: Buffer.from(secret.encryptedData, "base64"),
+          iv: Buffer.from(secret.iv, "base64"),
+          key: await crypto.subtle.importKey(
+            "raw",
+            Buffer.from(secret.key, "base64"),
+            "AES-GCM",
+            true,
+            ["decrypt"],
+          ),
+        })
+        : null;
       return { ...app, privateKey };
     }),
   );
@@ -58,13 +60,15 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   }
 
   const { secret } = githubApp;
-  const privateKey = await decryptSecret({
-    encryptedData: Buffer.from(secret.encryptedData, "base64"),
-    iv: Buffer.from(secret.iv, "base64"),
-    key: await crypto.subtle.importKey("raw", Buffer.from(secret.key, "base64"), "AES-GCM", true, [
-      "decrypt",
-    ]),
-  });
+  const privateKey = secret
+    ? await decryptSecret({
+      encryptedData: Buffer.from(secret.encryptedData, "base64"),
+      iv: Buffer.from(secret.iv, "base64"),
+      key: await crypto.subtle.importKey("raw", Buffer.from(secret.key, "base64"), "AES-GCM", true, [
+        "decrypt",
+      ]),
+    })
+    : null;
 
   return c.json({ ...githubApp, privateKey }, HttpStatusCodes.OK);
 };

@@ -28,13 +28,6 @@ export const users = pgTable("users", {
   emailVerificationTokenExpiresAt: timestamp("email_verification_token_expires_at"),
 });
 
-export const githubAppSecret = pgTable("github_app_secret", {
-  id: serial("id").primaryKey(),
-  encryptedData: text("encrypted_data").notNull(),
-  iv: text("iv").notNull(),
-  key: text("key").notNull(),
-});
-
 export const githubApp = pgTable("github_app", {
   id: serial("id").primaryKey(),
   webhookSecret: text("webhook_secret").notNull(),
@@ -42,7 +35,14 @@ export const githubApp = pgTable("github_app", {
   clientSecret: text("client_secret").notNull(),
   installationId: serial("installation_id"),
   appId: integer("app_id").notNull(),
-  secretId: integer("secret_id").references(() => githubAppSecret.id, { onDelete: "set null" }),
+});
+
+export const githubAppSecret = pgTable("github_app_secret", {
+  id: serial("id").primaryKey(),
+  encryptedData: text("encrypted_data").notNull(),
+  iv: text("iv").notNull(),
+  key: text("key").notNull(),
+  githubAppId: integer("github_app_id").references(() => githubApp.id, { onDelete: "set null" }),
 });
 
 export const applications = pgTable("applications", {
@@ -105,15 +105,12 @@ export const environmentVariablesRelations = relations(environmentVariables, ({ 
 }));
 
 export const githubAppRelations = relations(githubApp, ({ one, many }) => ({
-  secret: one(githubAppSecret, {
-    fields: [githubApp.secretId],
-    references: [githubAppSecret.id],
-  }),
+  secret: one(githubAppSecret),
   applications: many(applications),
 }));
 
 export const githubAppSecretRelations = relations(githubAppSecret, ({ one }) => ({
-  githubApp: one(githubApp),
+  githubApp: one(githubApp, { fields: [githubAppSecret.githubAppId], references: [githubApp.id] }),
 }));
 
 // Shared types

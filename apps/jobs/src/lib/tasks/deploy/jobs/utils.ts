@@ -1,4 +1,6 @@
+import { HTTPException } from "hono/http-exception";
 import { basename } from "node:path";
+import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { InsertDeploymentSchema } from "@/db/dto";
 
@@ -70,6 +72,8 @@ export function convertGitToAuthenticatedUrl(gitUrl: string, token: string) {
 
 export async function prepareDataForProcessing(deployment: InsertDeploymentSchema) {
   const githubApp = await getGithubAppByAppId(deployment.githubAppId);
+  if (!githubApp?.secret)
+    throw new HTTPException(HttpStatusCodes.UNAUTHORIZED, { message: "Github app secret not found" });
   if (!githubApp)
     return null;
   const hostName = await getSystemDomainName();
@@ -83,7 +87,7 @@ export async function prepareDataForProcessing(deployment: InsertDeploymentSchem
     // 20min job abort threshold when caching is enabled, otherwise 40min
     timeout: deployment.cache ? 1200000 : 2400000,
     repoName,
-    clone: { ...githubApp, repoUrl: deployment.repoUrl },
+    clone: { ...githubApp, repoUrl: deployment.repoUrl, secret: githubApp.secret },
     build: {
       port: deployment.port,
       env: environmentVariables && environmentVariables.cmdEnvVars,
