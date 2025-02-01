@@ -42,7 +42,7 @@ export const githubApp = pgTable("github_app", {
   clientSecret: text("client_secret").notNull(),
   installationId: serial("installation_id"),
   appId: integer("app_id").notNull(),
-  secretId: serial("secret_id").references(() => githubAppSecret.id, { onDelete: "set null" }),
+  secretId: integer("secret_id").references(() => githubAppSecret.id, { onDelete: "set null" }),
 });
 
 export const applications = pgTable("applications", {
@@ -53,7 +53,7 @@ export const applications = pgTable("applications", {
   fqdn: text("fqdn").notNull().unique(),
   logs: text("logs"),
   port: text("port").notNull(),
-  githubAppId: serial("github_app_id").references(() => githubApp.id, { onDelete: "set null" }),
+  githubAppId: integer("github_app_id").references(() => githubApp.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   deletedAt: timestamp("deleted_at"),

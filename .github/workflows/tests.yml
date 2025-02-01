@@ -17,7 +17,7 @@ jobs:
         ports:
           - 6379:6379
       db:
-        image: postgres:17
+        image: postgres
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
