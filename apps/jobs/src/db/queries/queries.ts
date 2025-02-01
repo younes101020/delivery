@@ -3,7 +3,6 @@ import { eq } from "drizzle-orm";
 import type {
   AuthRegisterSchema,
   InsertGithubAppSchema,
-  InsertGithubAppsSecretSchema,
   InsertServerConfigSchema,
   InsertUserSchema,
 } from "../dto";
