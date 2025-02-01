@@ -55,8 +55,5 @@ jobs:
       - name: Build
         run: yarn run build
 
-      - name: Migrate database
-        run: yarn run db:migrate
-
       - name: Run integration and unit tests
         run: yarn run test
