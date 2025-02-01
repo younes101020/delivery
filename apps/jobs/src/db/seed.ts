@@ -47,7 +47,6 @@ async function main() {
       },
     },
     githubAppSecret: {
-      count: 5,
       columns: {
         key: f.default({ defaultValue: SECRET.key }),
         iv: f.default({ defaultValue: SECRET.iv }),
