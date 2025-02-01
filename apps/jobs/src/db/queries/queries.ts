@@ -115,18 +115,16 @@ export async function getGithubAppById(id: number) {
   });
 }
 
-let count = 0;
-
 export async function createGithubAppWithSecret(newGithubApp: InsertGithubAppSchema, secret: {
   encryptedData: string;
   iv: string;
   key: string;
 }) {
   return db.transaction(async (tx) => {
-    console.log(count++, "COUNT");
+    console.log(secret, "SECRET");
     const [insertedSecret] = await tx.insert(githubAppSecret).values(secret).returning({ id: githubAppSecret.id });
     newGithubApp.secretId = insertedSecret.id;
-
+    console.log(newGithubApp, "githubapp");
     const [insertedGithubApp] = await tx.insert(githubApp).values(newGithubApp).returning();
     return insertedGithubApp;
   });
