@@ -42,6 +42,7 @@ jobs:
     env:
       DOTENV_PRIVATE_KEY_JOBS_CI: ${{ secrets.DOTENV_PRIVATE_KEY_JOBS_CI }}
       DOTENV_PRIVATE_KEY_WEB_CI: ${{ secrets.DOTENV_PRIVATE_KEY_WEB_CI }}
+      DOTENV_PRIVATE_KEY: ${{ DOTENV_PRIVATE_KEY }}
 
     steps:
       - run: curl -sfS https://dotenvx.sh/install.sh | sh
