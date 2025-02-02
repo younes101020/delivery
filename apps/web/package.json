@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "dotenvx run -f .env.development -- next dev",
-    "build": "dotenvx run -- next build",
+    "build": "dotenvx run -f .env.web.ci -- next build",
     "start": "next start",
     "lint": "next lint",
     "test": "concurrently --kill-others --success=first \"cd ../jobs && dotenvx run -f .env.test -- node ./dist/src/index.js\" \"cross-env vitest run\""
