@@ -10,6 +10,7 @@ export function setup() {
   }
   applyMigration();
   seedDatabaseWithFakeData();
+  // This is a temporary patch for: https://github.com/drizzle-team/drizzle-orm/issues/3915
   execSync("yarn db:temp:fix");
 }
 
