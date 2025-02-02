@@ -1,5 +1,5 @@
+import { z } from "@hono/zod-openapi";
 import { createInsertSchema } from "drizzle-zod";
-import { z } from "zod";
 
 import { users } from "../schema";
 
