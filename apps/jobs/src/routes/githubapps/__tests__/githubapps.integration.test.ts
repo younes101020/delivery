@@ -11,7 +11,7 @@ import { it } from "./fixtures";
 
 const client = testClient(createApp().route("/", router));
 
-describe("applications routes / integration test", () => {
+describe("githubapps routes / integration test", () => {
   it("post /githubapps validates the body when creating", async ({ githubAppPayload }) => {
     const { clientId, clientSecret, webhookSecret, appId } = githubAppPayload;
     const response = await client.githubapps.$post(

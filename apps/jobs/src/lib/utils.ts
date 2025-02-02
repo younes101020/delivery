@@ -1,7 +1,5 @@
 import { Buffer } from "node:buffer";
 
-import env from "@/env";
-
 interface Secret {
   encryptedData: BufferSource;
   iv: BufferSource;
