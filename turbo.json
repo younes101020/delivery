@@ -12,6 +12,9 @@
       "persistent": true,
       "cache": false
     },
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
     "test": {
       "dependsOn": ["^build"],
       "env": ["NEXT_PUBLIC_BASEURL", "AUTH_SECRET", "JOBS_BEARER_TOKEN", "JOBS_API_BASEURL", "DATABASE_URL", "MINIO_ROOT_USER", "MINIO_ROOT_PASSWORD", "MINIO_ENDPOINT", "MINIO_PORT", "MINIO_BUCKETS", "SSH_HOST", "PORT", "LOG_LEVEL", "BEARER_TOKEN", "TEST_USERS_PASSWORD", "TEST_ENTITY_COUNT"]
