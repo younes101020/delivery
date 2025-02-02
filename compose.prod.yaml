@@ -32,6 +32,8 @@ services:
       - NODE_ENV=${NODE_ENV}
       - SSH_HOST=${SSH_HOST}
       - BEARER_TOKEN=${BEARER_TOKEN}
+      - MINIO_SERVER_ACCESS_KEY=${MINIO_SERVER_ACCESS_KEY}
+      - MINIO_SERVER_SECRET_KEY=${MINIO_SERVER_SECRET_KEY}
     volumes:
       - /data/delivery/ssh/keys:/var/ssh/keys
     restart: always
@@ -48,8 +50,6 @@ services:
       - 5432:5432
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - MINIO_SERVER_ACCESS_KEY=${MINIO_SERVER_ACCESS_KEY}
-      - MINIO_SERVER_SECRET_KEY=${MINIO_SERVER_SECRET_KEY}
     networks:
       - host_network
     volumes:

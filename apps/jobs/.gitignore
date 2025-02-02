@@ -11,9 +11,8 @@
 # deps
 node_modules/
 
-# env
-.env
-.env.production
+# env decrypt key
+.env.keys
 
 # logs
 logs/

@@ -3,11 +3,11 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "dotenvx run -f .env.development -- next dev",
+    "build": "dotenvx run -- next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "concurrently --kill-others --success=first \"cd ../jobs && NODE_ENV=test node ./dist/src/index.js\" \"cross-env vitest run\""
+    "test": "concurrently --kill-others --success=first \"cd ../jobs && dotenvx run -f .env.test -- node ./dist/src/index.js\" \"cross-env vitest run\""
   },
   "dependencies": {
     "@delivery/jobs": "*",
@@ -31,8 +31,6 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cobe": "^0.6.3",
-    "dotenv": "^16.4.5",
-    "dotenv-expand": "^12.0.1",
     "drizzle-orm": "^0.36.1",
     "framer-motion": "^11.15.0",
     "jose": "^5.9.6",
@@ -48,6 +46,7 @@
   },
   "devDependencies": {
     "@delivery/eslint-config": "*",
+    "@dotenvx/dotenvx": "^1.34.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.1.0",
     "@testing-library/user-event": "^14.5.2",

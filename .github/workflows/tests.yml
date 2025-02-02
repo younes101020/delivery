@@ -12,6 +12,21 @@ jobs:
     environment: test
 
     services:
+      screenshots-storage:
+        image: bitnami/minio:latest
+        ports:
+          - 9000:9000
+          - 9001:9001
+        env:
+          MINIO_ROOT_USER: younes
+          MINIO_ROOT_PASSWORD: LJHSDF6DFCG2545xxDFG7SDFGd6
+          MINIO_SERVER_ACCESS_KEY: younes
+          MINIO_SERVER_SECRET_KEY: LJIhjkhgjHGJhjkJKL6515561jku
+          MINIO_DEFAULT_BUCKETS: screenshots:public
+          MINIO_ENDPOINT: http://localhost
+        volumes:
+          - ${{ github.workspace }}/data:/data
+        options: --name=minio --health-cmd "curl http://localhost:9000/minio/health/live"
       redis:
         image: redis
         ports:
@@ -25,24 +40,11 @@ jobs:
         ports:
           - 5432:5432
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
-      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-      JOBS_BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
-      PORT: 9030
-      LOG_LEVEL: silent
-      JOBS_API_BASEURL: http://localhost:3090
-      NEXT_PUBLIC_BASEURL: http://localhost:3000
-      TEST_USERS_PASSWORD: younes
-      TEST_ENTITY_COUNT: 50
-      MINIO_SERVER_ACCESS_KEY: ${{ secrets.MINIO_SERVER_ACCESS_KEY }}
-      MINIO_SERVER_SECRET_KEY: ${{ secrets.MINIO_SERVER_SECRET_KEY }}
-      MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
-      MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
-      MINIO_DEFAULT_BUCKETS: ${{ vars.MINIO_DEFAULT_BUCKETS }}
-      MINIO_PORT: ${{ vars.MINIO_PORT }}
+      DOTENV_PRIVATE_KEY_CI: ${{ secrets.DOTENV_PRIVATE_KEY_CI }}
+      DOTENV_PRIVATE_KEY_WEB_CI: ${{ secrets.DOTENV_PRIVATE_KEY_WEB_CI }}
 
     steps:
+      - run: curl -sfS https://dotenvx.sh/install.sh | sh
       - name: Checkout repository
         uses: actions/checkout@v2
 
