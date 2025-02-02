@@ -34,6 +34,7 @@ jobs:
       JOBS_API_BASEURL: http://localhost:3090
       NEXT_PUBLIC_BASEURL: http://localhost:3000
       TEST_USERS_PASSWORD: younes
+      TEST_ENTITY_COUNT: 50
 
     steps:
       - name: Checkout repository

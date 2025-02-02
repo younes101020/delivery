@@ -17,14 +17,13 @@ const SECRET = await encryptSecret(GITHUB_APP_PRIVATE_KEY);
 async function main() {
   const db = drizzle(env.DATABASE_URL);
   const passwordHash = await hashPassword(env.TEST_USERS_PASSWORD!);
-  await seed(db, schema).refine(f => ({
+  await seed(db, schema, { count: env.TEST_ENTITY_COUNT }).refine(f => ({
     users: {
       columns: {
         passwordHash: f.default({ defaultValue: passwordHash }),
       },
     },
     githubApp: {
-      count: 5,
       with: {
         applications: 10,
         githubAppSecret: 1,

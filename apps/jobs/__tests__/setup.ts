@@ -10,6 +10,7 @@ export function setup() {
   }
   applyMigration();
   seedDatabaseWithFakeData();
+  execSync("yarn db:temp:fix");
 }
 
 export function teardown() {

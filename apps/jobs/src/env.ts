@@ -23,6 +23,7 @@ const EnvSchema = z.object({
   MINIO_ROOT_PASSWORD: z.string().optional(),
   MINIO_BUCKETS: z.string().default("screenshots"),
   TEST_USERS_PASSWORD: z.string().min(8).optional(),
+  TEST_ENTITY_COUNT: z.coerce.number().default(10),
   SSH_HOST: z.string().default("host.docker.internal"),
   BEARER_TOKEN: z.string(),
 }).superRefine((input, ctx) => {
@@ -35,7 +36,7 @@ const EnvSchema = z.object({
       message: "Must be set when NODE_ENV is on 'production'",
     });
   }
-  if (input.NODE_ENV === "test" && !input.TEST_USERS_PASSWORD) {
+  if (input.NODE_ENV === "test" && (!input.TEST_USERS_PASSWORD || !input.TEST_ENTITY_COUNT)) {
     ctx.addIssue({
       code: z.ZodIssueCode.invalid_type,
       expected: "string",

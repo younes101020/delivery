@@ -23,7 +23,8 @@
     "build": "tsc -p tsconfig.build.json && tsc-alias",
     "db:migrate": "cross-env NODE_ENV=test npx tsx src/db/migrate.ts",
     "db:reset": "npx tsx src/db/reset.ts",
-    "db:seed": "npx tsx src/db/seed.ts"
+    "db:seed": "npx tsx src/db/seed.ts",
+    "db:temp:fix": "npx tsx src/db/temp-drizzle-seed-fix.ts"
   },
   "dependencies": {
     "@bull-board/hono": "^6.5.3",
