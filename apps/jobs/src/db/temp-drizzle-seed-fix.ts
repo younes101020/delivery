@@ -17,7 +17,7 @@ BEGIN
         FROM pg_sequences 
         WHERE schemaname = 'public'  -- adjust schema if needed
     LOOP
-        EXECUTE format('SELECT setval(%L, ${env.TEST_ENTITY_COUNT + 1})', 
+        EXECUTE format('SELECT setval(%L, ${sql.raw((env.TEST_ENTITY_COUNT + 1).toString())})', 
             seq_record.schemaname || '.' || seq_record.sequencename);
     END LOOP;
 END $$;`,
