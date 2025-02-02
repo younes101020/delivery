@@ -6,11 +6,11 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 import type { AppRouteHandler } from "@/lib/types";
 
 import { getApplicationByName } from "@/db/queries/queries";
-import { subscribeWorkerTo } from "@/lib/tasks";
-import { startDeploy } from "@/lib/tasks/deploy";
-import { prepareDataForProcessing } from "@/lib/tasks/deploy/jobs/utils";
-import { fetchQueueTitles } from "@/lib/tasks/deploy/utils";
-import { connection, getBullConnection, jobCanceler } from "@/lib/tasks/utils";
+import { subscribeWorkerTo } from "@/routes/deployments/lib/tasks";
+import { startDeploy } from "@/routes/deployments/lib/tasks/deploy";
+import { prepareDataForProcessing } from "@/routes/deployments/lib/tasks/deploy/jobs/utils";
+import { fetchQueueTitles } from "@/routes/deployments/lib/tasks/deploy/utils";
+import { connection, getBullConnection, jobCanceler } from "@/routes/deployments/lib/tasks/utils";
 
 import type { CancelRoute, CreateRoute, ListRoute, RetryRoute, StreamRoute } from "./deployments.routes";
 

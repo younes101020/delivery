@@ -4,8 +4,8 @@ import { ZodError } from "zod";
 
 import { insertDeploymentSchema } from "@/db/dto";
 import { DeploymentError } from "@/lib/error";
-import { convertGitToAuthenticatedUrl, parseAppHost } from "@/lib/tasks/deploy/jobs/utils";
-import { connection, getBullConnection } from "@/lib/tasks/utils";
+import { convertGitToAuthenticatedUrl, parseAppHost } from "@/routes/deployments/lib/tasks/deploy/jobs/utils";
+import { connection, getBullConnection } from "@/routes/deployments/lib/tasks/utils";
 
 import { it } from "./fixtures";
 

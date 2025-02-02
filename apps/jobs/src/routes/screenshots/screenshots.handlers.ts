@@ -4,10 +4,11 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 import type { AppRouteHandler } from "@/lib/types";
 
 import { getApplicationNameById } from "@/db/queries/queries";
-import { screenPage } from "@/lib/screenshots/screen-page";
-import { upload } from "@/lib/screenshots/upload";
 
 import type { GetImageUrl } from "./screenshots.routes";
+
+import { screenPage } from "./lib/screen-page";
+import { upload } from "./lib/upload";
 
 export const getImageUrl: AppRouteHandler<GetImageUrl> = async (c) => {
   const { url, applicationId } = c.req.valid("json");

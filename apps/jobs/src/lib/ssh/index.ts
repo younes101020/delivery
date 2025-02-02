@@ -1,6 +1,6 @@
 import { Client } from "ssh2";
 
-import type { Chunk, ISSH } from "../tasks/deploy/jobs/build";
+import type { Chunk, ISSH } from "../../routes/deployments/lib/tasks/deploy/jobs/build";
 
 import { loadConfig } from "./utils";
 

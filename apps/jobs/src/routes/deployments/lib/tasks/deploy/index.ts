@@ -2,7 +2,7 @@ import { FlowProducer } from "bullmq";
 
 import type { QueueDeploymentJobData } from "./types";
 
-import { subscribeWorkerTo } from "../";
+import { subscribeWorkerTo } from "..";
 import { connection, getBullConnection } from "../utils";
 
 /**
