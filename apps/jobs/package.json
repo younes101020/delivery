@@ -19,7 +19,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "yarn lint --fix",
-    "test": "dotenvx run -f .env.ci -- vitest",
+    "test": "dotenvx run -f .env.jobs.ci -- vitest",
     "build": "tsc -p tsconfig.build.json && tsc-alias",
     "db:migrate": "dotenvx run -f .env.ci -- npx tsx src/db/migrate.ts",
     "db:reset": "npx tsx src/db/reset.ts",

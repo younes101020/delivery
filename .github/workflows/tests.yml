@@ -40,7 +40,7 @@ jobs:
         ports:
           - 5432:5432
     env:
-      DOTENV_PRIVATE_KEY_CI: ${{ secrets.DOTENV_PRIVATE_KEY_CI }}
+      DOTENV_PRIVATE_KEY_JOBS_CI: ${{ secrets.DOTENV_PRIVATE_KEY_JOBS_CI }}
       DOTENV_PRIVATE_KEY_WEB_CI: ${{ secrets.DOTENV_PRIVATE_KEY_WEB_CI }}
 
     steps:
