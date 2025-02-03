@@ -27,7 +27,7 @@ export type env = z.infer<typeof EnvSchema>;
 
 // eslint-disable-next-line ts/no-redeclare
 const { data: env, error } = EnvSchema.safeParse(process.env);
-
+console.log(env, process.env, "ENVS")
 if (error) {
   console.error("❌ Invalid env:");
   console.error(JSON.stringify(error.flatten().fieldErrors, null, 2));
