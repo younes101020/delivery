@@ -40,6 +40,7 @@ jobs:
         ports:
           - 5432:5432
     env:
+      MINIO_PUBLIC_DOMAIN: ${{ vars.MINIO_PUBLIC_DOMAIN }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
       AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
@@ -51,7 +52,6 @@ jobs:
       TEST_USERS_PASSWORD: ${{ secrets.TEST_USERS_PASSWORD }}
       MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
       MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
-      MINIO_PUBLIC_DOMAIN: ${{ vars.MINIO_PUBLIC_DOMAIN }}
       MINIO_ENDPOINT: ${{ vars.MINIO_ENDPOINT }}
       MINIO_PORT: ${{ vars.MINIO_PORT }}
 
