@@ -54,6 +54,7 @@ jobs:
       MINIO_ENDPOINT: ${{ vars.MINIO_ENDPOINT }}
       MINIO_PORT: ${{ vars.MINIO_PORT }}
       MINIO_PUBLIC_DOMAIN: ${{ vars.MINIO_PUBLIC_DOMAIN }}
+      FOR_THE_TEST: ${{ vars.FOR_THE_TEST }}
 
     steps:
       - name: Checkout repository
