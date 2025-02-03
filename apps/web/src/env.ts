@@ -3,7 +3,7 @@ import { createEnv } from "@t3-oss/env-nextjs";
 import { config } from "dotenv";
 import { z } from "zod";
 
-console.log(process.env.GITHUB_ACTIONS, "GITHUB ACTIOIN ENV");
+console.log(process.env.CI, "GITHUB ACTIOIN ENV");
 if (process.env.GITHUB_ACTIONS !== "true") {
   config({ path: process.env.NODE_ENV === "test" ? ".env.test" : ".env" });
 }
