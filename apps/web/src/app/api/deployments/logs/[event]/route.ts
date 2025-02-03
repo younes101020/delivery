@@ -1,8 +1,8 @@
-import { serverEnv } from "@/env";
+import { env } from "@/env";
 
 export async function GET(_: Request, { params }: { params: Promise<{ event: string }> }) {
   const queueName = (await params).event;
-  const { body } = await fetch(`${serverEnv.JOBS_API_BASEURL}/deployments/logs/${queueName}`);
+  const { body } = await fetch(`${env.JOBS_API_BASEURL}/deployments/logs/${queueName}`);
   return new Response(body, {
     status: 200,
     headers: {

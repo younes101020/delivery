@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 
-import { publicEnv } from "@/env";
+import { env } from "@/env";
 
 import { Stepper } from "./_components/stepper";
 
@@ -16,7 +16,7 @@ async function SuspensedDeploymentsPage({ params }: { params: Promise<{ repoName
   const { repoName } = await params;
   return (
     <div className="h-full flex justify-center items-center py-4">
-      <Stepper repoName={repoName} baseUrl={publicEnv.NEXT_PUBLIC_BASEURL} />
+      <Stepper repoName={repoName} baseUrl={env.NEXT_PUBLIC_BASEURL} />
     </div>
   );
 }

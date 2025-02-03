@@ -1,8 +1,12 @@
-import type { NextConfig } from "next";
+import createJiti from "jiti";
+import { fileURLToPath } from "node:url";
 
-const nextConfig: NextConfig = {
-  /* config options here */
+const jiti = createJiti(fileURLToPath(import.meta.url));
+
+jiti("./src/env");
+const nextConfig = {
   output: "standalone",
+  transpilePackages: ["@t3-oss/env-nextjs", "@t3-oss/env-core"],
   experimental: {
     dynamicIO: true,
   },
@@ -20,7 +24,7 @@ const nextConfig: NextConfig = {
     webpackConfig.plugins.push(
       // Remove node: from import specifiers, because Next.js does not yet support node: scheme
       // https://github.com/vercel/next.js/issues/28774
-      new webpack.NormalModuleReplacementPlugin(/^node:/, (resource: any) => {
+      new webpack.NormalModuleReplacementPlugin(/^node:/, (resource) => {
         resource.request = resource.request.replace(/^node:/, "");
       }),
     );

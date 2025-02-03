@@ -3,7 +3,7 @@ import { Suspense } from "react";
 
 import { Deployment } from "@/app/_components/deployment";
 import { Skeleton } from "@/components/ui/skeleton";
-import { publicEnv } from "@/env";
+import { env } from "@/env";
 import { getAllInstallations, getAllInstallReposForEachRepoPage } from "@/lib/github";
 import { getServerConfiguration } from "@/lib/server/queries";
 import { getUser } from "@/lib/users";
@@ -37,7 +37,7 @@ async function GithubAppStep(props: StepChildrenProps) {
   const allGithubInstallations = await getAllInstallations();
   if (allGithubInstallations && allGithubInstallations.length > 0)
     redirect("/onboarding/?step=4");
-  return <GithubAppForm baseUrl={publicEnv.NEXT_PUBLIC_BASEURL} />;
+  return <GithubAppForm baseUrl={env.NEXT_PUBLIC_BASEURL} />;
 }
 
 async function DomainNameStep(props: StepChildrenProps) {

@@ -1,12 +1,13 @@
-
-import { GithubAppForm } from "@/app/(onboarding)/onboarding/_components/github-app-form";
-import { Login } from "@/app/_components/login-form";
-import { publicEnv } from "@/env";
 import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeAll, describe, expect, vi } from "vitest";
-import { onBoardingTest } from "./fixtures";
+
 import { Deployment } from "@/app/_components/deployment";
+import { Login } from "@/app/_components/login-form";
+import { GithubAppForm } from "@/app/(onboarding)/onboarding/_components/github-app-form";
+import { env } from "@/env";
+
+import { onBoardingTest } from "./fixtures";
 
 function setup(jsx: React.ReactElement) {
   return {
@@ -17,9 +18,9 @@ function setup(jsx: React.ReactElement) {
 
 const mockReplace = vi.fn();
 
-describe("Onboarding process", () => {
+describe("onboarding process", () => {
   beforeAll(() => {
-    global.ResizeObserver = vi.fn().mockImplementation(() => ({
+    globalThis.ResizeObserver = vi.fn().mockImplementation(() => ({
       observe: vi.fn(),
       unobserve: vi.fn(),
       disconnect: vi.fn(),
@@ -51,11 +52,11 @@ describe("Onboarding process", () => {
     "display error message when trying to register a user who has already registered",
     async ({ users }) => {
       const { userAction } = setup(<Login />);
-      const registeredUser = users.find((user) => user.registered);
+      const registeredUser = users.find(user => user.registered);
       const form = within(screen.getByRole("form"));
       await userAction.type(form.getByRole("textbox", { name: "email" }), registeredUser!.email);
-      await userAction.type(form.getByLabelText("password"), registeredUser!.password),
-        await userAction.click(form.getByRole("button"));
+      await userAction.type(form.getByLabelText("password"), registeredUser!.password);
+      await userAction.click(form.getByRole("button"));
       await waitFor(() => {
         expect(form.getByText("Impossible to sign up")).toBeDefined();
       });
@@ -63,7 +64,7 @@ describe("Onboarding process", () => {
   );
 
   onBoardingTest("github form include initial object to create a github app from manifest", () => {
-    setup(<GithubAppForm baseUrl={publicEnv.NEXT_PUBLIC_BASEURL} />);
+    setup(<GithubAppForm baseUrl={env.NEXT_PUBLIC_BASEURL} />);
     const form = within(screen.getByRole("form"));
     const manifestInput = form.getByLabelText<HTMLInputElement>("manifest");
     expect(manifestInput.value).toBeDefined();

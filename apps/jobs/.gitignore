@@ -12,7 +12,8 @@
 node_modules/
 
 # env decrypt key
-.env.keys
+.env
+.env.test
 
 # logs
 logs/
