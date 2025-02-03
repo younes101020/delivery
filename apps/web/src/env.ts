@@ -3,8 +3,7 @@ import { createEnv } from "@t3-oss/env-nextjs";
 import { config } from "dotenv";
 import { z } from "zod";
 
-console.log(process.env.CI, "GITHUB ACTIOIN ENV");
-if (process.env.GITHUB_ACTIONS !== "true") {
+if (process.env.CI !== "true") {
   config({ path: process.env.NODE_ENV === "test" ? ".env.test" : ".env" });
 }
 
@@ -20,5 +19,5 @@ export const env = createEnv({
   experimental__runtimeEnv: {
     NEXT_PUBLIC_BASEURL: process.env.NEXT_PUBLIC_BASEURL,
   },
-  skipValidation: process.env.GITHUB_ACTIONS === "true",
+  skipValidation: process.env.CI === "true",
 });
