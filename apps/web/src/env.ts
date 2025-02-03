@@ -19,4 +19,5 @@ export const env = createEnv({
   experimental__runtimeEnv: {
     NEXT_PUBLIC_BASEURL: process.env.NEXT_PUBLIC_BASEURL,
   },
+  skipValidation: process.env.GITHUB_ACTIONS === "true"
 });
