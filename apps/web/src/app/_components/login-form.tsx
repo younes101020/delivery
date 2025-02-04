@@ -3,15 +3,15 @@
 import { Loader2 } from "lucide-react";
 import { useActionState } from "react";
 
-import type { ActionState } from "@/lib/form-middleware";
+import type { ActionState } from "@/app/_lib/form-middleware";
 
+import { signUp } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import { signIn } from "../(login)/actions";
-import { signUp } from "../actions";
+//import { signIn } from "../(login)/actions";
 
 export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(

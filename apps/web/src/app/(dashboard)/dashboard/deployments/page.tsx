@@ -1,9 +1,9 @@
 import { Bird } from "lucide-react";
 
 import { EmptyState } from "@/components/ui/empty-state";
-import { getDeployments } from "@/lib/deployment/queries";
 
 import { DeploymentPreviewCard } from "./_components/deployment-preview-card";
+import { getDeployments } from "./_lib/queries";
 
 function NoDeployments() {
   return (

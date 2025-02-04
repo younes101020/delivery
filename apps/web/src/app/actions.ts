@@ -4,10 +4,10 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { setSession } from "@/lib/auth/session";
-import { validatedAction } from "@/lib/form-middleware";
-import { client } from "@/lib/http";
-import { getUser } from "@/lib/users";
+import { client } from "./_lib/client-http";
+import { validatedAction } from "./_lib/form-middleware";
+import { setSession } from "./_lib/session";
+import { getUser } from "./_lib/user-session";
 
 const signUpSchema = z.object({
   email: z.string().email(),

@@ -3,9 +3,10 @@
 import { revalidateTag } from "next/cache";
 import { z } from "zod";
 
-import { getFormChangesAction, validatedAction } from "@/lib/form-middleware";
-import { client } from "@/lib/http";
-import { transformEnvVars } from "@/lib/utils";
+import { client } from "@/app/_lib/client-http";
+import { getFormChangesAction, validatedAction } from "@/app/_lib/form-middleware";
+
+import { transformEnvVars } from "./_lib/utils";
 
 const editApplicationSchema = z
   .object({

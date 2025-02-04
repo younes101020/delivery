@@ -1,11 +1,12 @@
-import type { Installation } from "@/lib/github/types";
-import { test } from "vitest";
+import { it } from "vitest";
 
-type User = {
+import type { Installation } from "@/app/_lib/github/types";
+
+interface User {
   email: string;
   password: string;
   registered: boolean;
-};
+}
 
 const installations: Installation[] = [];
 const users: User[] = [];
@@ -15,8 +16,9 @@ interface OnBoardingFixtures {
   users: User[];
 }
 
-export const onBoardingTest = test.extend<OnBoardingFixtures>({
-  installations: async ({}, use) => {
+export const onBoardingTest = it.extend<OnBoardingFixtures>({
+  // eslint-disable-next-line no-empty-pattern
+  installations: async ({}, inject) => {
     installations[0].repositories.push(
       {
         id: 1,
@@ -51,10 +53,11 @@ export const onBoardingTest = test.extend<OnBoardingFixtures>({
     );
     installations[0].githubAppId = 10;
     installations[0].hasMore = true;
-    await use(installations);
+    await inject(installations);
     installations.length = 0;
   },
-  users: async ({}, use) => {
+  // eslint-disable-next-line no-empty-pattern
+  users: async ({}, inject) => {
     users.push(
       {
         email: "test@example.com",
@@ -72,7 +75,7 @@ export const onBoardingTest = test.extend<OnBoardingFixtures>({
         registered: false,
       },
     );
-    await use(users);
+    await inject(users);
     users.length = 0;
   },
 });

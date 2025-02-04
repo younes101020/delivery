@@ -4,9 +4,9 @@ import { Suspense } from "react";
 
 import { WithBannerBadge } from "@/components/banner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getApplicationById, getApplicationSreenshotUrl } from "@/lib/application/queries";
 import { formatDate } from "@/lib/utils";
 
+import { getApplicationById, getApplicationSreenshotUrl } from "../_lib/queries";
 import { AppForm } from "./_components/app-form";
 import DeleteAppForm from "./_components/delete-app-form";
 

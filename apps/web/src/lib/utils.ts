@@ -21,23 +21,6 @@ export type Nullable<T> = {
   [K in keyof T]: T[K] | null;
 };
 
-export function transformEnvVars(envs: string) {
-  if (!envs) {
-    return [];
-  }
-
-  return envs
-    .trim()
-    .split(/\s+/)
-    .map((env) => {
-      const [key, value] = env.split("=");
-      return {
-        key,
-        value,
-      };
-    });
-}
-
 export function formatDate(date: string | null | Date) {
   if (!date)
     return null;

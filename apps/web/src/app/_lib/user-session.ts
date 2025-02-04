@@ -1,5 +1,5 @@
-import { getSession } from "./auth/session";
-import { client } from "./http";
+import { client } from "./client-http";
+import { getSession } from "./session";
 
 export async function getUser() {
   const sessionData = await getSession();

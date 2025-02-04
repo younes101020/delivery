@@ -4,9 +4,9 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { setSession } from "@/lib/auth/session";
-import { validatedAction } from "@/lib/form-middleware";
-import { client } from "@/lib/http";
+import { client } from "@/app/_lib/client-http";
+import { validatedAction } from "@/app/_lib/form-middleware";
+import { setSession } from "@/app/_lib/session";
 
 export async function signOut() {
   (await cookies()).delete("session");
@@ -19,12 +19,14 @@ const signInSchema = z.object({
 
 export const signIn = validatedAction(signInSchema, async (data) => {
   const { email, password } = data;
+
   const response = await client.auth.verify.$post({
     json: {
       email,
       password,
     },
   });
+
   if (response.status !== 200) {
     return { error: "Invalid email or password. Please try again.", inputs: data };
   }

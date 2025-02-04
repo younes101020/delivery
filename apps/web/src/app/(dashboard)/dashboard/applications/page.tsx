@@ -4,10 +4,10 @@ import { Suspense } from "react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getApplications } from "@/lib/application/queries";
 import { formatDate } from "@/lib/utils";
 
 import { AppCard } from "./_components/app-card";
+import { getApplications } from "./_lib/queries";
 
 function NoApplicationsScreen() {
   return (

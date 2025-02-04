@@ -1,7 +1,7 @@
 import type { NewUser as User } from "@delivery/jobs/types";
 import type { z } from "zod";
 
-import { getUser } from "./users";
+import { getUser } from "./user-session";
 
 export interface ActionState<PrevState extends object = Record<string, any>> {
   error?: string;

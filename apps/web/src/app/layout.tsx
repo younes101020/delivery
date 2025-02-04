@@ -3,10 +3,9 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Suspense } from "react";
 
-import { UserProvider } from "@/lib/auth";
-import { getUser } from "@/lib/users";
-
+import { UserProvider } from "./_lib/user-provider";
 import "./globals.css";
+import { getUser } from "./_lib/user-session";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",

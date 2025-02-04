@@ -1,6 +1,7 @@
+import "server-only";
 import { unstable_cacheTag } from "next/cache";
 
-import { client } from "../http";
+import { client } from "@/app/_lib/client-http";
 
 export async function getApplicationById(id: string) {
   "use cache";
