@@ -1,14 +1,10 @@
 import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, beforeAll, describe, expect, vi } from "vitest";
+import { afterEach, describe, expect, vi } from "vitest";
 
-import { DeploymentForm } from "@/app/_components/deployment-form";
 import { Login } from "@/app/_components/login-form";
-import { GithubAppForm } from "@/app/(onboarding)/onboarding/_components/github-app-form";
-import { env } from "@/env";
 
 import { onBoardingTest } from "./fixtures";
-import { mockImports } from "./mocked-imports";
 
 function setup(jsx: React.ReactElement) {
   return {
