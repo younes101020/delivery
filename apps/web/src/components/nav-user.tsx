@@ -4,6 +4,7 @@ import { BadgeCheck, ChevronsUpDown, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { useUser } from "@/app/_lib/user-provider";
 import { signOut } from "@/app/(login)/actions";
 import {
   DropdownMenu,
@@ -20,7 +21,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useUser } from "@/lib/auth";
 
 export function NavUser() {
   const router = useRouter();

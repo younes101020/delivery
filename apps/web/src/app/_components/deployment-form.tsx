@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 
-import type { Installation, Repository } from "@/app/_lib/github/types";
+import type { GithubRepositories, Repository } from "@/app/_lib/github/types";
 import type { Nullable } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,7 @@ import type { ActionState } from "../_lib/form-middleware";
 import { deploy } from "../actions";
 
 interface DeploymentProps {
-  installations: Installation[];
+  installations: GithubRepositories[];
   isOnboarding?: boolean;
 }
 
@@ -200,7 +200,7 @@ type SelectedRepositoryProps = Nullable<{
 
 interface RepositorySectionProps {
   repo: Repository;
-  githubAppId: Installation["githubAppId"];
+  githubAppId: GithubRepositories["githubAppId"];
   selected: SelectedRepositoryProps;
   setSelected: (repository: SelectedRepositoryProps) => void;
 }

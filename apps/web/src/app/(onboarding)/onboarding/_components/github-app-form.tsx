@@ -10,8 +10,10 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
+const GITHUB_APP_REGISTRATION_URL = "https://github.com/settings/apps/new";
+
 export function GithubAppForm({ baseUrl }: { baseUrl: string }) {
-  const [url, setUrl] = useState("https://github.com/settings/apps/new");
+  const [url, setUrl] = useState(GITHUB_APP_REGISTRATION_URL);
   const [enableOrg, setEnableOrg] = useState(false);
   const [name, setName] = useState("");
 
@@ -41,7 +43,7 @@ export function GithubAppForm({ baseUrl }: { baseUrl: string }) {
 
   const handleOrgNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setUrl(`organizations/${value}/settings/apps/new`);
+    setUrl(`https://github.com/organizations/${value}/settings/apps/new`);
   };
 
   return (

@@ -13,11 +13,11 @@ const client = testClient(createApp().route("/", router));
 
 describe("githubapps routes / integration test", () => {
   it("post /githubapps validates the body when creating", async ({ githubAppPayload }) => {
-    const { clientId, clientSecret, webhookSecret, appId } = githubAppPayload;
+    const { privateKey, ...githubAppWithoutPrivateKey } = githubAppPayload;
     const response = await client.githubapps.$post(
       {
         // @ts-expect-error
-        json: { clientId, clientSecret, webhookSecret, appId },
+        json: githubAppWithoutPrivateKey,
       },
     );
     expect(response.status).toBe(422);

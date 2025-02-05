@@ -1,30 +1,17 @@
 import { createAppAuth } from "@octokit/auth-app";
 import { Octokit } from "@octokit/rest";
 
-import type { FailedInstallation, Installation, ListInstallationRepositoriesResult } from "./types";
+import { getAllGithubApp } from "./queries";
 
-import { getAllGithubAppInstallations } from "./queries";
-
-export async function getGithubRepositories(iteration: number) {
-  const installations = await getAllInstallationsWithRepos({ repoPage: iteration });
-  if (!installations)
-    return null;
-  const nonNullInstallations = installations
-    .filter(
-      (installation): installation is NonNullable<typeof installation> => installation !== null,
-    )
-    .flat();
-  return nonNullInstallations.length <= 0 ? null : nonNullInstallations;
-}
-
-export async function getAllInstallationsWithRepos({ repoPage }: { repoPage: number }) {
-  const result = await getAllGithubAppInstallations();
-  if (!result) {
+// Aggregates just the essential github repositories data needed by the frontend
+export async function getGithubRepositories(repoPage: number) {
+  const githubApps = await getAllGithubApp();
+  if (!githubApps) {
     return null;
   }
 
   const installations = await Promise.all(
-    result.map(async (installation) => {
+    githubApps.map(async (installation) => {
       const repositoriesResponse = await listGithubRepositories({
         appId: installation.appId.toString(),
         privateKey: installation.privateKey,
@@ -32,67 +19,50 @@ export async function getAllInstallationsWithRepos({ repoPage }: { repoPage: num
         repoPage,
       });
 
-      if (!repositoriesResponse.success) {
-        return { failed: true } as FailedInstallation;
-      }
-
       const { repositories, hasMore } = repositoriesResponse;
 
       return {
         githubAppId: installation.appId,
-        repositories: repositories.map(repo => ({
-          id: repo.id,
-          full_name: repo.full_name,
-          git_url: repo.git_url,
-          description: repo.description,
-        })),
-        hasMore,
+        name: installation.name,
+        repositories: repositories
+          ? repositories.map(repo => ({
+              id: repo.id,
+              full_name: repo.full_name,
+              git_url: repo.git_url,
+              description: repo.description,
+            }))
+          : [],
+        hasMore: typeof hasMore === "undefined" ? false : hasMore,
       };
     }),
   );
 
-  return installations.filter(isSuccessful);
+  return installations;
 }
 
-export async function listGithubRepositories({
+// This function fetches paginated github repositories data from a single GitHub installation
+async function listGithubRepositories({
   appId,
   privateKey,
   installationId,
   repoPerPage = 5,
   repoPage = 1,
-  type = "all",
 }: {
   appId: string;
   privateKey: string | null;
   installationId: string;
-  type?: string;
   repoPerPage?: number;
   repoPage?: number;
-}): Promise<ListInstallationRepositoriesResult> {
+}) {
   "use cache";
   try {
-    const octokit = new Octokit({
-      authStrategy: createAppAuth,
-      auth: {
-        appId,
-        privateKey,
-        installationId,
-      },
-    });
-
-    const { token } = (await octokit.auth({
-      type: "installation",
-    })) as { token: string };
-
-    const installationOctokit = new Octokit({
-      auth: token,
-    });
+    const installation = await getGithubAppInstallation({ appId, privateKey, installationId });
 
     const reposPromises = Array.from({ length: repoPage }, (_, pageIndex) =>
-      installationOctokit.apps.listReposAccessibleToInstallation({
+      installation.apps.listReposAccessibleToInstallation({
         per_page: repoPerPage,
         page: pageIndex + 1,
-        type,
+        type: "all",
       }));
     const iteratedRepos = await Promise.all(reposPromises);
     const repositories = iteratedRepos.map(repo => repo.data.repositories.reverse()).flat();
@@ -115,8 +85,24 @@ export async function listGithubRepositories({
   }
 }
 
-function isSuccessful(
-  installation: Installation | FailedInstallation,
-): installation is Installation {
-  return !("failed" in installation);
+// see: https://docs.github.com/en/rest/apps/installations?apiVersion=2022-11-28
+async function getGithubAppInstallation({ appId, privateKey, installationId }: { appId: string; privateKey: string | null; installationId: string }) {
+  const octokit = new Octokit({
+    authStrategy: createAppAuth,
+    auth: {
+      appId,
+      privateKey,
+      installationId,
+    },
+  });
+
+  const { token } = (await octokit.auth({
+    type: "installation",
+  })) as { token: string };
+
+  const installation = new Octokit({
+    auth: token,
+  });
+
+  return installation;
 }

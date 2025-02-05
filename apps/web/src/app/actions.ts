@@ -25,7 +25,7 @@ export const signUp = validatedAction(signUpSchema, async (data) => {
   });
 
   // Non explicit error message to end-user to prevent from enumeration attack
-  if (response.status !== 200)
+  if (!response.ok)
     return { error: "Impossible to sign up", inputs: data };
   const createdUser = await response.json();
   await setSession(createdUser);

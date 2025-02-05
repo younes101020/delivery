@@ -13,6 +13,7 @@ interface Fixtures {
 
 const sensitiveValue = faker.string.hexadecimal({ length: 64, prefix: "" });
 const githubAppPayload = {
+  name: faker.internet.displayName(),
   webhookSecret: sensitiveValue,
   clientId: "1",
   clientSecret: sensitiveValue,

@@ -5,7 +5,7 @@ import { getGithubRepositories } from "@/app/_lib/github/repositories";
 import { DeploymentForm } from "./deployment-form";
 
 interface DeploymentProps {
-  paginationPromise: Promise<{ page: number; step?: number }> | undefined;
+  paginationPromise: Promise<{ page: string; step?: string }> | undefined;
   onboarding?: boolean;
 }
 
@@ -13,13 +13,14 @@ export async function Deployment({ paginationPromise, onboarding = false }: Depl
   const searchParams = await paginationPromise;
 
   if (onboarding) {
-    if (!searchParams || searchParams.step !== 4) {
+    const onboardingStep = searchParams && searchParams.step ? Number.parseInt(searchParams.step) : null;
+    if (onboardingStep !== 4) {
       return null;
     }
   }
 
   const page = searchParams && searchParams.page;
-  const installations = await getGithubRepositories(page ?? 1);
+  const installations = await getGithubRepositories(page ? Number.parseInt(page) : 1);
 
   if (!installations) {
     if (onboarding)

@@ -4,7 +4,7 @@ import { ExternalLink as ExternalLinkIcon, Loader2, RotateCcw } from "lucide-rea
 import { redirect } from "next/navigation";
 import { useActionState, useEffect } from "react";
 
-import type { ActionState } from "@/lib/form-middleware";
+import type { ActionState } from "@/app/_lib/form-middleware";
 import type { Nullable } from "@/lib/utils";
 
 import { retryDeploy } from "@/app/actions";

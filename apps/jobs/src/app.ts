@@ -1,6 +1,3 @@
-import { bearerAuth } from "hono/bearer-auth";
-
-import env from "@/env";
 import configureOpenAPI from "@/lib/configure-open-api";
 import createApp from "@/lib/create-app";
 import applications from "@/routes/applications/applications.index";
@@ -28,8 +25,6 @@ const routes = [
 ] as const;
 
 routes.forEach((route) => {
-  if (env.NODE_ENV !== "test")
-    route.use("*", bearerAuth({ token: env.BEARER_TOKEN }));
   app.route("/", route);
 });
 

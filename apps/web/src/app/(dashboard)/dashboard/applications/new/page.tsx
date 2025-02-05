@@ -1,7 +1,7 @@
 import { Deployment } from "@/app/_components/deployment";
 
 export default function NewApplicationPage(props: {
-  searchParams?: Promise<{ page: number }>;
+  searchParams?: Promise<{ page: string }>;
 }) {
   return (
     <section className="p-5 bg-background/50 border">

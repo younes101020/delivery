@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 
 import { redirect } from "next/navigation";
 
-import { client } from "@/lib/http";
+import { client } from "@/app/_lib/client-http";
 
 import type { GithubAppResponse } from "../types";
 
@@ -33,6 +33,7 @@ export async function GET(request: NextRequest) {
       clientSecret: result.client_secret,
       appId: result.id,
       privateKey: result.pem,
+      name: result.name,
     },
   });
   if (appResponse.status !== 200) {

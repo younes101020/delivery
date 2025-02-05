@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { client } from "@/lib/http";
+import { setInstallationIdOnGithubApp } from "@/app/_lib/github/queries";
 
 export async function GET(req: NextRequest) {
   const installationId = req.nextUrl.searchParams.get("installation_id");
@@ -16,14 +16,7 @@ export async function GET(req: NextRequest) {
   const stateObj = JSON.parse(decodeURIComponent(state));
 
   try {
-    await client.githubapps[":id"].$patch({
-      param: {
-        id: stateObj.appId,
-      },
-      json: {
-        installationId: Number.parseInt(installationId),
-      },
-    });
+    await setInstallationIdOnGithubApp({ githubAppId: stateObj.appId, installationId: Number.parseInt(installationId) });
   }
   catch (error) {
     console.error(error);

@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { Deployment } from "@/app/_components/deployment";
-import { getAllGithubAppInstallations } from "@/app/_lib/github/queries";
+import { getAllGithubApp } from "@/app/_lib/github/queries";
 import { getUser } from "@/app/_lib/user-session";
 import { Skeleton } from "@/components/ui/skeleton";
 import { env } from "@/env";
@@ -13,9 +13,11 @@ import { GithubAppForm } from "./_components/github-app-form";
 import { StepProvider } from "./_components/step";
 import { getServerConfiguration } from "./_lib/queries";
 
-export default async function OnboardingPage(props: {
-  searchParams?: Promise<{ step: number; page: number }>;
-}) {
+interface SearchParams {
+  searchParams?: Promise<{ step: string; page: string }>;
+}
+
+export default async function OnboardingPage(props: SearchParams) {
   const searchParams = props.searchParams?.then(sp => ({ step: sp.step, page: sp.page }));
   return (
     <div className="flex justify-center items-center h-full *:lg:w-[70%] *:w-[90%]">
@@ -37,33 +39,32 @@ export default async function OnboardingPage(props: {
   );
 }
 
-interface StepChildrenProps {
-  searchParams: Promise<{ step: number; page: number }> | undefined;
-}
-
-async function GithubAppStep(props: StepChildrenProps) {
+async function GithubAppStep(props: SearchParams) {
   const searchParams = await props.searchParams;
-  if (!searchParams || searchParams.step !== 3) {
+  const onboardingStep = searchParams ? Number.parseInt(searchParams.step) : null;
+  if (onboardingStep !== 3) {
     return null;
   }
-  const allGithubInstallations = await getAllGithubAppInstallations();
+  const allGithubInstallations = await getAllGithubApp();
   if (allGithubInstallations && allGithubInstallations.length > 0)
     redirect("/onboarding/?step=4");
   return <GithubAppForm baseUrl={env.NEXT_PUBLIC_BASEURL} />;
 }
 
-async function DomainNameStep(props: StepChildrenProps) {
+async function DomainNameStep(props: SearchParams) {
   const searchParams = await props.searchParams;
-  if (!searchParams || searchParams.step !== 2) {
+  const onboardingStep = searchParams ? Number.parseInt(searchParams.step) : null;
+  if (onboardingStep !== 2) {
     return null;
   }
+
   const serverConfig = await getServerConfiguration();
   if (serverConfig?.domainName)
     redirect("/onboarding/?step=3");
   return <DomainNameForm />;
 }
 
-async function LoginStep(props: StepChildrenProps) {
+async function LoginStep(props: SearchParams) {
   const searchParams = await props.searchParams;
   if (searchParams && searchParams.step) {
     return null;

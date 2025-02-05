@@ -2,8 +2,8 @@
 
 import { z } from "zod";
 
-import { getFormChangesAction, validatedActionWithUser } from "@/lib/form-middleware";
-import { client } from "@/lib/http";
+import { client } from "@/app/_lib/client-http";
+import { getFormChangesAction, validatedActionWithUser } from "@/app/_lib/form-middleware";
 
 const updateAccountSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),

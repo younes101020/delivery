@@ -20,7 +20,7 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
 
   const githubAppsWithPrivateKey = await Promise.all(
     githubApps.map(async (app) => {
-      const { secret, ...appWithoutSecret } = app;
+      const { secret, ...githubApp } = app;
       const privateKey = secret
         ? await decryptSecret({
           encryptedData: Buffer.from(secret.encryptedData, "base64"),
@@ -34,7 +34,7 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
           ),
         })
         : null;
-      return { ...appWithoutSecret, privateKey };
+      return { ...githubApp, privateKey };
     }),
   );
   return c.json(githubAppsWithPrivateKey);

@@ -3,12 +3,12 @@
 import { Loader2, UserPen } from "lucide-react";
 import { useActionState } from "react";
 
-import type { ActionState } from "@/lib/form-middleware";
+import type { ActionState } from "@/app/_lib/form-middleware";
 
+import { useUser } from "@/app/_lib/user-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useUser } from "@/lib/auth";
 
 import { updateAccount } from "../actions";
 

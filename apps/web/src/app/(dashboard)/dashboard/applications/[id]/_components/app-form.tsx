@@ -3,7 +3,7 @@
 import { Loader2 } from "lucide-react";
 import { useActionState } from "react";
 
-import type { ActionState } from "@/lib/form-middleware";
+import type { ActionState } from "@/app/_lib/form-middleware";
 
 import { Button } from "@/components/ui/button";
 import { CardFooter } from "@/components/ui/card";

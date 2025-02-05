@@ -30,6 +30,7 @@ export const users = pgTable("users", {
 
 export const githubApp = pgTable("github_app", {
   id: serial("id").primaryKey(),
+  name: text("name").notNull(),
   webhookSecret: text("webhook_secret").notNull(),
   clientId: text("client_id").notNull(),
   clientSecret: text("client_secret").notNull(),
