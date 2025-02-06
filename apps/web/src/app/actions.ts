@@ -68,7 +68,7 @@ export const deploy = validatedAction(deploySchema, async (data) => {
         onboardingCompleted: true,
       },
     });
-    if (response.status !== 200) {
+    if (!response.ok) {
       return { error: "Something went wrong, please retry later.", inputs: data };
     }
     (await cookies()).set("skiponboarding", "true", {
@@ -96,7 +96,7 @@ export const retryDeploy = validatedAction(retryDeploySchema, async (data) => {
       queueName: repoName,
     },
   });
-  if (response.status !== 200) {
+  if (!response.ok) {
     return { error: "Impossible to retry deployment, please retry later.", inputs: data };
   }
   return { success: "Deployment retry attempted", inputs: data };
@@ -112,7 +112,7 @@ export const domainName = validatedAction(domainNameSchema, async (data) => {
       domainName: data.domainName,
     },
   });
-  if (response.status !== 200) {
+  if (!response.ok) {
     return { error: "Something went wrong, please retry later.", inputs: data };
   }
   redirect("/onboarding?step=3");
