@@ -17,8 +17,7 @@ interface SearchParams {
   searchParams?: Promise<{ step: string; page: string }>;
 }
 
-export default async function OnboardingPage(props: SearchParams) {
-  const searchParams = props.searchParams?.then(sp => ({ step: sp.step, page: sp.page }));
+export default async function OnboardingPage({ searchParams }: SearchParams) {
   return (
     <div className="flex justify-center items-center h-full *:lg:w-[70%] *:w-[90%]">
       <StepProvider>
@@ -32,7 +31,7 @@ export default async function OnboardingPage(props: SearchParams) {
           <GithubAppStep searchParams={searchParams} />
         </Suspense>
         <Suspense fallback={<CheckStepStatusLoadingScreen />}>
-          <Deployment paginationPromise={searchParams} onboarding={true} />
+          <Deployment sp={searchParams} onboarding={true} />
         </Suspense>
       </StepProvider>
     </div>

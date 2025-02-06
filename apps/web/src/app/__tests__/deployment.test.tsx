@@ -1,12 +1,16 @@
-import { cleanup } from "@testing-library/react";
-import { afterEach, beforeAll, describe, vi } from "vitest";
+import { cleanup, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { afterEach, beforeAll, describe, expect, vi } from "vitest";
 
-/* function setup(jsx: React.ReactElement) {
+import { DeploymentForm } from "../_components/deployment-form";
+import { deploymentTest } from "./fixtures";
+
+function setup(jsx: React.ReactElement) {
   return {
     userAction: userEvent.setup(),
     ...render(jsx),
   };
-} */
+}
 
 const mockReplace = vi.fn();
 
@@ -29,15 +33,21 @@ describe("onboarding process", () => {
     });
   });
 
+  globalThis.ResizeObserver = vi.fn().mockImplementation(() => ({
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
+  }));
+
   afterEach(() => {
     cleanup();
     vi.clearAllMocks();
   });
 
-  /* deploymentTest(
+  deploymentTest(
     "submit input should be disabled when no repository is selected",
-    ({ githubRepositories }) => {
-      setup(<DeploymentForm installations={githubRepositories} isOnboarding={true} />);
+    ({ repositories, githubApps }) => {
+      setup(<DeploymentForm repositories={repositories} githubApps={githubApps} isOnboarding={true} />);
       const form = within(screen.getByRole("form"));
       expect(form.getByLabelText("submit")).toHaveProperty("disabled", true);
     },
@@ -45,12 +55,12 @@ describe("onboarding process", () => {
 
   deploymentTest(
     "submit input should be enabled when repository is selected",
-    async ({ githubRepositories }) => {
-      const { userAction } = setup(<DeploymentForm installations={githubRepositories} isOnboarding={true} />);
+    async ({ repositories, githubApps }) => {
+      const { userAction } = setup(<DeploymentForm repositories={repositories} githubApps={githubApps} isOnboarding={true} />);
       const form = within(screen.getByRole("form"));
       const repoCard = screen.getByTestId("1-repo-card");
       await userAction.click(repoCard);
       expect(form.getByLabelText("submit")).toHaveProperty("disabled", false);
     },
-  ); */
+  );
 });

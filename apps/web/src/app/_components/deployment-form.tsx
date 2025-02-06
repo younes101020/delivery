@@ -1,32 +1,29 @@
 "use client";
 
-import { Check, Loader2, Rocket } from "lucide-react";
-import { motion } from "motion/react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { Loader2, Rocket } from "lucide-react";
+import { useActionState, useState } from "react";
 
-import type { GithubRepositories, Repository } from "@/app/_lib/github/types";
-import type { Nullable } from "@/lib/utils";
+import type { GithubApp, GithubRepositories } from "@/app/_lib/github/types";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 
 import type { ActionState } from "../_lib/form-middleware";
+import type { SelectedRepositoryProps } from "./deployment-repositories";
 
 import { deploy } from "../actions";
+import { DeploymentGithubAppList } from "./deployment-github-app-list";
+import { DeploymentRepositories } from "./deployment-repositories";
 
 interface DeploymentProps {
-  installations: GithubRepositories[];
+  repositories: GithubRepositories;
+  githubApps: GithubApp[];
   isOnboarding?: boolean;
 }
 
-export function DeploymentForm({ installations, isOnboarding = false }: DeploymentProps) {
+export function DeploymentForm({ repositories, githubApps, isOnboarding = false }: DeploymentProps) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(deploy, {
     error: "",
     inputs: {
@@ -35,37 +32,12 @@ export function DeploymentForm({ installations, isOnboarding = false }: Deployme
       cache: true,
     },
   });
-  const { isIntersecting, ref } = useIntersectionObserver({ threshold: 0.5 });
   const [selected, setSelected] = useState<SelectedRepositoryProps>({
     name: null,
     id: null,
     githubAppId: null,
     gitUrl: null,
   });
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const { replace } = useRouter();
-  const [hasTriggered, setHasTriggered] = useState(false);
-
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams);
-    if (isIntersecting && !hasTriggered) {
-      setHasTriggered(true);
-      const repoPage = params.get("page");
-      if (!repoPage) {
-        params.set("page", "2");
-      }
-      else {
-        let updatedRepoPage = Number.parseInt(repoPage);
-        updatedRepoPage++;
-        params.set("page", `${updatedRepoPage}`);
-      }
-      replace(`${pathname}?${params.toString()}`, { scroll: false });
-    }
-    else if (!isIntersecting) {
-      setHasTriggered(false);
-    }
-  }, [isIntersecting, pathname, replace, hasTriggered, searchParams]);
 
   return (
     <>
@@ -111,25 +83,11 @@ export function DeploymentForm({ installations, isOnboarding = false }: Deployme
           <p className="block text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 pb-2">
             Application source
           </p>
-          <ScrollArea className="max-h-80">
-            <div className="max-h-96 grid grid-cols-1 md:grid-cols-2 gap-2">
-              {installations[0].repositories.map(repo => (
-                <RepositorySection
-                  repo={repo}
-                  githubAppId={installations[0].githubAppId}
-                  key={repo.id}
-                  setSelected={setSelected}
-                  selected={selected}
-                />
-              ))}
+          <div className="grid grid-cols-4 gap-4">
+            <DeploymentGithubAppList githubApps={githubApps} />
+            <DeploymentRepositories githubApp={repositories.githubApp} repositories={repositories} selected={selected} setSelected={setSelected} />
+          </div>
 
-              {installations[0].hasMore && (
-                <div ref={ref}>
-                  <Skeleton className="w-full h-40" />
-                </div>
-              )}
-            </div>
-          </ScrollArea>
         </div>
         <p className="text-muted-foreground text-xs">
           This GitHub repository will be the source of your application.
@@ -188,51 +146,5 @@ export function DeploymentForm({ installations, isOnboarding = false }: Deployme
         </div>
       </form>
     </>
-  );
-}
-
-type SelectedRepositoryProps = Nullable<{
-  name: string;
-  gitUrl: string;
-  githubAppId: number;
-  id: number;
-}>;
-
-interface RepositorySectionProps {
-  repo: Repository;
-  githubAppId: GithubRepositories["githubAppId"];
-  selected: SelectedRepositoryProps;
-  setSelected: (repository: SelectedRepositoryProps) => void;
-}
-
-function RepositorySection({ repo, setSelected, selected, githubAppId }: RepositorySectionProps) {
-  const isSelected = selected.name === repo.full_name;
-  return (
-    <motion.section
-      whileHover={{ scale: 1.01 }}
-      whileTap={{ scale: 0.9 }}
-      className="cursor-pointer"
-      onClick={() => {
-        setSelected({
-          name: repo.full_name,
-          id: repo.id,
-          githubAppId,
-          gitUrl: repo.git_url,
-        });
-      }}
-      data-testid={`${repo.id}-repo-card`}
-    >
-      <Card className={`h-28 overflow-hidden relative ${isSelected && "border-primary"}`}>
-        {isSelected && (
-          <div className="absolute top-0 right-0">
-            <Check className="bg-primary text-primary-foreground" />
-          </div>
-        )}
-        <CardHeader>
-          <CardTitle>{repo.full_name}</CardTitle>
-          <CardDescription>{repo.description ?? "No description"}</CardDescription>
-        </CardHeader>
-      </Card>
-    </motion.section>
   );
 }

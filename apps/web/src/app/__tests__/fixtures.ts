@@ -1,15 +1,16 @@
 import { it } from "vitest";
 
-import type { GithubRepositories } from "@/app/_lib/github/types";
+import type { GithubApp, GithubRepositories } from "@/app/_lib/github/types";
 
 interface DeploymentFixtures {
-  githubRepositories: GithubRepositories;
+  repositories: GithubRepositories;
+  githubApps: GithubApp[];
 }
 
 export const deploymentTest = it.extend<DeploymentFixtures>({
   // eslint-disable-next-line no-empty-pattern
-  githubRepositories: async ({}, inject) => {
-    const githubRepositories = {
+  repositories: async ({}, inject) => {
+    const repositories = {
       repositories: [{
         id: 1,
         full_name: "octocat/Hello-World",
@@ -36,10 +37,18 @@ export const deploymentTest = it.extend<DeploymentFixtures>({
         git_url: "git://github.com/denoland/deno.git",
         description: "A modern runtime for JavaScript and TypeScript",
       }],
-      githubAppId: Math.floor(Math.random() * 100),
+      githubApp: { appId: 4578, name: "mygithubaap" },
       hasMore: Math.random() < 0.5,
-      name: "My Super Github Account",
     };
-    await inject(githubRepositories);
+    await inject(repositories);
+  },
+  // eslint-disable-next-line no-empty-pattern
+  githubApps: async ({}, inject) => {
+    const githubApps = [
+      { appId: 1234, name: "GitHub App 1" },
+      { appId: 5678, name: "GitHub App 2" },
+      { appId: 9012, name: "GitHub App 3" },
+    ];
+    await inject(githubApps);
   },
 });

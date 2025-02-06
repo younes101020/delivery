@@ -6,7 +6,12 @@ export interface Repository {
 }
 
 export interface GithubRepositories {
-  githubAppId: number;
   repositories: Repository[];
   hasMore: boolean;
+  githubApp: GithubApp;
+}
+
+export interface GithubApp {
+  appId: number;
+  name: string;
 }
