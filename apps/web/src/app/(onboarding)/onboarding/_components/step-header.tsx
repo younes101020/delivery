@@ -7,20 +7,20 @@ import { useStep } from "./step";
 const headerData = [
   {
     title: "Account creation",
-    description: "You will use this account to manage your applications.",
+    description: "To manage your applications.",
   },
   {
     title: "URLs",
     description:
-      "This will allow Delivery to expose the dashboard and your applications on the internet.",
+      "To expose your applications on the internet.",
   },
   {
     title: "Github App",
-    description: "This will allow Delivery to create deployment from your GitHub repositories.",
+    description: "To create deployment from your GitHub repositories.",
   },
   {
     title: "Deploy your app",
-    description: "This step should deploy your application over the internet.",
+    description: "To deploy your application over the internet.",
   },
 ];
 
