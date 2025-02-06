@@ -14,7 +14,7 @@ import type { ActionState } from "../_lib/form-middleware";
 import type { SelectedRepositoryProps } from "./deployment-repositories";
 
 import { deploy } from "../actions";
-import { DeploymentGithubAppList } from "./deployment-github-app-list";
+import { DeploymentGithubAppList } from "./deployment-github-apps";
 import { DeploymentRepositories } from "./deployment-repositories";
 
 interface DeploymentProps {
