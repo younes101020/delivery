@@ -7,7 +7,7 @@ import type { AppRouteHandler } from "@/lib/types";
 
 import { getApplicationByName } from "@/db/queries/queries";
 import { subscribeWorkerTo } from "@/routes/deployments/lib/tasks";
-import { startDeploy } from "@/routes/deployments/lib/tasks/deploy";
+import { JOBS, startDeploy } from "@/routes/deployments/lib/tasks/deploy";
 import { prepareDataForProcessing } from "@/routes/deployments/lib/tasks/deploy/jobs/utils";
 import { fetchQueueTitles } from "@/routes/deployments/lib/tasks/deploy/utils";
 import { connection, getBullConnection, jobCanceler } from "@/routes/deployments/lib/tasks/utils";
@@ -126,9 +126,12 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
     const jobs = (await queue.getJobs(["active", "failed"]) || []) as Job[];
 
     for (const job of jobs) {
+      const currentStep = job.name;
       allJobs.push({
         id: job.id!,
-        step: job.name,
+        previousStep: currentStep === JOBS.clone ? undefined : currentStep === JOBS.build ? JOBS.clone : JOBS.build,
+        step: currentStep,
+        nextStep: currentStep === JOBS.configure ? undefined : currentStep === JOBS.build ? JOBS.configure : JOBS.build,
         stacktrace: job.stacktrace,
         timestamp: new Date(job.timestamp),
         status: await job.getState(),

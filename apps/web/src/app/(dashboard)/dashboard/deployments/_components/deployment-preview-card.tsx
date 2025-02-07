@@ -6,7 +6,9 @@ import { cn, formatDate } from "@/lib/utils";
 
 interface DeploymentPreviewCardProps {
   id: string;
+  previousStep?: string;
   step: string;
+  nextStep?: string;
   timestamp: string;
   repoName: string;
   status: "completed" | "failed" | "active" | "delayed" | "prioritized" | "waiting" | "waiting-children" | "unknown";
@@ -17,6 +19,8 @@ export function DeploymentPreviewCard({
   step,
   timestamp,
   repoName,
+  previousStep,
+  nextStep,
   status,
 }: DeploymentPreviewCardProps) {
   const date = formatDate(timestamp);
@@ -28,10 +32,21 @@ export function DeploymentPreviewCard({
 
       <div className="mb-4 relative z-10 px-10">
         <dl className="text-xs">
-          <dt className="text-muted-foreground">Current step</dt>
-          <dd className="flex gap-2">
+          <dd className="flex gap-2 line-through opacity-50">
+            {previousStep}
+          </dd>
+        </dl>
+        <dl className="text-sm flex gap-2">
+          <dt className="pt-[.1rem]">
             <Bounce variant={status === "failed" ? "failed" : "active"} />
+          </dt>
+          <dd className="flex gap-2 align-middle">
             {step}
+          </dd>
+        </dl>
+        <dl className="text-xs">
+          <dd className="flex gap-2 opacity-50">
+            {nextStep}
           </dd>
         </dl>
       </div>

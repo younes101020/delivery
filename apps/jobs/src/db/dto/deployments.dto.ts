@@ -30,7 +30,9 @@ export const deploymentTrackerIdentifier = z.object({
 
 export const jobSchema = z.object({
   id: z.string(),
+  previousStep: z.string().optional(),
   step: z.string(),
+  nextStep: z.string().optional(),
   timestamp: z.string(),
   repoName: z.string(),
   status: z.enum(["completed", "failed", "active", "delayed", "prioritized", "waiting", "waiting-children", "unknown"]),
