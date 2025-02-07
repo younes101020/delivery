@@ -56,7 +56,10 @@ export function DeploymentPreviewCard({
         <span className="group-hover/feature:translate-x-2 transition duration-200 inline-block">
           {repoName}
         </span>
-        <Badge variant={status === "failed" ? "destructive" : "success"} className="w-fit">Step {status}</Badge>
+        <Badge variant={status === "failed" ? "destructive" : "success"} className="w-fit">
+          Step
+          {status}
+        </Badge>
       </div>
       <div className="text-xs max-w-xs relative z-10 px-10">
         <dl>
