@@ -1,4 +1,4 @@
-name: Running unit/integration tests
+name: ci
 
 on:
   push:

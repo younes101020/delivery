@@ -2,7 +2,7 @@ name: Push images to registry
 
 on:
   workflow_run:
-    workflows: ["Running unit/integration tests"]
+    workflows: ["ci"]
     types:
       - completed
     branches: ["main", "next"]
