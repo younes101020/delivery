@@ -29,7 +29,7 @@ export default async function DeploymentsPage() {
   }
   return (
     <section className="p-5 bg-background/50 border">
-      <h1 className="text-3xl font-bold bg-primary text-primary-foreground w-fit">New application</h1>
+      <h1 className="text-3xl font-bold tracking-wide">Ongoing deployments</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 relative z-10 py-10">
         {deployments.map(deployment => (
           <DeploymentPreviewCard key={deployment.id} {...deployment} />

@@ -40,10 +40,10 @@ export default async function ApplicationsPage() {
   return (
     <section className="p-5 bg-background/50 border">
       <div className="flex justify-between gap-2">
-        <h1 className="text-3xl font-bold bg-primary text-primary-foreground px-2 py-1 w-fit">Applications list</h1>
+        <h1 className="text-3xl font-bold tracking-wide text-secondary-foreground/85">Applications list</h1>
         <Link href="/dashboard/applications/new" className={buttonVariants({ variant: "outline" })}>
+          <PackagePlus className="mr-1 mt-[.1rem]" />
           New application
-          <PackagePlus className="ml-1 mt-[.1rem]" />
         </Link>
       </div>
 

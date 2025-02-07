@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Bounce } from "@/app/_components/bounce";
+import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { cn, formatDate } from "@/lib/utils";
 
@@ -50,15 +51,16 @@ export function DeploymentPreviewCard({
           </dd>
         </dl>
       </div>
-      <div className="text-lg font-bold mb-2 relative z-10 px-10">
+      <div className="text-lg font-bold mb-2 relative z-10 px-10 flex flex-col">
         <div className={`absolute left-0 inset-y-0 h-6 ${status === "failed" ? "bg-red-500/50" : "bg-green-500/50"} group-hover/feature:h-8 w-1 rounded-tr-full rounded-br-full ${status === "failed" ? "group-hover/feature:bg-red-500" : "group-hover/feature:bg-green-500"} transition-all duration-200 origin-center`} />
         <span className="group-hover/feature:translate-x-2 transition duration-200 inline-block">
           {repoName}
         </span>
+        <Badge variant={status === "failed" ? "destructive" : "success"} className="w-fit">Step {status}</Badge>
       </div>
       <div className="text-xs max-w-xs relative z-10 px-10">
         <dl>
-          <dt className="text-muted-foreground">Current step started at</dt>
+          <dt className="text-muted-foreground">This step started at</dt>
           <dd>
             {date}
           </dd>

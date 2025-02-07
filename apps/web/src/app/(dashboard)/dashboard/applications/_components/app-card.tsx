@@ -1,9 +1,8 @@
 "use client";
 
-import { ExternalLink, GitBranch, MoreHorizontal } from "lucide-react";
+import { ExternalLink, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
@@ -13,16 +12,15 @@ interface AppCardProps {
   fqdn: string;
   firstDeploymentAt: string;
   lastDeployed?: string;
-  status?: "Ready" | "Building" | "Error";
 }
 
-export function AppCard({ name, fqdn, firstDeploymentAt, status = "Error", id }: AppCardProps) {
+export function AppCard({ name, fqdn, firstDeploymentAt, id }: AppCardProps) {
   return (
     <Link href={`/dashboard/applications/${id}`} className="block">
       <Card className="w-full transition-all">
         <CardContent className="p-6 bg-sidebar/50">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold underline decoration-primary truncate">{name}</h2>
+            <h2 className="text-xl font-bold truncate">{name}</h2>
             <Button
               variant="ghost"
               size="icon"
@@ -31,19 +29,6 @@ export function AppCard({ name, fqdn, firstDeploymentAt, status = "Error", id }:
             >
               <MoreHorizontal className="h-5 w-5" />
             </Button>
-          </div>
-          <div className="flex items-center space-x-2 mb-4">
-            <Badge
-              variant={
-                status === "Ready" ? "default" : status === "Building" ? "secondary" : "destructive"
-              }
-            >
-              {status}
-            </Badge>
-          </div>
-          <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-4">
-            <GitBranch className="h-4 w-4" />
-            <span>main</span>
           </div>
           <dl className="text-xs pt-2">
             <dt className="text-muted-foreground">First deployment at</dt>
