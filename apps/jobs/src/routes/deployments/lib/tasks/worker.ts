@@ -1,20 +1,28 @@
 import { type Job, UnrecoverableError } from "bullmq";
 
 import { jobs } from "./deploy/jobs";
-import { jobCanceler } from "./utils";
+
+const MAX_TTL = 1800000; // 30min
+const TTL_EXIT_CODE = 10;
 
 export default async function Worker(job: Job) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), job.data.timeout);
+  let hasCompleted = false;
+  const harKillTimeout = setTimeout(() => {
+    if (!hasCompleted) {
+      process.exit(TTL_EXIT_CODE);
+    }
+  }, MAX_TTL);
+
   const processor = jobs[job.name];
-  const signal = jobCanceler.createSignal(job.id!);
+
   try {
     if (!processor) {
       throw new UnrecoverableError(`No processor found for job: ${job.name}`);
     }
-    return processor(job, signal);
+    await processor(job);
+    hasCompleted = true;
   }
   finally {
-    clearTimeout(timer);
+    clearTimeout(harKillTimeout);
   }
 }

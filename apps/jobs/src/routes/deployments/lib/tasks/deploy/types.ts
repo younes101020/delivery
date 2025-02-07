@@ -30,4 +30,4 @@ export type QueueDeploymentJobName = keyof QueueDeploymentJobData;
 
 export type QueueDeploymentJob<T extends QueueDeploymentJobName> = Omit<Job, "data"> & { data: QueueDeploymentJobData[T] & { repoName: string; timeout: number } };
 
-export type QueueDeploymentJobFns = Record<string, (job: QueueDeploymentJob<any>, signal: AbortSignal) => Promise<unknown>>;
+export type QueueDeploymentJobFns = Record<string, (job: QueueDeploymentJob<any>) => Promise<unknown>>;
