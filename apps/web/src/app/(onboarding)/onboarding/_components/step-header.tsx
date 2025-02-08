@@ -1,35 +1,28 @@
+import { Bounce } from "@/app/_components/bounce";
 import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+
 import { useStep } from "./step";
 
 const headerData = [
   {
     title: "Account creation",
-    description: "You will use this account to manage your applications.",
+    description: "To manage your applications.",
   },
   {
     title: "URLs",
     description:
-      "This will allow Delivery to expose the dashboard and your applications on the internet.",
+      "To expose your applications on the internet.",
   },
   {
     title: "Github App",
-    description: "This will allow Delivery to create deployment from your GitHub repositories.",
+    description: "To create deployment from your GitHub repositories.",
   },
   {
     title: "Deploy your app",
-    description: "This step should deploy your application over the internet.",
+    description: "To deploy your application over the internet.",
   },
 ];
-
-function Bounce() {
-  return (
-    <span className="relative flex h-2 w-2 pt-[.25rem]">
-      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-    </span>
-  );
-}
 
 export function StepsHeader({ className }: { className?: string }) {
   const { currentStep } = useStep();
@@ -44,7 +37,7 @@ export function StepsHeader({ className }: { className?: string }) {
           <CardDescription className="italic">{step.description}</CardDescription>
           <div
             className={`
-              absolute top-[-2rem] left-[-.8rem] text-muted-foreground font-bold text-6xl opacity-30
+              absolute top-[-2rem] left-[-.8rem] text-primary/75 font-bold text-6xl opacity-30
               before:content-[''] 
               before:absolute 
             `}

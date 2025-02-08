@@ -17,7 +17,8 @@ export function Cobe() {
     window.addEventListener("resize", onResize);
     onResize();
 
-    if (!canvasRef.current) return;
+    if (!canvasRef.current)
+      return;
 
     const globe = createGlobe(canvasRef.current, {
       devicePixelRatio: 1.4,
@@ -69,7 +70,7 @@ export function Cobe() {
     >
       <canvas
         ref={canvasRef}
-        style={{    
+        style={{
           width: "100%",
           height: "100%",
           contain: "layout paint size",

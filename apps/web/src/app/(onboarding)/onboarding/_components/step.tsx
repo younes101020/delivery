@@ -1,19 +1,24 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
+import type {
+  ReactNode,
+} from "react";
+
 import { useRouter, useSearchParams } from "next/navigation";
 import React, {
   createContext,
-  ReactNode,
   Suspense,
   useCallback,
   useContext,
 } from "react";
+
+import { Card, CardContent } from "@/components/ui/card";
+
 import { StepsHeader } from "./step-header";
 
-export type UseStepActionsProps = {
+export interface UseStepActionsProps {
   helpers: UseStepActions;
-};
+}
 
 export type UseStepActions = {
   goToNextStep: () => void;
@@ -46,7 +51,7 @@ function BaseStepProvider({ children }: { children: ReactNode }) {
   const canGoToPrevStep = currentStep - 1 > 0;
 
   const setStep = useCallback<SetStepCallbackType>(
-    step => {
+    (step) => {
       const newStep = typeof step === "function" ? step(currentStep) : step;
 
       if (newStep >= 1 && newStep <= maxStep) {

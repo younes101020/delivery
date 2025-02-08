@@ -1,7 +1,9 @@
-import { client } from "@/lib/http";
+import type { NextRequest } from "next/server";
+
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
-import { NextRequest } from "next/server";
+
+import { setInstallationIdOnGithubApp } from "@/app/_lib/github/queries";
 
 export async function GET(req: NextRequest) {
   const installationId = req.nextUrl.searchParams.get("installation_id");
@@ -14,15 +16,9 @@ export async function GET(req: NextRequest) {
   const stateObj = JSON.parse(decodeURIComponent(state));
 
   try {
-    await client.githubapps[":id"].$patch({
-      param: {
-        id: stateObj.appId,
-      },
-      json: {
-        installationId: parseInt(installationId),
-      },
-    });
-  } catch (error) {
+    await setInstallationIdOnGithubApp({ githubAppId: stateObj.appId, installationId: Number.parseInt(installationId) });
+  }
+  catch (error) {
     console.error(error);
     redirect("/onboarding/?step=3");
   }

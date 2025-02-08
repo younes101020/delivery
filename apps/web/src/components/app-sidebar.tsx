@@ -1,6 +1,6 @@
 "use client";
 
-import { LifeBuoy, Package, Send, Settings2, Truck } from "lucide-react";
+import { Package, Settings2, Truck } from "lucide-react";
 import * as React from "react";
 
 import { NavMain } from "@/components/nav-main";
@@ -15,28 +15,20 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+
 import { Logo } from "./ui/logo";
 
 const data = {
-  user: {
-    name: "youyou",
-    email: "m@example.com",
-    avatar: "/avatars/youyou.jpg",
-  },
   navMain: [
     {
       title: "Applications",
-      url: "#",
+      url: "/dashboard/applications",
       icon: Package,
       isActive: true,
       items: [
         {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
+          title: "New",
+          url: "/dashboard/applications/new",
         },
       ],
     },
@@ -44,20 +36,7 @@ const data = {
       title: "Deployments",
       url: "/dashboard/deployments",
       icon: Truck,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
+      items: [],
     },
     {
       title: "Settings",
@@ -66,7 +45,7 @@ const data = {
       items: [
         {
           title: "General",
-          url: "#",
+          url: "/dashboard/settings/general",
         },
         {
           title: "Team",
@@ -83,18 +62,7 @@ const data = {
       ],
     },
   ],
-  navSecondary: [
-    {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: Send,
-    },
-  ],
+  navSecondary: [],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -116,7 +84,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   );

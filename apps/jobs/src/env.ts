@@ -1,34 +1,26 @@
 /* eslint-disable node/no-process-env */
 import { config } from "dotenv";
-import { expand } from "dotenv-expand";
-import path from "node:path";
 import { z } from "zod";
 
-expand(config({
-  path: path.resolve(
-    process.cwd(),
-    process.env.NODE_ENV === "test" ? ".env.test" : ".env",
-  ),
-}));
+if (process.env.CI !== "true") {
+  config({ path: process.env.NODE_ENV === "test" ? ".env.test" : ".env" });
+}
 
 const EnvSchema = z.object({
   NODE_ENV: z.string().default("development"),
+  MINIO_ENDPOINT: z.string().default("localhost"),
+  MINIO_PORT: z.coerce.number().default(9000),
   PORT: z.coerce.number().default(9999),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]),
   DATABASE_URL: z.string(),
-  DATABASE_AUTH_TOKEN: z.string().optional(),
+  MINIO_PUBLIC_DOMAIN: z.string(),
+  MINIO_ROOT_USER: z.string(),
+  MINIO_ROOT_PASSWORD: z.string(),
+  MINIO_BUCKETS: z.string().default("screenshots"),
+  TEST_USERS_PASSWORD: z.string().min(8).optional(),
+  TEST_ENTITY_COUNT: z.coerce.number().default(10),
   SSH_HOST: z.string().default("host.docker.internal"),
   BEARER_TOKEN: z.string(),
-}).superRefine((input, ctx) => {
-  if (input.NODE_ENV === "production" && !input.DATABASE_AUTH_TOKEN) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.invalid_type,
-      expected: "string",
-      received: "undefined",
-      path: ["DATABASE_AUTH_TOKEN"],
-      message: "Must be set when NODE_ENV is on 'production'",
-    });
-  }
 });
 
 export type env = z.infer<typeof EnvSchema>;

@@ -1,51 +1,69 @@
-import { Skeleton } from "@/components/ui/skeleton";
-import { publicEnv } from "@/env";
-import { getAllInstallations, getAllInstallReposForEachRepoPage } from "@/lib/github";
-import { getServerConfiguration } from "@/lib/server";
-import { getUser } from "@/lib/users";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+
+import { Deployment } from "@/app/_components/deployment";
+import { getAllGithubApp } from "@/app/_lib/github/queries";
+import { getUser } from "@/app/_lib/user-session";
+import { Skeleton } from "@/components/ui/skeleton";
+import { env } from "@/env";
+
 import { Login } from "../../_components/login-form";
-import { Deployment } from "./_components/deployment";
 import { DomainNameForm } from "./_components/domain-name-form";
 import { GithubAppForm } from "./_components/github-app-form";
 import { StepProvider } from "./_components/step";
+import { getServerConfiguration } from "./_lib/queries";
 
-interface StepChildrenProps {
-  searchParams: Promise<{ step: number; page: number }> | undefined;
+interface SearchParams {
+  searchParams?: Promise<{ step: string; page: string }>;
 }
 
-async function GithubRepositoriesStep(props: StepChildrenProps) {
-  const searchParams = await props.searchParams;
-  if (!searchParams || searchParams.step != 4) {
-    return null;
-  }
-  const repositories = await getAllInstallReposForEachRepoPage(searchParams.page ?? 1);
-  if (!repositories || repositories.length <= 0) redirect("/onboarding/?step=3");
-  return <Deployment repositories={repositories} />;
+export default async function OnboardingPage({ searchParams }: SearchParams) {
+  return (
+    <div className="flex justify-center items-center h-full *:lg:w-[70%] *:w-[90%]">
+      <StepProvider>
+        <Suspense fallback={<CheckStepStatusLoadingScreen />}>
+          <LoginStep searchParams={searchParams} />
+        </Suspense>
+        <Suspense fallback={<CheckStepStatusLoadingScreen />}>
+          <DomainNameStep searchParams={searchParams} />
+        </Suspense>
+        <Suspense fallback={<CheckStepStatusLoadingScreen />}>
+          <GithubAppStep searchParams={searchParams} />
+        </Suspense>
+        <Suspense fallback={<CheckStepStatusLoadingScreen />}>
+          <Deployment sp={searchParams} onboarding={true} />
+        </Suspense>
+      </StepProvider>
+    </div>
+  );
 }
 
-async function GithubAppStep(props: StepChildrenProps) {
+async function GithubAppStep(props: SearchParams) {
   const searchParams = await props.searchParams;
-  if (!searchParams || searchParams.step != 3) {
+  const onboardingStep = searchParams ? Number.parseInt(searchParams.step) : null;
+  if (onboardingStep !== 3) {
     return null;
   }
-  const allGithubInstallations = await getAllInstallations();
-  if (allGithubInstallations && allGithubInstallations.length > 0) redirect("/onboarding/?step=4");
-  return <GithubAppForm baseUrl={publicEnv.NEXT_PUBLIC_BASEURL} />;
+  const allGithubInstallations = await getAllGithubApp();
+  if (allGithubInstallations && allGithubInstallations.length > 0)
+    redirect("/onboarding/?step=4");
+  return <GithubAppForm baseUrl={env.NEXT_PUBLIC_BASEURL} />;
 }
 
-async function DomainNameStep(props: StepChildrenProps) {
+async function DomainNameStep(props: SearchParams) {
   const searchParams = await props.searchParams;
-  if (!searchParams || searchParams.step != 2) {
+  const onboardingStep = searchParams ? Number.parseInt(searchParams.step) : null;
+  if (onboardingStep !== 2) {
     return null;
   }
+
   const serverConfig = await getServerConfiguration();
-  if (serverConfig?.domainName) redirect("/onboarding/?step=3");
+  if (serverConfig?.domainName)
+    redirect("/onboarding/?step=3");
   return <DomainNameForm />;
 }
 
-async function LoginStep(props: StepChildrenProps) {
+async function LoginStep(props: SearchParams) {
   const searchParams = await props.searchParams;
   if (searchParams && searchParams.step) {
     return null;
@@ -60,31 +78,9 @@ async function LoginStep(props: StepChildrenProps) {
 function CheckStepStatusLoadingScreen() {
   return (
     <Skeleton className="flex justify-center items-center h-52 w-full">
-      Check step status <span className=" text-primary">...</span>
+      Check step status
+      {" "}
+      <span className=" text-primary">...</span>
     </Skeleton>
-  );
-}
-
-export default async function OnboardingPage(props: {
-  searchParams?: Promise<{ step: number; page: number }>;
-}) {
-  const searchParams = props.searchParams?.then((sp) => ({ step: sp.step, page: sp.page }));
-  return (
-    <div className="flex justify-center items-center h-full *:lg:w-[70%] *:w-[90%]">
-      <StepProvider>
-        <Suspense fallback={<CheckStepStatusLoadingScreen />}>
-          <LoginStep searchParams={searchParams} />
-        </Suspense>
-        <Suspense fallback={<CheckStepStatusLoadingScreen />}>
-          <DomainNameStep searchParams={searchParams} />
-        </Suspense>
-        <Suspense fallback={<CheckStepStatusLoadingScreen />}>
-          <GithubAppStep searchParams={searchParams} />
-        </Suspense>
-        <Suspense fallback={<CheckStepStatusLoadingScreen />}>
-          <GithubRepositoriesStep searchParams={searchParams} />
-        </Suspense>
-      </StepProvider>
-    </div>
   );
 }

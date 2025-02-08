@@ -1,9 +1,16 @@
 "use client";
 
-import { Nullable } from "@/lib/utils";
-import { ExternalLink as ExternalLinkIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEventSource } from "../_hooks/use-event-source";
+import { ExternalLink as ExternalLinkIcon, Loader2, RotateCcw } from "lucide-react";
+import { redirect } from "next/navigation";
+import { useActionState, useEffect } from "react";
+
+import type { ActionState } from "@/app/_lib/form-middleware";
+import type { Nullable } from "@/lib/utils";
+
+import { retryDeploy } from "@/app/actions";
+import { Button } from "@/components/ui/button";
+
+import { type SSEMessage, useEventSource } from "../_hooks/use-event-source";
 import BoxReveal from "./ui/box-reveal";
 import { LogsTerminal } from "./ui/logsterminal";
 import Ripple from "./ui/ripple";
@@ -13,9 +20,11 @@ interface StepperProps {
   repoName: string;
 }
 
-export type SseData = Nullable<{
+export type DeploymentData = Nullable<{
   step: keyof typeof DEPLOYMENTMETADATA;
   logs: string;
+  isCriticalError?: boolean;
+  jobId?: string;
 }>;
 
 export const DEPLOYMENTMETADATA = {
@@ -33,29 +42,28 @@ export const DEPLOYMENTMETADATA = {
   },
 };
 
+const DEFAULT_STATE = { step: null, logs: null };
+
 export function Stepper({ repoName, baseUrl }: StepperProps) {
-  const router = useRouter();
-  const { step, logs } = useEventSource<SseData>({
-    type: `${repoName}-deployment-logs`,
+  const onMessage = (prev: DeploymentData, data: SSEMessage<DeploymentData>) => {
+    if (data.completed && data.appId) {
+      redirect(`/dashboard/applications/${data.appId}`);
+    }
+    return {
+      step: data.jobName,
+      logs: prev.logs ? `${prev.logs}${data.logs}` : data.logs,
+      isCriticalError: data.isCriticalError,
+      jobId: data.jobId,
+    };
+  };
+  const { step, logs, isCriticalError, jobId, reconnect } = useEventSource<DeploymentData>({
     eventUrl: `${baseUrl}/api/deployments/logs/${repoName}`,
-    initialState: {
-      step: null,
-      logs: null,
-    },
-    onMessage: (prev, data) => {
-      if (data.completed) {
-        router.replace(`/dashboard/applications/${repoName}`);
-        return prev;
-      }
-      return {
-        step: data.jobName,
-        logs: prev.logs ? `${prev.logs}${data.logs}` : data.logs,
-      };
-    },
+    initialState: DEFAULT_STATE,
+    onMessage,
   });
 
   return (
-    <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden">
+    <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden gap-4">
       <BoxReveal duration={0.5}>
         <p className="text-xl font-semibold">
           {step && DEPLOYMENTMETADATA[step].phrase}
@@ -66,13 +74,63 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
         <p className="text-xs text-primary">{step && DEPLOYMENTMETADATA[step].position}</p>
         <LogsTerminalButton step={step} logs={logs} />
       </div>
+      {isCriticalError && (
+        <div className="flex flex-col gap-2 text-center items-center">
+          <p className="text-destructive font-semibold">We were unable to deploy your application</p>
+          <p className="text-xs text-destructive">Once you think you have resolved the issue, you can redeploy.</p>
+          {jobId && <RetryDeploymentButton repoName={repoName} jobId={jobId} reconnect={reconnect} />}
+        </div>
+      )}
       <Ripple />
     </div>
   );
 }
 
-function LogsTerminalButton({ step, logs }: SseData) {
-  if (step === "clone" || !logs) return null;
+function RetryDeploymentButton({ jobId, repoName, reconnect }: { jobId: string; repoName: string; reconnect: () => void }) {
+  const [state, formAction, isPending] = useActionState<ActionState, FormData>(
+    retryDeploy,
+    { error: "", success: "", inputs: { repoName, jobId } },
+  );
+
+  useEffect(() => {
+    if (state.success)
+      reconnect();
+  }, [state, reconnect]);
+
+  return (
+    <div className="flex flex-col gap-2">
+      {state.error && <p className="text-xs text-destructive">{state.error}</p>}
+      <form>
+        <input type="hidden" name="repoName" defaultValue={state.inputs.repoName} />
+        <input type="hidden" name="jobId" defaultValue={state.inputs.jobId ?? ""} />
+        <Button
+          variant="outline"
+          className="w-fit"
+          formAction={formAction}
+        >
+          {isPending
+            ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Redeployment...
+                </>
+              )
+            : (
+                <>
+                  <RotateCcw />
+                  Retry
+                </>
+              )}
+        </Button>
+      </form>
+    </div>
+
+  );
+}
+
+function LogsTerminalButton({ step, logs }: DeploymentData) {
+  if (step === "clone" || !logs)
+    return null;
 
   return (
     <LogsTerminal logs={logs}>

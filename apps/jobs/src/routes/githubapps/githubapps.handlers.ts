@@ -1,64 +1,55 @@
-import { eq } from "drizzle-orm";
 import { Buffer } from "node:buffer";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import { db } from "@/db";
-import { githubApp, githubAppSecret } from "@/db/schema";
+import {
+  createGithubAppWithSecret,
+  getGithubAppById,
+  getGithubApps,
+  updateGithubApp,
+} from "@/db/queries/queries";
 import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
 import { decryptSecret, encryptSecret } from "@/lib/utils";
 
 import type { CreateRoute, GetOneRoute, ListRoute, PatchRoute } from "./githubapps.routes";
 
 export const list: AppRouteHandler<ListRoute> = async (c) => {
-  const githubApps = await db.query.githubApp.findMany({
-    with: {
-      secret: true,
-    },
-  });
+  const githubApps = await getGithubApps();
 
   const githubAppsWithPrivateKey = await Promise.all(
     githubApps.map(async (app) => {
-      const { secret } = app;
-      const privateKey = await decryptSecret({
-        encryptedData: Buffer.from(secret.encryptedData, "base64"),
-        iv: Buffer.from(secret.iv, "base64"),
-        key: await crypto.subtle.importKey(
-          "raw",
-          Buffer.from(secret.key, "base64"),
-          "AES-GCM",
-          true,
-          ["decrypt"],
-        ),
-      });
-      return { ...app, privateKey };
+      const { secret, ...githubApp } = app;
+      const privateKey = secret
+        ? await decryptSecret({
+          encryptedData: Buffer.from(secret.encryptedData, "base64"),
+          iv: Buffer.from(secret.iv, "base64"),
+          key: await crypto.subtle.importKey(
+            "raw",
+            Buffer.from(secret.key, "base64"),
+            "AES-GCM",
+            true,
+            ["decrypt"],
+          ),
+        })
+        : null;
+      return { ...githubApp, privateKey };
     }),
   );
-
   return c.json(githubAppsWithPrivateKey);
 };
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const newGithubApp = c.req.valid("json");
   const secret = await encryptSecret(newGithubApp.privateKey);
-  const [insertedSecret] = await db.insert(githubAppSecret).values(secret).returning();
-  newGithubApp.secretId = insertedSecret.id;
-  const [insertedGithubApp] = await db.insert(githubApp).values(newGithubApp).returning();
+  const insertedGithubApp = await createGithubAppWithSecret(newGithubApp, secret);
   return c.json(insertedGithubApp, HttpStatusCodes.OK);
 };
 
 export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   const { id } = c.req.valid("param");
-  const githubApp = await db.query.githubApp.findFirst({
-    where(fields, operators) {
-      return operators.eq(fields.id, id);
-    },
-    with: {
-      secret: true,
-    },
-  });
+  const githubApp = await getGithubAppById(id);
   if (!githubApp) {
     return c.json(
       {
@@ -69,13 +60,15 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   }
 
   const { secret } = githubApp;
-  const privateKey = await decryptSecret({
-    encryptedData: Buffer.from(secret.encryptedData, "base64"),
-    iv: Buffer.from(secret.iv, "base64"),
-    key: await crypto.subtle.importKey("raw", Buffer.from(secret.key, "base64"), "AES-GCM", true, [
-      "decrypt",
-    ]),
-  });
+  const privateKey = secret
+    ? await decryptSecret({
+      encryptedData: Buffer.from(secret.encryptedData, "base64"),
+      iv: Buffer.from(secret.iv, "base64"),
+      key: await crypto.subtle.importKey("raw", Buffer.from(secret.key, "base64"), "AES-GCM", true, [
+        "decrypt",
+      ]),
+    })
+    : null;
 
   return c.json({ ...githubApp, privateKey }, HttpStatusCodes.OK);
 };
@@ -103,11 +96,7 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
     );
   }
 
-  const [githubapp] = await db
-    .update(githubApp)
-    .set(updates)
-    .where(eq(githubApp.appId, id))
-    .returning();
+  const githubapp = await updateGithubApp(id, updates);
 
   if (!githubapp) {
     return c.json(

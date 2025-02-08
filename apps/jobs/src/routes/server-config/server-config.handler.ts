@@ -1,17 +1,15 @@
-import { eq } from "drizzle-orm";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import { db } from "@/db";
-import { systemConfig } from "@/db/schema";
+import { getSystemConfig, updateSystemConfig } from "@/db/queries/queries";
 import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
 
 import type { GetFirstRoute, PatchRoute } from "./server-config.route";
 
 export const getFirst: AppRouteHandler<GetFirstRoute> = async (c) => {
-  const systemconfig = await db.query.systemConfig.findFirst();
+  const systemconfig = await getSystemConfig();
 
   if (!systemconfig) {
     return c.json(
@@ -47,11 +45,7 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
     );
   }
 
-  const [systemconfig] = await db
-    .update(systemConfig)
-    .set(updates)
-    .where(eq(systemConfig.id, db.select({ id: systemConfig.id }).from(systemConfig).limit(1)))
-    .returning();
+  const systemconfig = await updateSystemConfig(updates);
 
   if (!systemconfig) {
     return c.json(

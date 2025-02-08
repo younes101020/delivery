@@ -4,7 +4,7 @@ import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 
 import {
-  insertGithubAppsSchema,
+  insertGithubAppSchema,
   patchGithubAppsSchema,
   selectGithubAppsSchema,
 } from "@/db/dto/githubapps.dto";
@@ -18,7 +18,7 @@ export const list = createRoute({
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      z.array(selectGithubAppsSchema.extend({ privateKey: z.string() })),
+      z.array(selectGithubAppsSchema.extend({ privateKey: z.string().nullable() })),
       "The list of githubapps",
     ),
   },
@@ -28,13 +28,13 @@ export const create = createRoute({
   path: "/githubapps",
   method: "post",
   request: {
-    body: jsonContentRequired(insertGithubAppsSchema, "The github app to create"),
+    body: jsonContentRequired(insertGithubAppSchema, "The github app to create"),
   },
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(selectGithubAppsSchema, "The created github app"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(insertGithubAppsSchema),
+      createErrorSchema(insertGithubAppSchema),
       "The validation error(s)",
     ),
   },
@@ -49,7 +49,7 @@ export const getOne = createRoute({
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      selectGithubAppsSchema.extend({ privateKey: z.string() }),
+      selectGithubAppsSchema.extend({ privateKey: z.string().nullable() }),
       "The requested github app",
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Github app not found"),

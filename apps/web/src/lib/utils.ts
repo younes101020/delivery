@@ -1,4 +1,4 @@
-import { clsx, type ClassValue } from "clsx";
+import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -20,3 +20,18 @@ export function parseSetCookie(header: string) {
 export type Nullable<T> = {
   [K in keyof T]: T[K] | null;
 };
+
+export function formatDate(date: string | null | Date) {
+  if (!date)
+    return null;
+  const dateObj = typeof date === "string" ? new Date(date) : date;
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+  });
+  return formatter.format(dateObj);
+}

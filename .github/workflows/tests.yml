@@ -12,14 +12,31 @@ jobs:
     environment: test
 
     services:
+      screenshots-storage:
+        image: bitnami/minio:latest
+        ports:
+          - 9000:9000
+          - 9001:9001
+        env:
+          MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
+          MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
+          MINIO_SERVER_ACCESS_KEY: ${{ secrets.MINIO_SERVER_ACCESS_KEY }}
+          MINIO_SERVER_SECRET_KEY: ${{ secrets.MINIO_SERVER_SECRET_KEY }}
+          MINIO_DEFAULT_BUCKETS: ${{ vars.MINIO_DEFAULT_BUCKETS }}
+          MINIO_ENDPOINT: ${{ vars.MINIO_ENDPOINT }}
+        volumes:
+          - ${{ github.workspace }}/data:/data
+        options: --name=minio --health-cmd "curl http://localhost:9000/minio/health/live"
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
       db:
         image: postgres
         env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DB: postgres
-        options: >-
-          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
         ports:
           - 5432:5432
     env:
@@ -27,16 +44,22 @@ jobs:
       BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
       AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
       JOBS_BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
-      PORT: 9030
-      LOG_LEVEL: silent
-      JOBS_API_BASEURL: http://localhost:3090
-      NEXT_PUBLIC_BASEURL: http://localhost:3000
+      PORT: ${{ vars.PORT }}
+      LOG_LEVEL: ${{ vars.LOG_LEVEL }}
+      JOBS_API_BASEURL: ${{ vars.JOBS_API_BASEURL }}
+      NEXT_PUBLIC_BASEURL: ${{ vars.NEXT_PUBLIC_BASEURL }}
+      TEST_USERS_PASSWORD: ${{ secrets.TEST_USERS_PASSWORD }}
+      MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
+      MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
+      MINIO_ENDPOINT: ${{ vars.MINIO_ENDPOINT }}
+      MINIO_PORT: ${{ vars.MINIO_PORT }}
+      MINIO_PUBLIC_DOMAIN: ${{ vars.MINIO_PUBLIC_DOMAIN }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Node.js 14.x
+      - name: Set up Node.js
         uses: actions/setup-node@v1
         with:
           node-version: 20
@@ -50,8 +73,5 @@ jobs:
       - name: Build
         run: yarn run build
 
-      - name: Migrate database
-        run: yarn run migrate
-
-      - name: Run e2e/unit tests
+      - name: Run integration and unit tests
         run: yarn run test

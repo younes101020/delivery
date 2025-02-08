@@ -32,6 +32,8 @@ services:
       - NODE_ENV=${NODE_ENV}
       - SSH_HOST=${SSH_HOST}
       - BEARER_TOKEN=${BEARER_TOKEN}
+      - MINIO_SERVER_ACCESS_KEY=${MINIO_SERVER_ACCESS_KEY}
+      - MINIO_SERVER_SECRET_KEY=${MINIO_SERVER_SECRET_KEY}
     volumes:
       - /data/delivery/ssh/keys:/var/ssh/keys
     restart: always
@@ -53,6 +55,19 @@ services:
     volumes:
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ${PWD}/db-data/:/var/lib/postgresql@16/data:rw
+    restart: always
+  
+  screenshots-storage:
+    image: bitnami/minio:latest
+    ports:
+      - 9000:9000
+      - 9001:9001
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - MINIO_DEFAULT_BUCKETS=${MINIO_DEFAULT_BUCKETS}
+    networks:
+      - host_network
     restart: always
   
   bull_queue:

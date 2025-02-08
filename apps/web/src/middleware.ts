@@ -1,7 +1,9 @@
-import { signToken, verifyToken } from "@/lib/auth/session";
 import type { NextRequest } from "next/server";
+
 import { NextResponse } from "next/server";
-import { parseSetCookie } from "./lib/utils";
+
+import { signToken, verifyToken } from "@/app/_lib/session";
+import { parseSetCookie } from "@/lib/utils";
 
 const protectedRoutes = "/dashboard";
 const onboardingRoute = "/onboarding";
@@ -17,16 +19,18 @@ export async function middleware(request: NextRequest) {
 
   const res = NextResponse.next();
 
-  if (!onboardingCookie) await forwardOnboardingStatus(res);
+  if (!onboardingCookie)
+    await forwardOnboardingStatus(res);
 
   const forwardedOnboardingCookie = res.cookies.get("skiponboarding");
 
   if (onboardingCookie || forwardedOnboardingCookie) {
-    const skiponboarding =
-      onboardingCookie?.value === "true" || forwardedOnboardingCookie?.value === "true";
+    const skiponboarding
+      = onboardingCookie?.value === "true" || forwardedOnboardingCookie?.value === "true";
     if (isOnboardingRoute && skiponboarding) {
       return NextResponse.redirect(new URL("/", request.url));
-    } else if (!skiponboarding && !isOnboardingRoute) {
+    }
+    else if (!skiponboarding && !isOnboardingRoute) {
       return NextResponse.redirect(new URL(onboardingRoute, request.url));
     }
   }
@@ -51,7 +55,8 @@ export async function middleware(request: NextRequest) {
         sameSite: "lax",
         expires: expiresInOneDay,
       });
-    } catch (error) {
+    }
+    catch (error) {
       console.error("Error updating session:", error);
       res.cookies.delete("session");
       if (isProtectedRoute) {
@@ -74,13 +79,14 @@ export const config = {
 async function forwardOnboardingStatus(res: NextResponse) {
   // TODO: wait for nextjs middleware to be nodejs compatible (https://github.com/vercel/next.js/discussions/71727) to use `serverEnv.AUTH_SECRET`
   // + replace fetch by trpc implementation
+  // eslint-disable-next-line node/no-process-env
   const response = await fetch(process.env.JOBS_API_BASEURL!);
   const headers = Object.fromEntries(response.headers);
   const cookie = parseSetCookie(headers["set-cookie"]);
   res.cookies.set({
     name: "skiponboarding",
     value: cookie.skiponboarding,
-    maxAge: parseInt(cookie["max-age"]),
-    path: cookie["path"],
+    maxAge: Number.parseInt(cookie["max-age"]),
+    path: cookie.path,
   });
 }

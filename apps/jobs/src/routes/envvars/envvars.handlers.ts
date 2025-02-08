@@ -2,16 +2,12 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import { db } from "@/db";
-import { environmentVariables } from "@/db/schema";
+import { createEnvironmentVariable } from "@/db/queries/queries";
 
 import type { CreateRoute } from "./envvars.routes";
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const environmentVariable = c.req.valid("json");
-  const [inserted] = await db
-    .insert(environmentVariables)
-    .values(environmentVariable)
-    .returning();
+  const inserted = await createEnvironmentVariable(environmentVariable);
   return c.json(inserted, HttpStatusCodes.OK);
 };

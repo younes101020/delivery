@@ -1,5 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { bearerAuth } from "hono/bearer-auth";
+import { except } from "hono/combine";
 import { cors } from "hono/cors";
 import { notFound, onError, serveEmojiFavicon } from "stoker/middlewares";
 import { defaultHook } from "stoker/openapi";
@@ -27,8 +28,10 @@ export default function createApp() {
   );
   app.use(serveEmojiFavicon("📝"));
   app.use(pinoLogger());
-  app.use("/^(?!/(doc|reference)).*$/", bearerAuth({ token: env.BEARER_TOKEN }));
   app.use(onboardingFlag);
+
+  if (env.NODE_ENV !== "test")
+    app.use("/", except("/auth/*", bearerAuth({ token: env.BEARER_TOKEN })));
 
   app.notFound(notFound);
   app.onError(onError);
