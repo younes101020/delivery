@@ -2,7 +2,7 @@ import { type Job, UnrecoverableError } from "bullmq";
 
 import { jobs } from "./deploy/jobs";
 
-const MAX_TTL = 1800000; // 30min
+const MAX_TTL = 1200000; // 20min
 const TTL_EXIT_CODE = 10;
 
 export default async function Worker(job: Job) {
