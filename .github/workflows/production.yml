@@ -5,7 +5,7 @@ on:
     workflows: [ci]
     types:
       - completed
-    branches: [main, next]
+    branches: ["main", "next"]
 
 jobs:
   push-to-registry:
