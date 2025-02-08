@@ -31,33 +31,35 @@ export function DeploymentPreviewCard({
     >
       <div className={`opacity-0 group-hover/feature:opacity-100 transition duration-200 absolute inset-0 h-full w-full bg-gradient-to-t ${status === "failed" ? "from-red-500/25" : "from-green-500/25"} to-transparent pointer-events-none`} />
 
-      <div className="mb-4 relative z-10 px-10">
-        <dl className="text-xs">
-          <dd className="flex gap-2 line-through opacity-50">
-            {previousStep}
-          </dd>
-        </dl>
-        <dl className="text-sm flex gap-2">
-          <dt className="pt-[.1rem]">
-            <Bounce variant={status === "failed" ? "failed" : "active"} />
-          </dt>
-          <dd className="flex gap-2 align-middle">
-            {step}
-          </dd>
-        </dl>
-        <dl className="text-xs">
-          <dd className="flex gap-2 opacity-50">
-            {nextStep}
-          </dd>
-        </dl>
-      </div>
+      {status === "active" && (
+        <div className="mb-4 relative z-10 px-10">
+          <dl className="text-xs">
+            <dd className="flex gap-2 line-through opacity-50">
+              {previousStep}
+            </dd>
+          </dl>
+          <dl className="text-sm flex gap-2">
+            <dt className="pt-[.1rem]">
+              <Bounce variant="active" />
+            </dt>
+            <dd className="flex gap-2 align-middle">
+              {step}
+            </dd>
+          </dl>
+          <dl className="text-xs">
+            <dd className="flex gap-2 opacity-50">
+              {nextStep}
+            </dd>
+          </dl>
+        </div>
+      )}
+
       <div className="text-lg font-bold mb-2 relative z-10 px-10 flex flex-col">
         <div className={`absolute left-0 inset-y-0 h-6 ${status === "failed" ? "bg-red-500/50" : "bg-green-500/50"} group-hover/feature:h-8 w-1 rounded-tr-full rounded-br-full ${status === "failed" ? "group-hover/feature:bg-red-500" : "group-hover/feature:bg-green-500"} transition-all duration-200 origin-center`} />
         <span className="group-hover/feature:translate-x-2 transition duration-200 inline-block">
           {repoName}
         </span>
         <Badge variant={status === "failed" ? "destructive" : "success"} className="w-fit">
-          Step
           {status}
         </Badge>
       </div>
