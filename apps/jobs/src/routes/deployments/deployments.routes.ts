@@ -49,14 +49,14 @@ export const streamLog = createRoute({
   },
 });
 
-export const list = createRoute({
+export const getCurrentDeploymentStep = createRoute({
   path: "/deployments/jobs",
   method: "get",
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      z.array(jobSchema).nullable(),
-      "The list of  failed and active jobs",
+      z.array(jobSchema),
+      "The current deployment state",
     ),
   },
 });
@@ -110,5 +110,5 @@ export const cancelJob = createRoute({
 export type StreamRoute = typeof streamLog;
 export type CreateRoute = typeof create;
 export type RetryRoute = typeof retryJob;
-export type ListRoute = typeof list;
+export type GetCurrentDeploymentStep = typeof getCurrentDeploymentStep;
 export type CancelRoute = typeof cancelJob;

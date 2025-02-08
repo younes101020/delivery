@@ -7,12 +7,12 @@ import type { AppRouteHandler } from "@/lib/types";
 
 import { getApplicationByName } from "@/db/queries/queries";
 import { subscribeWorkerTo } from "@/routes/deployments/lib/tasks";
-import { JOBS, startDeploy } from "@/routes/deployments/lib/tasks/deploy";
+import { startDeploy } from "@/routes/deployments/lib/tasks/deploy";
 import { prepareDataForProcessing } from "@/routes/deployments/lib/tasks/deploy/jobs/utils";
-import { fetchQueueTitles } from "@/routes/deployments/lib/tasks/deploy/utils";
+import { getCurrentDeploymentsState, getLatestJob, getOldestJob } from "@/routes/deployments/lib/tasks/deploy/utils";
 import { connection, getBullConnection, jobCanceler } from "@/routes/deployments/lib/tasks/utils";
 
-import type { CancelRoute, CreateRoute, ListRoute, RetryRoute, StreamRoute } from "./deployments.routes";
+import type { CancelRoute, CreateRoute, GetCurrentDeploymentStep, RetryRoute, StreamRoute } from "./deployments.routes";
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const deployment = c.req.valid("json");
@@ -117,32 +117,10 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
   }) as any;
 };
 
-export const list: AppRouteHandler<ListRoute> = async (c) => {
-  const queueTitles = await fetchQueueTitles(connection);
-  const allJobs = [];
+export const getCurrentDeploymentsStep: AppRouteHandler<GetCurrentDeploymentStep> = async (c) => {
+  const currentDeploymentsState = await getCurrentDeploymentsState();
 
-  for (const item of queueTitles) {
-    const queue = new Queue(item.queueName, { connection: getBullConnection(connection) });
-    const jobs = (await queue.getJobs(["active", "failed"]) || []) as Job[];
-
-    for (const job of jobs) {
-      const currentStep = job.name;
-      allJobs.push({
-        id: job.id!,
-        previousStep: currentStep === JOBS.clone ? undefined : currentStep === JOBS.build ? JOBS.clone : JOBS.build,
-        step: currentStep,
-        nextStep: currentStep === JOBS.configure ? undefined : currentStep === JOBS.build ? JOBS.configure : JOBS.build,
-        stacktrace: job.stacktrace,
-        timestamp: new Date(job.timestamp),
-        status: await job.getState(),
-        repoName: item.queueName,
-      });
-    }
-  }
-
-  const deployments = allJobs.length > 0 ? allJobs : null;
-
-  return c.json(deployments);
+  return c.json(currentDeploymentsState);
 };
 
 export const retryJob: AppRouteHandler<RetryRoute> = async (c) => {

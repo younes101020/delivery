@@ -3,7 +3,7 @@ import { Bird } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
 
 import { DeploymentPreviewCard } from "./_components/deployment-preview-card";
-import { getDeployments } from "./_lib/queries";
+import { getCurrentDeploymentsState } from "./_lib/queries";
 
 function NoDeployments() {
   return (
@@ -23,10 +23,11 @@ function NoDeployments() {
 }
 
 export default async function DeploymentsPage() {
-  const deployments = await getDeployments();
-  if (!deployments) {
+  const deployments = await getCurrentDeploymentsState();
+
+  if (!deployments || deployments.length < 1)
     return <NoDeployments />;
-  }
+
   return (
     <section className="p-5 bg-background/50 border">
       <h1 className="text-3xl font-bold tracking-wide">Ongoing deployments</h1>
