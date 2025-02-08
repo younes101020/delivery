@@ -2,10 +2,10 @@ name: Push images to registry
 
 on:
   workflow_run:
-    workflows: ["CI"]
+    workflows: [CI]
     types:
       - completed
-    branches: ["main", "next"]
+    branches: [main, next]
 
 jobs:
   push-to-registry:
