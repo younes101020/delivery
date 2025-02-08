@@ -63,7 +63,15 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
 
   const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection) });
 
-  const job = await queue.getJobs(["active", "failed"]).then(jobs => jobs[0]);
+  const allJobs = await queue.getJobs(["active", "failed"]);
+
+  const haveJobFailed = allJobs.find(async (job) => {
+    const state = await job.getState();
+    return state === "failed";
+  });
+
+  const jobs = haveJobFailed.length > 0 ? await queue.getJobs(["failed"]) : allJobs;
+  const job = haveJobFailed.length > 0 ? getOldestJob(jobs)! : getLatestJob(allJobs)!;
 
   const { name, data, id } = job;
 
