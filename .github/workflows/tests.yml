@@ -1,4 +1,4 @@
-name: ci
+name: Running UT/E2E and IT tests
 
 on:
   push:
