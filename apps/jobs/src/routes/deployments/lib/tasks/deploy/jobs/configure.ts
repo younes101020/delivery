@@ -31,6 +31,7 @@ export async function configure(job: QueueDeploymentJob<"configure">) {
       isCriticalError: true,
       jobId: job.id,
     });
+    job.updateData({ ...job.data, logs: message, isCriticalError: true });
     throw new DeploymentError({
       name: "CONFIGURE_APP_ERROR",
       message,
