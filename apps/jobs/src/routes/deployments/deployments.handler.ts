@@ -9,7 +9,7 @@ import { getApplicationByName } from "@/db/queries/queries";
 import { subscribeWorkerTo } from "@/routes/deployments/lib/tasks";
 import { startDeploy } from "@/routes/deployments/lib/tasks/deploy";
 import { prepareDataForProcessing } from "@/routes/deployments/lib/tasks/deploy/jobs/utils";
-import { checkIfOngoingDeploymentExist, getCurrentDeploymentsState, getJobs, getLatestJob, getOldestJob } from "@/routes/deployments/lib/tasks/deploy/utils";
+import { checkIfOngoingDeploymentExist, getCurrentDeploymentsState, getJobs } from "@/routes/deployments/lib/tasks/deploy/utils";
 import { connection, getBullConnection, jobCanceler } from "@/routes/deployments/lib/tasks/utils";
 
 import type { CancelRoute, CreateRoute, GetCurrentDeploymentStep, RetryRoute, StreamPreview, StreamRoute } from "./deployments.routes";
