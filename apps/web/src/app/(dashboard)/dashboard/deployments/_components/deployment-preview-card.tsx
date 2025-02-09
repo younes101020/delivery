@@ -1,30 +1,47 @@
+"use client";
+
 import Link from "next/link";
+
+import type { Nullable } from "@/lib/utils";
 
 import { Bounce } from "@/app/_components/bounce";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn, formatDate } from "@/lib/utils";
+
+import { useEventSource } from "../_hooks/use-event-source";
 
 interface DeploymentPreviewCardProps {
   id: string;
-  previousStep?: string;
-  step: string;
-  nextStep?: string;
   timestamp: string;
   repoName: string;
-  status: "completed" | "failed" | "active" | "delayed" | "prioritized" | "waiting" | "waiting-children" | "unknown";
   stacktrace: (string | null)[];
+  baseUrl: string;
 }
 
+export type DeploymentPreview = Nullable<{
+  step: "clone" | "build" | "configure";
+  status: "completed" | "failed" | "active" | "delayed" | "prioritized" | "waiting" | "waiting-children" | "unknown";
+  logs?: string;
+}>;
+
+const DEFAULT_STATE = { step: null, status: null };
+
 export function DeploymentPreviewCard({
-  step,
   timestamp,
   repoName,
-  previousStep,
-  nextStep,
-  status,
+  baseUrl,
 }: DeploymentPreviewCardProps) {
   const date = formatDate(timestamp);
+  const { status, step } = useEventSource<DeploymentPreview>({
+    eventUrl: `${baseUrl}/api/deployments/preview/${repoName}`,
+    initialState: DEFAULT_STATE,
+  });
+
+  const previousStep = step === "build" ? "clone" : step === "configure" ? "build" : null;
+  const nextStep = step === "clone" ? "build" : step === "build" ? "configure" : null;
+
   return (
     <div
       className="flex flex-col border py-10 relative group/feature"
@@ -55,27 +72,41 @@ export function DeploymentPreviewCard({
       )}
 
       <div className="text-lg font-bold mb-2 relative z-10 px-10 flex flex-col">
-        <div className={`absolute left-0 inset-y-0 h-6 ${status === "failed" ? "bg-red-500/50" : "bg-green-500/50"} group-hover/feature:h-8 w-1 rounded-tr-full rounded-br-full ${status === "failed" ? "group-hover/feature:bg-red-500" : "group-hover/feature:bg-green-500"} transition-all duration-200 origin-center`} />
         <span className="group-hover/feature:translate-x-2 transition duration-200 inline-block">
           {repoName}
         </span>
-        <Badge variant={status === "failed" ? "destructive" : "success"} className="w-fit">
-          {status}
-        </Badge>
+        {status
+          ? (
+              <Badge variant={status === "failed" ? "destructive" : "success"} className="w-fit">
+                {status}
+              </Badge>
+            )
+          : <Skeleton className="inline-flex items-center h-7 px-2.5 py-0.5 text-xs border w-fit">Loading</Skeleton>}
+
       </div>
-      <div className="text-xs max-w-xs relative z-10 px-10">
-        <dl>
-          <dt className="text-muted-foreground">This step started at</dt>
-          <dd>
-            {date}
-          </dd>
-        </dl>
-        <Link href={`/dashboard/deployments/${repoName}`} className={cn(buttonVariants({ variant: "outline" }), "mt-4")}>
-          View details
-          {" "}
-          {">"}
-        </Link>
-      </div>
+      {status === "completed"
+        ? (
+            <Link href="/dashboard/applications" className={cn(buttonVariants({ variant: "default" }), "mt-4")}>
+              Go to applications
+            </Link>
+          )
+        : (
+            <div className="text-xs max-w-xs relative z-10 px-10">
+
+              <dl>
+                <dt className="text-muted-foreground">This step started at</dt>
+                <dd>
+                  {date}
+                </dd>
+              </dl>
+              <Link href={`/dashboard/deployments/${repoName}`} className={cn(buttonVariants({ variant: "outline" }), "mt-4")}>
+                View details
+                {" "}
+                {">"}
+              </Link>
+            </div>
+          )}
+
     </div>
   );
 }

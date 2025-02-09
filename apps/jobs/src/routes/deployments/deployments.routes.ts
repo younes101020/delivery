@@ -28,6 +28,27 @@ export const create = createRoute({
   },
 });
 
+export const streamPreview = createRoute({
+  path: "/deployments/preview/{queueName}",
+  method: "get",
+  tags,
+  request: {
+    params: queueSchema,
+  },
+  responses: {
+    [HttpStatusCodes.OK]: {
+      content: {
+        "text/event-stream": {
+          schema: z.unknown(),
+        },
+      },
+      description: "The deployment preview job process",
+    },
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "No active or failed deployment found"),
+    [HttpStatusCodes.GONE]: jsonContent(goneSchema, "Deployment has already been processed"),
+  },
+});
+
 export const streamLog = createRoute({
   path: "/deployments/logs/{queueName}",
   method: "get",
@@ -42,9 +63,9 @@ export const streamLog = createRoute({
           schema: z.unknown(),
         },
       },
-      description: "The build process logs of the Docker image",
+      description: "The deployment logs job process",
     },
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "No active deployment found"),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "No active or failed deployment found"),
     [HttpStatusCodes.GONE]: jsonContent(goneSchema, "Deployment has already been processed"),
   },
 });
@@ -112,3 +133,4 @@ export type CreateRoute = typeof create;
 export type RetryRoute = typeof retryJob;
 export type GetCurrentDeploymentStep = typeof getCurrentDeploymentStep;
 export type CancelRoute = typeof cancelJob;
+export type StreamPreview = typeof streamPreview;

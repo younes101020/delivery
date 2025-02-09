@@ -15,8 +15,8 @@ export default function DeploymentPage({ params }: { params: Promise<{ repoName:
 async function SuspensedDeploymentsPage({ params }: { params: Promise<{ repoName: string }> }) {
   const { repoName } = await params;
   return (
-    <div className="h-full flex justify-center items-center py-4">
+    <section className="h-full flex justify-center items-center py-4">
       <Stepper repoName={repoName} baseUrl={env.NEXT_PUBLIC_BASEURL} />
-    </div>
+    </section>
   );
 }

@@ -9,10 +9,10 @@ import { getApplicationByName } from "@/db/queries/queries";
 import { subscribeWorkerTo } from "@/routes/deployments/lib/tasks";
 import { startDeploy } from "@/routes/deployments/lib/tasks/deploy";
 import { prepareDataForProcessing } from "@/routes/deployments/lib/tasks/deploy/jobs/utils";
-import { getCurrentDeploymentsState, getLatestJob, getOldestJob } from "@/routes/deployments/lib/tasks/deploy/utils";
+import { checkIfOngoingDeploymentExist, getCurrentDeploymentsState, getJobs, getLatestJob, getOldestJob } from "@/routes/deployments/lib/tasks/deploy/utils";
 import { connection, getBullConnection, jobCanceler } from "@/routes/deployments/lib/tasks/utils";
 
-import type { CancelRoute, CreateRoute, GetCurrentDeploymentStep, RetryRoute, StreamRoute } from "./deployments.routes";
+import type { CancelRoute, CreateRoute, GetCurrentDeploymentStep, RetryRoute, StreamPreview, StreamRoute } from "./deployments.routes";
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const deployment = c.req.valid("json");
@@ -33,15 +33,10 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
   return c.json(queueName, HttpStatusCodes.OK);
 };
 
-export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
+export const streamPreview: AppRouteHandler<StreamPreview> = async (c) => {
   const { queueName } = c.req.valid("param");
-
   const queue = new Queue(queueName, { connection: getBullConnection(connection) });
-
-  const activeJobsCount = await queue.getActiveCount();
-  const failedJobsCount = await queue.getFailedCount();
-
-  const ongoingDeploymentExist = activeJobsCount > 0 || failedJobsCount > 0;
+  const ongoingDeploymentExist = await checkIfOngoingDeploymentExist(queue);
 
   if (!ongoingDeploymentExist) {
     const hasAlreadyBeenDeployed = await getApplicationByName(queueName);
@@ -62,18 +57,79 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
   }
 
   const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection) });
+  const job = await getJobs(queue);
 
-  const allJobs = await queue.getJobs(["active", "failed"]);
+  return streamSSE(c, async (stream) => {
+    await stream.writeSSE({
+      data: JSON.stringify({ step: job.name, status: await job.getState() }),
+    });
 
-  const haveJobFailed = allJobs.find(async (job) => {
-    const state = await job.getState();
-    return state === "failed";
-  });
+    async function activeHandler(job: { jobId: string }) {
+      const jobState = await Job.fromId(queue, job.jobId);
+      await stream.writeSSE({
+        data: JSON.stringify({ step: jobState?.name, status: "active" }),
+      });
+    }
 
-  const jobs = haveJobFailed.length > 0 ? await queue.getJobs(["failed"]) : allJobs;
-  const job = haveJobFailed.length > 0 ? getOldestJob(jobs)! : getLatestJob(allJobs)!;
+    async function failedHandler({ jobId }: { jobId: string }) {
+      const jobState = await Job.fromId(queue, jobId);
+      await stream.writeSSE({
+        data: JSON.stringify({ step: jobState?.name, status: "failed" }),
+      });
+    }
 
-  const { name, data, id } = job;
+    async function completedHandler({ jobId }: { jobId: string }) {
+      const jobState = await Job.fromId(queue, jobId);
+      const isLastDeploymentStep = jobState?.name === "configure";
+      if (isLastDeploymentStep) {
+        await stream.writeSSE({
+          data: JSON.stringify({ step: jobState?.name, status: "completed" }),
+        });
+      }
+    }
+
+    queueEvents.on("active", activeHandler);
+    queueEvents.on("failed", failedHandler);
+    queueEvents.on("completed", completedHandler);
+
+    stream.onAbort(() => {
+      queueEvents.removeListener("active", activeHandler);
+      queueEvents.removeListener("failed", failedHandler);
+      queueEvents.on("completed", completedHandler);
+    });
+
+    while (true) {
+      await stream.sleep(4000);
+    }
+    // casting cause: no typescript support for sse in hono https://github.com/honojs/hono/issues/3309
+  }) as any;
+};
+
+export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
+  const { queueName } = c.req.valid("param");
+  const queue = new Queue(queueName, { connection: getBullConnection(connection) });
+  const ongoingDeploymentExist = await checkIfOngoingDeploymentExist(queue);
+
+  if (!ongoingDeploymentExist) {
+    const hasAlreadyBeenDeployed = await getApplicationByName(queueName);
+    if (hasAlreadyBeenDeployed) {
+      return c.json(
+        {
+          message: HttpStatusPhrases.GONE,
+        },
+        HttpStatusCodes.GONE,
+      );
+    }
+    return c.json(
+      {
+        message: HttpStatusPhrases.NOT_FOUND,
+      },
+      HttpStatusCodes.NOT_FOUND,
+    );
+  }
+
+  const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection) });
+  const { name, data, id } = await getJobs(queue);
 
   return streamSSE(c, async (stream) => {
     await stream.writeSSE({
@@ -103,9 +159,9 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
     }
 
     async function failedHandler({ jobId }: { jobId: string }) {
+      const jobState = await Job.fromId(queue, jobId);
       await stream.writeSSE({
-        data: JSON.stringify({ jobId }),
-
+        data: JSON.stringify({ jobName: jobState?.name, logs: jobState?.data.logs, isCriticalError: true, jobId }),
       });
     }
 
@@ -116,6 +172,7 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
     stream.onAbort(() => {
       queueEvents.removeListener("progress", progressHandler);
       queueEvents.removeListener("completed", completeHandler);
+      queueEvents.removeListener("failed", failedHandler);
     });
 
     while (true) {

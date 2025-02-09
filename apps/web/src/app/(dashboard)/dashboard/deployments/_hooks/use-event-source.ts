@@ -2,30 +2,21 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export interface SSEMessage<T> {
-  jobName: T extends { step: infer S } ? S : never;
-  logs: string;
-  completed?: boolean;
-  isCriticalError?: boolean;
-  appId?: string;
-  jobId?: string;
-}
-
 interface SseProps<T> {
   eventUrl: string;
   initialState: T;
-  onMessage?: (prev: T, data: SSEMessage<T>) => T;
+  onMessage?: (prev: T, data: T) => void;
 }
 
-export function useEventSource<T>({ initialState, eventUrl, onMessage }: SseProps<T>) {
+export function useEventSource<T extends { logs?: string | null }>({ initialState, eventUrl, onMessage }: SseProps<T>) {
   const [sseData, setSseData] = useState<T>(() => initialState);
   const eventSourceRef = useRef<EventSource | null>(null);
 
-  const handleMessage = useCallback((prev: T, data: SSEMessage<T>) => {
+  const handleMessage = useCallback((prev: T, data: T) => {
     if (onMessage) {
-      return onMessage(prev, data);
+      onMessage(prev, data);
     }
-    return prev;
+    return data.logs ? { ...data, logs: prev.logs ? `${prev.logs}${data.logs}` : data.logs } : data;
   }, [onMessage]);
 
   const connect = useCallback(() => {
@@ -38,7 +29,7 @@ export function useEventSource<T>({ initialState, eventUrl, onMessage }: SseProp
 
     newEventSource.onmessage = (e: MessageEvent) => {
       try {
-        const data = JSON.parse(e.data);
+        const data = JSON.parse(e.data) as T;
         setSseData(prev => handleMessage(prev, data));
       }
       catch (error) {
