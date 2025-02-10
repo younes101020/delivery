@@ -39,8 +39,9 @@ export async function clone(job: QueueDeploymentJob<"clone">) {
   try {
     await ssh(`git clone ${authenticatedUrl} ${repoName}`, {
       cwd: APPLICATIONS_PATH,
-      onStdout: ({ chunk, isCriticalError }) => {
+      onStdout: ({ chunk, chunks, isCriticalError }) => {
         job.updateProgress({ logs: chunk, isCriticalError, jobId: job.id });
+        job.updateData({ ...job.data, logs: chunks?.join(), isCriticalError });
       },
     });
   }

@@ -3,17 +3,14 @@ import { DeploymentError } from "@/lib/error";
 
 import type { QueueDeploymentJob } from "../types";
 
-import { extractPortCmd } from "./utils";
-
 export async function configure(job: QueueDeploymentJob<"configure">) {
   const { application, environmentVariable, fqdn } = job.data;
-  const port = extractPortCmd(application.port);
   await job.updateProgress({ logs: "\nWe configure your application..." });
   let applicationId;
 
   try {
     const persistedApplication = await createApplication({
-      applicationData: { ...application, fqdn, port },
+      applicationData: { ...application, fqdn, port: application.port },
       envVars: environmentVariable,
     });
     await job.updateProgress({
@@ -31,6 +28,7 @@ export async function configure(job: QueueDeploymentJob<"configure">) {
       isCriticalError: true,
       jobId: job.id,
     });
+    await job.updateData({ ...job.data, logs: message, isCriticalError: true });
     throw new DeploymentError({
       name: "CONFIGURE_APP_ERROR",
       message,

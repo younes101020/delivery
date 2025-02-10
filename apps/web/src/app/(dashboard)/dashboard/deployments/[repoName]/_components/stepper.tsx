@@ -10,7 +10,7 @@ import type { Nullable } from "@/lib/utils";
 import { retryDeploy } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 
-import { type SSEMessage, useEventSource } from "../_hooks/use-event-source";
+import { useEventSource } from "../../_hooks/use-event-source";
 import BoxReveal from "./ui/box-reveal";
 import { LogsTerminal } from "./ui/logsterminal";
 import Ripple from "./ui/ripple";
@@ -21,10 +21,12 @@ interface StepperProps {
 }
 
 export type DeploymentData = Nullable<{
-  step: keyof typeof DEPLOYMENTMETADATA;
-  logs: string;
+  jobName: keyof typeof DEPLOYMENTMETADATA;
+  logs?: string;
   isCriticalError?: boolean;
   jobId?: string;
+  appId?: string;
+  completed?: boolean;
 }>;
 
 export const DEPLOYMENTMETADATA = {
@@ -42,21 +44,15 @@ export const DEPLOYMENTMETADATA = {
   },
 };
 
-const DEFAULT_STATE = { step: null, logs: null };
+const DEFAULT_STATE = { jobName: null, logs: null };
 
 export function Stepper({ repoName, baseUrl }: StepperProps) {
-  const onMessage = (prev: DeploymentData, data: SSEMessage<DeploymentData>) => {
+  const onMessage = (_: DeploymentData, data: DeploymentData) => {
     if (data.completed && data.appId) {
       redirect(`/dashboard/applications/${data.appId}`);
     }
-    return {
-      step: data.jobName,
-      logs: prev.logs ? `${prev.logs}${data.logs}` : data.logs,
-      isCriticalError: data.isCriticalError,
-      jobId: data.jobId,
-    };
   };
-  const { step, logs, isCriticalError, jobId, reconnect } = useEventSource<DeploymentData>({
+  const { jobName, logs, isCriticalError, jobId, reconnect } = useEventSource<DeploymentData>({
     eventUrl: `${baseUrl}/api/deployments/logs/${repoName}`,
     initialState: DEFAULT_STATE,
     onMessage,
@@ -66,13 +62,13 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden gap-4">
       <BoxReveal duration={0.5}>
         <p className="text-xl font-semibold">
-          {step && DEPLOYMENTMETADATA[step].phrase}
+          {jobName && DEPLOYMENTMETADATA[jobName].phrase}
           <span className="text-primary">.</span>
         </p>
       </BoxReveal>
       <div className="flex gap-2">
-        <p className="text-xs text-primary">{step && DEPLOYMENTMETADATA[step].position}</p>
-        <LogsTerminalButton step={step} logs={logs} />
+        <p className="text-xs text-primary">{jobName && DEPLOYMENTMETADATA[jobName].position}</p>
+        <LogsTerminalButton logs={logs} />
       </div>
       {isCriticalError && (
         <div className="flex flex-col gap-2 text-center items-center">
@@ -128,8 +124,8 @@ function RetryDeploymentButton({ jobId, repoName, reconnect }: { jobId: string; 
   );
 }
 
-function LogsTerminalButton({ step, logs }: DeploymentData) {
-  if (step === "clone" || !logs)
+function LogsTerminalButton({ logs }: Pick<DeploymentData, "logs">) {
+  if (!logs)
     return null;
 
   return (

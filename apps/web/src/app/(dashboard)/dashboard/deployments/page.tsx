@@ -1,6 +1,7 @@
 import { Bird } from "lucide-react";
 
 import { EmptyState } from "@/components/ui/empty-state";
+import { env } from "@/env";
 
 import { DeploymentPreviewCard } from "./_components/deployment-preview-card";
 import { getCurrentDeploymentsState } from "./_lib/queries";
@@ -33,7 +34,7 @@ export default async function DeploymentsPage() {
       <h1 className="text-3xl font-bold tracking-wide">Ongoing deployments</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 relative z-10 py-10">
         {deployments.map(deployment => (
-          <DeploymentPreviewCard key={deployment.id} {...deployment} />
+          <DeploymentPreviewCard key={deployment.id} {...deployment} baseUrl={env.NEXT_PUBLIC_BASEURL} />
         ))}
       </div>
     </section>

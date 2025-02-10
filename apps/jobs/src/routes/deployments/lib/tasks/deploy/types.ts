@@ -6,14 +6,15 @@ type Application = InsertApplicationSchemaWithSharedEnv["applicationData"];
 
 export interface QueueDeploymentJobData {
   repoName: string;
-  timeout: number;
   clone: SelectedGithubAppsSchema & {
     secret: SelectedGithubAppSecretSchema;
     repoUrl: string;
   };
   build: {
     env?: string;
-    port: string;
+    port: number;
+    staticdeploy: boolean;
+    publishdir?: string;
     fqdn: string;
     cache: boolean;
     logs?: string;
@@ -28,6 +29,6 @@ export interface QueueDeploymentJobData {
 
 export type QueueDeploymentJobName = keyof QueueDeploymentJobData;
 
-export type QueueDeploymentJob<T extends QueueDeploymentJobName> = Omit<Job, "data"> & { data: QueueDeploymentJobData[T] & { repoName: string; timeout: number } };
+export type QueueDeploymentJob<T extends QueueDeploymentJobName> = Omit<Job, "data"> & { data: QueueDeploymentJobData[T] & { repoName: string } };
 
 export type QueueDeploymentJobFns = Record<string, (job: QueueDeploymentJob<any>) => Promise<unknown>>;

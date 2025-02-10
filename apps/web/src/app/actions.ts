@@ -42,14 +42,41 @@ const deploySchema = z.object({
   githubAppId: z.coerce.number(),
   isOnboarding: z.coerce.boolean(),
   cache: z.coerce.boolean(),
+  staticdeploy: z.coerce.boolean(),
+  publishdir: z.string().optional(),
   port: z
-    .string()
-    .regex(/^\d+(?::\d+)?$/, { message: "The port format is invalid" })
-    .transform((port) => {
-      const [first, second] = port.split(":");
-      return second ? port : `${first}:${first}`;
-    }),
+    .coerce
+    .number()
+    .optional(),
   env: z.string().optional(),
+}).superRefine((input, ctx) => {
+  if (!input.port && !input.staticdeploy) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.invalid_type,
+      expected: "boolean",
+      received: "undefined",
+      path: ["port"],
+      message: "Must be set when the deployment mode is not static",
+    });
+  }
+  if (input.staticdeploy) {
+    if (!input.publishdir) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.invalid_type,
+        expected: "string",
+        received: "undefined",
+        path: ["publishdir"],
+        message: "Must be set when the deployment mode is static",
+      });
+    }
+    else if (!input.publishdir.startsWith("/")) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["publishdir"],
+        message: "Publish directory path must start with a forward slash (/)",
+      });
+    }
+  }
 });
 
 export const deploy = validatedAction(deploySchema, async (data) => {

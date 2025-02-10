@@ -1,4 +1,4 @@
-name: Running UT/E2E and IT tests
+name: Running UT/E2E and IT tests and release
 
 on:
   push:
@@ -75,3 +75,47 @@ jobs:
 
       - name: Run integration and unit tests
         run: yarn run test
+
+  release:
+    name: Release
+    if: github.ref_name == 'main' || github.ref_name == 'next'
+    runs-on: ubuntu-latest
+    needs: [tests]
+    environment: production
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
+      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+      JOBS_API_BASEURL: ${{ vars.JOBS_API_BASEURL }}
+      JOBS_BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
+      PORT: ${{ vars.PORT }}
+      LOG_LEVEL: ${{ vars.LOG_LEVEL }}
+      NEXT_PUBLIC_BASEURL: ${{ vars.NEXT_PUBLIC_BASEURL }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      
+      - name: Release
+        run: npx -p @semantic-release/exec semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push images
+        if: env.docker_publish == 'true'
+        run: |
+          docker compose -f compose.prod.yaml build
+          docker compose -f compose.prod.yaml push

@@ -39,7 +39,7 @@ describe("application routes / integration test", () => {
   });
 
   it("patch /applications/{id} return application info when payload is submited", async ({ applicationId }) => {
-    const newPort = "7854:7458";
+    const newPort = 7458;
     const response = await client.applications[":id"].$patch(
       {
         param: {

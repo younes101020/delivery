@@ -53,7 +53,7 @@ export const applications = pgTable("applications", {
     .generatedAlwaysAs((): SQL => sql`split_part(${applications.fqdn}, '.', 1)`),
   fqdn: text("fqdn").notNull().unique(),
   logs: text("logs"),
-  port: text("port").notNull(),
+  port: integer("port").notNull(),
   githubAppId: integer("github_app_id").notNull().references(() => githubApp.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

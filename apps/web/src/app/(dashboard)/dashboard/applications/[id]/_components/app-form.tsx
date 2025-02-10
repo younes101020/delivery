@@ -16,7 +16,7 @@ import { editApplication } from "../../actions";
 interface AppFormProps {
   id: number;
   fqdn?: string | undefined;
-  port?: string | undefined;
+  port?: number | undefined;
   environmentVariables?: string;
 }
 
@@ -55,7 +55,7 @@ export function AppForm(applicationData: AppFormProps) {
           id="port"
           name="port"
           type="text"
-          placeholder="eg: 5745:3000"
+          placeholder="eg: 3000"
           aria-label="port"
           required
           defaultValue={state.inputs?.port}
