@@ -51,18 +51,6 @@ export function transformEnvVars(envs: InsertDeploymentSchema["env"]) {
   };
 }
 
-export function extractPortCmd(portCmd: string) {
-  const portMatch = portCmd.match(/-p\s*(\d+:\d+)/);
-  if (!portMatch) {
-    throw new DeploymentError({
-      name: "CONFIGURE_APP_ERROR",
-      message: "Invalid port command format",
-      cause: "Port command must be in format: -p host:container",
-    });
-  }
-  return portMatch[1];
-}
-
 export function convertGitToAuthenticatedUrl(gitUrl: string, token: string) {
   return gitUrl.replace(
     "git://",
@@ -82,20 +70,21 @@ export async function prepareDataForProcessing(deployment: InsertDeploymentSchem
   const repoName = basename(deployment.repoUrl, ".git").toLowerCase();
   const fqdn = parseAppHost(repoName, hostName);
   const environmentVariables = transformEnvVars(deployment.env);
+  const port = deployment.staticdeploy ? 80 : deployment.port!;
 
   return {
-    // 20min job abort threshold when caching is enabled, otherwise 40min
-    timeout: deployment.cache ? 1200000 : 2400000,
     repoName,
     clone: { ...githubApp, repoUrl: deployment.repoUrl, secret: githubApp.secret },
     build: {
-      port: deployment.port,
+      port,
+      staticdeploy: deployment.staticdeploy,
       env: environmentVariables && environmentVariables.cmdEnvVars,
       cache: deployment.cache,
       fqdn,
+      ...(deployment.staticdeploy && { publishdir: deployment.publishdir }),
     },
     configure: {
-      application: { port: deployment.port, githubAppId: githubApp.id },
+      application: { port, githubAppId: githubApp.id },
       environmentVariable: environmentVariables && environmentVariables.persistedEnvVars,
       fqdn,
     },

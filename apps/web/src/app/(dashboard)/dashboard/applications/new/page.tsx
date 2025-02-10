@@ -5,7 +5,7 @@ export default function NewApplicationPage(props: {
 }) {
   return (
     <section className="p-5 bg-background/50 border">
-      <h1 className="text-3xl font-bold px-2 py-1 w-fit mx-5 tracking-wide">New application</h1>
+      <h1 className="text-3xl font-bold py-1 w-fit mx-5 leading-none tracking-tight">New application</h1>
       <Deployment sp={props.searchParams} />
     </section>
   );

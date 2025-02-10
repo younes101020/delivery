@@ -4,16 +4,45 @@ export const insertDeploymentSchema = z.object({
   repoUrl: z.string(),
   githubAppId: z.number(),
   port: z
-    .string()
-    .regex(/^\d+(?::\d+)?$/, { message: "The port format is invalid" })
-    .transform(port => `-p ${port}`)
-    .describe("Port number or port mapping in format port:port"),
+    .coerce
+    .number()
+    .optional(),
   env: z
     .string()
     .regex(/^(?:\w+=[\w.-]+(?:\s+|$))*$/)
     .optional()
     .describe("Environment variables in KEY=value format, separated by spaces"),
   cache: z.coerce.boolean(),
+  staticdeploy: z.coerce.boolean(),
+  publishdir: z.string().optional(),
+}).superRefine((input, ctx) => {
+  if (!input.port && !input.staticdeploy) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.invalid_type,
+      expected: "boolean",
+      received: "undefined",
+      path: ["port"],
+      message: "Must be set when the deployment mode is not static",
+    });
+  }
+  if (input.staticdeploy) {
+    if (!input.publishdir) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.invalid_type,
+        expected: "string",
+        received: "undefined",
+        path: ["publishdir"],
+        message: "Must be set when the deployment mode is static",
+      });
+    }
+    else if (!input.publishdir.startsWith("/")) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["publishdir"],
+        message: "Publish directory path must start with a forward slash (/)",
+      });
+    }
+  }
 });
 
 export const queueSchema = z.object({

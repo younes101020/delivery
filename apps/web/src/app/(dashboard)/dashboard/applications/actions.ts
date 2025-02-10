@@ -11,7 +11,10 @@ import { transformEnvVars } from "./_lib/utils";
 const editApplicationSchema = z
   .object({
     fqdn: z.string(),
-    port: z.string(),
+    port: z
+      .coerce
+      .number()
+      .optional(),
     environmentVariables: z.string(),
     id: z.coerce.number(),
   })

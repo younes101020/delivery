@@ -1,5 +1,7 @@
 "use client";
 
+import type { CheckedState } from "@radix-ui/react-checkbox";
+
 import { Loader2, Rocket } from "lucide-react";
 import { useActionState, useState } from "react";
 
@@ -24,12 +26,14 @@ interface DeploymentProps {
 }
 
 export function DeploymentForm({ repositories, githubApps, isOnboarding = false }: DeploymentProps) {
+  const initialStaticChoice = false;
   const [state, formAction, pending] = useActionState<ActionState, FormData>(deploy, {
     error: "",
     inputs: {
       port: "",
       env: "",
       cache: true,
+      staticdeploy: initialStaticChoice,
     },
   });
   const [selected, setSelected] = useState<SelectedRepositoryProps>({
@@ -38,29 +42,56 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
     githubAppId: null,
     gitUrl: null,
   });
+  const [isStaticDeployment, setIsTaticDeployment] = useState<CheckedState>(initialStaticChoice);
 
   return (
     <>
       <form action={formAction} className="px-5 space-y-8 mt-8" aria-label="form">
-        <div>
-          <Label htmlFor="port" className="block text-sm font-medium">
-            Exposed or mapped port
-          </Label>
-          <div className="mt-1">
-            <Input
-              id="port"
-              name="port"
-              type="text"
-              required
-              defaultValue={state.inputs.port}
-              className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
-              placeholder="ex: 3000 or 5695:3000"
-            />
-          </div>
-          <p className="text-muted-foreground text-xs pt-1">
-            This port will be used by the reverse proxy to make your application accessible.
-          </p>
-        </div>
+
+        {isStaticDeployment
+          ? (
+              <div>
+                <Label htmlFor="publishdir" className="block text-sm font-medium">
+                  Publish directory
+                </Label>
+                <div className="mt-1">
+                  <Input
+                    id="publishdir"
+                    name="publishdir"
+                    type="text"
+                    required={isStaticDeployment === "indeterminate" ? false : isStaticDeployment}
+                    defaultValue={state.inputs.publishdir}
+                    className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
+                    placeholder="ex: /dist"
+                  />
+                </div>
+                <p className="text-muted-foreground text-xs pt-1">
+                  The output directory of your build
+                </p>
+              </div>
+            )
+          : (
+              <div>
+                <Label htmlFor="port" className="block text-sm font-medium">
+                  Exposed or mapped port
+                </Label>
+                <div className="mt-1">
+                  <Input
+                    id="port"
+                    name="port"
+                    type="text"
+                    required={!isStaticDeployment}
+                    defaultValue={state.inputs.port}
+                    className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
+                    placeholder="ex: 3000 or 5695:3000"
+                  />
+                </div>
+                <p className="text-muted-foreground text-xs pt-1">
+                  This port will be used by the reverse proxy to make your application accessible.
+                </p>
+              </div>
+            )}
+
         <div>
           <Label htmlFor="env" className="block">
             Environment variables
@@ -92,6 +123,26 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
         <p className="text-muted-foreground text-xs">
           This GitHub repository will be the source of your application.
         </p>
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="staticdeploy"
+            name="staticdeploy"
+            defaultChecked={!!(state.inputs.staticdeploy === "on" || state.inputs.staticdeploy)}
+            key={state.inputs.staticdeploy}
+            onCheckedChange={isChecked => setIsTaticDeployment(isChecked)}
+          />
+          <div className="flex flex-col">
+            <label
+              htmlFor="terms"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Build and serve static files
+            </label>
+            <p className="block text-xs text-muted-foreground">
+              Your source code will be built, and the output static files will be served via Nginx
+            </p>
+          </div>
+        </div>
         <div className="flex items-center space-x-2">
           <Checkbox
             id="cache"
