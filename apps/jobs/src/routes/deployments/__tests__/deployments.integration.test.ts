@@ -39,7 +39,7 @@ describe("deployments routes", () => {
           // @ts-expect-error
           port: "not-a-number",
           cache: true,
-          static: false,
+          staticdeploy: false,
           repoUrl,
         },
       },
