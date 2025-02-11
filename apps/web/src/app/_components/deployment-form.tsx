@@ -73,7 +73,7 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
           : (
               <div>
                 <Label htmlFor="port" className="block text-sm font-medium">
-                  Exposed or mapped port
+                  Running port
                 </Label>
                 <div className="mt-1">
                   <Input
@@ -83,11 +83,11 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
                     required={!isStaticDeployment}
                     defaultValue={state.inputs.port}
                     className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
-                    placeholder="ex: 3000 or 5695:3000"
+                    placeholder="ex: 3000"
                   />
                 </div>
                 <p className="text-muted-foreground text-xs pt-1">
-                  This port will be used by the reverse proxy to make your application accessible.
+                  Port on which your application runs.
                 </p>
               </div>
             )}

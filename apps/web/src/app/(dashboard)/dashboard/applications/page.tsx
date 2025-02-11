@@ -3,24 +3,34 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { buttonVariants } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate } from "@/lib/utils";
 
 import { AppCard } from "./_components/app-card";
 import { getApplications } from "./_lib/queries";
 
-function NoApplicationsScreen() {
+function NoApplications() {
   return (
-    <div className="w-full h-full">
-      <p className="text-center underline decoration-primary">No application</p>
+    <div className="h-full flex justify-center items-center">
+      <EmptyState
+        title="No application"
+        description="You can see all your applications here."
+        icons={[PackagePlus]}
+        action={{
+          label: "Deploy application",
+          href: "/applications/new",
+        }}
+      />
     </div>
+
   );
 }
 
 async function ApplicationList() {
   const applications = await getApplications();
-  if (!applications)
-    return <NoApplicationsScreen />;
+  if (!applications || applications.length < 1)
+    return <NoApplications />;
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       {applications.map(application => (
@@ -38,16 +48,16 @@ async function ApplicationList() {
 
 export default async function ApplicationsPage() {
   return (
-    <section className="p-5 bg-background/50 border">
+    <section className="p-5 bg-background/50 border h-[90%]">
       <div className="flex justify-between gap-2">
         <h1 className="text-3xl font-bold tracking-wide text-secondary-foreground/85">Applications list</h1>
         <Link href="/dashboard/applications/new" className={buttonVariants({ variant: "outline" })}>
           <PackagePlus className="mr-1 mt-[.1rem]" />
-          New application
+          Deploy application
         </Link>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-8 h-full">
         <Suspense fallback={<Skeleton className="h-32 w-full" />}>
           <ApplicationList />
         </Suspense>
