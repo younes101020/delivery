@@ -31,6 +31,7 @@
     "@radix-ui/react-tooltip": "^1.1.6",
     "@t3-oss/env-nextjs": "^0.12.0",
     "@tabler/icons-react": "^3.28.1",
+    "babel-plugin-react-compiler": "19.0.0-beta-30d8a17-20250209",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cobe": "^0.6.3",

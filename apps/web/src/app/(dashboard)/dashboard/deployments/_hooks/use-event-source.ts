@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface SseProps<T> {
   eventUrl: string;
@@ -12,14 +12,7 @@ export function useEventSource<T extends { logs?: string | null }>({ initialStat
   const [sseData, setSseData] = useState<T>(() => initialState);
   const eventSourceRef = useRef<EventSource | null>(null);
 
-  const handleMessage = useCallback((prev: T, data: T) => {
-    if (onMessage) {
-      onMessage(prev, data);
-    }
-    return data.logs ? { ...data, logs: prev.logs ? `${prev.logs}${data.logs}` : data.logs } : data;
-  }, [onMessage]);
-
-  const connect = useCallback(() => {
+  useEffect(() => {
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
     }
@@ -30,7 +23,12 @@ export function useEventSource<T extends { logs?: string | null }>({ initialStat
     newEventSource.onmessage = (e: MessageEvent) => {
       try {
         const data = JSON.parse(e.data) as T;
-        setSseData(prev => handleMessage(prev, data));
+        setSseData((prev) => {
+          if (onMessage) {
+            onMessage(prev, data);
+          }
+          return data.logs ? { ...data, logs: prev.logs ? `${prev.logs}${data.logs}` : data.logs } : data;
+        });
       }
       catch (error) {
         console.error("Failed to parse SSE data:", error);
@@ -45,18 +43,7 @@ export function useEventSource<T extends { logs?: string | null }>({ initialStat
       newEventSource.close();
       eventSourceRef.current = null;
     };
-  }, [eventUrl]);
+  }, [eventUrl, onMessage]);
 
-  useEffect(() => {
-    const cleanup = connect();
-    return () => {
-      cleanup();
-    };
-  }, [connect]);
-
-  const reconnect = useCallback(() => {
-    connect();
-  }, [connect]);
-
-  return { ...sseData, reconnect };
+  return sseData;
 }

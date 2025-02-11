@@ -2,7 +2,7 @@
 
 import { ExternalLink as ExternalLinkIcon, Loader2, RotateCcw } from "lucide-react";
 import { redirect } from "next/navigation";
-import { useActionState, useEffect } from "react";
+import { useActionState } from "react";
 
 import type { ActionState } from "@/app/_lib/form-middleware";
 import type { Nullable } from "@/lib/utils";
@@ -48,15 +48,20 @@ const DEFAULT_STATE = { jobName: null, logs: null };
 
 export function Stepper({ repoName, baseUrl }: StepperProps) {
   const onMessage = (_: DeploymentData, data: DeploymentData) => {
+    console.log("is finished: ", data.jobName, data.completed, data.appId);
     if (data.completed && data.appId) {
       redirect(`/dashboard/applications/${data.appId}`);
     }
   };
-  const { jobName, logs, isCriticalError, jobId, reconnect } = useEventSource<DeploymentData>({
+  const { jobName, logs, isCriticalError, jobId } = useEventSource<DeploymentData>({
     eventUrl: `${baseUrl}/api/deployments/logs/${repoName}`,
     initialState: DEFAULT_STATE,
     onMessage,
   });
+  const [state, formAction, isPending] = useActionState<ActionState, FormData>(
+    retryDeploy,
+    { error: "", success: "", inputs: { repoName, jobId } },
+  );
 
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden gap-4">
@@ -74,53 +79,38 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
         <div className="flex flex-col gap-2 text-center items-center">
           <p className="text-destructive font-semibold">We were unable to deploy your application</p>
           <p className="text-xs text-destructive">Once you think you have resolved the issue, you can redeploy.</p>
-          {jobId && <RetryDeploymentButton repoName={repoName} jobId={jobId} reconnect={reconnect} />}
+          {jobId && (
+            <div className="flex flex-col gap-2">
+              {state.error && <p className="text-xs text-destructive">{state.error}</p>}
+              <form>
+                <input type="hidden" name="repoName" defaultValue={state.inputs.repoName} />
+                <input type="hidden" name="jobId" defaultValue={state.inputs.jobId ?? ""} />
+                <Button
+                  variant="outline"
+                  className="w-fit"
+                  formAction={formAction}
+                >
+                  {isPending
+                    ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Redeployment...
+                        </>
+                      )
+                    : (
+                        <>
+                          <RotateCcw />
+                          Retry
+                        </>
+                      )}
+                </Button>
+              </form>
+            </div>
+          )}
         </div>
       )}
       <Ripple />
     </div>
-  );
-}
-
-function RetryDeploymentButton({ jobId, repoName, reconnect }: { jobId: string; repoName: string; reconnect: () => void }) {
-  const [state, formAction, isPending] = useActionState<ActionState, FormData>(
-    retryDeploy,
-    { error: "", success: "", inputs: { repoName, jobId } },
-  );
-
-  useEffect(() => {
-    if (state.success)
-      reconnect();
-  }, [state, reconnect]);
-
-  return (
-    <div className="flex flex-col gap-2">
-      {state.error && <p className="text-xs text-destructive">{state.error}</p>}
-      <form>
-        <input type="hidden" name="repoName" defaultValue={state.inputs.repoName} />
-        <input type="hidden" name="jobId" defaultValue={state.inputs.jobId ?? ""} />
-        <Button
-          variant="outline"
-          className="w-fit"
-          formAction={formAction}
-        >
-          {isPending
-            ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Redeployment...
-                </>
-              )
-            : (
-                <>
-                  <RotateCcw />
-                  Retry
-                </>
-              )}
-        </Button>
-      </form>
-    </div>
-
   );
 }
 
