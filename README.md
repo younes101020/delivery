@@ -1,8 +1,4 @@
-<div align="center">
-  <img src="https://github.com/user-attachments/assets/904f879b-1a7a-4f9c-8250-b595caf89dbb">
-</div>
-
-https://github.com/user-attachments/assets/ea291180-4ecc-40f1-831a-372153ba9ee0
+https://github.com/user-attachments/assets/6d9c58d7-800a-4699-ad08-c49bd4da7c14
 
 Self-hostable Coolify, Vercel, Heroku alternative focusing on one single thing:
 deploying your applications as simply as possible, without any vendor lock-in.
