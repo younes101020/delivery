@@ -26,19 +26,18 @@ export async function startDeploy(jobsData: QueueDeploymentJobData) {
     name: JOBS.configure,
     data: { ...jobsData.configure, repoName: queueName },
     queueName,
-    opts: { removeOnComplete: true },
     children: [
       {
         name: JOBS.build,
         data: { ...jobsData.build, repoName: queueName },
         queueName,
-        opts: { removeOnComplete: true, attempts: 3, failParentOnFailure: true },
+        opts: { attempts: 3, failParentOnFailure: true },
         children: [
           {
             name: JOBS.clone,
             data: { ...jobsData.clone, repoName: queueName },
             queueName,
-            opts: { removeOnComplete: true, attempts: 3, failParentOnFailure: true },
+            opts: { attempts: 3, failParentOnFailure: true },
           },
         ],
       },

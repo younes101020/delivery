@@ -148,8 +148,8 @@ export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
       });
     }
 
-    async function completeHandler(job: { jobId: string }) {
-      const jobState = await Job.fromId(queue, job.jobId);
+    async function completeHandler({ jobId }: { jobId: string }) {
+      const jobState = await Job.fromId(queue, jobId);
       if (jobState?.name === "configure") {
         const applicationId = jobState.returnvalue;
         await stream.writeSSE({
