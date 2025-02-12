@@ -2,6 +2,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
+import { roboto } from "@/app/layout";
 import { WithBannerBadge } from "@/components/banner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate } from "@/lib/utils";
@@ -12,15 +13,6 @@ import DeleteAppForm from "./_components/delete-app-form";
 
 interface AppProps {
   id: string;
-}
-
-function GetApplicationLoadingScreen() {
-  return (
-    <div className="flex flex-col gap-4">
-      <Skeleton className="h-8 w-full" />
-      <Skeleton className="h-8 w-full" />
-    </div>
-  );
 }
 
 async function AppPreviewImage({ id }: AppProps) {
@@ -110,7 +102,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
   return (
     <section className="p-5 bg-background/50 border">
-      <h1 className="text-3xl font-bold bg-primary text-primary-foreground px-2 py-1 w-fit">Application configuration</h1>
+      <h1 className={`text-3xl font-bold tracking-wide leading-none ${roboto.className} italic bg-primary text-primary-foreground px-2 py-1 w-fit`}>Application configuration</h1>
       <div className="mt-8 grid grid-cols-4 gap-4">
         <Suspense
           fallback={(
@@ -141,5 +133,14 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         </div>
       </div>
     </section>
+  );
+}
+
+function GetApplicationLoadingScreen() {
+  return (
+    <div className="flex flex-col gap-4">
+      <Skeleton className="h-8 w-full" />
+      <Skeleton className="h-8 w-full" />
+    </div>
   );
 }

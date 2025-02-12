@@ -7,6 +7,7 @@ import type { Nullable } from "@/lib/utils";
 import { Bounce } from "@/app/_components/bounce";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, formatDate } from "@/lib/utils";
 
