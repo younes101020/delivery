@@ -5,7 +5,6 @@ import { Deployment } from "@/app/_components/deployment";
 import { getAllGithubApp } from "@/app/_lib/github/queries";
 import { getUser } from "@/app/_lib/user-session";
 import { Skeleton } from "@/components/ui/skeleton";
-import { env } from "@/env";
 
 import { Login } from "../../_components/login-form";
 import { DomainNameForm } from "./_components/domain-name-form";
@@ -47,7 +46,7 @@ async function GithubAppStep(props: SearchParams) {
   const allGithubInstallations = await getAllGithubApp();
   if (allGithubInstallations && allGithubInstallations.length > 0)
     redirect("/onboarding/?step=4");
-  return <GithubAppForm baseUrl={env.NEXT_PUBLIC_BASEURL} />;
+  return <GithubAppForm />;
 }
 
 async function DomainNameStep(props: SearchParams) {

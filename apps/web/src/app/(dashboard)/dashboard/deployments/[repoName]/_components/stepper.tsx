@@ -47,15 +47,15 @@ export const DEPLOYMENTMETADATA = {
 
 const DEFAULT_STATE = { jobName: null, logs: null };
 
+export function Stepper({ repoName }: StepperProps) {
   const { setRefreshTracker } = useRefreshTracker();
   const onMessage = (_: DeploymentData, data: DeploymentData) => {
-    console.log("is finished: ", data.jobName, data.completed, data.appId);
     if (data.completed && data.appId) {
       redirect(`/dashboard/applications/${data.appId}`);
     }
   };
   const { jobName, logs, isCriticalError, jobId } = useEventSource<DeploymentData>({
-    eventUrl: `${baseUrl}/api/deployments/logs/${repoName}`,
+    eventUrl: `${env.NEXT_PUBLIC_BASEURL}/api/deployments/logs/${repoName}`,
     initialState: DEFAULT_STATE,
     onMessage,
   });

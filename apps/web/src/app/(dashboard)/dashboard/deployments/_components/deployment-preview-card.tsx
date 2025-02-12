@@ -9,16 +9,16 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { env } from "@/env";
 import { cn, formatDate } from "@/lib/utils";
 
-import { useEventSource } from "../_hooks/use-event-source";
+import { useEventSource } from "../../../../_hooks/use-event-source";
 
 interface DeploymentPreviewCardProps {
   id: string;
   timestamp: string;
   repoName: string;
   stacktrace: (string | null)[];
-  baseUrl: string;
 }
 
 export type DeploymentPreview = Nullable<{
@@ -32,11 +32,10 @@ const DEFAULT_STATE = { step: null, status: null };
 export function DeploymentPreviewCard({
   timestamp,
   repoName,
-  baseUrl,
 }: DeploymentPreviewCardProps) {
   const date = formatDate(timestamp);
   const { status, step } = useEventSource<DeploymentPreview>({
-    eventUrl: `${baseUrl}/api/deployments/preview/${repoName}`,
+    eventUrl: `${env.NEXT_PUBLIC_BASEURL}/api/deployments/preview/${repoName}`,
     initialState: DEFAULT_STATE,
   });
 

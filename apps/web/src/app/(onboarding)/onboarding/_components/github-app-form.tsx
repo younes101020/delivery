@@ -9,13 +9,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { env } from "@/env";
 
 const GITHUB_APP_REGISTRATION_URL = "https://github.com/settings/apps/new";
 
-export function GithubAppForm({ baseUrl }: { baseUrl: string }) {
+export function GithubAppForm() {
   const [url, setUrl] = useState(GITHUB_APP_REGISTRATION_URL);
   const [enableOrg, setEnableOrg] = useState(false);
   const [name, setName] = useState("");
+  const baseUrl = env.NEXT_PUBLIC_BASEURL;
 
   const data = useMemo(
     () => ({
