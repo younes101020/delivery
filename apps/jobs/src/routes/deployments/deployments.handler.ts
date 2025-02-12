@@ -105,7 +105,7 @@ export const streamPreview: AppRouteHandler<StreamPreview> = async (c) => {
   }) as any;
 };
 
-export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
+export const streamLog: AppRouteHandler<StreamLogsRoute> = async (c) => {
   const { queueName } = c.req.valid("param");
   const queue = new Queue(queueName, { connection: getBullConnection(connection) });
   const ongoingDeploymentExist = await checkIfOngoingDeploymentExist(queue);

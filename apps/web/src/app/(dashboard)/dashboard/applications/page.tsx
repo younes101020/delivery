@@ -53,7 +53,7 @@ export default async function ApplicationsPage() {
         <h1 className="text-3xl font-bold tracking-wide text-secondary-foreground/85">Applications list</h1>
         <Link href="/dashboard/applications/new" className={buttonVariants({ variant: "outline" })}>
           <PackagePlus className="mr-1 mt-[.1rem]" />
-          Deploy application
+          Deploy new application
         </Link>
       </div>
 
