@@ -2,11 +2,12 @@
 
 import { ExternalLink as ExternalLinkIcon, Loader2, RotateCcw } from "lucide-react";
 import { redirect } from "next/navigation";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 
 import type { ActionState } from "@/app/_lib/form-middleware";
 import type { Nullable } from "@/lib/utils";
 
+import { useRefreshTracker } from "@/app/_lib/refresh-tracker-provider";
 import { retryDeploy } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 
@@ -46,7 +47,7 @@ export const DEPLOYMENTMETADATA = {
 
 const DEFAULT_STATE = { jobName: null, logs: null };
 
-export function Stepper({ repoName, baseUrl }: StepperProps) {
+  const { setRefreshTracker } = useRefreshTracker();
   const onMessage = (_: DeploymentData, data: DeploymentData) => {
     console.log("is finished: ", data.jobName, data.completed, data.appId);
     if (data.completed && data.appId) {
@@ -58,6 +59,9 @@ export function Stepper({ repoName, baseUrl }: StepperProps) {
     initialState: DEFAULT_STATE,
     onMessage,
   });
+  useEffect(() => {
+    setRefreshTracker(true);
+  }, []);
   const [state, formAction, isPending] = useActionState<ActionState, FormData>(
     retryDeploy,
     { error: "", success: "", inputs: { repoName, jobId } },

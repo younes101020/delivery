@@ -34,6 +34,23 @@ export async function getCurrentDeploymentsState() {
   return currentDeploymentsState.filter(isNotNull);
 }
 
+export async function getCurrentDeploymentCount() {
+  const deployments = await fetchQueueTitles(connection);
+  const activeQueues = [];
+  let currentActiveDeploymentCount = 0;
+
+  for (const deployment of deployments) {
+    const queue = new Queue(deployment.queueName, { connection: getBullConnection(connection) });
+    const jobs = await queue.getJobs(["active"]);
+    if (jobs.length > 0) {
+      currentActiveDeploymentCount++;
+      activeQueues.push(queue);
+    }
+  }
+
+  return { currentActiveDeploymentCount, activeQueues };
+}
+
 export async function getJobs(queue: Queue) {
   const activeAndFailedJobs = await queue.getJobs(["active", "failed"]);
   const failedJobs = await queue.getJobs(["failed"]);

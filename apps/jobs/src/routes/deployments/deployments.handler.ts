@@ -9,10 +9,10 @@ import { getApplicationByName } from "@/db/queries/queries";
 import { subscribeWorkerTo } from "@/routes/deployments/lib/tasks";
 import { startDeploy } from "@/routes/deployments/lib/tasks/deploy";
 import { prepareDataForProcessing } from "@/routes/deployments/lib/tasks/deploy/jobs/utils";
-import { checkIfOngoingDeploymentExist, getCurrentDeploymentsState, getJobs } from "@/routes/deployments/lib/tasks/deploy/utils";
+import { checkIfOngoingDeploymentExist, getCurrentDeploymentCount, getCurrentDeploymentsState, getJobs, getPreviousDeploymentsState } from "@/routes/deployments/lib/tasks/deploy/utils";
 import { connection, getBullConnection, jobCanceler } from "@/routes/deployments/lib/tasks/utils";
 
-import type { CancelRoute, CreateRoute, GetCurrentDeploymentStep, RetryRoute, StreamPreview, StreamRoute } from "./deployments.routes";
+import type { CancelRoute, CreateRoute, GetCurrentDeploymentStep, GetPreviousDeploymentStep, RetryRoute, StreamCurrentDeploymentCount, StreamLogsRoute, StreamPreview } from "./deployments.routes";
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const deployment = c.req.valid("json");
@@ -186,6 +186,60 @@ export const getCurrentDeploymentsStep: AppRouteHandler<GetCurrentDeploymentStep
   const currentDeploymentsState = await getCurrentDeploymentsState();
 
   return c.json(currentDeploymentsState);
+};
+
+export const streamCurrentDeploymentsCount: AppRouteHandler<StreamCurrentDeploymentCount> = async (c) => {
+  const { currentActiveDeploymentCount, activeQueues } = await getCurrentDeploymentCount();
+  let inMemoryActiveDeploymentCount = currentActiveDeploymentCount;
+  const inMemoryQueueEvents: QueueEvents[] = [];
+
+  for (const activeQueue of activeQueues) {
+    const queueEvents = new QueueEvents(activeQueue.name, { connection: getBullConnection(connection) });
+    inMemoryQueueEvents.push(queueEvents);
+  }
+console.log('ok', inMemoryActiveDeploymentCount)
+  return streamSSE(c, async (stream) => {
+    await stream.writeSSE({
+      data: JSON.stringify({ isActiveDeployment: inMemoryActiveDeploymentCount > 0 }),
+    });
+
+    async function completeHandler() {
+      inMemoryActiveDeploymentCount--;
+      await stream.writeSSE({
+        data: JSON.stringify({ isActiveDeployment: inMemoryActiveDeploymentCount > 0 }),
+      });
+    }
+
+    async function failedHandler() {
+      inMemoryActiveDeploymentCount--;
+      await stream.writeSSE({
+        data: JSON.stringify({ isActiveDeployment: inMemoryActiveDeploymentCount > 0 }),
+      });
+    }
+
+    for (const queueEvents of inMemoryQueueEvents) {
+      queueEvents.on("completed", completeHandler);
+      queueEvents.on("failed", failedHandler);
+    }
+
+    stream.onAbort(() => {
+      for (const queueEvents of inMemoryQueueEvents) {
+        queueEvents.removeListener("completed", completeHandler);
+        queueEvents.removeListener("failed", failedHandler);
+      }
+    });
+
+    while (true) {
+      await stream.sleep(4000);
+    }
+    // casting cause: no typescript support for sse in hono https://github.com/honojs/hono/issues/3309
+  }) as any;
+};
+
+export const getPreviousDeploymentStep: AppRouteHandler<GetPreviousDeploymentStep> = async (c) => {
+  const previousDeploymentsState = await getPreviousDeploymentsState();
+
+  return c.json(previousDeploymentsState);
 };
 
 export const retryJob: AppRouteHandler<RetryRoute> = async (c) => {

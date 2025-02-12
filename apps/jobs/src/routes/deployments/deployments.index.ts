@@ -9,6 +9,7 @@ const router = createRouter()
   .openapi(routes.streamLog, handlers.streamLog)
   .openapi(routes.retryJob, handlers.retryJob)
   .openapi(routes.getCurrentDeploymentStep, handlers.getCurrentDeploymentsStep)
+  .openapi(routes.streamCurrentDeploymentCount, handlers.streamCurrentDeploymentsCount)
   .openapi(routes.cancelJob, handlers.cancelJob);
 
 export default router;

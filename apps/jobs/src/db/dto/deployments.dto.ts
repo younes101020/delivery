@@ -64,5 +64,10 @@ export const jobSchema = z.object({
   stacktrace: z.array(z.string().optional()),
 });
 
+
+export const currentJobCountSchema = z.object({
+  count: z.number(),
+});
+
 export type InsertDeploymentSchema = z.infer<typeof insertDeploymentSchema>;
 export type JobSchema = z.infer<typeof jobSchema>;

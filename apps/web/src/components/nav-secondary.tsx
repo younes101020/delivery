@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 
 import * as React from "react";
 
+import { DeploymentTracker } from "@/app/_components/deployment-count-tracker";
 import {
   SidebarGroup,
   SidebarGroupContent,

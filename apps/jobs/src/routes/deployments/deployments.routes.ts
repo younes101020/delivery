@@ -3,7 +3,7 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema } from "stoker/openapi/schemas";
 
-import { deploymentTrackerIdentifier, insertDeploymentSchema, jobIdParamsSchema, jobSchema, queueSchema } from "@/db/dto";
+import { currentJobCountSchema, currentJobSchema, deploymentTrackerIdentifier, insertDeploymentSchema, jobIdParamsSchema, previousJobSchema, queueSchema } from "@/db/dto";
 import { goneSchema, notFoundSchema, okSchema } from "@/lib/constants";
 
 const tags = ["Deployments"];
@@ -82,6 +82,22 @@ export const getCurrentDeploymentStep = createRoute({
   },
 });
 
+export const streamCurrentDeploymentCount = createRoute({
+  path: "/deployments/jobs/ongoing/count",
+  method: "get",
+  tags,
+  responses: {
+    [HttpStatusCodes.OK]: {
+      content: {
+        "text/event-stream": {
+          schema: z.unknown(),
+        },
+      },
+      description: "The ongoings deployment count",
+    },
+  },
+});
+
 export const retryJob = createRoute({
   path: "/deployments/jobs/retry/{jobId}",
   method: "post",
@@ -132,5 +148,6 @@ export type StreamRoute = typeof streamLog;
 export type CreateRoute = typeof create;
 export type RetryRoute = typeof retryJob;
 export type GetCurrentDeploymentStep = typeof getCurrentDeploymentStep;
+export type StreamCurrentDeploymentCount = typeof streamCurrentDeploymentCount;
 export type CancelRoute = typeof cancelJob;
 export type StreamPreview = typeof streamPreview;
