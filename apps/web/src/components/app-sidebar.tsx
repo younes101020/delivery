@@ -65,7 +65,7 @@ const data = {
   navSecondary: [],
 };
 
-export function AppSidebar({ ...props  }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>

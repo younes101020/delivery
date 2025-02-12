@@ -197,7 +197,7 @@ export const streamCurrentDeploymentsCount: AppRouteHandler<StreamCurrentDeploym
     const queueEvents = new QueueEvents(activeQueue.name, { connection: getBullConnection(connection) });
     inMemoryQueueEvents.push(queueEvents);
   }
-console.log('ok', inMemoryActiveDeploymentCount)
+  console.log("ok", inMemoryActiveDeploymentCount);
   return streamSSE(c, async (stream) => {
     await stream.writeSSE({
       data: JSON.stringify({ isActiveDeployment: inMemoryActiveDeploymentCount > 0 }),

@@ -27,7 +27,7 @@ export async function build(job: QueueDeploymentJob<"build">) {
         onStdout: async ({ chunk, chunks, isCriticalError }) => {
           await Promise.all([
             job.updateProgress({ logs: chunk, isCriticalError, jobId: job.id }),
-            job.updateData({ ...job.data, logs: chunks?.join(), isCriticalError })
+            job.updateData({ ...job.data, logs: chunks?.join(), isCriticalError }),
           ]);
         },
       },

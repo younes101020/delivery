@@ -3,7 +3,7 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema } from "stoker/openapi/schemas";
 
-import { currentJobCountSchema, currentJobSchema, deploymentTrackerIdentifier, insertDeploymentSchema, jobIdParamsSchema, previousJobSchema, queueSchema } from "@/db/dto";
+import { currentJobSchema, deploymentTrackerIdentifier, insertDeploymentSchema, jobIdParamsSchema, previousJobSchema, queueSchema } from "@/db/dto";
 import { goneSchema, notFoundSchema, okSchema } from "@/lib/constants";
 
 const tags = ["Deployments"];
