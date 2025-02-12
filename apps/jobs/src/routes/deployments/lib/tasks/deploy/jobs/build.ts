@@ -7,7 +7,7 @@ import type { QueueDeploymentJob } from "../types";
 export type Chunk = string;
 
 export interface ISSH {
-  onStdout: ({ chunks, chunk, isCriticalError }: { chunks?: Chunk[]; chunk: Chunk; isCriticalError?: boolean }) => void;
+  onStdout: ({ chunks, chunk, isCriticalError }: { chunks?: Chunk[]; chunk: Chunk; isCriticalError?: boolean }) => Promise<void>;
   cwd?: string;
 }
 
@@ -24,9 +24,11 @@ export async function build(job: QueueDeploymentJob<"build">) {
       fullCmd,
       {
         cwd: `${APPLICATIONS_PATH}/${repoName}`,
-        onStdout: ({ chunk, chunks, isCriticalError }) => {
-          job.updateProgress({ logs: chunk, isCriticalError, jobId: job.id });
-          job.updateData({ ...job.data, logs: chunks?.join(), isCriticalError });
+        onStdout: async ({ chunk, chunks, isCriticalError }) => {
+          await Promise.all([
+            job.updateProgress({ logs: chunk, isCriticalError, jobId: job.id }),
+            job.updateData({ ...job.data, logs: chunks?.join(), isCriticalError })
+          ]);
         },
       },
     );
