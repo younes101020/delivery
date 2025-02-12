@@ -2,7 +2,7 @@ import { PackagePlus } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 
-import { roboto } from "@/app/layout";
+import { roboto } from "@/app/font";
 import { buttonVariants } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";

@@ -2,7 +2,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
-import { roboto } from "@/app/layout";
+import { roboto } from "@/app/font";
 import { WithBannerBadge } from "@/components/banner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate } from "@/lib/utils";

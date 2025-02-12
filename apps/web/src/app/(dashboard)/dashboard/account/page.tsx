@@ -1,4 +1,4 @@
-import { roboto } from "@/app/layout";
+import { roboto } from "@/app/font";
 
 import { AccountForm } from "./_components/account-form";
 import { SecurityForm } from "./_components/security-form";

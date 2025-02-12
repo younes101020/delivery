@@ -1,7 +1,7 @@
 import { Bird } from "lucide-react";
 import { Suspense } from "react";
 
-import { roboto } from "@/app/layout";
+import { roboto } from "@/app/font";
 import { CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Separator } from "@/components/ui/separator";

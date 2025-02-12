@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 
-import { Roboto } from "next/font/google";
 import localFont from "next/font/local";
 import { Suspense } from "react";
 
@@ -19,14 +18,6 @@ const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
   weight: "100 900",
-});
-
-export const roboto = Roboto({
-  weight: "400",
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-  display: "swap",
-  variable: "--font-roboto",
 });
 
 export const metadata: Metadata = {

@@ -1,5 +1,5 @@
 import { Deployment } from "@/app/_components/deployment";
-import { roboto } from "@/app/layout";
+import { roboto } from "@/app/font";
 
 export default function NewApplicationPage(props: {
   searchParams?: Promise<{ page: string }>;
