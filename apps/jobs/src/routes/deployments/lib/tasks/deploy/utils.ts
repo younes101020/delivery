@@ -1,6 +1,6 @@
 import { type Job, Queue } from "bullmq";
 
-import type { JobSchema } from "@/db/dto";
+import type { CurrentJobSchema, PreviousJobSchema } from "@/db/dto";
 
 import type { RedisType } from "../types";
 
@@ -27,11 +27,41 @@ export async function getCurrentDeploymentsState() {
     };
   }));
 
-  function isNotNull<T extends JobSchema>(deployState: null | T): deployState is T {
+  function isNotNull<T extends CurrentJobSchema>(deployState: null | T): deployState is T {
     return deployState != null;
   }
 
   return currentDeploymentsState.filter(isNotNull);
+}
+
+export async function getPreviousDeploymentsState() {
+  const deployments = await fetchQueueTitles(connection);
+
+  const previousDeploymentsState = await Promise.all(deployments.map(async (deployment) => {
+    const queue = new Queue(deployment.queueName, { connection: getBullConnection(connection) });
+    const jobs = await queue.getJobs(["completed"]);
+
+    if (jobs.length < 1)
+      return null;
+
+    const latestStep = getLatestJob(jobs)!;
+    const logs = jobs.find(job => job.name === "build").data.logs;
+    const applicationId = jobs.find(job => job.name === "configure").returnvalue;
+
+    return {
+      id: latestStep.id!,
+      timestamp: new Date(latestStep.timestamp).toDateString(),
+      repoName: deployment.queueName,
+      logs,
+      applicationId,
+    };
+  }));
+
+  function isNotNull<T extends PreviousJobSchema>(deployState: null | T): deployState is T {
+    return deployState != null;
+  }
+
+  return previousDeploymentsState.filter(isNotNull);
 }
 
 export async function getCurrentDeploymentCount() {

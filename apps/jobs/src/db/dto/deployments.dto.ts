@@ -57,17 +57,25 @@ export const deploymentTrackerIdentifier = z.object({
   queueName: z.string(),
 });
 
-export const jobSchema = z.object({
+export const currentJobSchema = z.object({
   id: z.string(),
   timestamp: z.string(),
   repoName: z.string(),
   stacktrace: z.array(z.string().optional()),
 });
 
+export const previousJobSchema = z.object({
+  id: z.string(),
+  applicationId: z.number(),
+  timestamp: z.string(),
+  repoName: z.string(),
+  logs: z.string(),
+});
 
 export const currentJobCountSchema = z.object({
   count: z.number(),
 });
 
 export type InsertDeploymentSchema = z.infer<typeof insertDeploymentSchema>;
-export type JobSchema = z.infer<typeof jobSchema>;
+export type CurrentJobSchema = z.infer<typeof currentJobSchema>;
+export type PreviousJobSchema = z.infer<typeof previousJobSchema>;

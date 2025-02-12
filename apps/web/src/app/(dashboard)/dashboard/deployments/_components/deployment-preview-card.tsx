@@ -43,70 +43,76 @@ export function DeploymentPreviewCard({
   const nextStep = step === "clone" ? "build" : step === "build" ? "configure" : null;
 
   return (
-    <div
+    <Card
       className="flex flex-col border py-10 relative group/feature"
     >
-      <div className={`opacity-0 group-hover/feature:opacity-100 transition duration-200 absolute inset-0 h-full w-full bg-gradient-to-t ${status === "failed" ? "from-red-500/25" : "from-green-500/25"} to-transparent pointer-events-none`} />
+      <div className={`opacity-0 group-hover/feature:opacity-100 transition duration-200 absolute inset-0 h-full w-full bg-gradient-to-t ${status === "failed" && "from-red-500/25"} ${status === "active" && "from-green-500/25"} to-transparent pointer-events-none`} />
+      <CardContent className="px-0">
+        {status === "active" && (
+          <div className="mb-4 relative z-10 px-10">
+            <dl className="text-xs">
+              <dd className="flex gap-2 line-through opacity-50">
+                {previousStep}
+              </dd>
+            </dl>
+            <dl className="text-sm flex gap-2">
+              <dt className="pt-[.1rem]">
+                <Bounce variant="active" />
+              </dt>
+              <dd className="flex gap-2 align-middle">
+                {step}
+              </dd>
+            </dl>
+            <dl className="text-xs">
+              <dd className="flex gap-2 opacity-50">
+                {nextStep}
+              </dd>
+            </dl>
+          </div>
+        )}
 
-      {status === "active" && (
-        <div className="mb-4 relative z-10 px-10">
-          <dl className="text-xs">
-            <dd className="flex gap-2 line-through opacity-50">
-              {previousStep}
-            </dd>
-          </dl>
-          <dl className="text-sm flex gap-2">
-            <dt className="pt-[.1rem]">
-              <Bounce variant="active" />
-            </dt>
-            <dd className="flex gap-2 align-middle">
-              {step}
-            </dd>
-          </dl>
-          <dl className="text-xs">
-            <dd className="flex gap-2 opacity-50">
-              {nextStep}
-            </dd>
-          </dl>
+        <div className="text-lg font-bold mb-2 relative z-10 px-10 flex flex-col">
+          <span className="group-hover/feature:translate-x-2 transition duration-200 inline-block mb-2">
+            {repoName}
+          </span>
+          {status
+            ? (
+                <Badge variant={status === "failed" ? "destructive" : "success"} className="w-fit">
+                  {status}
+                </Badge>
+              )
+            : <Skeleton className="inline-flex items-center h-7 px-2.5 py-0.5 text-xs border w-fit">Checking status...</Skeleton>}
+
         </div>
-      )}
+      </CardContent>
 
-      <div className="text-lg font-bold mb-2 relative z-10 px-10 flex flex-col">
-        <span className="group-hover/feature:translate-x-2 transition duration-200 inline-block">
-          {repoName}
-        </span>
-        {status
+      <CardFooter className="px-0">
+        {status === "completed"
           ? (
-              <Badge variant={status === "failed" ? "destructive" : "success"} className="w-fit">
-                {status}
-              </Badge>
-            )
-          : <Skeleton className="inline-flex items-center h-7 px-2.5 py-0.5 text-xs border w-fit">Loading</Skeleton>}
-
-      </div>
-      {status === "completed"
-        ? (
-            <Link href="/dashboard/applications" className={cn(buttonVariants({ variant: "default" }), "mt-4")}>
-              Go to applications
-            </Link>
-          )
-        : (
-            <div className="text-xs max-w-xs relative z-10 px-10">
-
-              <dl>
-                <dt className="text-muted-foreground">This step started at</dt>
-                <dd>
-                  {date}
-                </dd>
-              </dl>
-              <Link href={`/dashboard/deployments/${repoName}`} className={cn(buttonVariants({ variant: "outline" }), "mt-4")}>
-                View details
-                {" "}
-                {">"}
+              <Link href="/dashboard/applications" className={cn(buttonVariants({ variant: "default" }), "mt-4")}>
+                Go to applications
               </Link>
-            </div>
-          )}
+            )
+          : (
+              <div className="text-xs max-w-xs relative z-10 px-10">
+                {status && status !== "failed" && (
+                  <dl>
+                    <dt className="text-muted-foreground">This step started at</dt>
+                    <dd>
+                      {date}
+                    </dd>
+                  </dl>
+                )}
+                {status && (
+                  <Link href={`/dashboard/deployments/${repoName}`} className={cn(buttonVariants({ variant: status === "failed" ? "destructive" : status === "active" ? "default" : "ghost" }), "mt-4")}>
+                    View details
+                  </Link>
+                )}
 
-    </div>
+              </div>
+            )}
+      </CardFooter>
+
+    </Card>
   );
 }

@@ -10,14 +10,14 @@ import type { Nullable } from "@/lib/utils";
 import { useRefreshTracker } from "@/app/_lib/refresh-tracker-provider";
 import { retryDeploy } from "@/app/actions";
 import { Button } from "@/components/ui/button";
+import { env } from "@/env";
 
-import { useEventSource } from "../../_hooks/use-event-source";
+import { LogsTerminal } from "../../_components/deployment-logs";
+import { useEventSource } from "../../../../../_hooks/use-event-source";
 import BoxReveal from "./ui/box-reveal";
-import { LogsTerminal } from "./ui/logsterminal";
 import Ripple from "./ui/ripple";
 
 interface StepperProps {
-  baseUrl: string;
   repoName: string;
 }
 

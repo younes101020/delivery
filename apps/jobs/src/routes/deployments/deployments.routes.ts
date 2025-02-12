@@ -71,13 +71,25 @@ export const streamLog = createRoute({
 });
 
 export const getCurrentDeploymentStep = createRoute({
-  path: "/deployments/jobs",
+  path: "/deployments/jobs/ongoing",
   method: "get",
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      z.array(jobSchema),
+      z.array(currentJobSchema),
       "The current deployment state",
+    ),
+  },
+});
+
+export const getPreviousDeploymentStep = createRoute({
+  path: "/deployments/jobs/previous",
+  method: "get",
+  tags,
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      z.array(previousJobSchema),
+      "The previous deployment state",
     ),
   },
 });
@@ -144,10 +156,11 @@ export const cancelJob = createRoute({
   },
 });
 
-export type StreamRoute = typeof streamLog;
+export type StreamLogsRoute = typeof streamLog;
 export type CreateRoute = typeof create;
 export type RetryRoute = typeof retryJob;
 export type GetCurrentDeploymentStep = typeof getCurrentDeploymentStep;
+export type GetPreviousDeploymentStep = typeof getPreviousDeploymentStep;
 export type StreamCurrentDeploymentCount = typeof streamCurrentDeploymentCount;
 export type CancelRoute = typeof cancelJob;
 export type StreamPreview = typeof streamPreview;
