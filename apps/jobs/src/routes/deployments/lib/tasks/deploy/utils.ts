@@ -93,6 +93,15 @@ export async function getJobs(queue: Queue) {
   return job;
 }
 
+export async function deleteDeploymentJobs(queueName: string) {
+  const queue = new Queue(queueName, { connection: getBullConnection(connection) });
+  const completedJobs = await queue.getJobs(["completed"]);
+
+  for (const job of completedJobs) {
+    await job.remove();
+  }
+}
+
 export async function checkIfOngoingDeploymentExist(queue: Queue) {
   const jobsCounts = await Promise.all([queue.getActiveCount(), queue.getFailedCount()]);
   return jobsCounts.some(jobCount => jobCount > 0);

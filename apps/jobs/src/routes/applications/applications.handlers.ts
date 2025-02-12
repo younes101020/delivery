@@ -19,6 +19,8 @@ import type {
   RemoveRoute,
 } from "./applications.routes";
 
+import { deleteDeploymentJobs } from "../deployments/lib/tasks/deploy/utils";
+
 export const list: AppRouteHandler<ListRoute> = async (c) => {
   const applications = await getApplications();
   return c.json(applications);
@@ -125,6 +127,8 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
       HttpStatusCodes.INTERNAL_SERVER_ERROR,
     );
   }
+
+  await deleteDeploymentJobs(repoName);
 
   return c.body(null, HttpStatusCodes.NO_CONTENT);
 };
