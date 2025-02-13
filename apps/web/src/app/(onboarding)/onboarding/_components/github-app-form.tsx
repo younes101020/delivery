@@ -3,12 +3,15 @@
 import { Info } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { Button } from "@/components/ui/button";
-import { CardFooter } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@/app/_components/ui/button";
+import { CardFooter } from "@/app/_components/ui/card";
+import { Checkbox } from "@/app/_components/ui/checkbox";
+import { Input } from "@/app/_components/ui/input";
+import { Label } from "@/app/_components/ui/label";
+import { ScrollArea } from "@/app/_components/ui/scroll-area";
+import { Switch } from "@/app/_components/ui/switch";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/app/_components/ui/tooltip";
+import { WEBHOOK_EVENTS } from "@/app/_lib/github/config";
 import { env } from "@/env";
 
 const GITHUB_APP_REGISTRATION_URL = "https://github.com/settings/apps/new";
@@ -17,6 +20,7 @@ export function GithubAppForm() {
   const [url, setUrl] = useState(GITHUB_APP_REGISTRATION_URL);
   const [enableOrg, setEnableOrg] = useState(false);
   const [name, setName] = useState("");
+  const [selectedEvents, setSelectedEvents] = useState(["pull_request", "push"]);
   const baseUrl = env.NEXT_PUBLIC_BASEURL;
 
   const data = useMemo(
@@ -38,9 +42,9 @@ export function GithubAppForm() {
         administration: "write",
         pull_requests: "write",
       },
-      default_events: ["pull_request", "push"],
+      default_events: selectedEvents,
     }),
-    [name, baseUrl],
+    [name, baseUrl, selectedEvents],
   );
 
   const handleOrgNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,8 +52,12 @@ export function GithubAppForm() {
     setUrl(`https://github.com/organizations/${value}/settings/apps/new`);
   };
 
+  const handleWebhookEventCheckboxChange = (optionId: string) => {
+    setSelectedEvents(prev => (prev.includes(optionId) ? prev.filter(id => id !== optionId) : [...prev, optionId]));
+  };
+
   return (
-    <form action={url} method="POST" className="space-y-4" aria-label="form">
+    <form action={url} method="POST" className="space-y-8" aria-label="form">
       <div>
         <Label htmlFor="name" className="block text-sm font-medium">
           Github App name
@@ -69,6 +77,33 @@ export function GithubAppForm() {
           />
         </div>
         <p className="text-muted-foreground text-xs pt-1">Enter a name for your Github App</p>
+      </div>
+      <div>
+        <Label htmlFor="events" className="block text-sm font-medium">
+          Redeploy when
+        </Label>
+        <ScrollArea className="my-2 w-full h-40">
+          <div className="flex flex-col gap-2">
+            {WEBHOOK_EVENTS.map(option => (
+              <div key={option.id} className="flex items-center space-x-2">
+                <Checkbox
+                  id={option.id}
+                  checked={selectedEvents.includes(option.id)}
+                  onCheckedChange={() => handleWebhookEventCheckboxChange(option.id)}
+                />
+                <Label
+                  htmlFor={option.id}
+                  className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  {option.label}
+                </Label>
+              </div>
+            ))}
+          </div>
+
+        </ScrollArea>
+
+        <p className="text-muted-foreground text-xs pt-1">What events should trigger a redeployment?</p>
       </div>
       <div className={enableOrg ? "" : "opacity-25"}>
         <Label htmlFor="organization" className="block text-sm font-medium">

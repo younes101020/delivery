@@ -107,6 +107,11 @@ export async function checkIfOngoingDeploymentExist(queue: Queue) {
   return jobsCounts.some(jobCount => jobCount > 0);
 }
 
+export async function checkIfDeploymentExist(queue: Queue) {
+  const jobsCounts = await queue.getCompletedCount();
+  return jobsCounts === 3;
+}
+
 export function getLatestJob(jobs: Job[]) {
   return jobs.some(job => job.name === JOBS.configure)
     ? jobs.find(job => job.name === JOBS.configure)

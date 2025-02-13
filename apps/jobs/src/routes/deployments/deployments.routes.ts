@@ -28,6 +28,26 @@ export const create = createRoute({
   },
 });
 
+export const redeploy = createRoute({
+  path: "/deployments/redeploy",
+  method: "post",
+  request: {
+    body: jsonContentRequired(insertDeploymentSchema, "The deployment to create"),
+  },
+  tags,
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      deploymentTrackerIdentifier,
+      "Unique identifier to let you track queue events",
+    ),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Github application not found"),
+    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
+      createErrorSchema(insertDeploymentSchema),
+      "The validation error(s)",
+    ),
+  },
+});
+
 export const streamPreview = createRoute({
   path: "/deployments/preview/{queueName}",
   method: "get",
@@ -158,6 +178,7 @@ export const cancelJob = createRoute({
 
 export type StreamLogsRoute = typeof streamLog;
 export type CreateRoute = typeof create;
+export type RedeployRoute = typeof redeploy;
 export type RetryRoute = typeof retryJob;
 export type GetCurrentDeploymentStep = typeof getCurrentDeploymentStep;
 export type GetPreviousDeploymentStep = typeof getPreviousDeploymentStep;

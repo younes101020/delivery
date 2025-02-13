@@ -12,9 +12,28 @@ import { prepareDataForProcessing } from "@/routes/deployments/lib/tasks/deploy/
 import { checkIfOngoingDeploymentExist, getCurrentDeploymentCount, getCurrentDeploymentsState, getJobs, getPreviousDeploymentsState } from "@/routes/deployments/lib/tasks/deploy/utils";
 import { connection, getBullConnection, jobCanceler } from "@/routes/deployments/lib/tasks/utils";
 
-import type { CancelRoute, CreateRoute, GetCurrentDeploymentStep, GetPreviousDeploymentStep, RetryRoute, StreamCurrentDeploymentCount, StreamLogsRoute, StreamPreview } from "./deployments.routes";
+import type { CancelRoute, CreateRoute, GetCurrentDeploymentStep, GetPreviousDeploymentStep, RedeployRoute, RetryRoute, StreamCurrentDeploymentCount, StreamLogsRoute, StreamPreview } from "./deployments.routes";
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
+  const deployment = c.req.valid("json");
+
+  const data = await prepareDataForProcessing(deployment);
+
+  if (!data) {
+    return c.json(
+      {
+        message: HttpStatusPhrases.NOT_FOUND,
+      },
+      HttpStatusCodes.NOT_FOUND,
+    );
+  }
+
+  const queueName = await startDeploy(data);
+
+  return c.json(queueName, HttpStatusCodes.OK);
+};
+
+export const redeploy: AppRouteHandler<RedeployRoute> = async (c) => {
   const deployment = c.req.valid("json");
 
   const data = await prepareDataForProcessing(deployment);
@@ -197,7 +216,7 @@ export const streamCurrentDeploymentsCount: AppRouteHandler<StreamCurrentDeploym
     const queueEvents = new QueueEvents(activeQueue.name, { connection: getBullConnection(connection) });
     inMemoryQueueEvents.push(queueEvents);
   }
-  console.log("ok", inMemoryActiveDeploymentCount);
+
   return streamSSE(c, async (stream) => {
     await stream.writeSSE({
       data: JSON.stringify({ isActiveDeployment: inMemoryActiveDeploymentCount > 0 }),
