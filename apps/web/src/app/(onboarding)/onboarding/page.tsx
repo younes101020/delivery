@@ -2,9 +2,9 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { Deployment } from "@/app/_components/deployment";
-import { getAllGithubApp } from "@/app/_lib/github/queries";
+import { Skeleton } from "@/app/_components/ui/skeleton";
+import { getAllGithubAppCreds } from "@/app/_lib/github/queries";
 import { getUser } from "@/app/_lib/user-session";
-import { Skeleton } from "@/components/ui/skeleton";
 
 import { Login } from "../../_components/login-form";
 import { DomainNameForm } from "./_components/domain-name-form";
@@ -43,7 +43,7 @@ async function GithubAppStep(props: SearchParams) {
   if (onboardingStep !== 3) {
     return null;
   }
-  const allGithubInstallations = await getAllGithubApp();
+  const allGithubInstallations = await getAllGithubAppCreds();
   if (allGithubInstallations && allGithubInstallations.length > 0)
     redirect("/onboarding/?step=4");
   return <GithubAppForm />;

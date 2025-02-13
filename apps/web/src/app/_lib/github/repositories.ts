@@ -1,10 +1,8 @@
-import { createAppAuth } from "@octokit/auth-app";
-import { Octokit } from "@octokit/rest";
-
-import { getAllGithubApp } from "./queries";
+import { getGithubApp } from "./client";
+import { getAllGithubAppCreds } from "./queries";
 
 export async function getGithubRepositoriesByGithubAppId(repoPage: number, githubAppId?: number) {
-  const githubApps = await getAllGithubApp();
+  const githubApps = await getAllGithubAppCreds();
   if (!githubApps)
     return null;
 
@@ -61,10 +59,10 @@ async function listGithubRepositories({
 }) {
   "use cache";
   try {
-    const installation = await getGithubAppInstallation({ appId, privateKey, installationId });
+    const githubApp = await getGithubApp({ appId, privateKey, installationId, authType: "installation" });
 
     const reposPromises = Array.from({ length: repoPage }, (_, pageIndex) =>
-      installation.apps.listReposAccessibleToInstallation({
+      githubApp.listReposAccessibleToInstallation({
         per_page: repoPerPage,
         page: pageIndex + 1,
         type: "all",
