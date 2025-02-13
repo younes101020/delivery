@@ -5,10 +5,10 @@ import { useActionState } from "react";
 
 import type { ActionState } from "@/app/_lib/form-middleware";
 
+import { Button } from "@/app/_components/ui/button";
+import { Input } from "@/app/_components/ui/input";
+import { Label } from "@/app/_components/ui/label";
 import { domainName } from "@/app/actions";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 interface DomainNameState {
   domainName: string;

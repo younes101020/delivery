@@ -2,10 +2,10 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
-import { roboto } from "@/app/font";
-import { WithBannerBadge } from "@/components/banner";
-import { Skeleton } from "@/components/ui/skeleton";
-import { formatDate } from "@/lib/utils";
+import { WithBannerBadge } from "@/app/_components/banner";
+import { PageTitle } from "@/app/_components/ui/page-title";
+import { Skeleton } from "@/app/_components/ui/skeleton";
+import { formatDate } from "@/app/_lib/utils";
 
 import { getApplicationById, getApplicationSreenshotUrl } from "../_lib/queries";
 import { AppForm } from "./_components/app-form";
@@ -102,7 +102,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
   return (
     <section className="p-5 bg-background/50 border">
-      <h1 className={`text-3xl font-bold tracking-wide leading-none ${roboto.className} italic bg-primary text-primary-foreground px-2 py-1 w-fit`}>Application configuration</h1>
+      <PageTitle>Application configuration</PageTitle>
       <div className="mt-8 grid grid-cols-4 gap-4">
         <Suspense
           fallback={(

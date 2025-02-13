@@ -2,11 +2,11 @@ import { PackagePlus } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 
-import { roboto } from "@/app/font";
-import { buttonVariants } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
-import { Skeleton } from "@/components/ui/skeleton";
-import { formatDate } from "@/lib/utils";
+import { buttonVariants } from "@/app/_components/ui/button";
+import { EmptyState } from "@/app/_components/ui/empty-state";
+import { PageTitle } from "@/app/_components/ui/page-title";
+import { Skeleton } from "@/app/_components/ui/skeleton";
+import { formatDate } from "@/app/_lib/utils";
 
 import { AppCard } from "./_components/app-card";
 import { getApplications } from "./_lib/queries";
@@ -51,7 +51,7 @@ export default async function ApplicationsPage() {
   return (
     <section className="p-5 bg-background/50 border h-[90%]">
       <div className="flex justify-between gap-2">
-        <h1 className={`text-3xl font-bold tracking-wide leading-none ${roboto.className} italic bg-primary text-primary-foreground px-2 py-1`}>My applications</h1>
+        <PageTitle>My applications</PageTitle>
         <Link href="/dashboard/applications/new" className={buttonVariants({ variant: "outline" })}>
           <PackagePlus className="mr-1 mt-[.1rem]" />
           Deploy new application

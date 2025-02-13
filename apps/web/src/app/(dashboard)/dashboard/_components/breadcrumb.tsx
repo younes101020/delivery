@@ -7,7 +7,7 @@ import {
   BreadcrumbLink,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from "@/app/_components/ui/breadcrumb";
 
 export function DynamicBreadcrumb() {
   const segments = useSelectedLayoutSegments();

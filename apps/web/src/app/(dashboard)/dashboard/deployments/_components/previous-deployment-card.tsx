@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Button, buttonVariants } from "@/app/_components/ui/button";
+import { Card, CardContent, CardFooter } from "@/app/_components/ui/card";
 
 import { LogsTerminal } from "./deployment-logs";
 

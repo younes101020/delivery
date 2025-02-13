@@ -1,11 +1,10 @@
 import { Bird } from "lucide-react";
 import { Suspense } from "react";
 
-import { roboto } from "@/app/font";
-import { CardTitle } from "@/components/ui/card";
-import { EmptyState } from "@/components/ui/empty-state";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/app/_components/ui/empty-state";
+import { PageTitle } from "@/app/_components/ui/page-title";
+import { Separator } from "@/app/_components/ui/separator";
+import { Skeleton } from "@/app/_components/ui/skeleton";
 
 import { DeploymentPreviewCard } from "./_components/deployment-preview-card";
 import { PreviousDeploymentPreviewCard } from "./_components/previous-deployment-card";
@@ -15,7 +14,7 @@ export default async function DeploymentsPage() {
   return (
     <section className="p-5 bg-background/50 border flex flex-col gap-3">
       <div>
-        <CardTitle className={`text-3xl ${roboto.className} italic bg-primary text-primary-foreground px-2 py-1 w-fit tracking-wide leading-none`}>Ongoing deployments</CardTitle>
+        <PageTitle>Ongoing deployments</PageTitle>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 relative z-10 py-10">
           <Suspense fallback={<Skeleton className="w-full h-16" />}>
             <OngoingDeploymentPreview />
@@ -24,7 +23,7 @@ export default async function DeploymentsPage() {
       </div>
       <Separator className="my-4" />
       <div>
-        <CardTitle className={`text-3xl ${roboto.className} italic bg-primary text-primary-foreground px-2 py-1 w-fit tracking-wide leading-none`}>Previous deployments</CardTitle>
+        <PageTitle>Previous deployments</PageTitle>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-10 py-10">
           <Suspense fallback={<Skeleton className="w-full h-16" />}>
             <PreviousDeployment />

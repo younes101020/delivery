@@ -1,6 +1,6 @@
 "use client";
 
-import { Spinner } from "@/components/ui/spinner";
+import { Spinner } from "@/app/_components/ui/spinner";
 import { env } from "@/env";
 
 import { useEventSource } from "../_hooks/use-event-source";

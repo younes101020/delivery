@@ -7,10 +7,10 @@ import { useActionState, useState } from "react";
 
 import type { GithubApp, GithubRepositories } from "@/app/_lib/github/types";
 
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/app/_components/ui/button";
+import { Checkbox } from "@/app/_components/ui/checkbox";
+import { Input } from "@/app/_components/ui/input";
+import { Label } from "@/app/_components/ui/label";
 
 import type { ActionState } from "../_lib/form-middleware";
 import type { SelectedRepositoryProps } from "./deployment-repositories";
@@ -123,45 +123,48 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
         <p className="text-muted-foreground text-xs">
           This GitHub repository will be the source of your application.
         </p>
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="staticdeploy"
-            name="staticdeploy"
-            defaultChecked={!!(state.inputs.staticdeploy === "on" || state.inputs.staticdeploy)}
-            key={state.inputs.staticdeploy}
-            onCheckedChange={isChecked => setIsTaticDeployment(isChecked)}
-          />
-          <div className="flex flex-col">
-            <label
-              htmlFor="terms"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              Build and serve static files
-            </label>
-            <p className="block text-xs text-muted-foreground">
-              Your source code will be built, and the output static files will be served via Nginx
-            </p>
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="staticdeploy"
+              name="staticdeploy"
+              defaultChecked={!!(state.inputs.staticdeploy === "on" || state.inputs.staticdeploy)}
+              key={state.inputs.staticdeploy}
+              onCheckedChange={isChecked => setIsTaticDeployment(isChecked)}
+            />
+            <div className="flex flex-col">
+              <label
+                htmlFor="terms"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Build and serve static files
+              </label>
+              <p className="block text-xs text-muted-foreground">
+                Your source code will be built, and the output static files will be served via Nginx
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="cache"
+              name="cache"
+              defaultChecked={!!(state.inputs.cache === "on" || state.inputs.cache)}
+              key={state.inputs.cache}
+            />
+            <div className="flex flex-col">
+              <label
+                htmlFor="terms"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Enable caching
+              </label>
+              <p className="block text-xs text-muted-foreground">
+                Unchanged dependencies will not be reinstalled
+              </p>
+            </div>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="cache"
-            name="cache"
-            defaultChecked={!!(state.inputs.cache === "on" || state.inputs.cache)}
-            key={state.inputs.cache}
-          />
-          <div className="flex flex-col">
-            <label
-              htmlFor="terms"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              Enable caching
-            </label>
-            <p className="block text-xs text-muted-foreground">
-              Unchanged dependencies will not be reinstalled
-            </p>
-          </div>
-        </div>
+
         <div className={`flex ${state.error ? "justify-between" : "justify-end"}`}>
           <input type="hidden" name="repoUrl" id="repoUrl" value={selected.gitUrl ?? "no-url"} />
           <input

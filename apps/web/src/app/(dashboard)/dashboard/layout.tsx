@@ -1,7 +1,7 @@
-import { AppSidebar } from "@/components/app-sidebar";
-import { Breadcrumb, BreadcrumbList } from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/app/_components/app-sidebar";
+import { Breadcrumb, BreadcrumbList } from "@/app/_components/ui/breadcrumb";
+import { Separator } from "@/app/_components/ui/separator";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/app/_components/ui/sidebar";
 
 import { DynamicBreadcrumb } from "./_components/breadcrumb";
 

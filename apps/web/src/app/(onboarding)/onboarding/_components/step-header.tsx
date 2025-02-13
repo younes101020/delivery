@@ -1,6 +1,6 @@
-import { Bounce } from "@/app/_components/bounce";
-import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { Bounce } from "@/app/_components/ui/bounce";
+import { CardDescription, CardHeader, CardTitle } from "@/app/_components/ui/card";
+import { cn } from "@/app/_lib/utils";
 
 import { useStep } from "./step";
 
@@ -27,7 +27,7 @@ const headerData = [
 export function StepsHeader({ className }: { className?: string }) {
   const { currentStep } = useStep();
   return (
-    <CardHeader className={cn("flex md:flex-row gap-8 md:gap-4 justify-around mt-8", className)}>
+    <CardHeader className={cn("flex md:flex-row gap-8 md:gap-4 justify-around px-10 mt-5", className)}>
       {headerData.map((step, i) => (
         <div key={i} className={`w-56 ${i + 1 !== currentStep && "opacity-40"} relative`}>
           <CardTitle className="flex gap-2 font-mono">

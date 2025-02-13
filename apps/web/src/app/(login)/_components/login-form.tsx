@@ -1,8 +1,8 @@
 import { Login } from "@/app/_components/login-form";
-import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { Card, CardContent } from "@/app/_components/ui/card";
+import { cn } from "@/app/_lib/utils";
 
-import { Cobe } from "../../../components/ui/cobeglobe";
+import { Cobe } from "../../_components/ui/cobeglobe";
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
   return (

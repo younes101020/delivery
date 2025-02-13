@@ -89,25 +89,3 @@ async function listGithubRepositories({
     return { success: false, error: "We can't list github repositories" };
   }
 }
-
-// see: https://docs.github.com/en/rest/apps/installations?apiVersion=2022-11-28
-async function getGithubAppInstallation({ appId, privateKey, installationId }: { appId: string; privateKey: string | null; installationId: string }) {
-  const octokit = new Octokit({
-    authStrategy: createAppAuth,
-    auth: {
-      appId,
-      privateKey,
-      installationId,
-    },
-  });
-
-  const { token } = (await octokit.auth({
-    type: "installation",
-  })) as { token: string };
-
-  const installation = new Octokit({
-    auth: token,
-  });
-
-  return installation;
-}

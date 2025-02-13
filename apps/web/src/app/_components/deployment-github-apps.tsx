@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/app/_components/ui/card";
 
 import type { GithubApp } from "../_lib/github/types";
 

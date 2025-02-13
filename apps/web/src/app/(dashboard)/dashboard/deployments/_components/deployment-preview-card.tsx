@@ -2,17 +2,16 @@
 
 import Link from "next/link";
 
-import type { Nullable } from "@/lib/utils";
+import type { Nullable } from "@/app/_lib/utils";
 
-import { Bounce } from "@/app/_components/bounce";
-import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/app/_components/ui/badge";
+import { Bounce } from "@/app/_components/ui/bounce";
+import { buttonVariants } from "@/app/_components/ui/button";
+import { Card, CardContent, CardFooter } from "@/app/_components/ui/card";
+import { Skeleton } from "@/app/_components/ui/skeleton";
+import { useEventSource } from "@/app/_hooks/use-event-source";
+import { cn, formatDate } from "@/app/_lib/utils";
 import { env } from "@/env";
-import { cn, formatDate } from "@/lib/utils";
-
-import { useEventSource } from "../../../../_hooks/use-event-source";
 
 interface DeploymentPreviewCardProps {
   id: string;

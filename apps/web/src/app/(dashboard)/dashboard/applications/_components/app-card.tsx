@@ -3,8 +3,8 @@
 import { ExternalLink, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/app/_components/ui/button";
+import { Card, CardContent, CardFooter } from "@/app/_components/ui/card";
 
 interface AppCardProps {
   id: number;

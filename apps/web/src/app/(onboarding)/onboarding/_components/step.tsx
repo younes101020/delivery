@@ -12,7 +12,7 @@ import React, {
   useContext,
 } from "react";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/app/_components/ui/card";
 
 import { StepsHeader } from "./step-header";
 
@@ -95,7 +95,7 @@ function BaseStepProvider({ children }: { children: ReactNode }) {
       }}
     >
       <Card className="w-full mx-4 mt-4">
-        <StepsHeader className="p-10" />
+        <StepsHeader />
         {React.Children.map(children, (child, index) => {
           if (React.isValidElement(child) && index + 1 === currentStep) {
             return <CardContent>{React.cloneElement(child)}</CardContent>;

@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/app/_components/ui/dialog";
 
 interface LogsTerminalProps {
   logs: string;
