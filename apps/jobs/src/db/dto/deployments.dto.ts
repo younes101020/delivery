@@ -76,6 +76,6 @@ export const currentJobCountSchema = z.object({
   count: z.number(),
 });
 
-export type InsertDeploymentSchema = z.infer<typeof insertDeploymentSchema>;
+export type DeploymentReferenceAndDataSchema = z.infer<typeof insertDeploymentSchema>;
 export type CurrentJobSchema = z.infer<typeof currentJobSchema>;
 export type PreviousJobSchema = z.infer<typeof previousJobSchema>;

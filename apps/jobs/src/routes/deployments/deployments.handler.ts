@@ -7,8 +7,7 @@ import type { AppRouteHandler } from "@/lib/types";
 
 import { getApplicationByName } from "@/db/queries/queries";
 import { subscribeWorkerTo } from "@/routes/deployments/lib/tasks";
-import { startDeploy } from "@/routes/deployments/lib/tasks/deploy";
-import { prepareDataForProcessing } from "@/routes/deployments/lib/tasks/deploy/jobs/utils";
+import { deployApp, redeployApp } from "@/routes/deployments/lib/tasks/deploy";
 import { checkIfOngoingDeploymentExist, getCurrentDeploymentCount, getCurrentDeploymentsState, getJobs, getPreviousDeploymentsState } from "@/routes/deployments/lib/tasks/deploy/utils";
 import { connection, getBullConnection, jobCanceler } from "@/routes/deployments/lib/tasks/utils";
 
@@ -17,39 +16,17 @@ import type { CancelRoute, CreateRoute, GetCurrentDeploymentStep, GetPreviousDep
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const deployment = c.req.valid("json");
 
-  const data = await prepareDataForProcessing(deployment);
+  const queueName = await deployApp(deployment);
 
-  if (!data) {
-    return c.json(
-      {
-        message: HttpStatusPhrases.NOT_FOUND,
-      },
-      HttpStatusCodes.NOT_FOUND,
-    );
-  }
-
-  const queueName = await startDeploy(data);
-
-  return c.json(queueName, HttpStatusCodes.OK);
+  return c.json({ queueName }, HttpStatusCodes.OK);
 };
 
 export const redeploy: AppRouteHandler<RedeployRoute> = async (c) => {
-  const deployment = c.req.valid("json");
+  const { queueName } = c.req.valid("param");
 
-  const data = await prepareDataForProcessing(deployment);
+  await redeployApp(queueName);
 
-  if (!data) {
-    return c.json(
-      {
-        message: HttpStatusPhrases.NOT_FOUND,
-      },
-      HttpStatusCodes.NOT_FOUND,
-    );
-  }
-
-  const queueName = await startDeploy(data);
-
-  return c.json(queueName, HttpStatusCodes.OK);
+  return c.json({ queueName }, HttpStatusCodes.OK);
 };
 
 export const streamPreview: AppRouteHandler<StreamPreview> = async (c) => {

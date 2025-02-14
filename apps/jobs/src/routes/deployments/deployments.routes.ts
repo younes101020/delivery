@@ -29,18 +29,17 @@ export const create = createRoute({
 });
 
 export const redeploy = createRoute({
-  path: "/deployments/redeploy",
+  path: "/deployments/redeploy/{queueName}",
   method: "post",
-  request: {
-    body: jsonContentRequired(insertDeploymentSchema, "The deployment to create"),
-  },
   tags,
+  request: {
+    params: queueSchema,
+  },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       deploymentTrackerIdentifier,
-      "Unique identifier to let you track queue events",
+      "Deployment name",
     ),
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Github application not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(insertDeploymentSchema),
       "The validation error(s)",
