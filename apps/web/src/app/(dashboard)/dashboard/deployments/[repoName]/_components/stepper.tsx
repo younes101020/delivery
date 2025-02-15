@@ -87,8 +87,8 @@ export function Stepper({ repoName }: StepperProps) {
             <div className="flex flex-col gap-2">
               {state.error && <p className="text-xs text-destructive">{state.error}</p>}
               <form>
-                <input type="hidden" name="repoName" defaultValue={state.inputs.repoName} />
-                <input type="hidden" name="jobId" defaultValue={state.inputs.jobId ?? ""} />
+                <input type="hidden" name="repoName" defaultValue={repoName} />
+                <input type="hidden" name="jobId" defaultValue={jobId} />
                 <Button
                   variant="outline"
                   className="w-fit"
