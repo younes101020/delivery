@@ -99,13 +99,21 @@ services:
       #- "--log.level=DEBUG"
       - "--api.insecure=true"
       - "--providers.docker=true"
+      - "--providers.file.directory=/etc/traefik/config"
       - "--providers.docker.exposedbydefault=false"
       - "--entryPoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=younesfakallah60@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+
     ports:
       - "80:80"
-      - "8080:8080"
+      - "443:443"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./letsencrypt:/letsencrypt"
+      - "./config:/etc/traefik/config"
     networks:
       - host_network
 
