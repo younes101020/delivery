@@ -11,21 +11,22 @@ export async function ssh(command: string, { onStdout, cwd }: ISSH) {
   return new Promise<Chunk[] | Error>((resolve, reject) => {
     const result: Chunk[] = [];
 
-    const timeout = setTimeout(async () => {
-      conn.end();
-      const errorMessage = "SSH connection timed out after 30 minutes";
-      result.push(errorMessage);
-      await onStdout({ chunk: errorMessage, chunks: result, isCriticalError: true });
-      reject(new Error(errorMessage));
-    }, 1_800_000); // 30min
-
     conn
       .on("ready", () => {
         conn.exec(fullCommand, (err, stream) => {
+          const timeout = setTimeout(async () => {
+            const errorMessage = "SSH connection timed out after 30 minutes";
+            result.push(errorMessage);
+            await onStdout({ chunk: errorMessage, chunks: result, isCriticalError: true });
+            stream.close();
+            reject(new Error(errorMessage));
+          }, 1_800_000); // 30min
+
           if (err) {
             clearTimeout(timeout);
             throw err;
           }
+
           stream
             .setEncoding("utf-8")
             .on("close", () => {
@@ -58,7 +59,6 @@ export async function ssh(command: string, { onStdout, cwd }: ISSH) {
       .connect(config);
 
     conn.on("error", (err) => {
-      clearTimeout(timeout);
       conn.end();
       reject(err);
     });
