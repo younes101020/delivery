@@ -27,6 +27,16 @@ import {
 export async function createApplication(application: InsertApplicationSchemaWithSharedEnv) {
   const { applicationData, envVars } = application;
   return await db.transaction(async (tx) => {
+    const existingApp = await tx.query.applications.findFirst({
+      where(fields, operators) {
+        return operators.eq(fields.fqdn, applicationData.fqdn);
+      },
+    });
+
+    if (existingApp) {
+      return { id: 0 };
+    }
+
     const [application] = await tx.insert(applications).values(applicationData).returning({
       id: applications.id,
     });

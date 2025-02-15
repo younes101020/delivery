@@ -110,14 +110,15 @@ export const redeployApp = runDeployment(async (queueName) => {
 
     const completedJobs = await queue.getJobs("completed");
     const jobMap = new Map(completedJobs.map(j => [j.name, j.data]));
+    const overrideNonInitialQueueData = { isCriticalError: undefined, logs: undefined };
 
     await queue.obliterate();
 
     return {
       repoName: queueName,
-      clone: { ...jobMap.get("clone"), isCriticalError: undefined, logs: undefined },
-      build: { ...jobMap.get("build"), isCriticalError: undefined, logs: undefined },
-      configure: { ...jobMap.get("configure"), isCriticalError: undefined, logs: undefined },
+      clone: { ...jobMap.get("clone"), ...overrideNonInitialQueueData },
+      build: { ...jobMap.get("build"), ...overrideNonInitialQueueData },
+      configure: { ...jobMap.get("configure"), ...overrideNonInitialQueueData },
     };
   }
   throw new HTTPException(HttpStatusCodes.BAD_REQUEST, { message: "Invalid redeployment payload" });

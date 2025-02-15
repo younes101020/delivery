@@ -6,12 +6,14 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 import type { AppRouteHandler } from "@/lib/types";
 
 import { getApplicationByName } from "@/db/queries/queries";
+import { APPLICATIONS_PATH } from "@/lib/constants";
+import { ssh } from "@/lib/ssh";
 import { subscribeWorkerTo } from "@/routes/deployments/lib/tasks";
 import { deployApp, redeployApp } from "@/routes/deployments/lib/tasks/deploy";
 import { checkIfOngoingDeploymentExist, getCurrentDeploymentCount, getCurrentDeploymentsState, getJobs, getPreviousDeploymentsState } from "@/routes/deployments/lib/tasks/deploy/utils";
 import { connection, getBullConnection, jobCanceler } from "@/routes/deployments/lib/tasks/utils";
 
-import type { CancelRoute, CreateRoute, GetCurrentDeploymentStep, GetPreviousDeploymentStep, RedeployRoute, RetryRoute, StreamCurrentDeploymentCount, StreamLogsRoute, StreamPreview } from "./deployments.routes";
+import type { CreateRoute, GetCurrentDeploymentStep, GetPreviousDeploymentStep, RedeployRoute, RetryRoute, StreamCurrentDeploymentCount, StreamLogsRoute, StreamPreview } from "./deployments.routes";
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const deployment = c.req.valid("json");
@@ -23,6 +25,16 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
 
 export const redeploy: AppRouteHandler<RedeployRoute> = async (c) => {
   const { queueName } = c.req.valid("param");
+
+  const appName = queueName;
+
+  await ssh(
+    "git pull",
+    {
+      cwd: `${APPLICATIONS_PATH}/${appName}`,
+      onStdout: () => Promise.resolve(),
+    },
+  );
 
   await redeployApp(queueName);
 
