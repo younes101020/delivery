@@ -151,30 +151,6 @@ export const retryJob = createRoute({
   },
 });
 
-export const cancelJob = createRoute({
-  path: "/deployments/jobs/cancel/{jobId}",
-  method: "delete",
-  tags,
-  request: {
-    params: jobIdParamsSchema,
-    body: jsonContentRequired(
-      queueSchema,
-      "The queue name to which the job belongs",
-    ),
-  },
-  description: "Cancel an active job",
-  responses: {
-    [HttpStatusCodes.NO_CONTENT]: {
-      description: "Job aborted",
-    },
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "No active job found"),
-    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(jobIdParamsSchema).or(createErrorSchema(queueSchema)),
-      "The validation error(s)",
-    ),
-  },
-});
-
 export type StreamLogsRoute = typeof streamLog;
 export type CreateRoute = typeof create;
 export type RedeployRoute = typeof redeploy;
@@ -182,5 +158,4 @@ export type RetryRoute = typeof retryJob;
 export type GetCurrentDeploymentStep = typeof getCurrentDeploymentStep;
 export type GetPreviousDeploymentStep = typeof getPreviousDeploymentStep;
 export type StreamCurrentDeploymentCount = typeof streamCurrentDeploymentCount;
-export type CancelRoute = typeof cancelJob;
 export type StreamPreview = typeof streamPreview;

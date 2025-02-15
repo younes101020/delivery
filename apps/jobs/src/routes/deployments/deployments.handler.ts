@@ -11,7 +11,7 @@ import { ssh } from "@/lib/ssh";
 import { subscribeWorkerTo } from "@/routes/deployments/lib/tasks";
 import { deployApp, redeployApp } from "@/routes/deployments/lib/tasks/deploy";
 import { checkIfOngoingDeploymentExist, getCurrentDeploymentCount, getCurrentDeploymentsState, getJobs, getPreviousDeploymentsState } from "@/routes/deployments/lib/tasks/deploy/utils";
-import { connection, getBullConnection, jobCanceler } from "@/routes/deployments/lib/tasks/utils";
+import { connection, getBullConnection } from "@/routes/deployments/lib/tasks/utils";
 
 import type { CreateRoute, GetCurrentDeploymentStep, GetPreviousDeploymentStep, RedeployRoute, RetryRoute, StreamCurrentDeploymentCount, StreamLogsRoute, StreamPreview } from "./deployments.routes";
 
@@ -272,24 +272,4 @@ export const retryJob: AppRouteHandler<RetryRoute> = async (c) => {
     { response },
     HttpStatusCodes.OK,
   );
-};
-
-export const cancelJob: AppRouteHandler<CancelRoute> = async (c) => {
-  const { jobId } = c.req.valid("param");
-  const { queueName } = c.req.valid("json");
-  const queue = new Queue(queueName, { connection: getBullConnection(connection) });
-  const job = await Job.fromId(queue, jobId);
-
-  if (!job) {
-    return c.json(
-      {
-        message: HttpStatusPhrases.NOT_FOUND,
-      },
-      HttpStatusCodes.NOT_FOUND,
-    );
-  }
-
-  jobCanceler.cancel(jobId);
-
-  return c.body(null, HttpStatusCodes.NO_CONTENT);
 };

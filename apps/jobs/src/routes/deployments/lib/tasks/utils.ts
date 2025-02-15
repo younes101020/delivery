@@ -26,32 +26,3 @@ export function getBullConnection(redis: RedisOptions | Redis): Redis {
 
   return connection;
 }
-
-/**
- * Creates a job cancellation manager to track and control job abort signals, allowing jobs to be cancelled and cleaned up gracefully.
- */
-function createJobCanceler() {
-  const controllers = new Map();
-
-  return {
-    createSignal(jobId: string) {
-      const controller = new AbortController();
-      controllers.set(jobId, controller);
-      return controller.signal;
-    },
-
-    cancel(jobId: string) {
-      const controller = controllers.get(jobId);
-      if (controller) {
-        controller.abort();
-        controllers.delete(jobId);
-      }
-    },
-
-    cleanup(jobId: string) {
-      controllers.delete(jobId);
-    },
-  };
-}
-
-export const jobCanceler = createJobCanceler();
