@@ -1,4 +1,7 @@
-import { Bird } from "lucide-react";
+import type { LucideProps } from "lucide-react";
+import type { ForwardRefExoticComponent, RefAttributes } from "react";
+
+import { History, Truck } from "lucide-react";
 import { Suspense } from "react";
 
 import { EmptyState } from "@/app/_components/ui/empty-state";
@@ -38,7 +41,7 @@ async function OngoingDeploymentPreview() {
   const deployments = await getCurrentDeploymentsState();
 
   if (deployments.length < 1)
-    return <NoDeployments title="No ongoing deployment" description="You can preview all your ongoing deployments here." />;
+    return <NoDeployments title="No ongoing deployment" description="You can preview all your ongoing deployments here." Icon={Truck} />;
 
   return deployments.map(deployment => (
     <DeploymentPreviewCard key={deployment.id} {...deployment} />
@@ -49,22 +52,21 @@ async function PreviousDeployment() {
   const deployments = await getPreviousDeploymentsState();
 
   if (deployments.length < 1)
-    return <NoDeployments title="No previous deployment" description="You can preview all your previous deployments here." />;
+    return <NoDeployments title="No previous deployment" description="You can preview all your previous deployments here." Icon={History} />;
 
   return deployments.map(deployment => (
     <PreviousDeploymentPreviewCard key={deployment.id} {...deployment} />
   ));
 }
 
-function NoDeployments({ title, description }: { title: string; description: string }) {
+function NoDeployments({ title, description, Icon }: { title: string; description: string; Icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>> }) {
   return (
-    <div className="h-full flex justify-center items-center">
+    <div className="h-full flex justify-center items-center md:col-span-2 lg:col-span-3 xl:col-span-4">
       <EmptyState
         title={title}
         description={description}
-        icons={[Bird]}
+        icons={[Icon]}
       />
     </div>
-
   );
 }

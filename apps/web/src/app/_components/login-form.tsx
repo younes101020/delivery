@@ -63,8 +63,8 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
 
       {state?.error && <div className="text-destructive text-sm">{state.error}</div>}
 
-      <CardFooter className="flex px-0 pt-8">
-        <Button type="submit" disabled={pending} aria-label="submit" className="w-full">
+      <CardFooter className="flex px-0 pt-8 justify-end">
+        <Button type="submit" disabled={pending} aria-label="submit">
           {pending
             ? (
                 <>

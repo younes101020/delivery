@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { Button, buttonVariants } from "@/app/_components/ui/button";
 import { Card, CardContent, CardFooter } from "@/app/_components/ui/card";
+import { cn } from "@/app/_lib/utils";
 
 import { LogsTerminal } from "./deployment-logs";
 
@@ -35,9 +36,9 @@ export function PreviousDeploymentPreviewCard({
 
       <CardFooter className="flex flex-wrap gap-3">
         <LogsTerminal logs={logs}>
-          <Button>View build logs</Button>
+          <Button className="text-xs">View build logs</Button>
         </LogsTerminal>
-        <Link href={`/dashboard/applications/${applicationId}`} className={buttonVariants({ variant: "outline" })}>
+        <Link href={`/dashboard/applications/${applicationId}`} className={cn(buttonVariants({ variant: "outline" }), "text-xs")}>
           Application setting
         </Link>
       </CardFooter>
