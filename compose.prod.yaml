@@ -15,7 +15,7 @@ services:
     ports:
       - 3000:3000
     networks:
-      - host_network
+      - proxy
     depends_on:
       - jobs
 
@@ -44,7 +44,7 @@ services:
     ports:
       - 3090:3090
     networks:
-      - host_network
+      - proxy
     depends_on:
       - db
 
@@ -55,7 +55,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     networks:
-      - host_network
+      - proxy
     volumes:
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ${PWD}/db-data/:/var/lib/postgresql@16/data:rw
@@ -71,7 +71,7 @@ services:
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
       - MINIO_DEFAULT_BUCKETS=${MINIO_DEFAULT_BUCKETS}
     networks:
-      - host_network
+      - proxy
     restart: always
   
   bull_queue:
@@ -82,7 +82,7 @@ services:
     ports:
       - 6379:6379
     networks:
-      - host_network
+      - proxy
 
   adminer:
     image: adminer
@@ -90,23 +90,34 @@ services:
     ports:
       - 3050:8080
     networks:
-      - host_network
+      - proxy
   
   traefik:
     image: "traefik:v3.2"
     container_name: "traefik"
     command:
-      #- "--log.level=DEBUG"
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.file.directory=/etc/traefik/config"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entryPoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=younesfakallah60@gmail.com"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-
+      - --api.dashboard=true
+      - --log.level=INFO
+      #- --log.filepath=/var/log/traefik.log
+      - --accesslog=true
+      #- --accesslog.filepath=/var/log/traefik-access.log
+      - --providers.docker.network=proxy
+      - --providers.docker.exposedByDefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entryPoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.asDefault=true 
+      - --entrypoints.websecure.http.tls.certresolver=myresolver
+      - --certificatesresolvers.myresolver.acme.email=younesfakallah60@gmail.com
+      - --certificatesresolvers.myresolver.acme.tlschallenge=true
+      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mydashboard.rule=Host(`traefik.example.com`)
+      - traefik.http.routers.mydashboard.service=api@internal
+      - traefik.http.routers.mydashboard.middlewares=myauth
+      - traefik.http.middlewares.myauth.basicauth.users=test:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/
     ports:
       - "80:80"
       - "443:443"
@@ -115,12 +126,15 @@ services:
       - "./letsencrypt:/letsencrypt"
       - "./config:/etc/traefik/config"
     networks:
-      - host_network
+      - proxy
+    restart: always
 
 networks:
-  host_network:
-    name: host_network
-    driver: bridge
+  proxy:
+    name: proxy
 
 volumes:
   postgres_data:
+    name: postgres_data
+  letsencrypt:
+    name: letsencrypt

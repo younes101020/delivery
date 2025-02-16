@@ -4,3 +4,4 @@ db-data
 .turbo
 /.yarn/install-state.gz
 config.yml
+letsencrypt
