@@ -6,10 +6,10 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import type { DeploymentReferenceAndDataSchema } from "@/db/dto";
 
 import { getGithubAppByAppId, getSystemDomainName } from "@/db/queries/queries";
+import { subscribeWorkerTo } from "@/routes/deployments/lib/tasks";
 
 import type { QueueDeploymentJobData } from "./types";
 
-import { subscribeWorkerTo } from "..";
 import { connection, getBullConnection } from "../utils";
 import { parseAppHost, transformEnvVars } from "./jobs/utils";
 
@@ -124,7 +124,7 @@ export const redeployApp = runDeployment(async (queueName) => {
   throw new HTTPException(HttpStatusCodes.BAD_REQUEST, { message: "Invalid redeployment payload" });
 });
 
-function waitForDeploymentToComplete(queueName: string, queue: Queue) {
+export function waitForDeploymentToComplete(queueName: string, queue: Queue) {
   const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection) });
   return new Promise<void>((res, rej) => {
     const timeout = setTimeout(() => {
