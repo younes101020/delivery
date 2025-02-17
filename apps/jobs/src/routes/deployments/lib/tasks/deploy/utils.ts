@@ -1,6 +1,12 @@
-import { type Job, Queue } from "bullmq";
+import type { Job as TJob } from "bullmq";
 
-import type { CurrentJobSchema, PreviousJobSchema } from "@/db/dto";
+import { Job, Queue, QueueEvents } from "bullmq";
+import { HTTPException } from "hono/http-exception";
+import { basename } from "node:path";
+
+import type { CurrentJobSchema, DeploymentReferenceAndDataSchema, PreviousJobSchema } from "@/db/dto";
+
+import { DeploymentError } from "@/lib/error";
 
 import type { RedisType } from "../types";
 
@@ -107,12 +113,34 @@ export async function checkIfOngoingDeploymentExist(queue: Queue) {
   return jobsCounts.some(jobCount => jobCount > 0);
 }
 
+export function waitForDeploymentToComplete(queueName: string, queue: Queue) {
+  const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection) });
+  return new Promise<void>((res, rej) => {
+    const timeout = setTimeout(() => {
+      queueEvents.removeAllListeners();
+      rej(new HTTPException(408, { message: "Deployment timeout exceeded" }));
+    }, 15 * 60 * 1000); // 15 minute timeout
+
+    const completedHandler = async ({ jobId }: { jobId: string }) => {
+      const jobState = await Job.fromId(queue, jobId);
+      const isDeploymentCompleted = jobState?.name === "configure";
+      if (isDeploymentCompleted) {
+        clearTimeout(timeout);
+        queueEvents.removeListener("completed", completedHandler);
+        res();
+      }
+    };
+
+    queueEvents.on("completed", completedHandler);
+  });
+}
+
 export async function checkIfDeploymentExist(queue: Queue) {
   const jobsCounts = await queue.getCompletedCount();
   return jobsCounts === 3;
 }
 
-export function getLatestJob(jobs: Job[]) {
+export function getLatestJob(jobs: TJob[]) {
   return jobs.some(job => job.name === JOBS.configure)
     ? jobs.find(job => job.name === JOBS.configure)
     : jobs.some(job => job.name === JOBS.build)
@@ -122,7 +150,7 @@ export function getLatestJob(jobs: Job[]) {
         : jobs[0];
 }
 
-export function getOldestJob(jobs: Job[]) {
+export function getOldestJob(jobs: TJob[]) {
   return jobs.some(job => job.name === JOBS.clone)
     ? jobs.find(job => job.name === JOBS.clone)
     : jobs.some(job => job.name === JOBS.build)
@@ -162,4 +190,59 @@ export async function fetchQueueTitles(redis: RedisType, prefix: string = "bull"
       queueName: parts[parts.length - 2],
     };
   });
+}
+
+export function fromGitUrlToQueueName(repoUrl: string) {
+  return basename(repoUrl, ".git").toLowerCase();
+}
+
+export function transformEnvVars(envs: DeploymentReferenceAndDataSchema["env"]) {
+  if (!envs) {
+    return undefined;
+  }
+
+  const cmdEnvVars = envs
+    .trim()
+    .split(/\s+/)
+    .map(env => `-e ${env}`)
+    .join(" ");
+
+  const persistedEnvVars = envs
+    .trim()
+    .split(/\s+/)
+    .map((env) => {
+      const [key, value] = env.split("=");
+      return {
+        key,
+        value,
+      };
+    });
+
+  return {
+    cmdEnvVars,
+    persistedEnvVars,
+  };
+}
+
+export function parseAppHost(appName: string, hostName: string) {
+  let url: URL;
+  try {
+    url = new URL(hostName);
+  }
+  catch (error) {
+    throw new DeploymentError({
+      name: "BUILD_APP_ERROR",
+      message: "The provided host name is not a valid URL",
+      cause: error,
+    });
+  }
+  url.hostname = `${appName}.${url.hostname}`;
+  return url.host;
+}
+
+export function convertGitToAuthenticatedUrl(gitUrl: string, token: string) {
+  return gitUrl.replace(
+    "git://",
+    `https://x-access-token:${token}@`,
+  );
 }

@@ -51,4 +51,6 @@
     "Hono",
     "openapi"
   ],
+  "terminal.integrated.fontFamily": "",
+  "editor.fontFamily": "Consolas, 'Courier New'",
 }

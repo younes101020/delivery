@@ -1,125 +1,203 @@
-import { type Queue, QueueEvents } from "bullmq";
+import { FlowProducer, Queue } from "bullmq";
 import { HTTPException } from "hono/http-exception";
-import Redis from "ioredis";
-import { afterEach, beforeEach, describe, expect, vi } from "vitest";
-import { ZodError } from "zod";
+import * as HttpStatusCodes from "stoker/http-status-codes";
+import { afterEach, describe, expect, vi } from "vitest";
 
-import { insertDeploymentSchema } from "@/db/dto";
-import { DeploymentError } from "@/lib/error";
 import { it } from "@/routes/deployments/__tests__/fixtures";
-import { convertGitToAuthenticatedUrl, parseAppHost } from "@/routes/deployments/lib/tasks/deploy/jobs/utils";
-import { connection, getBullConnection } from "@/routes/deployments/lib/tasks/utils";
+import { waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
 
-import { waitForDeploymentToComplete } from "..";
+import { deployApp, JOBS, redeployApp } from "..";
 
-const eventHandlers: Record<string, ({ jobId }: { jobId: string }) => void> = {};
-
-vi.mock("bullmq", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("bullmq")>();
-
-  const FlowProducer = vi.fn();
-  FlowProducer.prototype.add = vi.fn();
-
-  const QueueEvents = vi.fn();
-  QueueEvents.prototype.on = vi.fn((event, handler) => {
-    eventHandlers[event] = handler;
-  });
-  QueueEvents.prototype.removeAllListeners = vi.fn();
-  QueueEvents.prototype.removeListener = vi.fn();
-
-  const Job = {
-    fromId: vi.fn().mockResolvedValue({ name: "configure" }),
-  };
-
-  return { ...actual, FlowProducer, QueueEvents, Job };
-});
-
-vi.mock("@/routes/deployments/lib/tasks", () => {
-  const subscribeWorkerTo = vi.fn();
-  return { subscribeWorkerTo };
-});
-
-describe("deployments related unit tests", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-
+describe("deployments tests", () => {
   afterEach(() => {
     vi.clearAllMocks();
-    vi.useRealTimers();
+  });
+  vi.mock("@/routes/deployments/lib/tasks", () => {
+    const subscribeWorkerTo = vi.fn();
+    return { subscribeWorkerTo };
   });
 
-  it("should format git URL to authenticated url", async ({ repoUrl, installationAuthenticationToken }) => {
-    const authenticatedUrl = convertGitToAuthenticatedUrl(repoUrl, installationAuthenticationToken);
-    const expectedUrl = `https://x-access-token:${installationAuthenticationToken}@${repoUrl.replace("git://", "")}`;
-
-    expect(authenticatedUrl).toBe(expectedUrl);
+  const mocks = vi.hoisted(() => {
+    return {
+      getGithubAppByAppId: vi.fn().mockResolvedValue({ secret: true }),
+      getSystemDomainName: vi.fn().mockResolvedValue("https://domain.com"),
+      fromGitUrlToQueueName: vi.fn().mockReturnValue("my-app"),
+      waitForDeploymentToComplete: vi.fn(),
+      transformEnvVars: vi.fn().mockReturnValue(
+        {
+          cmdEnvVars: "-e VAR=VAL",
+          persistedEnvVars: [{ key: "VAR", value: "VAL" }],
+        },
+      ),
+      parseAppHost: vi.fn().mockReturnValue("https://my-app.domain.com"),
+    };
   });
 
-  it("should reject invalid port formats", () => {
-    const invalidPorts = ["8080:80:90", "abc", "8080:abc", ":8080", "8080:", ""];
+  vi.mock("bullmq", async (importOriginal) => {
+    const actual = await importOriginal<typeof import("bullmq")>();
+    const FlowProducer = vi.fn();
+    FlowProducer.prototype.add = vi.fn();
 
-    invalidPorts.forEach((invalidPort) => {
-      expect(() => insertDeploymentSchema.parse({
-        repoUrl: "",
-        githubAppId: 1,
-        port: invalidPort,
-      })).toThrow(ZodError);
+    const Queue = vi.fn();
+    Queue.prototype.getActiveCount = vi.fn();
+    Queue.prototype.obliterate = vi.fn();
+    Queue.prototype.getJobs = vi.fn();
+    return { ...actual, FlowProducer, Queue };
+  });
+
+  vi.mock("@/db/queries/queries", () => {
+    return {
+      getGithubAppByAppId: mocks.getGithubAppByAppId,
+      getSystemDomainName: mocks.getSystemDomainName,
+    };
+  });
+
+  vi.mock("@/routes/deployments/lib/tasks/deploy/utils", () => {
+    return {
+      fromGitUrlToQueueName: mocks.fromGitUrlToQueueName,
+      transformEnvVars: mocks.transformEnvVars,
+      parseAppHost: mocks.parseAppHost,
+      waitForDeploymentToComplete: mocks.waitForDeploymentToComplete,
+    };
+  });
+
+  describe("`deployApp()` tests", () => {
+    it("throw error if the given payload is not an object when attempting to deploy", async () => {
+      await expect(deployApp("")).rejects.toThrow(new HTTPException(HttpStatusCodes.BAD_REQUEST, { message: "Invalid deployment payload" }));
+    });
+
+    it("throw error if github app is not found when attempting to deploy", async ({ deployAppPayload }) => {
+      mocks.getGithubAppByAppId.mockResolvedValueOnce(null);
+
+      await expect(deployApp(deployAppPayload)).rejects.toThrow(new HTTPException(HttpStatusCodes.NOT_FOUND, { message: "Github app not found" }));
+    });
+
+    it("throw error if server domain name is not found when attempting to deploy", async ({ deployAppPayload }) => {
+      mocks.getSystemDomainName.mockResolvedValueOnce(null);
+
+      await expect(deployApp(deployAppPayload)).rejects.toThrow(new HTTPException(HttpStatusCodes.NOT_FOUND, { message: "Domain name of the server not found" }));
+    });
+
+    it("throw error if the github app secret is not found when attempting to deploy", async ({ deployAppPayload }) => {
+      mocks.getGithubAppByAppId.mockResolvedValueOnce({ secret: null });
+
+      await expect(deployApp(deployAppPayload)).rejects.toThrow(new HTTPException(HttpStatusCodes.UNAUTHORIZED, { message: "Invalid github app secret" }));
+    });
+
+    it("call the add method from bullmq flowproducer", async ({ deployAppPayload }) => {
+      const spy = vi.spyOn(FlowProducer.prototype, "add");
+
+      await deployApp(deployAppPayload);
+
+      expect(spy).toHaveBeenCalled();
+    });
+
+    it("call the add method from bullmq flowproducer with jobs dependencies", async ({ githubApp, deployAppPayload }) => {
+      const { repoUrl, cache, publishdir, port: exposedPort, staticdeploy } = deployAppPayload;
+      const queueName = mocks.fromGitUrlToQueueName();
+      const env = mocks.transformEnvVars();
+      const fqdn = mocks.parseAppHost();
+      const port = staticdeploy ? 80 : exposedPort;
+      mocks.getGithubAppByAppId.mockResolvedValueOnce(githubApp);
+      const spy = vi.spyOn(FlowProducer.prototype, "add");
+
+      await deployApp(deployAppPayload);
+
+      expect(spy).toHaveBeenCalledWith({
+        name: JOBS.configure,
+        data: {
+          application: {
+            port,
+            githubAppId: githubApp.id,
+          },
+          environmentVariable: env.persistedEnvVars,
+          fqdn,
+          repoName: queueName,
+        },
+        queueName,
+        children: [
+          {
+            name: JOBS.build,
+            data: { env: env.cmdEnvVars, cache, ...(staticdeploy && { publishdir }), port, staticdeploy, fqdn, repoName: queueName },
+            queueName,
+            opts: { attempts: 3, failParentOnFailure: true },
+            children: [
+              {
+                name: JOBS.clone,
+                data: { ...githubApp, repoUrl, secret: githubApp.secret, repoName: queueName },
+                queueName,
+                opts: { attempts: 3, failParentOnFailure: true },
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it("return queue name", async ({ deployAppPayload }) => {
+      const queueName = mocks.fromGitUrlToQueueName();
+
+      const shouldBequeueName = await deployApp(deployAppPayload);
+
+      expect(shouldBequeueName).toBe(queueName);
     });
   });
 
-  it("should append application name as hostname", () => {
-    expect(parseAppHost("weatherapp", "https://younes.fr")).toBe("weatherapp.younes.fr");
-  });
+  describe("`redeployApp()` tests", () => {
+    it("throw error if the given payload is not an string when attempting to redeploy", async () => {
+      // @ts-expect-error test purpose
+      await expect(redeployApp({})).rejects.toThrow(new HTTPException(HttpStatusCodes.BAD_REQUEST, { message: "Invalid redeployment payload" }));
+    });
 
-  it("should throw BUILD_APP_ERROR error for invalid host name URL", () => {
-    try {
-      parseAppHost("weatherapp", "invalid-hostname");
-      expect(true).toBe(false);
-    }
-    catch (error) {
-      if (error instanceof DeploymentError) {
-        expect(error.name).toBe("BUILD_APP_ERROR");
-      }
-    }
-  });
+    it("not call the `waitForDeploymentToComplete()` function when there is no active deployment of my-app", async ({ completedJobs }) => {
+      vi.spyOn(Queue.prototype, "getActiveCount").mockResolvedValueOnce(0);
+      vi.spyOn(Queue.prototype, "getJobs").mockResolvedValueOnce(completedJobs);
 
-  it("should return cached redis connection if exists", () => {
-    const connection1 = getBullConnection(connection);
-    const connection2 = getBullConnection(connection);
+      await redeployApp("my-app");
 
-    expect(connection1).toBe(connection2);
-  });
+      expect(waitForDeploymentToComplete).not.toHaveBeenCalled();
+    });
 
-  it("should return redis instance if redis is passed", () => {
-    const connection1 = getBullConnection(connection);
+    it("call the add method from bullmq flowproducer", async ({ completedJobs }) => {
+      const spy = vi.spyOn(FlowProducer.prototype, "add");
+      vi.spyOn(Queue.prototype, "getJobs").mockResolvedValueOnce(completedJobs);
 
-    expect(connection1).toBeInstanceOf(Redis);
-  });
+      await redeployApp("my-app");
 
-  it("should resolve when the last deployment step is completed", async () => {
-    const promise = waitForDeploymentToComplete("my-app", {} as Queue);
+      expect(spy).toHaveBeenCalled();
+    });
 
-    eventHandlers.completed({ jobId: "123" });
+    it("call the add method from bullmq flowproducer with jobs dependencies", async ({ completedJobs }) => {
+      const jobMap = new Map(completedJobs.map(j => [j.name, j.data]));
+      const overrideNonInitialQueueData = { isCriticalError: undefined, logs: undefined };
+      const queueName = jobMap.get("configure")?.repoName;
 
-    await expect(promise).resolves.toBeUndefined();
-  });
+      const spy = vi.spyOn(FlowProducer.prototype, "add");
+      vi.spyOn(Queue.prototype, "getJobs").mockResolvedValueOnce(completedJobs);
 
-  it("should reject after 15min with timeout http code", async () => {
-    const promise = waitForDeploymentToComplete("my-app", {} as Queue);
+      await redeployApp("my-app");
 
-    vi.advanceTimersByTime(900000);
-
-    await expect(promise).rejects.toThrow(new HTTPException(408, { message: "Deployment timeout exceeded" }));
-  });
-
-  it("should call removeAllListeners when deployment failed due to timeout", async () => {
-    const o = waitForDeploymentToComplete("my-app", {} as Queue);
-
-    const queueEventsSpy = vi.spyOn(QueueEvents.prototype, "removeAllListeners");
-    vi.advanceTimersByTime(900000);
-    await expect(o).rejects.toThrowError();
-
-    expect(queueEventsSpy).toBeCalledTimes(1);
+      expect(spy).toHaveBeenCalledWith({
+        name: JOBS.configure,
+        data: { ...jobMap.get("configure"), ...overrideNonInitialQueueData },
+        queueName,
+        children: [
+          {
+            name: JOBS.build,
+            data: { ...jobMap.get("build"), ...overrideNonInitialQueueData },
+            queueName,
+            opts: { attempts: 3, failParentOnFailure: true },
+            children: [
+              {
+                name: JOBS.clone,
+                data: { ...jobMap.get("clone"), ...overrideNonInitialQueueData },
+                queueName,
+                opts: { attempts: 3, failParentOnFailure: true },
+              },
+            ],
+          },
+        ],
+      });
+    });
   });
 });

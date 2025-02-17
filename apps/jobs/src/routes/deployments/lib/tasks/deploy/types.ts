@@ -5,10 +5,10 @@ import type { InsertApplicationSchemaWithSharedEnv, InsertEnvironmentVariablesSc
 type Application = InsertApplicationSchemaWithSharedEnv["applicationData"];
 
 export interface QueueDeploymentJobData {
-  repoName: string;
   clone: SelectedGithubAppsSchema & {
     secret: SelectedGithubAppSecretSchema;
     repoUrl: string;
+    repoName: string;
   };
   build: {
     env?: string;
@@ -19,11 +19,13 @@ export interface QueueDeploymentJobData {
     cache: boolean;
     logs?: string;
     isCriticalError?: boolean;
+    repoName: string;
   };
   configure: {
     application: Pick<Application, "port" | "githubAppId">;
     environmentVariable: InsertEnvironmentVariablesSchema[] | undefined;
     fqdn: string;
+    repoName: string;
   };
 }
 

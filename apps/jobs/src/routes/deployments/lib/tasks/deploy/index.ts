@@ -1,17 +1,16 @@
-import { FlowProducer, Job, Queue, QueueEvents } from "bullmq";
+import { FlowProducer, Queue } from "bullmq";
 import { HTTPException } from "hono/http-exception";
-import { basename } from "node:path";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { DeploymentReferenceAndDataSchema } from "@/db/dto";
 
 import { getGithubAppByAppId, getSystemDomainName } from "@/db/queries/queries";
 import { subscribeWorkerTo } from "@/routes/deployments/lib/tasks";
+import { fromGitUrlToQueueName, parseAppHost, transformEnvVars, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
 
 import type { QueueDeploymentJobData } from "./types";
 
 import { connection, getBullConnection } from "../utils";
-import { parseAppHost, transformEnvVars } from "./jobs/utils";
 
 type QueueName = string;
 
@@ -26,27 +25,26 @@ function runDeployment(
 ) {
   return async (payload: QueueName | DeploymentReferenceAndDataSchema) => {
     const data = await getDeploymentData(payload);
+    const repoName = data.build.repoName;
 
-    const queueName = typeof payload === "object" ? basename(payload.repoUrl, ".git").toLowerCase() : payload;
-
-    await subscribeWorkerTo(queueName);
+    await subscribeWorkerTo(repoName);
 
     const flowProducer = new FlowProducer({ connection: getBullConnection(connection) });
     await flowProducer.add({
       name: JOBS.configure,
-      data: { ...data.configure, repoName: queueName },
-      queueName,
+      data: data.configure,
+      queueName: repoName,
       children: [
         {
           name: JOBS.build,
-          data: { ...data.build, repoName: queueName },
-          queueName,
+          data: data.build,
+          queueName: repoName,
           opts: { attempts: 3, failParentOnFailure: true },
           children: [
             {
               name: JOBS.clone,
-              data: { ...data.clone, repoName: queueName },
-              queueName,
+              data: data.clone,
+              queueName: repoName,
               opts: { attempts: 3, failParentOnFailure: true },
             },
           ],
@@ -54,7 +52,7 @@ function runDeployment(
       ],
     });
 
-    return queueName;
+    return repoName;
   };
 }
 
@@ -72,26 +70,27 @@ export const deployApp = runDeployment(async (payload) => {
     if (!githubApp?.secret)
       throw new HTTPException(HttpStatusCodes.UNAUTHORIZED, { message: "Invalid github app secret" });
 
-    const queueName = basename(repoUrl, ".git").toLowerCase();
+    const repoName = fromGitUrlToQueueName(repoUrl);
     const port = staticdeploy ? 80 : exposedPort!;
-    const fqdn = parseAppHost(queueName, hostName);
+    const fqdn = parseAppHost(repoName, hostName);
     const environmentVariables = transformEnvVars(env);
 
     return {
-      repoName: queueName,
-      clone: { ...githubApp, repoUrl, secret: githubApp.secret },
+      clone: { ...githubApp, repoUrl, secret: githubApp.secret, repoName },
       build: {
         port,
         staticdeploy,
         env: environmentVariables && environmentVariables.cmdEnvVars,
         cache,
         fqdn,
+        repoName,
         ...(staticdeploy && { publishdir }),
       },
       configure: {
         application: { port, githubAppId: githubApp.id },
         environmentVariable: environmentVariables && environmentVariables.persistedEnvVars,
         fqdn,
+        repoName,
       },
     };
   }
@@ -115,7 +114,6 @@ export const redeployApp = runDeployment(async (queueName) => {
     await queue.obliterate();
 
     return {
-      repoName: queueName,
       clone: { ...jobMap.get("clone"), ...overrideNonInitialQueueData },
       build: { ...jobMap.get("build"), ...overrideNonInitialQueueData },
       configure: { ...jobMap.get("configure"), ...overrideNonInitialQueueData },
@@ -123,25 +121,3 @@ export const redeployApp = runDeployment(async (queueName) => {
   }
   throw new HTTPException(HttpStatusCodes.BAD_REQUEST, { message: "Invalid redeployment payload" });
 });
-
-export function waitForDeploymentToComplete(queueName: string, queue: Queue) {
-  const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection) });
-  return new Promise<void>((res, rej) => {
-    const timeout = setTimeout(() => {
-      queueEvents.removeAllListeners();
-      rej(new HTTPException(408, { message: "Deployment timeout exceeded" }));
-    }, 15 * 60 * 1000); // 15 minute timeout
-
-    const completedHandler = async ({ jobId }: { jobId: string }) => {
-      const jobState = await Job.fromId(queue, jobId);
-      const isDeploymentCompleted = jobState?.name === "configure";
-      if (isDeploymentCompleted) {
-        clearTimeout(timeout);
-        queueEvents.removeListener("completed", completedHandler);
-        res();
-      }
-    };
-
-    queueEvents.on("completed", completedHandler);
-  });
-}

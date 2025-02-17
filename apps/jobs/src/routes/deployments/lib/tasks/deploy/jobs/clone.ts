@@ -5,10 +5,9 @@ import { APPLICATIONS_PATH } from "@/lib/constants";
 import { DeploymentError } from "@/lib/error";
 import { ssh } from "@/lib/ssh";
 import { decryptSecret } from "@/lib/utils";
+import { convertGitToAuthenticatedUrl } from "@/routes/deployments/lib/tasks/deploy/utils";
 
 import type { QueueDeploymentJob } from "../types";
-
-import { convertGitToAuthenticatedUrl } from "./utils";
 
 export async function clone(job: QueueDeploymentJob<"clone">) {
   const { secret, appId, clientId, clientSecret, installationId, repoUrl, repoName } = job.data;
