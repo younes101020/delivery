@@ -115,7 +115,6 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
       `rm -Rvf ${repoName} && sudo docker rm -f $(docker ps -a -q --filter ancestor=${repoName}) && docker rmi ${repoName}`,
       {
         cwd: `${APPLICATIONS_PATH}`,
-        onStdout: () => Promise.resolve(),
       },
     );
   }

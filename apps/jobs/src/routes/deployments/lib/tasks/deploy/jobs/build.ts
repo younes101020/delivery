@@ -7,7 +7,7 @@ import type { QueueDeploymentJob } from "../types";
 export type Chunk = string;
 
 export interface ISSH {
-  onStdout: ({ chunks, chunk, isCriticalError }: { chunks?: Chunk[]; chunk: Chunk; isCriticalError?: boolean }) => Promise<void>;
+  onStdout?: ({ chunks, chunk, isCriticalError }: { chunks?: Chunk[]; chunk: Chunk; isCriticalError?: boolean }) => Promise<void>;
   cwd?: string;
 }
 
