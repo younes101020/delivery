@@ -12,6 +12,7 @@ import {
 export function DynamicBreadcrumb() {
   const segments = useSelectedLayoutSegments();
   const withSeparator = segments
+    .filter(segment => !segment.startsWith("("))
     .map((segment, index) => {
       const href = `/dashboard/${segments.slice(0, index + 1).join("/")}`;
 

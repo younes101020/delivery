@@ -30,7 +30,6 @@ const data = {
       title: "Applications",
       url: "/dashboard/applications",
       icon: Package,
-      isActive: true,
       items: [
         {
           title: "New",

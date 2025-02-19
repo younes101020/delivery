@@ -5,3 +5,4 @@ db-data
 /.yarn/install-state.gz
 config.yml
 letsencrypt
+config
