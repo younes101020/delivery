@@ -3856,24 +3856,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tabler/icons-react@npm:^3.28.1":
-  version: 3.28.1
-  resolution: "@tabler/icons-react@npm:3.28.1"
-  dependencies:
-    "@tabler/icons": "npm:3.28.1"
-  peerDependencies:
-    react: ">= 16"
-  checksum: 10c0/fe8b7baaae5a2c896c519c509d3c05e83cf4ea0c5b683add200cd2c0587a66a590a3ca26f54e91a8ee2b15c519c0854651c11490c2eab8ef111cee9b8e76b3e3
-  languageName: node
-  linkType: hard
-
-"@tabler/icons@npm:3.28.1":
-  version: 3.28.1
-  resolution: "@tabler/icons@npm:3.28.1"
-  checksum: 10c0/330f738b74d203e910382725f4ff6b9c177f8738a54c71fc6e56c3204cf21749b0512148650ae85c211692c49aa5e03f09f2ea8458688309d917bb65f698dbd0
-  languageName: node
-  linkType: hard
-
 "@testing-library/dom@npm:^10.4.0":
   version: 10.4.0
   resolution: "@testing-library/dom@npm:10.4.0"

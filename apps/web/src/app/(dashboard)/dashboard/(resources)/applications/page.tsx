@@ -11,20 +11,23 @@ import { formatDate } from "@/app/_lib/utils";
 import { AppCard } from "./_components/app-card";
 import { getApplications } from "./_lib/queries";
 
-function NoApplications() {
+export default async function ApplicationsPage() {
   return (
-    <div className="h-full flex justify-center items-center">
-      <EmptyState
-        title="No application"
-        description="You can see all your applications here."
-        icons={[PackagePlus]}
-        action={{
-          label: "Deploy application",
-          href: "/applications/new",
-        }}
-      />
-    </div>
+    <section className="p-5 bg-background/50 border h-[90%]">
+      <div className="flex justify-between gap-2">
+        <PageTitle>My applications</PageTitle>
+        <Link href="/dashboard/applications/new" className={buttonVariants({ variant: "outline" })}>
+          <PackagePlus className="mr-1 mt-[.1rem]" />
+          Deploy new application
+        </Link>
+      </div>
 
+      <div className="mt-8 h-full">
+        <Suspense fallback={<Skeleton className="h-32 w-full" />}>
+          <ApplicationList />
+        </Suspense>
+      </div>
+    </section>
   );
 }
 
@@ -47,22 +50,19 @@ async function ApplicationList() {
   );
 }
 
-export default async function ApplicationsPage() {
+function NoApplications() {
   return (
-    <section className="p-5 bg-background/50 border h-[90%]">
-      <div className="flex justify-between gap-2">
-        <PageTitle>My applications</PageTitle>
-        <Link href="/dashboard/applications/new" className={buttonVariants({ variant: "outline" })}>
-          <PackagePlus className="mr-1 mt-[.1rem]" />
-          Deploy new application
-        </Link>
-      </div>
+    <div className="h-full flex justify-center items-center">
+      <EmptyState
+        title="No application"
+        description="You can see all your applications here."
+        icons={[PackagePlus]}
+        action={{
+          label: "Deploy application",
+          href: "/applications/new",
+        }}
+      />
+    </div>
 
-      <div className="mt-8 h-full">
-        <Suspense fallback={<Skeleton className="h-32 w-full" />}>
-          <ApplicationList />
-        </Suspense>
-      </div>
-    </section>
   );
 }

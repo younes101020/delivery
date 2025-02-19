@@ -1,7 +1,7 @@
 import { basename } from "node:path";
 
 import { client } from "@/app/_lib/client-http";
-import { getApplications } from "@/app/(dashboard)/dashboard/applications/_lib/queries";
+import { getApplications } from "@/app/(dashboard)/dashboard/(resources)/applications/_lib/queries";
 
 export async function POST(req: Request) {
   const { repository } = await req.json();

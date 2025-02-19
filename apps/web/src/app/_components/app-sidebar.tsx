@@ -1,6 +1,6 @@
 "use client";
 
-import { Package, Settings2, Truck } from "lucide-react";
+import { Cuboid, Package, Settings2, Truck } from "lucide-react";
 import * as React from "react";
 
 import { NavMain } from "@/app/_components/nav-main";
@@ -34,6 +34,17 @@ const data = {
         {
           title: "New",
           url: "/dashboard/applications/new",
+        },
+      ],
+    },
+    {
+      title: "Databases",
+      url: "/dashboard/databases",
+      icon: Cuboid,
+      items: [
+        {
+          title: "Hub",
+          url: "/dashboard/databases/hub",
         },
       ],
     },
