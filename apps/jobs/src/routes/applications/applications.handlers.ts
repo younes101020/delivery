@@ -110,22 +110,19 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
     );
   }
 
-  try {
-    await ssh(
-      `rm -Rvf ${repoName} && sudo docker rm -f $(docker ps -a -q --filter ancestor=${repoName}) && docker rmi ${repoName}`,
-      {
-        cwd: `${APPLICATIONS_PATH}`,
-      },
-    );
-  }
-  catch (e) {
+  await ssh(
+    `rm -Rvf ${repoName} && sudo docker rm -f $(docker ps -a -q --filter ancestor=${repoName}) && docker rmi ${repoName}`,
+    {
+      cwd: `${APPLICATIONS_PATH}`,
+    },
+  ).catch((e) => {
     return c.json(
       {
         message: e instanceof Error ? e.message : HttpStatusPhrases.INTERNAL_SERVER_ERROR,
       },
       HttpStatusCodes.INTERNAL_SERVER_ERROR,
     );
-  }
+  });
 
   await deleteDeploymentJobs(repoName);
 

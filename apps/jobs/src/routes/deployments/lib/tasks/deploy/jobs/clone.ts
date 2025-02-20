@@ -35,21 +35,18 @@ export async function clone(job: QueueDeploymentJob<"clone">) {
 
   const authenticatedUrl = convertGitToAuthenticatedUrl(repoUrl, installationAuthentication.token);
 
-  try {
-    await ssh(`git clone ${authenticatedUrl} ${repoName}`, {
-      cwd: APPLICATIONS_PATH,
-      onStdout: async ({ chunk, chunks, isCriticalError }) => {
-        await Promise.all([
-          job.updateProgress({ logs: chunk, isCriticalError, jobId: job.id }),
-          job.updateData({ ...job.data, logs: chunks?.join(), isCriticalError }),
-        ]);
-      },
-    });
-  }
-  catch (error) {
+  await ssh(`git clone ${authenticatedUrl} ${repoName}`, {
+    cwd: APPLICATIONS_PATH,
+    onStdout: async ({ chunk, chunks, isCriticalError }) => {
+      await Promise.all([
+        job.updateProgress({ logs: chunk, isCriticalError, jobId: job.id }),
+        job.updateData({ ...job.data, logs: chunks?.join(), isCriticalError }),
+      ]);
+    },
+  }).catch((error) => {
     throw new DeploymentError({
       name: "CLONE_APP_ERROR",
       message: error instanceof Error ? error.message : "Unexpected error",
     });
-  }
+  });
 }

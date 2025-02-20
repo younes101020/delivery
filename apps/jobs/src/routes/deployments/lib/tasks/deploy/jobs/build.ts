@@ -19,26 +19,24 @@ export async function build(job: QueueDeploymentJob<"build">) {
   const deployCmd = `nixpacks build ./ --name ${repoName} ${!cache ? "--no-cache" : ""} -l "traefik.enable=true" -l "traefik.http.routers.${repoName}.rule=Host(\\\`${fqdn}\\\`)" -l "traefik.http.services.${repoName}.loadbalancer.server.port=${port}" && docker run ${env ?? ""} --network host_network -d ${repoName}`;
 
   const fullCmd = staticdeploy ? `${buildAndExtractStaticArtefactCmd} ${deployCmd}` : deployCmd;
-  try {
-    await ssh(
-      fullCmd,
-      {
-        cwd: `${APPLICATIONS_PATH}/${repoName}`,
-        onStdout: async ({ chunk, chunks, isCriticalError }) => {
-          await Promise.all([
-            job.updateProgress({ logs: chunk, isCriticalError, jobId: job.id }),
-            job.updateData({ ...job.data, logs: chunks?.join(), isCriticalError }),
-          ]);
-        },
+
+  await ssh(
+    fullCmd,
+    {
+      cwd: `${APPLICATIONS_PATH}/${repoName}`,
+      onStdout: async ({ chunk, chunks, isCriticalError }) => {
+        await Promise.all([
+          job.updateProgress({ logs: chunk, isCriticalError, jobId: job.id }),
+          job.updateData({ ...job.data, logs: chunks?.join(), isCriticalError }),
+        ]);
       },
-    );
-  }
-  catch (error) {
+    },
+  ).catch((error) => {
     throw new DeploymentError({
       name: "BUILD_APP_ERROR",
       message: error instanceof Error ? error.message : "Unexpected error",
     });
-  }
+  });
 
   await job.updateProgress({ logs: "Your application is now online! 🚀" });
 }
