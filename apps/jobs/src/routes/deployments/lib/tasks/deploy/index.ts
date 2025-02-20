@@ -1,16 +1,16 @@
 import { FlowProducer, Queue } from "bullmq";
 import { HTTPException } from "hono/http-exception";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { DeploymentReferenceAndDataSchema } from "@/db/dto";
 
 import { getGithubAppByAppId, getSystemDomainName } from "@/db/queries/queries";
-import { subscribeWorkerTo } from "@/routes/deployments/lib/tasks";
+import { connection, getBullConnection, subscribeWorkerTo } from "@/lib/tasks/utils";
 import { fromGitUrlToQueueName, parseAppHost, transformEnvVars, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
 
 import type { QueueDeploymentJobData } from "./types";
-
-import { connection, getBullConnection } from "../utils";
 
 type QueueName = string;
 
@@ -20,6 +20,8 @@ export const JOBS = {
   build: "build",
 };
 
+const processorFile = join(dirname(fileURLToPath(import.meta.url)), "../worker.ts");
+
 function runDeployment(
   getDeploymentData: (payload: QueueName | DeploymentReferenceAndDataSchema) => Promise<QueueDeploymentJobData>,
 ) {
@@ -27,7 +29,7 @@ function runDeployment(
     const data = await getDeploymentData(payload);
     const repoName = data.build.repoName;
 
-    await subscribeWorkerTo(repoName);
+    await subscribeWorkerTo(repoName, processorFile);
 
     const flowProducer = new FlowProducer({ connection: getBullConnection(connection) });
     await flowProducer.add({

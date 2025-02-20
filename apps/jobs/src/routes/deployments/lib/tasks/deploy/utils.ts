@@ -5,13 +5,12 @@ import { HTTPException } from "hono/http-exception";
 import { basename } from "node:path";
 
 import type { CurrentJobSchema, DeploymentReferenceAndDataSchema, PreviousJobSchema } from "@/db/dto";
+import type { RedisType } from "@/lib/tasks/types";
 
 import { DeploymentError } from "@/lib/error";
-
-import type { RedisType } from "../types";
+import { connection, getBullConnection } from "@/lib/tasks/utils";
 
 import { JOBS } from ".";
-import { connection, getBullConnection } from "../utils";
 
 export async function getCurrentDeploymentsState() {
   const deployments = await fetchQueueTitles(connection);

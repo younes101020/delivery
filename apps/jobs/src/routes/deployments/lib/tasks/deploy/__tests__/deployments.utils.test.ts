@@ -1,6 +1,5 @@
 import { QueueEvents, type Queue as TQueue } from "bullmq";
 import { HTTPException } from "hono/http-exception";
-import Redis from "ioredis";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import { afterEach, beforeEach, describe, expect, vi } from "vitest";
 import { ZodError } from "zod";
@@ -9,7 +8,6 @@ import { insertDeploymentSchema } from "@/db/dto";
 import { DeploymentError } from "@/lib/error";
 import { it } from "@/routes/deployments/__tests__/fixtures";
 import { convertGitToAuthenticatedUrl, parseAppHost, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
-import { connection, getBullConnection } from "@/routes/deployments/lib/tasks/utils";
 
 const eventHandlers: Record<string, ({ jobId }: { jobId: string }) => void> = {};
 
@@ -70,19 +68,6 @@ describe("deployments utils unit tests", () => {
         expect(error.name).toBe("BUILD_APP_ERROR");
       }
     }
-  });
-
-  it("return cached redis connection if exists", () => {
-    const connection1 = getBullConnection(connection);
-    const connection2 = getBullConnection(connection);
-
-    expect(connection1).toBe(connection2);
-  });
-
-  it("return redis instance if redis is passed", () => {
-    const connection1 = getBullConnection(connection);
-
-    expect(connection1).toBeInstanceOf(Redis);
   });
 
   it("resolve when the last deployment step is completed", async () => {

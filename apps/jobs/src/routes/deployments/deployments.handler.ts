@@ -10,10 +10,9 @@ import type { AppRouteHandler } from "@/lib/types";
 import { getApplicationByName } from "@/db/queries/queries";
 import { APPLICATIONS_PATH } from "@/lib/constants";
 import { ssh } from "@/lib/ssh";
-import { subscribeWorkerTo } from "@/routes/deployments/lib/tasks";
+import { connection, getBullConnection, subscribeWorkerTo } from "@/lib/tasks/utils";
 import { deployApp, redeployApp } from "@/routes/deployments/lib/tasks/deploy";
 import { checkIfOngoingDeploymentExist, getCurrentDeploymentCount, getCurrentDeploymentsState, getJobs, getPreviousDeploymentsState } from "@/routes/deployments/lib/tasks/deploy/utils";
-import { connection, getBullConnection } from "@/routes/deployments/lib/tasks/utils";
 
 import type { CreateRoute, GetCurrentDeploymentStep, GetPreviousDeploymentStep, RedeployRoute, RetryRoute, StreamCurrentDeploymentCount, StreamLogsRoute, StreamPreview } from "./deployments.routes";
 
@@ -252,6 +251,8 @@ export const getPreviousDeploymentStep: AppRouteHandler<GetPreviousDeploymentSte
   return c.json(previousDeploymentsState);
 };
 
+const processorFile = join(dirname(fileURLToPath(import.meta.url)), "lib/tasks/worker.ts");
+
 export const retryJob: AppRouteHandler<RetryRoute> = async (c) => {
   const { jobId } = c.req.valid("param");
   const { queueName } = c.req.valid("json");
@@ -268,7 +269,7 @@ export const retryJob: AppRouteHandler<RetryRoute> = async (c) => {
   }
 
   const response = await faileJob?.retry();
-  await subscribeWorkerTo(queueName);
+  await subscribeWorkerTo(queueName, processorFile);
 
   return c.json(
     { response },
