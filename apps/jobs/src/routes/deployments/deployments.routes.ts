@@ -15,6 +15,7 @@ export const create = createRoute({
     body: jsonContentRequired(insertDeploymentSchema, "The deployment to create"),
   },
   tags,
+  description: "Start the deployment of an application",
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       deploymentTrackerIdentifier,
@@ -32,6 +33,7 @@ export const redeploy = createRoute({
   path: "/deployments/redeploy/{queueName}",
   method: "post",
   tags,
+  description: "Restart the deployment of an application. If a deployment of the same application is in progress during the redeployment attempt, the redeployment will occur after the current deployment is completed",
   request: {
     params: queueSchema,
   },
@@ -51,6 +53,7 @@ export const streamPreview = createRoute({
   path: "/deployments/preview/{queueName}",
   method: "get",
   tags,
+  description: "Fetch the status and state of an application's deployment with SSE",
   request: {
     params: queueSchema,
   },
@@ -72,6 +75,7 @@ export const streamLog = createRoute({
   path: "/deployments/logs/{queueName}",
   method: "get",
   tags,
+  description: "Fetch the logs of the current deployment with SSE",
   request: {
     params: queueSchema,
   },
@@ -93,6 +97,7 @@ export const getCurrentDeploymentStep = createRoute({
   path: "/deployments/jobs/ongoing",
   method: "get",
   tags,
+  description: "Fetch the metadata of the ongoing deployments",
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       z.array(currentJobSchema),
@@ -105,6 +110,7 @@ export const getPreviousDeploymentStep = createRoute({
   path: "/deployments/jobs/previous",
   method: "get",
   tags,
+  description: "Fetch the metadata of the completed deployments",
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       z.array(previousJobSchema),
@@ -117,6 +123,7 @@ export const streamCurrentDeploymentCount = createRoute({
   path: "/deployments/jobs/ongoing/count",
   method: "get",
   tags,
+  description: "Fetch the total number of ongoing deployments",
   responses: {
     [HttpStatusCodes.OK]: {
       content: {
