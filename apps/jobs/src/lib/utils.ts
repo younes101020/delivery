@@ -1,4 +1,5 @@
 import { Buffer } from "node:buffer";
+import { randomBytes } from "node:crypto";
 
 interface Secret {
   encryptedData: BufferSource;
@@ -31,4 +32,8 @@ export async function encryptSecret(secretKey: string) {
     iv: Buffer.from(iv).toString("base64"),
     key: Buffer.from(await crypto.subtle.exportKey("raw", encryptionKey)).toString("base64"),
   };
+}
+
+export function generateRandomString() {
+  return randomBytes(64).toString("hex");
 }

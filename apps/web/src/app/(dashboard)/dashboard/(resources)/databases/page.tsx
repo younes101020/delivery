@@ -1,10 +1,9 @@
-import { Boxes } from "lucide-react";
+import { Boxes, PackagePlus } from "lucide-react";
 import Link from "next/link";
 
 import { buttonVariants } from "@/app/_components/ui/button";
+import { EmptyState } from "@/app/_components/ui/empty-state";
 import { PageTitle } from "@/app/_components/ui/page-title";
-
-import { DatabaseCard } from "./_components/database-card";
 
 export default function DatabasesPage() {
   return (
@@ -17,16 +16,16 @@ export default function DatabasesPage() {
         </Link>
       </div>
 
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <DatabaseCard className="p-4" title="PostgresSQL" withArrow />
+      <div className="h-full mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <NoDatabases />
       </div>
     </section>
   );
 }
 
-/* function NoDatabases() {
+function NoDatabases() {
   return (
-    <div className="h-full flex justify-center items-center">
+    <div className="h-full flex justify-center items-center md:col-span-2 lg:col-span-3 xl:col-span-4">
       <EmptyState
         title="No databases"
         description="You can see all your databases here."
@@ -38,4 +37,4 @@ export default function DatabasesPage() {
       />
     </div>
   );
-} */
+}

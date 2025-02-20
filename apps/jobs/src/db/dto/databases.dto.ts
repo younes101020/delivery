@@ -11,8 +11,8 @@ export const createDatabaseSchema = z.object({
   ]),
 });
 
-export const databaseAccess = z.object({
-  databaseUrl: z.string(),
+export const createDatabaseSchemaResp = z.object({
+  success: z.literal(true),
 });
 
 export type CreateDatabaseSchema = z.infer<typeof createDatabaseSchema>;

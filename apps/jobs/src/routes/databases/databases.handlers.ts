@@ -4,8 +4,10 @@ import type { AppRouteHandler } from "@/lib/types";
 
 import type { CreateRoute } from "./databases.routes";
 
-export const create: AppRouteHandler<CreateRoute> = async (c) => {
-  // const { type } = c.req.valid("json");
+import { startDatabase } from "./lib/tasks/start-database";
 
-  return c.json({ databaseUrl: "" }, HttpStatusCodes.OK);
+export const create: AppRouteHandler<CreateRoute> = async (c) => {
+  const databaseJobData = c.req.valid("json");
+  await startDatabase(databaseJobData);
+  return c.json({ success: true }, HttpStatusCodes.OK);
 };
