@@ -139,55 +139,23 @@ export async function checkIfDeploymentExist(queue: Queue) {
 }
 
 export function getLatestJob(jobs: TJob[]) {
-  return jobs.some(job => job.name === JOBS.configure)
-    ? jobs.find(job => job.name === JOBS.configure)
-    : jobs.some(job => job.name === JOBS.build)
-      ? jobs.find(job => job.name === JOBS.build)
-      : jobs.some(job => job.name === JOBS.clone)
-        ? jobs.find(job => job.name === JOBS.clone)
-        : jobs[0];
+  const jobOrder = [JOBS.configure, JOBS.build, JOBS.clone];
+  for (const jobName of jobOrder) {
+    const job = jobs.find(job => job.name === jobName);
+    if (job)
+      return job;
+  }
+  return jobs[0];
 }
 
 export function getOldestJob(jobs: TJob[]) {
-  return jobs.some(job => job.name === JOBS.clone)
-    ? jobs.find(job => job.name === JOBS.clone)
-    : jobs.some(job => job.name === JOBS.build)
-      ? jobs.find(job => job.name === JOBS.build)
-      : jobs.some(job => job.name === JOBS.configure)
-        ? jobs.find(job => job.name === JOBS.configure)
-        : jobs[0];
-}
-
-function normalizePrefixGlob(prefixGlob: string): string {
-  let prefixGlobNorm = prefixGlob;
-  const sectionsCount = prefixGlobNorm.split(":").length - 1;
-
-  if (sectionsCount > 1) {
-    prefixGlobNorm += prefixGlobNorm.endsWith(":") ? "" : ":";
+  const jobOrder = [JOBS.clone, JOBS.build, JOBS.configure];
+  for (const jobName of jobOrder) {
+    const job = jobs.find(job => job.name === jobName);
+    if (job)
+      return job;
   }
-  else if (sectionsCount === 1) {
-    prefixGlobNorm += prefixGlobNorm.endsWith(":") ? "*:" : ":";
-  }
-  else {
-    prefixGlobNorm += prefixGlobNorm.trim().length > 0 ? ":*:" : "*:*:";
-  }
-
-  prefixGlobNorm += "meta";
-
-  return prefixGlobNorm;
-}
-
-export async function fetchQueueTitles(redis: RedisType, prefix: string = "bull") {
-  const connection = getBullConnection(redis);
-  const keys = await connection.keys(normalizePrefixGlob(prefix));
-
-  return keys.map((key) => {
-    const parts = key.split(":");
-    return {
-      prefix: parts.slice(0, -2).join(":"),
-      queueName: parts[parts.length - 2],
-    };
-  });
+  return jobs[0];
 }
 
 export function fromGitUrlToQueueName(repoUrl: string) {
