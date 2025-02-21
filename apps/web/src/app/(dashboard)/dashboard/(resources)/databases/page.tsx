@@ -31,7 +31,7 @@ function NoDatabases() {
         description="You can see all your databases here."
         icons={[PackagePlus]}
         action={{
-          label: "Select new database from Hub",
+          label: "Install database from Hub",
           href: "/databases/hub",
         }}
       />

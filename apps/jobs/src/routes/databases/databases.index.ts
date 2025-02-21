@@ -4,6 +4,8 @@ import * as handlers from "./databases.handlers";
 import * as routes from "./databases.routes";
 
 const router = createRouter()
-  .openapi(routes.create, handlers.create);
+  .openapi(routes.create, handlers.create)
+  .openapi(routes.list, handlers.list)
+  .openapi(routes.streamCurrentDatabase, handlers.streamCurrentDatabase);
 
 export default router;
