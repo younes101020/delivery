@@ -31,7 +31,7 @@ function runDeployment(
 
     await subscribeWorkerTo(repoName, processorFile);
 
-    const flowProducer = new FlowProducer({ connection: getBullConnection(connection) });
+    const flowProducer = new FlowProducer({ connection: getBullConnection(connection), prefix: "application" });
     await flowProducer.add({
       name: JOBS.configure,
       data: data.configure,
@@ -101,7 +101,7 @@ export const deployApp = runDeployment(async (payload) => {
 
 export const redeployApp = runDeployment(async (queueName) => {
   if (typeof queueName === "string") {
-    const queue = new Queue(queueName, { connection: getBullConnection(connection) });
+    const queue = new Queue(queueName, { connection: getBullConnection(connection), prefix: "application" });
 
     const activeCount = await queue.getActiveCount();
     const isDeploymentRunning = activeCount > 0;

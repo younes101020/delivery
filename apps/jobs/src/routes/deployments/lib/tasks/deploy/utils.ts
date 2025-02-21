@@ -5,18 +5,17 @@ import { HTTPException } from "hono/http-exception";
 import { basename } from "node:path";
 
 import type { CurrentJobSchema, DeploymentReferenceAndDataSchema, PreviousJobSchema } from "@/db/dto";
-import type { RedisType } from "@/lib/tasks/types";
 
 import { DeploymentError } from "@/lib/error";
-import { connection, getBullConnection } from "@/lib/tasks/utils";
+import { connection, fetchQueueTitles, getBullConnection } from "@/lib/tasks/utils";
 
 import { JOBS } from ".";
 
 export async function getCurrentDeploymentsState() {
-  const deployments = await fetchQueueTitles(connection);
+  const deployments = await fetchQueueTitles(connection, "application");
 
   const currentDeploymentsState = await Promise.all(deployments.map(async (deployment) => {
-    const queue = new Queue(deployment.queueName, { connection: getBullConnection(connection) });
+    const queue = new Queue(deployment.queueName, { connection: getBullConnection(connection), prefix: "application" });
     const jobs = await queue.getJobs(["active", "failed"]);
 
     if (jobs.length < 1)
@@ -40,10 +39,10 @@ export async function getCurrentDeploymentsState() {
 }
 
 export async function getPreviousDeploymentsState() {
-  const deployments = await fetchQueueTitles(connection);
+  const deployments = await fetchQueueTitles(connection, "application");
 
   const previousDeploymentsState = await Promise.all(deployments.map(async (deployment) => {
-    const queue = new Queue(deployment.queueName, { connection: getBullConnection(connection) });
+    const queue = new Queue(deployment.queueName, { connection: getBullConnection(connection), prefix: "application" });
     const jobs = await queue.getJobs(["completed"]);
 
     if (jobs.length < 1)
@@ -70,12 +69,12 @@ export async function getPreviousDeploymentsState() {
 }
 
 export async function getCurrentDeploymentCount() {
-  const deployments = await fetchQueueTitles(connection);
+  const deployments = await fetchQueueTitles(connection, "application");
   const activeQueues = [];
   let currentActiveDeploymentCount = 0;
 
   for (const deployment of deployments) {
-    const queue = new Queue(deployment.queueName, { connection: getBullConnection(connection) });
+    const queue = new Queue(deployment.queueName, { connection: getBullConnection(connection), prefix: "application" });
     const jobs = await queue.getJobs(["active"]);
     if (jobs.length > 0) {
       currentActiveDeploymentCount++;
@@ -99,7 +98,7 @@ export async function getJobs(queue: Queue) {
 }
 
 export async function deleteDeploymentJobs(queueName: string) {
-  const queue = new Queue(queueName, { connection: getBullConnection(connection) });
+  const queue = new Queue(queueName, { connection: getBullConnection(connection), prefix: "application" });
   const completedJobs = await queue.getJobs(["completed"]);
 
   for (const job of completedJobs) {
@@ -113,7 +112,7 @@ export async function checkIfOngoingDeploymentExist(queue: Queue) {
 }
 
 export function waitForDeploymentToComplete(queueName: string, queue: Queue) {
-  const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection) });
+  const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection), prefix: "application" });
   return new Promise<void>((res, rej) => {
     const timeout = setTimeout(() => {
       queueEvents.removeAllListeners();

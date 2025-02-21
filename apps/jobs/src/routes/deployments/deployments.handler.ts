@@ -44,7 +44,7 @@ export const redeploy: AppRouteHandler<RedeployRoute> = async (c) => {
 
 export const streamPreview: AppRouteHandler<StreamPreview> = async (c) => {
   const { queueName } = c.req.valid("param");
-  const queue = new Queue(queueName, { connection: getBullConnection(connection) });
+  const queue = new Queue(queueName, { connection: getBullConnection(connection), prefix: "application" });
   const ongoingDeploymentExist = await checkIfOngoingDeploymentExist(queue);
 
   if (!ongoingDeploymentExist) {
@@ -65,10 +65,10 @@ export const streamPreview: AppRouteHandler<StreamPreview> = async (c) => {
     );
   }
 
-  const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection) });
-  const job = await getJobs(queue);
-
   return streamSSE(c, async (stream) => {
+    const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection), prefix: "application" });
+    const job = await getJobs(queue);
+
     await stream.writeSSE({
       data: JSON.stringify({ step: job.name, status: await job.getState() }),
     });
@@ -106,17 +106,13 @@ export const streamPreview: AppRouteHandler<StreamPreview> = async (c) => {
       queueEvents.removeListener("failed", failedHandler);
       queueEvents.on("completed", completedHandler);
     });
-
-    while (true) {
-      await stream.sleep(4000);
-    }
     // casting cause: no typescript support for sse in hono https://github.com/honojs/hono/issues/3309
   }) as any;
 };
 
 export const streamLog: AppRouteHandler<StreamLogsRoute> = async (c) => {
   const { queueName } = c.req.valid("param");
-  const queue = new Queue(queueName, { connection: getBullConnection(connection) });
+  const queue = new Queue(queueName, { connection: getBullConnection(connection), prefix: "application" });
   const ongoingDeploymentExist = await checkIfOngoingDeploymentExist(queue);
 
   if (!ongoingDeploymentExist) {
@@ -136,11 +132,10 @@ export const streamLog: AppRouteHandler<StreamLogsRoute> = async (c) => {
       HttpStatusCodes.NOT_FOUND,
     );
   }
-
-  const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection) });
-  const { name, data, id } = await getJobs(queue);
-
   return streamSSE(c, async (stream) => {
+    const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection), prefix: "application" });
+    const { name, data, id } = await getJobs(queue);
+
     await stream.writeSSE({
       data: JSON.stringify({ jobName: name, logs: data.logs, isCriticalError: data.isCriticalError, jobId: id }),
     });
@@ -256,7 +251,7 @@ const processorFile = join(dirname(fileURLToPath(import.meta.url)), "lib/tasks/w
 export const retryJob: AppRouteHandler<RetryRoute> = async (c) => {
   const { jobId } = c.req.valid("param");
   const { queueName } = c.req.valid("json");
-  const queue = new Queue(queueName, { connection: getBullConnection(connection) });
+  const queue = new Queue(queueName, { connection: getBullConnection(connection), prefix: "application" });
   const faileJob = await Job.fromId(queue, jobId);
 
   if (!faileJob) {
