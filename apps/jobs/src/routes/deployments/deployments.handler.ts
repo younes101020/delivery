@@ -178,10 +178,6 @@ export const streamLog: AppRouteHandler<StreamLogsRoute> = async (c) => {
       queueEvents.removeListener("completed", completeHandler);
       queueEvents.removeListener("failed", failedHandler);
     });
-
-    while (true) {
-      await stream.sleep(4000);
-    }
     // casting cause: no typescript support for sse in hono https://github.com/honojs/hono/issues/3309
   }) as any;
 };
@@ -193,16 +189,15 @@ export const getCurrentDeploymentsStep: AppRouteHandler<GetCurrentDeploymentStep
 };
 
 export const streamCurrentDeploymentsCount: AppRouteHandler<StreamCurrentDeploymentCount> = async (c) => {
-  const { currentActiveDeploymentCount, activeQueues } = await getCurrentDeploymentCount();
-  let inMemoryActiveDeploymentCount = currentActiveDeploymentCount;
-  const inMemoryQueueEvents: QueueEvents[] = [];
-
-  for (const activeQueue of activeQueues) {
-    const queueEvents = new QueueEvents(activeQueue.name, { connection: getBullConnection(connection) });
-    inMemoryQueueEvents.push(queueEvents);
-  }
-
   return streamSSE(c, async (stream) => {
+    const { currentActiveDeploymentCount, activeQueues } = await getCurrentDeploymentCount();
+    let inMemoryActiveDeploymentCount = currentActiveDeploymentCount;
+    const inMemoryQueueEvents: QueueEvents[] = [];
+
+    for (const activeQueue of activeQueues) {
+      const queueEvents = new QueueEvents(activeQueue.name, { connection: getBullConnection(connection), prefix: "application" });
+      inMemoryQueueEvents.push(queueEvents);
+    }
     await stream.writeSSE({
       data: JSON.stringify({ isActiveDeployment: inMemoryActiveDeploymentCount > 0 }),
     });
@@ -232,10 +227,6 @@ export const streamCurrentDeploymentsCount: AppRouteHandler<StreamCurrentDeploym
         queueEvents.removeListener("failed", failedHandler);
       }
     });
-
-    while (true) {
-      await stream.sleep(4000);
-    }
     // casting cause: no typescript support for sse in hono https://github.com/honojs/hono/issues/3309
   }) as any;
 };
