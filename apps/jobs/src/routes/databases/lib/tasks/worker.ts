@@ -5,7 +5,7 @@ import { jobs } from "./start-database/jobs";
 // This processor will timeout in 15 minutes.
 const MAX_TTL = 900_000;
 
-export default async function Worker(job: Job) {
+export default async function WorkerFactory(job: Job) {
   const hardKillTimeout = setTimeout(() => {
     process.exit(10);
   }, MAX_TTL);

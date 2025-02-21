@@ -5,7 +5,7 @@ import { jobs } from "./deploy/jobs";
 // This processor will timeout in 30 minutes.
 const MAX_TTL = 1_800_000;
 
-export default async function Worker(job: Job) {
+export default async function WorkerFactory(job: Job) {
   const hardKillTimeout = setTimeout(() => {
     process.exit(10);
   }, MAX_TTL);
