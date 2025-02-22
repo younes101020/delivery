@@ -1,6 +1,6 @@
 import { Job, Queue, QueueEvents } from "bullmq";
 
-import type { Database, DatabaseJobSchema } from "@/db/dto";
+import type { Database } from "@/db/dto";
 
 import { connection, fetchQueueTitles, getBullConnection } from "@/lib/tasks/utils";
 
@@ -27,32 +27,6 @@ export async function getInStartingDatabases() {
   }
 
   return activeInStartingDatabasesJobs;
-}
-
-export async function getOnDatabases() {
-  const startingDatabases = await fetchQueueTitles(connection, PREFIX);
-
-  const onDbs = await Promise.all(startingDatabases.map(async (startingDatabase) => {
-    const dbQueue = getDatabaseQueue(startingDatabase.queueName as Database);
-    const jobs = await dbQueue.getJobs(["completed"]);
-
-    if (jobs.length < 1)
-      return null;
-
-    const startingDatabaseJob = jobs[0];
-
-    return {
-      id: startingDatabaseJob.id!,
-      timestamp: new Date(startingDatabaseJob.timestamp).toDateString(),
-      database: startingDatabase.queueName as Database,
-    };
-  }));
-
-  function isNotNull<T extends DatabaseJobSchema>(dbState: null | T): dbState is T {
-    return dbState != null;
-  }
-
-  return onDbs.filter(isNotNull);
 }
 
 export function getDatabaseQueue(queueName: Database) {

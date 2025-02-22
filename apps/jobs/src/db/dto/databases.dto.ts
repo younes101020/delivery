@@ -17,12 +17,14 @@ export const createDatabaseSchemaResp = z.object({
   success: z.literal(true),
 });
 
-export const databaseJobSchema = z.object({
+export const databaseSchema = z.object({
   id: z.string(),
-  timestamp: z.string(),
-  database,
+  name: z.string(),
+  state: z.string(),
+  status: z.string(),
+  createdAt: z.number(),
 });
 
 export type CreateDatabaseSchema = z.infer<typeof createDatabaseSchema>;
-export type DatabaseJobSchema = z.infer<typeof databaseJobSchema>;
+export type DatabaseSchema = z.infer<typeof databaseSchema>;
 export type Database = z.infer<typeof database>;

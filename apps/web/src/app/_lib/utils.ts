@@ -21,7 +21,7 @@ export type Nullable<T> = {
   [K in keyof T]: T[K] | null;
 };
 
-export function formatDate(date: string | null | Date) {
+export function formatDate(date: string | null | Date | number) {
   if (!date)
     return null;
   const dateObj = typeof date === "string" ? new Date(date) : date;

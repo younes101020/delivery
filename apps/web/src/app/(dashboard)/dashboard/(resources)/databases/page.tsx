@@ -1,13 +1,18 @@
 import { Boxes, PackagePlus } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { buttonVariants } from "@/app/_components/ui/button";
 import { EmptyState } from "@/app/_components/ui/empty-state";
 import { PageTitle } from "@/app/_components/ui/page-title";
+import { Skeleton } from "@/app/_components/ui/skeleton";
+
+import { DatabaseCard } from "./_components/database-card";
+import { getDatabaseContainers } from "./_lib/queries";
 
 export default function DatabasesPage() {
   return (
-    <section className="h-[90%] p-5 bg-background/50 border">
+    <section className="p-5 bg-background/50 border">
       <div className="flex justify-between gap-2">
         <PageTitle>My databases</PageTitle>
         <Link href="/dashboard/applications/hub" className={buttonVariants({ variant: "outline" })}>
@@ -17,10 +22,21 @@ export default function DatabasesPage() {
       </div>
 
       <div className="h-full mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <NoDatabases />
+        <Suspense fallback={<Skeleton className="h-32 w-full" />}>
+          <DatabaseList />
+        </Suspense>
       </div>
     </section>
   );
+}
+
+async function DatabaseList() {
+  const dbContainers = await getDatabaseContainers();
+
+  if (!dbContainers || dbContainers.length < 1) {
+    return <NoDatabases />;
+  }
+  return dbContainers.map(dbContainer => <DatabaseCard key={dbContainer.id} {...dbContainer} />);
 }
 
 function NoDatabases() {

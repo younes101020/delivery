@@ -6,10 +6,11 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import type { CreateRoute, ListRoute, StreamCurrentDatabaseRoute } from "./databases.routes";
+import type { CreateRoute, ListRoute, StopRoute, StreamCurrentDatabaseRoute } from "./databases.routes";
 
+import { getDatabasesContainers, stopDatabaseContainer } from "./lib/remote-docker/utils";
 import { startDatabase } from "./lib/tasks/start-database";
-import { getDatabaseJobByIdFromQueue, getDatabaseQueueEvents, getInStartingDatabases, getOnDatabases } from "./lib/tasks/start-database/utils";
+import { getDatabaseJobByIdFromQueue, getDatabaseQueueEvents, getInStartingDatabases } from "./lib/tasks/start-database/utils";
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const databaseJobData = c.req.valid("json");
@@ -18,8 +19,24 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
 };
 
 export const list: AppRouteHandler<ListRoute> = async (c) => {
-  const dbs = await getOnDatabases();
+  const dbs = await getDatabasesContainers();
   return c.json(dbs, HttpStatusCodes.OK);
+};
+
+export const stop: AppRouteHandler<StopRoute> = async (c) => {
+  const { id } = c.req.valid("param");
+
+  await stopDatabaseContainer(id)
+    .catch(() => {
+      return c.json(
+        {
+          message: HttpStatusPhrases.NOT_FOUND,
+        },
+        HttpStatusCodes.NOT_FOUND,
+      );
+    });
+
+  return c.json(null, HttpStatusCodes.NO_CONTENT);
 };
 
 export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> = async (c) => {

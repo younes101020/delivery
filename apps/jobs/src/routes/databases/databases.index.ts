@@ -5,6 +5,7 @@ import * as routes from "./databases.routes";
 
 const router = createRouter()
   .openapi(routes.create, handlers.create)
+  .openapi(routes.stop, handlers.stop)
   .openapi(routes.list, handlers.list)
   .openapi(routes.streamCurrentDatabase, handlers.streamCurrentDatabase);
 

@@ -3,7 +3,7 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema } from "stoker/openapi/schemas";
 
-import { createDatabaseSchema, createDatabaseSchemaResp, databaseJobSchema } from "@/db/dto/databases.dto";
+import { createDatabaseSchema, createDatabaseSchemaResp, databaseSchema } from "@/db/dto/databases.dto";
 import { notFoundSchema } from "@/lib/constants";
 
 const tags = ["Databases"];
@@ -34,7 +34,7 @@ export const list = createRoute({
   description: "Fetch the list of running databases.",
   tags,
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(z.array(databaseJobSchema), "List of running database."),
+    [HttpStatusCodes.OK]: jsonContent(z.array(databaseSchema), "List of running database."),
   },
 });
 
@@ -56,6 +56,25 @@ export const streamCurrentDatabase = createRoute({
   },
 });
 
+export const stop = createRoute({
+  path: "/databases/{id}/stop",
+  method: "post",
+  description: "Stop a running database container.",
+  request: {
+    params: z.object({
+      id: z.string().describe("The ID of the database container to stop"),
+    }),
+  },
+  tags,
+  responses: {
+    [HttpStatusCodes.NO_CONTENT]: {
+      description: "Database container stopped successfully",
+    },
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Database container not found"),
+  },
+});
+
 export type CreateRoute = typeof create;
 export type ListRoute = typeof list;
 export type StreamCurrentDatabaseRoute = typeof streamCurrentDatabase;
+export type StopRoute = typeof stop;

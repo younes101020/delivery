@@ -2,6 +2,7 @@ import { Worker } from "bullmq";
 import Redis, { type RedisOptions } from "ioredis";
 import IORedis from "ioredis";
 
+import type { Resources } from "./const";
 import type { RedisType } from "./types";
 
 export const connection = new IORedis({ maxRetriesPerRequest: null });
@@ -24,8 +25,6 @@ export async function subscribeWorkerTo(queueName: string, processorFile: string
 
   return worker;
 }
-
-type Resources = "application" | "database";
 
 const connectionMap = new Map<RedisOptions | Redis, Redis>();
 
