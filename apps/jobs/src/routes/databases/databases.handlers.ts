@@ -1,21 +1,21 @@
-import type { QueueEvents } from "bullmq";
-
 import { streamSSE } from "hono/streaming";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import type { CreateRoute, ListRoute, StopRoute, StreamCurrentDatabaseRoute } from "./databases.routes";
+import type { CreateRoute, ListRoute, StartRoute, StopRoute, StreamCurrentDatabaseRoute } from "./databases.routes";
 
-import { getDatabasesContainers, stopDatabaseContainer } from "./lib/remote-docker/utils";
+import { getDatabasesContainers } from "./lib/remote-docker/utils";
+import { createDatabase } from "./lib/tasks/create-database";
+import { getCreateDatabaseQueueEvents, getDatabaseJobByIdFromQueue, getInCreatingDatabasesJobs } from "./lib/tasks/create-database/utils";
 import { startDatabase } from "./lib/tasks/start-database";
-import { getDatabaseJobByIdFromQueue, getDatabaseQueueEvents, getInStartingDatabases } from "./lib/tasks/start-database/utils";
+import { stopDatabase } from "./lib/tasks/stop-database";
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const databaseJobData = c.req.valid("json");
-  await startDatabase(databaseJobData);
-  return c.json({ success: true }, HttpStatusCodes.OK);
+  await createDatabase(databaseJobData);
+  return c.json(null, HttpStatusCodes.ACCEPTED);
 };
 
 export const list: AppRouteHandler<ListRoute> = async (c) => {
@@ -26,21 +26,20 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
 export const stop: AppRouteHandler<StopRoute> = async (c) => {
   const { id } = c.req.valid("param");
 
-  await stopDatabaseContainer(id)
-    .catch(() => {
-      return c.json(
-        {
-          message: HttpStatusPhrases.NOT_FOUND,
-        },
-        HttpStatusCodes.NOT_FOUND,
-      );
-    });
+  await stopDatabase(id);
 
-  return c.json(null, HttpStatusCodes.NO_CONTENT);
+  return c.json(null, HttpStatusCodes.ACCEPTED);
+};
+
+export const start: AppRouteHandler<StartRoute> = async (c) => {
+  const { id } = c.req.valid("param");
+  await startDatabase(id);
+
+  return c.json(null, HttpStatusCodes.ACCEPTED);
 };
 
 export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> = async (c) => {
-  const activeInStartingDatabasesJobs = await getInStartingDatabases();
+  const activeInStartingDatabasesJobs = await getInCreatingDatabasesJobs();
 
   if (activeInStartingDatabasesJobs.length < 1) {
     return c.json(
@@ -51,14 +50,9 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
     );
   }
 
+  const queueEvents = getCreateDatabaseQueueEvents();
+
   return streamSSE(c, async (stream) => {
-    const inMemoryQueueEvents: QueueEvents[] = [];
-
-    for (const activeInStartingDatabasesJob of activeInStartingDatabasesJobs) {
-      const queueEvents = getDatabaseQueueEvents(activeInStartingDatabasesJob.database);
-      inMemoryQueueEvents.push(queueEvents);
-    }
-
     await stream.writeSSE({
       data: JSON.stringify(activeInStartingDatabasesJobs),
     });
@@ -87,16 +81,12 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
       });
     }
 
-    for (const queueEvents of inMemoryQueueEvents) {
-      queueEvents.on("completed", completeHandler);
-      queueEvents.on("failed", failedHandler);
-    }
+    queueEvents.on("completed", completeHandler);
+    queueEvents.on("failed", failedHandler);
 
     stream.onAbort(() => {
-      for (const queueEvents of inMemoryQueueEvents) {
-        queueEvents.removeListener("completed", completeHandler);
-        queueEvents.removeListener("failed", failedHandler);
-      }
+      queueEvents.removeListener("completed", completeHandler);
+      queueEvents.removeListener("failed", failedHandler);
     });
     // casting cause: no typescript support for sse in hono https://github.com/honojs/hono/issues/3309
   }) as any;

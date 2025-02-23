@@ -14,7 +14,7 @@ describe("databases routes", async () => {
       {
         json: {
           // @ts-expect-error test purpose
-          type: "non-existent-db-type",
+          type: 5,
         },
       },
     );

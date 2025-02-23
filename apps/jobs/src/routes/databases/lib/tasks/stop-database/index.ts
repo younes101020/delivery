@@ -3,13 +3,13 @@ import { fileURLToPath } from "node:url";
 
 import { subscribeWorkerTo } from "@/lib/tasks/utils";
 
-import { getStartDatabaseQueue, queueName } from "./utils";
+import { getStopDatabaseQueue, queueName } from "./utils";
 
 const PROCESSOR_FILE = join(dirname(fileURLToPath(import.meta.url)), "../worker.ts");
 
-export async function startDatabase(containerId: string) {
-  const startDbQueue = getStartDatabaseQueue();
-  await startDbQueue.add(queueName, { containerId });
+export async function stopDatabase(containerId: string) {
+  const stopDbQueue = getStopDatabaseQueue();
+  await stopDbQueue.add(queueName, { containerId });
 
   await subscribeWorkerTo(queueName, PROCESSOR_FILE);
 }

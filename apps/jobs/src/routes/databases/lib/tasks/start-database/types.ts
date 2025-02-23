@@ -1,21 +1,17 @@
 import type { Job } from "bullmq";
 
-import type { CreateDatabaseSchema } from "@/db/dto";
 import type { MergeSubJobs } from "@/lib/tasks/types";
 
-type dbType = CreateDatabaseSchema["type"];
-
-export interface QueueDatabaseJobData {
+export interface StartQueueDatabaseJobData {
   start: {
-    type: dbType;
+    containerId: string;
   };
-
 }
 
-export type QueueDatabaseJobName = keyof QueueDatabaseJobData;
+export type StartQueueDatabaseJobName = keyof StartQueueDatabaseJobData;
 
-export type QueueDatabaseJob<T extends QueueDatabaseJobName> = Omit<Job, "data"> & { data: QueueDatabaseJobData[T] };
+export type StartQueueDatabaseJob<T extends StartQueueDatabaseJobName> = Omit<Job, "data"> & { data: StartQueueDatabaseJobData[T] };
 
-export type QueueDatabaseJobFns = Record<string, (job: QueueDatabaseJob<any>) => Promise<unknown>>;
+export type StartQueueDatabaseJobFns = Record<string, (job: StartQueueDatabaseJob<any>) => Promise<unknown>>;
 
-export type AllDatabaseJobsData = MergeSubJobs<QueueDatabaseJobData>;
+export type AllStartQueueDatabaseJobsData = MergeSubJobs<StartQueueDatabaseJobData>;

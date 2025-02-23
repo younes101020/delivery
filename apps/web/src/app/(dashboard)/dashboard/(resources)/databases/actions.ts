@@ -15,11 +15,11 @@ export const injectEnv = validatedAction(injectEnvSchema, async (inputs) => {
   return { success: "", inputs };
 });
 
-const stopContainerSchema = z.object({
+const updateContainerStatusSchema = z.object({
   containerId: z.string(),
 });
 
-export const stopContainer = validatedAction(stopContainerSchema, async (inputs) => {
+export const stopContainer = validatedAction(updateContainerStatusSchema, async (inputs) => {
   const { containerId } = inputs;
 
   const response = await client.databases[":id"].stop.$post({
@@ -31,4 +31,18 @@ export const stopContainer = validatedAction(stopContainerSchema, async (inputs)
   }
 
   return { success: "Container stopped", inputs };
+});
+
+export const startContainer = validatedAction(updateContainerStatusSchema, async (inputs) => {
+  const { containerId } = inputs;
+
+  const response = await client.databases[":id"].start.$post({
+    param: { id: containerId },
+  });
+
+  if (response.status !== 200) {
+    return { error: "Unable to start the container", inputs };
+  }
+
+  return { success: "Container started", inputs };
 });

@@ -1,9 +1,11 @@
-import { Ban, ChevronsLeftRightEllipsis } from "lucide-react";
+import { Ban, ChevronsLeftRightEllipsis, Play } from "lucide-react";
 
+import { Bounce } from "@/app/_components/ui/bounce";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/app/_components/ui/card";
 import { formatDate } from "@/app/_lib/utils";
 
 import { EnvButton } from "./env-button";
+import { StartButton } from "./start-button";
 import { StopButton } from "./stop-button";
 
 interface DatabaseCardProps {
@@ -15,23 +17,40 @@ interface DatabaseCardProps {
 }
 
 export function DatabaseCard({ name, status, state, createdAt, id }: DatabaseCardProps) {
+  const canStopContainer = state === "running";
+  const canStartContainer = state === "exited" || state === "created";
+
+  const bounceVariant = state === "running" ? "active" : state === "exited" ? "failed" : "primary";
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-lg truncate">{name}</CardTitle>
-        <StopButton containerId={id} className="text-xs">
-          <Ban className="stroke-destructive" />
-          Shutdown
-        </StopButton>
+        {canStopContainer && (
+          <StopButton containerId={id} className="text-xs">
+            <Ban className="stroke-destructive" />
+            Shutdown
+          </StopButton>
+        )}
+        {canStartContainer && (
+          <StartButton containerId={id} className="text-xs">
+            <Play className="stroke-primary" />
+            Start
+          </StartButton>
+        )}
+
       </CardHeader>
-      <CardContent className="text-xs">
+      <CardContent className="text-xs space-y-2">
         <dl>
           <dt className="text-muted-foreground">Status</dt>
           <dd>{status}</dd>
         </dl>
         <dl>
           <dt className="text-muted-foreground">State</dt>
-          <dd>{state}</dd>
+          <dd className="flex gap-1">
+            <Bounce variant={bounceVariant} />
+            {state}
+          </dd>
         </dl>
         <dl>
           <dt className="text-muted-foreground">Creation date</dt>

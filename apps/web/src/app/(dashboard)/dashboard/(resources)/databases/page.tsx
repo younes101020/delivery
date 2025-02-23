@@ -8,6 +8,7 @@ import { PageTitle } from "@/app/_components/ui/page-title";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 
 import { DatabaseCard } from "./_components/database-card";
+import { OnStartingDatabaseCard } from "./_components/on-starting-database-card";
 import { getDatabaseContainers } from "./_lib/queries";
 
 export default function DatabasesPage() {
@@ -22,6 +23,7 @@ export default function DatabasesPage() {
       </div>
 
       <div className="h-full mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <OnStartingDatabaseCard name="postgres" />
         <Suspense fallback={<Skeleton className="h-32 w-full" />}>
           <DatabaseList />
         </Suspense>

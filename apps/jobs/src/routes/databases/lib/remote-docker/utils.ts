@@ -3,7 +3,7 @@ import Docker from "dockerode";
 import { loadConfig } from "@/lib/ssh/utils";
 
 const sshConfig = await loadConfig();
-const docker = new Docker({ protocol: "ssh", username: sshConfig.username, sshOptions: sshConfig });
+export const docker = new Docker({ protocol: "ssh", username: sshConfig.username, sshOptions: sshConfig });
 
 export async function getDatabasesContainers() {
   // const options = { filters: { label: ["delivery.resource=database"] } };
@@ -14,4 +14,9 @@ export async function getDatabasesContainers() {
 export async function stopDatabaseContainer(containerId: string) {
   const container = docker.getContainer(containerId);
   await container.stop();
+}
+
+export async function startDatabaseContainer(containerId: string) {
+  const container = docker.getContainer(containerId);
+  await container.start();
 }

@@ -3,7 +3,7 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema } from "stoker/openapi/schemas";
 
-import { createDatabaseSchema, createDatabaseSchemaResp, databaseSchema } from "@/db/dto/databases.dto";
+import { createDatabaseSchema, databaseSchema } from "@/db/dto/databases.dto";
 import { notFoundSchema } from "@/lib/constants";
 
 const tags = ["Databases"];
@@ -17,10 +17,9 @@ export const create = createRoute({
   },
   tags,
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(
-      createDatabaseSchemaResp,
-      "Indicates that the database startup process has begun.",
-    ),
+    [HttpStatusCodes.ACCEPTED]: {
+      description: "Database creation request accepted",
+    },
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(createDatabaseSchema),
       "The validation error(s)",
@@ -39,7 +38,7 @@ export const list = createRoute({
 });
 
 export const streamCurrentDatabase = createRoute({
-  path: "/databases/jobs/ongoing",
+  path: "/databases/start/ongoing",
   method: "get",
   description: "Fetch the status and state of databases in the process of starting.",
   tags,
@@ -67,8 +66,26 @@ export const stop = createRoute({
   },
   tags,
   responses: {
-    [HttpStatusCodes.NO_CONTENT]: {
-      description: "Database container stopped successfully",
+    [HttpStatusCodes.ACCEPTED]: {
+      description: "Database container stop request accepted",
+    },
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Database container not found"),
+  },
+});
+
+export const start = createRoute({
+  path: "/databases/{id}/start",
+  method: "post",
+  description: "Start a stopped database container.",
+  request: {
+    params: z.object({
+      id: z.string().describe("The ID of the database container to start"),
+    }),
+  },
+  tags,
+  responses: {
+    [HttpStatusCodes.ACCEPTED]: {
+      description: "Database container start request accepted",
     },
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Database container not found"),
   },
@@ -78,3 +95,4 @@ export type CreateRoute = typeof create;
 export type ListRoute = typeof list;
 export type StreamCurrentDatabaseRoute = typeof streamCurrentDatabase;
 export type StopRoute = typeof stop;
+export type StartRoute = typeof start;

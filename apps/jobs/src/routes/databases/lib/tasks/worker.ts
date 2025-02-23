@@ -1,6 +1,6 @@
 import { type Job, UnrecoverableError } from "bullmq";
 
-import { jobs } from "./start-database/jobs";
+import { jobs } from ".";
 
 // This processor will timeout in 15 minutes.
 const MAX_TTL = 900_000;

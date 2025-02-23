@@ -1,17 +1,16 @@
 import { DatabaseError } from "@/lib/error";
 import { docker } from "@/routes/databases/lib/remote-docker/utils";
 
-import type { StartQueueDatabaseJob } from "../types";
+import type { StopQueueDatabaseJob } from "../types";
 
-export async function start(job: StartQueueDatabaseJob<"start">) {
+export async function stop(job: StopQueueDatabaseJob<"stop">) {
   const { containerId } = job.data;
 
   const dbContainer = docker.getContainer(containerId);
-
-  await dbContainer.start()
+  await dbContainer.stop()
     .catch((error) => {
       throw new DatabaseError({
-        name: "START_DATABASE_ERROR",
+        name: "STOP_DATABASE_ERROR",
         message: error instanceof Error ? error.message : "Unexpected error",
       });
     });

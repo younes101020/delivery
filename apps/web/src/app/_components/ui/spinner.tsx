@@ -1,6 +1,12 @@
-import * as motion from "motion/react-client";
+import { motion } from "motion/react";
 
-export function Spinner() {
+import { cn } from "@/app/_lib/utils";
+
+interface SpinnerProps {
+  className?: string;
+}
+
+export function Spinner({ className }: SpinnerProps) {
   return (
     <motion.div
       animate={{
@@ -15,7 +21,10 @@ export function Spinner() {
         repeat: Infinity,
         repeatDelay: 1,
       }}
-      className="bg-transparent border border-primary-foreground border-dashed w-2 h-2"
+      className={cn(
+        "bg-transparent border border-primary-foreground border-dashed size-2",
+        className,
+      )}
     />
   );
 }

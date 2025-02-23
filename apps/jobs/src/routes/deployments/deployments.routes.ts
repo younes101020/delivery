@@ -4,7 +4,7 @@ import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema } from "stoker/openapi/schemas";
 
 import { currentJobSchema, deploymentTrackerIdentifier, insertDeploymentSchema, jobIdParamsSchema, previousJobSchema, queueSchema } from "@/db/dto";
-import { goneSchema, notFoundSchema, okSchema } from "@/lib/constants";
+import { goneSchema, notFoundSchema } from "@/lib/constants";
 
 const tags = ["Deployments"];
 
@@ -17,7 +17,7 @@ export const create = createRoute({
   tags,
   description: "Start the deployment of an application",
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(
+    [HttpStatusCodes.ACCEPTED]: jsonContent(
       deploymentTrackerIdentifier,
       "Unique identifier to let you track queue events",
     ),
@@ -38,7 +38,7 @@ export const redeploy = createRoute({
     params: queueSchema,
   },
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(
+    [HttpStatusCodes.ACCEPTED]: jsonContent(
       deploymentTrackerIdentifier,
       "Deployment name",
     ),
@@ -149,7 +149,9 @@ export const retryJob = createRoute({
   },
   description: "Retry launching a failed or completed job",
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(okSchema, "Job retry attempted"),
+    [HttpStatusCodes.ACCEPTED]: {
+      description: "Job retry attempted",
+    },
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "No failed or completed job found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(jobIdParamsSchema).or(createErrorSchema(queueSchema)),

@@ -8,6 +8,7 @@ export const DEPLOYMENTERRORNAME = {
 
 export const DATABASEERRORNAME = {
   start: "START_DATABASE_ERROR",
+  stop: "STOP_DATABASE_ERROR",
 } as const;
 
 export type DeploymentErrorNameType = typeof DEPLOYMENTERRORNAME[keyof typeof DEPLOYMENTERRORNAME];

@@ -21,7 +21,7 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
 
   const queueName = await deployApp(deployment);
 
-  return c.json({ queueName }, HttpStatusCodes.OK);
+  return c.json({ queueName }, HttpStatusCodes.ACCEPTED);
 };
 
 export const redeploy: AppRouteHandler<RedeployRoute> = async (c) => {
@@ -39,7 +39,7 @@ export const redeploy: AppRouteHandler<RedeployRoute> = async (c) => {
 
   await redeployApp(queueName);
 
-  return c.json({ queueName }, HttpStatusCodes.OK);
+  return c.json({ queueName }, HttpStatusCodes.ACCEPTED);
 };
 
 export const streamPreview: AppRouteHandler<StreamPreview> = async (c) => {
@@ -254,11 +254,8 @@ export const retryJob: AppRouteHandler<RetryRoute> = async (c) => {
     );
   }
 
-  const response = await faileJob?.retry();
+  await faileJob?.retry();
   await subscribeWorkerTo(queueName, processorFile);
 
-  return c.json(
-    { response },
-    HttpStatusCodes.OK,
-  );
+  return c.json(null, HttpStatusCodes.ACCEPTED);
 };
