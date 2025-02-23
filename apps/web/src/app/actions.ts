@@ -84,7 +84,7 @@ export const deploy = validatedAction(deploySchema, async (data) => {
   const deploymentResponse = await client.deployments.$post({
     json: data,
   });
-  if (deploymentResponse.status !== 200) {
+  if (deploymentResponse.status !== 202) {
     return { error: "Impossible to start the deployment.", inputs: data };
   }
 

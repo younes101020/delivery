@@ -26,7 +26,7 @@ export const stopContainer = validatedAction(updateContainerStatusSchema, async 
     param: { id: containerId },
   });
 
-  if (response.status !== 204) {
+  if (response.status !== 202) {
     return { error: "Unable to stop the container", inputs };
   }
 
@@ -40,7 +40,7 @@ export const startContainer = validatedAction(updateContainerStatusSchema, async
     param: { id: containerId },
   });
 
-  if (response.status !== 200) {
+  if (response.status !== 202) {
     return { error: "Unable to start the container", inputs };
   }
 
