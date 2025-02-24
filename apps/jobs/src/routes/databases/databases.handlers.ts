@@ -39,22 +39,27 @@ export const start: AppRouteHandler<StartRoute> = async (c) => {
 };
 
 export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> = async (c) => {
-  const activeInStartingDatabasesJobs = await getInCreatingDatabasesJobs();
-
-  if (activeInStartingDatabasesJobs.length < 1) {
-    return c.json(
-      {
-        message: HttpStatusPhrases.NOT_FOUND,
-      },
-      HttpStatusCodes.NOT_FOUND,
-    );
-  }
-
-  const queueEvents = getCreateDatabaseQueueEvents();
-
   return streamSSE(c, async (stream) => {
-    await stream.writeSSE({
-      data: JSON.stringify(activeInStartingDatabasesJobs),
+    const activeInStartingDatabasesJobs = await getInCreatingDatabasesJobs();
+
+    if (activeInStartingDatabasesJobs.length > 0) {
+      await stream.writeSSE({
+        data: JSON.stringify(activeInStartingDatabasesJobs),
+      });
+    }
+
+    const activeQueuesEvents = await getDatabaseQueuesEvents();
+
+    for (const queueEvents of activeQueuesEvents) {
+      queueEvents.on("completed", completeHandler);
+      queueEvents.on("failed", failedHandler);
+    }
+
+    stream.onAbort(() => {
+      for (const queueEvents of activeQueuesEvents) {
+        queueEvents.removeListener("completed", completeHandler);
+        queueEvents.removeListener("failed", failedHandler);
+      }
     });
 
     async function completeHandler({ jobId }: { jobId: string }) {
@@ -80,14 +85,6 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
         }),
       });
     }
-
-    queueEvents.on("completed", completeHandler);
-    queueEvents.on("failed", failedHandler);
-
-    stream.onAbort(() => {
-      queueEvents.removeListener("completed", completeHandler);
-      queueEvents.removeListener("failed", failedHandler);
-    });
     // casting cause: no typescript support for sse in hono https://github.com/honojs/hono/issues/3309
   }) as any;
 };

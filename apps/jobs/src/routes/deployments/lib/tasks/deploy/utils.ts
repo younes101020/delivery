@@ -70,17 +70,14 @@ export async function getPreviousDeploymentsState() {
 
 export async function getCurrentDeploymentCount() {
   const deployments = await fetchQueueTitles(connection, "application");
-  const activeQueues = [];
-  let currentActiveDeploymentCount = 0;
-
-  for (const deployment of deployments) {
+  const queuesWithCounts = await Promise.all(deployments.map(async (deployment) => {
     const queue = new Queue(deployment.queueName, { connection: getBullConnection(connection), prefix: "application" });
-    const jobs = await queue.getJobs(["active"]);
-    if (jobs.length > 0) {
-      currentActiveDeploymentCount++;
-      activeQueues.push(queue);
-    }
-  }
+    const hasActiveJobs = await queue.getActiveCount() > 0;
+    return hasActiveJobs ? queue : null;
+  }));
+
+  const activeQueues = queuesWithCounts.filter((queue): queue is Queue => queue !== null);
+  const currentActiveDeploymentCount = activeQueues.length;
 
   return { currentActiveDeploymentCount, activeQueues };
 }
@@ -92,7 +89,7 @@ export async function getJobs(queue: Queue) {
   const haveJobFailed = failedJobs.length > 0;
 
   const jobs = haveJobFailed ? failedJobs : activeAndFailedJobs;
-  const job = haveJobFailed ? getOldestJob(jobs)! : getLatestJob(activeAndFailedJobs)!;
+  const job = haveJobFailed ? getOldestJob(jobs) : getLatestJob(activeAndFailedJobs);
 
   return job;
 }
@@ -100,10 +97,7 @@ export async function getJobs(queue: Queue) {
 export async function deleteDeploymentJobs(queueName: string) {
   const queue = new Queue(queueName, { connection: getBullConnection(connection), prefix: "application" });
   const completedJobs = await queue.getJobs(["completed"]);
-
-  for (const job of completedJobs) {
-    await job.remove();
-  }
+  await Promise.all(completedJobs.map(job => job.remove()));
 }
 
 export async function checkIfOngoingDeploymentExist(queue: Queue) {

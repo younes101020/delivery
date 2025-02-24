@@ -61,13 +61,14 @@ export const streamPreview = createRoute({
     [HttpStatusCodes.OK]: {
       content: {
         "text/event-stream": {
-          schema: z.unknown(),
+          schema: z.object({
+            step: z.enum(["clone", "build", "configure"]),
+            status: z.enum(["active", "failed", "completed"]),
+          }),
         },
       },
       description: "The deployment preview job process",
     },
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "No active or failed deployment found"),
-    [HttpStatusCodes.GONE]: jsonContent(goneSchema, "Deployment has already been processed"),
   },
 });
 
@@ -83,13 +84,18 @@ export const streamLog = createRoute({
     [HttpStatusCodes.OK]: {
       content: {
         "text/event-stream": {
-          schema: z.unknown(),
+          schema: z.object({
+            jobName: z.enum(["clone", "build", "configure"]).optional(),
+            logs: z.string().optional(),
+            isCriticalError: z.boolean().optional(),
+            jobId: z.string().optional(),
+            completed: z.boolean().optional(),
+            appId: z.string().optional(),
+          }),
         },
       },
       description: "The deployment logs job process",
     },
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "No active or failed deployment found"),
-    [HttpStatusCodes.GONE]: jsonContent(goneSchema, "Deployment has already been processed"),
   },
 });
 
@@ -128,7 +134,9 @@ export const streamCurrentDeploymentCount = createRoute({
     [HttpStatusCodes.OK]: {
       content: {
         "text/event-stream": {
-          schema: z.unknown(),
+          schema: z.object({
+            isActiveDeployment: z.boolean(),
+          }),
         },
       },
       description: "The ongoings deployment count",

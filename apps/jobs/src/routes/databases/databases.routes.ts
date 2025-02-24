@@ -38,20 +38,25 @@ export const list = createRoute({
 });
 
 export const streamCurrentDatabase = createRoute({
-  path: "/databases/start/ongoing",
+  path: "/databases/ongoing",
   method: "get",
-  description: "Fetch the status and state of databases in the process of starting.",
+  description: "Stream real-time updates about databases that are currently being created, started or stopped.",
   tags,
   responses: {
     [HttpStatusCodes.OK]: {
       content: {
         "text/event-stream": {
-          schema: z.unknown(),
+          schema: z.object({
+            id: z.string(),
+            timestamp: z.number(),
+            database: z.string(),
+            status: z.enum(["completed", "failed", "stopped"]),
+          }),
         },
       },
-      description: "Databases in the process of starting.",
+      description: "Stream of database creation/startup/stop status updates",
     },
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "No active starting database found."),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "No databases are currently being created, started or stopped"),
   },
 });
 
