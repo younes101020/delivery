@@ -102,15 +102,24 @@ export const streamLog: AppRouteHandler<StreamLogsRoute> = async (c) => {
       data: JSON.stringify({ jobName: name, logs: data.logs, isCriticalError: data.isCriticalError, jobId: id }),
     });
 
+    queueEvents.on("active", activeHandler);
     queueEvents.on("progress", progressHandler);
     queueEvents.on("completed", completeHandler);
     queueEvents.on("failed", failedHandler);
 
     stream.onAbort(() => {
+      queueEvents.removeListener("active", activeHandler);
       queueEvents.removeListener("progress", progressHandler);
       queueEvents.removeListener("completed", completeHandler);
       queueEvents.removeListener("failed", failedHandler);
     });
+
+    async function activeHandler({ jobId }: { jobId: string }) {
+      const jobState = await Job.fromId(queue, jobId);
+      await stream.writeSSE({
+        data: JSON.stringify({ jobName: jobState?.name, logs: jobState?.data.logs, isCriticalError: jobState?.data.isCriticalError, jobId }),
+      });
+    }
 
     async function progressHandler({ data, jobId }: { data: number | object; jobId: string }) {
       const jobState = await Job.fromId(queue, jobId);
@@ -179,15 +188,24 @@ export const streamCurrentDeploymentsCount: AppRouteHandler<StreamCurrentDeploym
       });
     }
 
+    async function activeHandler() {
+      inMemoryActiveDeploymentCount++;
+      await stream.writeSSE({
+        data: JSON.stringify({ isActiveDeployment: true }),
+      });
+    }
+
     for (const queueEvents of inMemoryQueueEvents) {
       queueEvents.on("completed", completeHandler);
       queueEvents.on("failed", failedHandler);
+      queueEvents.on("active", activeHandler);
     }
 
     stream.onAbort(() => {
       for (const queueEvents of inMemoryQueueEvents) {
         queueEvents.removeListener("completed", completeHandler);
         queueEvents.removeListener("failed", failedHandler);
+        queueEvents.removeListener("active", activeHandler);
       }
     });
     // casting cause: no typescript support for sse in hono https://github.com/honojs/hono/issues/3309

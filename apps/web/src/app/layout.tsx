@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Suspense } from "react";
 
-import { RefreshTrackerProvider } from "./_lib/refresh-tracker-provider";
 import { UserProvider } from "./_lib/user-provider";
 import "./globals.css";
 import { getUser } from "./_lib/user-session";
@@ -38,7 +37,7 @@ export default function RootLayout({
       >
         <Suspense>
           <UserProvider userPromise={userPromise}>
-            <RefreshTrackerProvider>{children}</RefreshTrackerProvider>
+            {children}
           </UserProvider>
         </Suspense>
       </body>

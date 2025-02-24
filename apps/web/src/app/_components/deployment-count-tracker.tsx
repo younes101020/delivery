@@ -4,7 +4,6 @@ import { Spinner } from "@/app/_components/ui/spinner";
 import { env } from "@/env";
 
 import { useEventSource } from "../_hooks/use-event-source";
-import { useRefreshTracker } from "../_lib/refresh-tracker-provider";
 
 interface DeploymentTrackerEventData {
   isActiveDeployment: boolean;
@@ -14,12 +13,9 @@ interface DeploymentTrackerEventData {
 const DEFAULT_STATE = { isActiveDeployment: false };
 
 export function DeploymentTracker() {
-  const { refreshTracker } = useRefreshTracker();
-
   const { isActiveDeployment } = useEventSource<DeploymentTrackerEventData>({
-    eventUrl: `${env.NEXT_PUBLIC_BASEURL}/api/deployments/count`,
+    eventUrl: `${env.NEXT_PUBLIC_BASEURL}/api/deployments-proxy/count`,
     initialState: DEFAULT_STATE,
-    boolDependency: refreshTracker,
   });
 
   return (

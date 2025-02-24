@@ -6,10 +6,9 @@ interface SseProps<T> {
   eventUrl: string;
   initialState: T;
   onMessage?: (prev: T, data: T) => void;
-  boolDependency?: boolean | null;
 }
 
-export function useEventSource<T extends { logs?: string | null }>({ initialState, eventUrl, onMessage, boolDependency }: SseProps<T>) {
+export function useEventSource<T extends { logs?: string | null }>({ initialState, eventUrl, onMessage }: SseProps<T>) {
   const [sseData, setSseData] = useState<T>(() => initialState);
   const eventSourceRef = useRef<EventSource | null>(null);
 
@@ -44,8 +43,7 @@ export function useEventSource<T extends { logs?: string | null }>({ initialStat
       newEventSource.close();
       eventSourceRef.current = null;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [eventUrl, onMessage, ...(boolDependency !== undefined ? [boolDependency] : [])]);
+  }, [eventUrl, onMessage]);
 
   return sseData;
 }
