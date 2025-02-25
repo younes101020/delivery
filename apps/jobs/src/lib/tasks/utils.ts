@@ -5,26 +5,23 @@ import IORedis from "ioredis";
 import type { Resources } from "./const";
 import type { RedisType } from "./types";
 
-export const connection = new IORedis({ maxRetriesPerRequest: null });
+export const connection = new IORedis();
+
+let worker: Worker | null = null;
 
 export async function subscribeWorkerTo(queueName: string, processorFile: string) {
-  const worker = new Worker(queueName, processorFile, {
-    connection: getBullConnection(connection),
-  });
-
-  worker.on("error", (error) => {
-    if (error instanceof Error) {
-      console.error("Error: ", error);
-    }
-  });
-  worker.on("failed", (_, error) => {
-    if (error instanceof Error) {
-      console.error("Job failed: ", error);
-    }
+  worker = new Worker(queueName, processorFile, {
+    connection,
   });
 
   return worker;
 }
+
+process.on("SIGTERM", async () => {
+  if (worker) {
+    await worker.close();
+  }
+});
 
 const connectionMap = new Map<RedisOptions | Redis, Redis>();
 

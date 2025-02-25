@@ -33,9 +33,13 @@ export function DeploymentPreviewCard({
   repoName,
 }: DeploymentPreviewCardProps) {
   const date = formatDate(timestamp);
+  const onMessage = (prev: DeploymentPreview, data: DeploymentPreview) => {
+    return data.logs ? { ...data, logs: prev.logs ? `${prev.logs}${data.logs}` : data.logs } : data;
+  };
   const { status, step } = useEventSource<DeploymentPreview>({
-    eventUrl: `${env.NEXT_PUBLIC_BASEURL}/api/deployments/preview/${repoName}`,
+    eventUrl: `${env.NEXT_PUBLIC_BASEURL}/api/deployments-proxy/preview/${repoName}`,
     initialState: DEFAULT_STATE,
+    onMessage,
   });
 
   const previousStep = step === "build" ? "clone" : step === "configure" ? "build" : null;

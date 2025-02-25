@@ -2,14 +2,13 @@
 
 import { ExternalLink as ExternalLinkIcon, Loader2, RotateCcw } from "lucide-react";
 import { redirect } from "next/navigation";
-import { useActionState, useEffect } from "react";
+import { useActionState } from "react";
 
 import type { ActionState } from "@/app/_lib/form-middleware";
 import type { Nullable } from "@/app/_lib/utils";
 
 import { Button } from "@/app/_components/ui/button";
 import { useEventSource } from "@/app/_hooks/use-event-source";
-import { useRefreshTracker } from "@/app/_lib/refresh-tracker-provider";
 import { retryDeploy } from "@/app/actions";
 import { env } from "@/env";
 
@@ -48,20 +47,18 @@ export const DEPLOYMENTMETADATA = {
 const DEFAULT_STATE = { jobName: null, logs: null };
 
 export function Stepper({ repoName }: StepperProps) {
-  const { setRefreshTracker } = useRefreshTracker();
-  const onMessage = (_: DeploymentData, data: DeploymentData) => {
+  const onMessage = (prev: DeploymentData, data: DeploymentData) => {
     if (data.completed && data.appId) {
       redirect(`/dashboard/applications/${data.appId}`);
     }
+    return data.logs ? { ...data, logs: prev.logs ? `${prev.logs}${data.logs}` : data.logs } : data;
   };
   const { jobName, logs, isCriticalError, jobId } = useEventSource<DeploymentData>({
-    eventUrl: `${env.NEXT_PUBLIC_BASEURL}/api/deployments/logs/${repoName}`,
+    eventUrl: `${env.NEXT_PUBLIC_BASEURL}/api/deployments-proxy/logs/${repoName}`,
     initialState: DEFAULT_STATE,
     onMessage,
   });
-  useEffect(() => {
-    setRefreshTracker(true);
-  }, []);
+
   const [state, formAction, isPending] = useActionState<ActionState, FormData>(
     retryDeploy,
     { error: "", success: "", inputs: { repoName, jobId } },

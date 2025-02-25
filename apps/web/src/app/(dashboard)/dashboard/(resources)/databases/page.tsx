@@ -23,7 +23,7 @@ export default function DatabasesPage() {
       </div>
 
       <div className="h-full mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <OnStartingDatabaseCard name="postgres" />
+        <OnStartingDatabaseCard />
         <Suspense fallback={<Skeleton className="h-32 w-full" />}>
           <DatabaseList />
         </Suspense>
@@ -38,7 +38,19 @@ async function DatabaseList() {
   if (!dbContainers || dbContainers.length < 1) {
     return <NoDatabases />;
   }
-  return dbContainers.map(dbContainer => <DatabaseCard key={dbContainer.id} {...dbContainer} />);
+
+  // Display running containers first
+  const sortedContainers = [...dbContainers].sort((a, b) => {
+    if (a.state === "running" && b.state !== "running")
+      return -1;
+    if (a.state !== "running" && b.state === "running")
+      return 1;
+    return 0;
+  });
+
+  return sortedContainers.map(dbContainer => (
+    <DatabaseCard key={dbContainer.id} isProcessing={false} {...dbContainer} />
+  ));
 }
 
 function NoDatabases() {

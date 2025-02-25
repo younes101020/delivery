@@ -1,22 +1,48 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/app/_components/ui/card";
-import { Spinner } from "@/app/_components/ui/spinner";
+import type { Nullable } from "@/app/_lib/utils";
 
-interface OnStartingDatabaseCardProps {
-  name: string;
-}
+import { useEventSource } from "@/app/_hooks/use-event-source";
+import { env } from "@/env";
 
-export function OnStartingDatabaseCard({ name }: OnStartingDatabaseCardProps) {
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-lg truncate">{name}</CardTitle>
-        <Spinner className="border-primary" />
-      </CardHeader>
-      <CardContent className="text-xs">
+import { DatabaseCard } from "./database-card";
 
-      </CardContent>
-    </Card>
-  );
+export type DatabaseData = Nullable<{
+  jobId: string;
+  containerId: string;
+  timestamp: number;
+  database: string;
+  queueName: string;
+  status: "completed" | "failed";
+}>[];
+
+const DEFAULT_STATE: DatabaseData = [{
+  jobId: null,
+  containerId: null,
+  timestamp: null,
+  database: null,
+  queueName: null,
+  status: null,
+}];
+
+export function OnStartingDatabaseCard() {
+  const onMessage = (prevDbContainers: DatabaseData, data: DatabaseData) => {
+    const existingContainerIds = new Set(data.map(d => d.containerId));
+    const filteredPrev = prevDbContainers.filter(prev =>
+      prev.containerId && !existingContainerIds.has(prev.containerId),
+    );
+    return [...filteredPrev, ...data];
+  };
+
+  const dbContainers = useEventSource<DatabaseData>({
+    eventUrl: `${env.NEXT_PUBLIC_BASEURL}/api/databases-proxy/ongoing`,
+    initialState: DEFAULT_STATE,
+    onMessage,
+  });
+
+  return dbContainers
+    .filter(({ jobId, containerId, database }) => jobId && containerId && database)
+    .map(({ jobId, containerId, database }) => (
+      <DatabaseCard key={jobId} isProcessing={true} id={containerId!} name={database!} />
+    ));
 }

@@ -9,7 +9,7 @@ const PROCESSOR_FILE = join(dirname(fileURLToPath(import.meta.url)), "../worker.
 
 export async function stopDatabase(containerId: string) {
   const stopDbQueue = getStopDatabaseQueue();
-  await stopDbQueue.add(queueName, { containerId });
+  await stopDbQueue.add(queueName, { containerId }, { removeOnComplete: true });
 
   await subscribeWorkerTo(queueName, PROCESSOR_FILE);
 }

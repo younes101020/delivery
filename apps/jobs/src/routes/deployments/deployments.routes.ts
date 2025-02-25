@@ -4,7 +4,7 @@ import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema } from "stoker/openapi/schemas";
 
 import { currentJobSchema, deploymentTrackerIdentifier, insertDeploymentSchema, jobIdParamsSchema, previousJobSchema, queueSchema } from "@/db/dto";
-import { goneSchema, notFoundSchema } from "@/lib/constants";
+import { notFoundSchema } from "@/lib/constants";
 
 const tags = ["Deployments"];
 

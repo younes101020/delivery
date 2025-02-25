@@ -7,12 +7,11 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import { getApplicationByName } from "@/db/queries/queries";
 import { APPLICATIONS_PATH } from "@/lib/constants";
 import { ssh } from "@/lib/ssh";
 import { connection, getBullConnection, subscribeWorkerTo } from "@/lib/tasks/utils";
 import { deployApp, redeployApp } from "@/routes/deployments/lib/tasks/deploy";
-import { checkIfOngoingDeploymentExist, getCurrentDeploymentCount, getCurrentDeploymentsState, getJobs, getPreviousDeploymentsState } from "@/routes/deployments/lib/tasks/deploy/utils";
+import { getCurrentDeploymentCount, getCurrentDeploymentsState, getJobs, getPreviousDeploymentsState } from "@/routes/deployments/lib/tasks/deploy/utils";
 
 import type { CreateRoute, GetCurrentDeploymentStep, GetPreviousDeploymentStep, RedeployRoute, RetryRoute, StreamCurrentDeploymentCount, StreamLogsRoute, StreamPreview } from "./deployments.routes";
 

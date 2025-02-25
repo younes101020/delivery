@@ -1,6 +1,5 @@
 import { streamSSE } from "hono/streaming";
 import * as HttpStatusCodes from "stoker/http-status-codes";
-import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
@@ -8,9 +7,9 @@ import type { CreateRoute, ListRoute, StartRoute, StopRoute, StreamCurrentDataba
 
 import { getDatabasesContainers } from "./lib/remote-docker/utils";
 import { createDatabase } from "./lib/tasks/create-database";
-import { getCreateDatabaseQueueEvents, getDatabaseJobByIdFromQueue, getInCreatingDatabasesJobs } from "./lib/tasks/create-database/utils";
 import { startDatabase } from "./lib/tasks/start-database";
 import { stopDatabase } from "./lib/tasks/stop-database";
+import { getDatabaseJobByIdFromQueue, getDatabaseQueuesEvents, getDatabasesActiveJobs } from "./lib/tasks/utils";
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const databaseJobData = c.req.valid("json");
@@ -40,35 +39,52 @@ export const start: AppRouteHandler<StartRoute> = async (c) => {
 
 export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> = async (c) => {
   return streamSSE(c, async (stream) => {
-    const activeInStartingDatabasesJobs = await getInCreatingDatabasesJobs();
+    const activeDatabasesJobs = await getDatabasesActiveJobs();
 
-    if (activeInStartingDatabasesJobs.length > 0) {
+    if (activeDatabasesJobs.length > 0) {
       await stream.writeSSE({
-        data: JSON.stringify(activeInStartingDatabasesJobs),
+        data: JSON.stringify(activeDatabasesJobs),
       });
     }
 
-    const activeQueuesEvents = await getDatabaseQueuesEvents();
+    const dbQueuesEvents = await getDatabaseQueuesEvents();
 
-    for (const queueEvents of activeQueuesEvents) {
+    for (const queueEvents of dbQueuesEvents) {
+      queueEvents.on("active", activeHandler);
       queueEvents.on("completed", completeHandler);
       queueEvents.on("failed", failedHandler);
     }
 
     stream.onAbort(() => {
-      for (const queueEvents of activeQueuesEvents) {
+      for (const queueEvents of dbQueuesEvents) {
+        queueEvents.removeListener("active", activeHandler);
         queueEvents.removeListener("completed", completeHandler);
         queueEvents.removeListener("failed", failedHandler);
       }
     });
 
+    async function activeHandler({ jobId }: { jobId: string }) {
+      const job = await getDatabaseJobByIdFromQueue(jobId);
+      await stream.writeSSE({
+        data: JSON.stringify([{
+          jobId,
+          containerId: job?.data.containerId,
+          timestamp: job?.timestamp,
+          database: job?.data.type,
+          queueName: activeDatabasesJobs.find(j => j.jobId === jobId)?.queueName,
+          status: "completed",
+        }]),
+      });
+    }
+
     async function completeHandler({ jobId }: { jobId: string }) {
       const job = await getDatabaseJobByIdFromQueue(jobId);
       await stream.writeSSE({
         data: JSON.stringify({
-          id: job?.id,
+          jobId,
           timestamp: job?.timestamp,
           database: job?.data.type,
+          queueName: activeDatabasesJobs.find(j => j.jobId === jobId)?.queueName,
           status: "completed",
         }),
       });
@@ -78,9 +94,10 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
       const job = await getDatabaseJobByIdFromQueue(jobId);
       await stream.writeSSE({
         data: JSON.stringify({
-          id: job?.id,
+          jobId,
           timestamp: job?.timestamp,
           database: job?.data.type,
+          queueName: activeDatabasesJobs.find(j => j.jobId === jobId)?.queueName,
           status: "failed",
         }),
       });

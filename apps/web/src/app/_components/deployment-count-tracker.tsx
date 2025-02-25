@@ -13,9 +13,13 @@ interface DeploymentTrackerEventData {
 const DEFAULT_STATE = { isActiveDeployment: false };
 
 export function DeploymentTracker() {
+  const onMessage = (prev: DeploymentTrackerEventData, data: DeploymentTrackerEventData) => {
+    return data.logs ? { ...data, logs: prev.logs ? `${prev.logs}${data.logs}` : data.logs } : data;
+  };
   const { isActiveDeployment } = useEventSource<DeploymentTrackerEventData>({
     eventUrl: `${env.NEXT_PUBLIC_BASEURL}/api/deployments-proxy/count`,
     initialState: DEFAULT_STATE,
+    onMessage,
   });
 
   return (

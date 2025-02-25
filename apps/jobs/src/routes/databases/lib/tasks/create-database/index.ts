@@ -11,7 +11,7 @@ const PROCESSOR_FILE = join(dirname(fileURLToPath(import.meta.url)), "../worker.
 
 export async function createDatabase(databaseJobData: CreateDatabaseSchema) {
   const createDbQueue = getCreateDatabaseQueue();
-  await createDbQueue.add(queueName, databaseJobData);
+  await createDbQueue.add(queueName, databaseJobData, { removeOnComplete: true });
 
   await subscribeWorkerTo(queueName, PROCESSOR_FILE);
 }

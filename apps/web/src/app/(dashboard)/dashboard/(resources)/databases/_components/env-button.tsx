@@ -38,6 +38,7 @@ export function EnvButton({
         formAction={formAction}
         disabled={pending}
         type="submit"
+        variant="outline"
       >
         {pending
           ? (
