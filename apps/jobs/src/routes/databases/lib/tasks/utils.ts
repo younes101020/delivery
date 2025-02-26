@@ -4,15 +4,12 @@ import { connection, fetchQueueTitles, getBullConnection } from "@/lib/tasks/uti
 
 import type { AllQueueDatabaseJobsData } from "./types";
 
-import { PREFIX } from "./const";
+import { PREFIX, queueNames } from "./const";
 
 export async function getDatabaseQueuesEvents() {
-  const dbQueuesTitle = await fetchQueueTitles(connection, PREFIX);
   const bullConnection = getBullConnection(connection);
 
-  const dbQueueEvents = dbQueuesTitle.map(({ prefix, queueName }) => {
-    return new QueueEvents(queueName, { connection: bullConnection, prefix });
-  });
+  const dbQueueEvents = Object.values(queueNames).map(queueName => new QueueEvents(queueName, { connection: bullConnection, prefix: PREFIX }));
 
   return dbQueueEvents;
 }
@@ -36,12 +33,19 @@ export async function getDatabasesActiveJobs() {
   return activeJobs.flat();
 }
 
-export async function getDatabaseJobByIdFromQueue(jobId: string) {
+export async function getDatabaseJobAndQueueNameByJobId(jobId: string) {
   const dbQueues = await getDatabaseQueues();
 
-  const jobs = await Promise.all(dbQueues.map(queue => Job.fromId<AllQueueDatabaseJobsData>(queue, jobId)));
+  const jobsWithQueueName = await Promise.all(
+    dbQueues.map(async (queue) => {
+      const job = await Job.fromId<AllQueueDatabaseJobsData>(queue, jobId);
+      return { queueName: queue.name, job };
+    }),
+  );
 
-  return jobs.find(job => job !== null) ?? null;
+  const job = jobsWithQueueName.find(jwQueue => jwQueue.job !== null) ?? null;
+
+  return job;
 }
 
 export async function getDatabaseQueues() {

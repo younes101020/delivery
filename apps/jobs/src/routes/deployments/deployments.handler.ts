@@ -15,6 +15,8 @@ import { getCurrentDeploymentCount, getCurrentDeploymentsState, getJobs, getPrev
 
 import type { CreateRoute, GetCurrentDeploymentStep, GetPreviousDeploymentStep, RedeployRoute, RetryRoute, StreamCurrentDeploymentCount, StreamLogsRoute, StreamPreview } from "./deployments.routes";
 
+import { PREFIX } from "./lib/tasks/const";
+
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const deployment = c.req.valid("json");
 
@@ -81,10 +83,13 @@ export const streamPreview: AppRouteHandler<StreamPreview> = async (c) => {
     queueEvents.on("failed", failedHandler);
     queueEvents.on("completed", completedHandler);
 
-    stream.onAbort(() => {
-      queueEvents.removeListener("active", activeHandler);
-      queueEvents.removeListener("failed", failedHandler);
-      queueEvents.on("completed", completedHandler);
+    return new Promise((resolve) => {
+      stream.onAbort(() => {
+        queueEvents.removeListener("active", activeHandler);
+        queueEvents.removeListener("failed", failedHandler);
+        queueEvents.removeListener("completed", completedHandler);
+        resolve();
+      });
     });
     // casting cause: no typescript support for sse in hono https://github.com/honojs/hono/issues/3309
   }) as any;
@@ -105,13 +110,6 @@ export const streamLog: AppRouteHandler<StreamLogsRoute> = async (c) => {
     queueEvents.on("progress", progressHandler);
     queueEvents.on("completed", completeHandler);
     queueEvents.on("failed", failedHandler);
-
-    stream.onAbort(() => {
-      queueEvents.removeListener("active", activeHandler);
-      queueEvents.removeListener("progress", progressHandler);
-      queueEvents.removeListener("completed", completeHandler);
-      queueEvents.removeListener("failed", failedHandler);
-    });
 
     async function activeHandler({ jobId }: { jobId: string }) {
       const jobState = await Job.fromId(queue, jobId);
@@ -149,6 +147,15 @@ export const streamLog: AppRouteHandler<StreamLogsRoute> = async (c) => {
       });
     }
 
+    return new Promise((resolve) => {
+      stream.onAbort(() => {
+        queueEvents.removeListener("active", activeHandler);
+        queueEvents.removeListener("progress", progressHandler);
+        queueEvents.removeListener("completed", completeHandler);
+        queueEvents.removeListener("failed", failedHandler);
+        resolve();
+      });
+    });
     // casting cause: no typescript support for sse in hono https://github.com/honojs/hono/issues/3309
   }) as any;
 };
@@ -200,12 +207,15 @@ export const streamCurrentDeploymentsCount: AppRouteHandler<StreamCurrentDeploym
       queueEvents.on("active", activeHandler);
     }
 
-    stream.onAbort(() => {
-      for (const queueEvents of inMemoryQueueEvents) {
-        queueEvents.removeListener("completed", completeHandler);
-        queueEvents.removeListener("failed", failedHandler);
-        queueEvents.removeListener("active", activeHandler);
-      }
+    return new Promise((resolve) => {
+      stream.onAbort(() => {
+        for (const queueEvents of inMemoryQueueEvents) {
+          queueEvents.removeListener("completed", completeHandler);
+          queueEvents.removeListener("failed", failedHandler);
+          queueEvents.removeListener("active", activeHandler);
+        }
+        resolve();
+      });
     });
     // casting cause: no typescript support for sse in hono https://github.com/honojs/hono/issues/3309
   }) as any;
@@ -235,7 +245,6 @@ export const retryJob: AppRouteHandler<RetryRoute> = async (c) => {
   }
 
   await faileJob?.retry();
-  await subscribeWorkerTo(queueName, processorFile);
-
+  subscribeWorkerTo(queueName, PREFIX, processorFile);
   return c.json(null, HttpStatusCodes.ACCEPTED);
 };

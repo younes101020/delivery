@@ -9,7 +9,7 @@ import { getDatabasesContainers } from "./lib/remote-docker/utils";
 import { createDatabase } from "./lib/tasks/create-database";
 import { startDatabase } from "./lib/tasks/start-database";
 import { stopDatabase } from "./lib/tasks/stop-database";
-import { getDatabaseJobByIdFromQueue, getDatabaseQueuesEvents, getDatabasesActiveJobs } from "./lib/tasks/utils";
+import { getDatabaseJobAndQueueNameByJobId, getDatabaseQueuesEvents, getDatabasesActiveJobs } from "./lib/tasks/utils";
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const databaseJobData = c.req.valid("json");
@@ -55,53 +55,65 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
       queueEvents.on("failed", failedHandler);
     }
 
-    stream.onAbort(() => {
-      for (const queueEvents of dbQueuesEvents) {
-        queueEvents.removeListener("active", activeHandler);
-        queueEvents.removeListener("completed", completeHandler);
-        queueEvents.removeListener("failed", failedHandler);
-      }
-    });
-
     async function activeHandler({ jobId }: { jobId: string }) {
-      const job = await getDatabaseJobByIdFromQueue(jobId);
-      await stream.writeSSE({
-        data: JSON.stringify([{
-          jobId,
-          containerId: job?.data.containerId,
-          timestamp: job?.timestamp,
-          database: job?.data.type,
-          queueName: activeDatabasesJobs.find(j => j.jobId === jobId)?.queueName,
-          status: "completed",
-        }]),
-      });
+      const jobsWithQueueName = await getDatabaseJobAndQueueNameByJobId(jobId);
+
+      if (jobsWithQueueName?.job) {
+        const { job, queueName } = jobsWithQueueName;
+        await stream.writeSSE({
+          data: JSON.stringify([{
+            jobId,
+            containerId: job?.data.containerId,
+            timestamp: job?.timestamp,
+            queueName,
+            status: "active",
+          }]),
+        });
+      }
     }
 
     async function completeHandler({ jobId }: { jobId: string }) {
-      const job = await getDatabaseJobByIdFromQueue(jobId);
-      await stream.writeSSE({
-        data: JSON.stringify({
-          jobId,
-          timestamp: job?.timestamp,
-          database: job?.data.type,
-          queueName: activeDatabasesJobs.find(j => j.jobId === jobId)?.queueName,
-          status: "completed",
-        }),
-      });
+      const jobsWithQueueName = await getDatabaseJobAndQueueNameByJobId(jobId);
+
+      if (jobsWithQueueName?.job) {
+        const { job, queueName } = jobsWithQueueName;
+        await stream.writeSSE({
+          data: JSON.stringify({
+            jobId,
+            containerId: job?.data.containerId,
+            timestamp: job?.timestamp,
+            queueName,
+            status: "completed",
+          }),
+        });
+      }
     }
 
     async function failedHandler({ jobId }: { jobId: string }) {
-      const job = await getDatabaseJobByIdFromQueue(jobId);
-      await stream.writeSSE({
-        data: JSON.stringify({
-          jobId,
-          timestamp: job?.timestamp,
-          database: job?.data.type,
-          queueName: activeDatabasesJobs.find(j => j.jobId === jobId)?.queueName,
-          status: "failed",
-        }),
-      });
+      const jobsWithQueueName = await getDatabaseJobAndQueueNameByJobId(jobId);
+      if (jobsWithQueueName?.job) {
+        const { job, queueName } = jobsWithQueueName;
+        await stream.writeSSE({
+          data: JSON.stringify({
+            jobId,
+            containerId: job?.data.containerId,
+            timestamp: job?.timestamp,
+            queueName,
+            status: "failed",
+          }),
+        });
+      }
     }
+    return new Promise((resolve) => {
+      stream.onAbort(() => {
+        for (const queueEvents of dbQueuesEvents) {
+          queueEvents.removeListener("active", activeHandler);
+          queueEvents.removeListener("completed", completeHandler);
+          queueEvents.removeListener("failed", failedHandler);
+        }
+        resolve();
+      });
+    });
     // casting cause: no typescript support for sse in hono https://github.com/honojs/hono/issues/3309
   }) as any;
 };

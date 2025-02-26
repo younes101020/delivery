@@ -5,13 +5,14 @@ import IORedis from "ioredis";
 import type { Resources } from "./const";
 import type { RedisType } from "./types";
 
-export const connection = new IORedis();
+export const connection = new IORedis({ maxRetriesPerRequest: null });
 
 let worker: Worker | null = null;
 
-export async function subscribeWorkerTo(queueName: string, processorFile: string) {
+export function subscribeWorkerTo(queueName: string, prefix: string, processorFile: string) {
   worker = new Worker(queueName, processorFile, {
-    connection,
+    connection: getBullConnection(connection),
+    prefix,
   });
 
   return worker;

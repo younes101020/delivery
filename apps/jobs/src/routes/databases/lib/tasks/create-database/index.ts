@@ -5,13 +5,14 @@ import type { CreateDatabaseSchema } from "@/db/dto";
 
 import { subscribeWorkerTo } from "@/lib/tasks/utils";
 
+import { PREFIX } from "../const";
 import { getCreateDatabaseQueue, queueName } from "./utils";
 
 const PROCESSOR_FILE = join(dirname(fileURLToPath(import.meta.url)), "../worker.ts");
 
 export async function createDatabase(databaseJobData: CreateDatabaseSchema) {
+  subscribeWorkerTo(queueName, PREFIX, PROCESSOR_FILE);
+
   const createDbQueue = getCreateDatabaseQueue();
   await createDbQueue.add(queueName, databaseJobData, { removeOnComplete: true });
-
-  await subscribeWorkerTo(queueName, PROCESSOR_FILE);
 }

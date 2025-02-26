@@ -12,6 +12,8 @@ import { fromGitUrlToQueueName, parseAppHost, transformEnvVars, waitForDeploymen
 
 import type { QueueDeploymentJobData } from "./types";
 
+import { PREFIX } from "../const";
+
 type QueueName = string;
 
 export const JOBS = {
@@ -29,7 +31,7 @@ function runDeployment(
     const data = await getDeploymentData(payload);
     const repoName = data.build.repoName;
 
-    await subscribeWorkerTo(repoName, processorFile);
+    subscribeWorkerTo(repoName, PREFIX, processorFile);
 
     const flowProducer = new FlowProducer({ connection: getBullConnection(connection), prefix: "application" });
     await flowProducer.add({
