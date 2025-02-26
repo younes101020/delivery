@@ -11,10 +11,9 @@ const client = testClient(createApp().route("/", router));
 describe("databases routes", async () => {
   it("post /databases validates the database choice", async () => {
     const response = await client.databases.$post(
-      {
+      { // @ts-expect-error test purpose
         json: {
-          // @ts-expect-error test purpose
-          type: 5,
+
         },
       },
     );
