@@ -7,9 +7,9 @@ import { cn } from "@/app/_lib/utils";
 const bounceVariants = cva("bg-primary", {
   variants: {
     variant: {
-      primary: "bg-primary",
-      active: "bg-green-500",
-      failed: "bg-red-500",
+      primary: "bg-primary/50",
+      active: "bg-green-500/50",
+      failed: "bg-red-500/50",
     },
   },
   defaultVariants: {

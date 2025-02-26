@@ -11,18 +11,16 @@ export type DatabaseData = Nullable<{
   jobId: string;
   containerId: string;
   timestamp: number;
-  database: string;
   queueName: string;
-  status: "completed" | "failed";
+  status: "completed" | "failed" | "active";
 }>[];
 
 const DEFAULT_STATE: DatabaseData = [{
   jobId: null,
   containerId: null,
   timestamp: null,
-  database: null,
   queueName: null,
-  status: null,
+  status: "active",
 }];
 
 export function OnStartingDatabaseCard() {
@@ -41,8 +39,8 @@ export function OnStartingDatabaseCard() {
   });
 
   return dbContainers
-    .filter(({ jobId, containerId, database }) => jobId && containerId && database)
-    .map(({ jobId, containerId, database }) => (
-      <DatabaseCard key={jobId} isProcessing={true} id={containerId!} name={database!} />
+    .filter(({ jobId, containerId }) => jobId && containerId)
+    .map(({ jobId, containerId }) => (
+      <DatabaseCard key={jobId} isProcessing={true} id={containerId!} name="" />
     ));
 }
