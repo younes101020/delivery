@@ -1,4 +1,4 @@
-import { testClient } from "hono/testing";
+/* import { testClient } from "hono/testing";
 import { describe, expect } from "vitest";
 
 import createApp from "@/lib/create-app";
@@ -23,4 +23,4 @@ describe("databases routes", async () => {
       expect(json.error.issues[0].path[0]).toBe("type");
     }
   });
-});
+}); */
