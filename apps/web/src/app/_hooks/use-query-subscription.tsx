@@ -1,26 +1,21 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 
+import { getQueryClient } from "@/app/_lib/react-query-provider";
 import { env } from "@/env";
 
 export function useQuerySubscription(endpoints: string) {
-  const { data, error } = useQuery({ queryKey: [`sse`] });
-  const queryClient = useQueryClient();
+  const queryClient = getQueryClient();
   useEffect(() => {
     const eventSource = new EventSource(`${env.NEXT_PUBLIC_BASEURL}/api${endpoints}`);
     eventSource.onmessage = (event) => {
       const queryData = JSON.parse(event.data);
-      queryClient.setQueriesData({ queryKey: [`sse`] }, queryData);
+      const queryKey = queryData.containerId ? [queryData.containerId] : ["sse"];
+      queryClient.setQueriesData({ queryKey }, queryData);
     };
     return () => {
       eventSource.close();
     };
   }, [queryClient, endpoints]);
-
-  return {
-    data,
-    error,
-  };
 }

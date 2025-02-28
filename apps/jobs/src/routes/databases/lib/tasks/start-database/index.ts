@@ -12,5 +12,5 @@ export async function startDatabase(containerId: string) {
   subscribeWorkerTo(queueName, PREFIX, PROCESSOR_FILE);
 
   const startDbQueue = getStartDatabaseQueue();
-  await startDbQueue.add(queueName, { containerId }, { removeOnComplete: true });
+  await startDbQueue.add(queueName, { containerId });
 }

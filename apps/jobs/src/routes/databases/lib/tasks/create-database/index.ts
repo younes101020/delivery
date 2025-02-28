@@ -14,5 +14,5 @@ export async function createDatabase(databaseJobData: CreateDatabaseSchema) {
   subscribeWorkerTo(queueName, PREFIX, PROCESSOR_FILE);
 
   const createDbQueue = getCreateDatabaseQueue();
-  await createDbQueue.add(queueName, databaseJobData, { removeOnComplete: true });
+  await createDbQueue.add(queueName, databaseJobData);
 }

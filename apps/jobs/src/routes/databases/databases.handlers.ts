@@ -18,8 +18,21 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
 };
 
 export const list: AppRouteHandler<ListRoute> = async (c) => {
-  const dbs = await getDatabasesContainers();
-  return c.json(dbs, HttpStatusCodes.OK);
+  const [databases, activeJobs] = await Promise.all([
+    getDatabasesContainers(),
+    getDatabasesActiveJobs(),
+  ]);
+  const databasesWithStatus = databases.map((db) => {
+    const activeJob = activeJobs.find(job => job.containerId === db.id);
+    if (activeJob) {
+      return {
+        ...db,
+        isProcessing: true,
+      };
+    }
+    return db;
+  });
+  return c.json(databasesWithStatus, HttpStatusCodes.OK);
 };
 
 export const stop: AppRouteHandler<StopRoute> = async (c) => {
@@ -39,14 +52,6 @@ export const start: AppRouteHandler<StartRoute> = async (c) => {
 
 export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> = async (c) => {
   return streamSSE(c, async (stream) => {
-    const activeDatabasesJobs = await getDatabasesActiveJobs();
-
-    if (activeDatabasesJobs.length > 0) {
-      await stream.writeSSE({
-        data: JSON.stringify(activeDatabasesJobs),
-      });
-    }
-
     const dbQueuesEvents = await getDatabaseQueuesEvents();
 
     for (const queueEvents of dbQueuesEvents) {
@@ -61,13 +66,12 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
       if (jobsWithQueueName?.job) {
         const { job, queueName } = jobsWithQueueName;
         await stream.writeSSE({
-          data: JSON.stringify([{
+          data: JSON.stringify({
             jobId,
             containerId: job?.data.containerId,
-            timestamp: job?.timestamp,
             queueName,
             status: "active",
-          }]),
+          }),
         });
       }
     }
@@ -81,23 +85,23 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
           data: JSON.stringify({
             jobId,
             containerId: job?.data.containerId,
-            timestamp: job?.timestamp,
             queueName,
             status: "completed",
           }),
         });
+        await job.remove();
       }
     }
 
     async function failedHandler({ jobId }: { jobId: string }) {
       const jobsWithQueueName = await getDatabaseJobAndQueueNameByJobId(jobId);
+
       if (jobsWithQueueName?.job) {
         const { job, queueName } = jobsWithQueueName;
         await stream.writeSSE({
           data: JSON.stringify({
             jobId,
             containerId: job?.data.containerId,
-            timestamp: job?.timestamp,
             queueName,
             status: "failed",
           }),

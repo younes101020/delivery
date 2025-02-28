@@ -10,6 +10,7 @@ const bounceVariants = cva("bg-primary", {
       primary: "bg-primary/50",
       active: "bg-green-500/50",
       failed: "bg-red-500/50",
+      process: "bg-yellow-500/50",
     },
   },
   defaultVariants: {

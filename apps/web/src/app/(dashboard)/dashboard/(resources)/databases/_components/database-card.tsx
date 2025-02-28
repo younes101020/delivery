@@ -1,19 +1,19 @@
-import { Ban, ChevronsLeftRightEllipsis, Play } from "lucide-react";
+import { ChevronsLeftRightEllipsis } from "lucide-react";
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/app/_components/ui/card";
 import { formatDate } from "@/app/_lib/utils";
 
+import { DatabaseActions } from "./database-actions";
 import { DatabaseStatus } from "./database-status";
 import { EnvButton } from "./env-button";
-import { StartButton } from "./start-button";
-import { StopButton } from "./stop-button";
 import { PostgresIcon } from "./ui/postgres-icon";
 
 interface DatabaseCardProps {
   id: string;
   name: string;
-  state: string;
+  state: "created" | "restarting" | "running" | "removing" | "paused" | "exited" | "dead";
   status: string;
+  isProcessing: boolean;
   createdAt: number;
 }
 
@@ -27,7 +27,7 @@ export function DatabaseCard({ name, state, id, status, createdAt }: DatabaseCar
           <CardTitle className="text-lg truncate">{name}</CardTitle>
         </div>
 
-        <ContainerActions state={state} id={id} />
+        <DatabaseActions state={state} id={id} />
 
       </CardHeader>
       <CardContent className="text-xs space-y-2">
@@ -35,7 +35,7 @@ export function DatabaseCard({ name, state, id, status, createdAt }: DatabaseCar
         <>
           <dl>
             <dt className="text-muted-foreground">State</dt>
-            <DatabaseStatus state={state} />
+            <DatabaseStatus id={id} initialState={state} />
           </dl>
           <dl>
             <dt className="text-muted-foreground">Creation date</dt>
@@ -57,31 +57,5 @@ export function DatabaseCard({ name, state, id, status, createdAt }: DatabaseCar
 
       </CardFooter>
     </Card>
-  );
-}
-
-interface ContainerActionsProps {
-  state: string;
-  id: string;
-}
-
-function ContainerActions({ id, state }: ContainerActionsProps) {
-  const canStopContainer = state === "running";
-  const canStartContainer = state === "exited" || state === "created";
-  return (
-    <>
-      {canStopContainer && (
-        <StopButton containerId={id} className="text-xs">
-          <Ban className="stroke-destructive" />
-          Shutdown
-        </StopButton>
-      )}
-      {canStartContainer && (
-        <StartButton containerId={id} className="text-xs">
-          <Play className="stroke-primary" />
-          Start
-        </StartButton>
-      )}
-    </>
   );
 }
