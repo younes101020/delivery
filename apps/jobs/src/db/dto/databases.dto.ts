@@ -29,7 +29,6 @@ export const databaseSchema = z.object({
     z.literal("exited"),
     z.literal("dead"),
   ]),
-  status: z.string(),
   createdAt: z.number(),
   isProcessing: z.boolean(),
 });

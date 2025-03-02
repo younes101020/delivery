@@ -40,16 +40,7 @@ async function DatabaseList() {
     return <NoDatabases />;
   }
 
-  // Display running containers first
-  const sortedContainers = [...dbContainers].sort((a, b) => {
-    if (a.state === "running" && b.state !== "running")
-      return -1;
-    if (a.state !== "running" && b.state === "running")
-      return 1;
-    return 0;
-  });
-
-  return sortedContainers.map(dbContainer => (
+  return dbContainers.map(dbContainer => (
     <DatabaseCard key={dbContainer.id} {...dbContainer} />
   ));
 }

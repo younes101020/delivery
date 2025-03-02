@@ -12,12 +12,11 @@ interface DatabaseCardProps {
   id: string;
   name: string;
   state: "created" | "restarting" | "running" | "removing" | "paused" | "exited" | "dead";
-  status: string;
   isProcessing: boolean;
   createdAt: number;
 }
 
-export function DatabaseCard({ name, state, id, status, createdAt }: DatabaseCardProps) {
+export function DatabaseCard({ name, state, id, createdAt }: DatabaseCardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -27,7 +26,7 @@ export function DatabaseCard({ name, state, id, status, createdAt }: DatabaseCar
           <CardTitle className="text-lg truncate">{name}</CardTitle>
         </div>
 
-        <DatabaseActions state={state} id={id} />
+        <DatabaseActions initialState={state} id={id} />
 
       </CardHeader>
       <CardContent className="text-xs space-y-2">
@@ -40,10 +39,6 @@ export function DatabaseCard({ name, state, id, status, createdAt }: DatabaseCar
           <dl>
             <dt className="text-muted-foreground">Creation date</dt>
             <dd>{formatDate(createdAt)}</dd>
-          </dl>
-          <dl>
-            <dt className="text-muted-foreground">Status</dt>
-            <dd>{status}</dd>
           </dl>
         </>
 

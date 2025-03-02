@@ -7,45 +7,43 @@ import { Bounce } from "@/app/_components/ui/bounce";
 
 import type { DatabaseStatusData } from "./types";
 
+import { state, variants } from "./const";
+
 interface DatabaseStatusProps {
   initialState: "created" | "restarting" | "running" | "removing" | "paused" | "exited" | "dead";
   id: string;
 }
 
-const variants = {
-  stop: "failed",
-  start: "active",
-  create: "primary",
-  running: "active",
-  paused: "primary",
-  exited: "failed",
-  dead: "failed",
-  restarting: "active",
-  removing: "failed",
-  created: "primary",
-} as const;
-
 export function DatabaseStatus({ initialState, id }: DatabaseStatusProps) {
   const { data } = useQuery<DatabaseStatusData>({ queryKey: [id] });
 
-  const variant = data?.status === "completed" ? variants[data.queueName] : variants[initialState];
+  const isProcessing = data && data.status !== "completed";
 
-  const state = data?.status === "completed" ? data.queueName : initialState;
+  if (isProcessing) {
+    return (
+      <dd>
+        <Badge variant="processing">
+          Processing
+        </Badge>
+      </dd>
+    );
+  }
+
+  const isCompleted = data?.status === "completed";
+
+  if (isCompleted) {
+    return (
+      <dd className="flex gap-1">
+        <Bounce variant={variants[data.queueName]} />
+        {state[data.queueName]}
+      </dd>
+    );
+  }
 
   return (
-    <>
-      <dd className="flex gap-1">
-        <Bounce variant={variant} />
-        {state}
-      </dd>
-      <dd className="mt-1">
-        {data?.status === "active"
-        && (
-          <Badge variant="processing">
-            Processing
-          </Badge>
-        )}
-      </dd>
-    </>
+    <dd className="flex gap-1">
+      <Bounce variant={variants[initialState]} />
+      {initialState}
+    </dd>
   );
 }

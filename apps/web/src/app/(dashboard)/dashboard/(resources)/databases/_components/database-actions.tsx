@@ -12,26 +12,61 @@ import { cn } from "@/app/_lib/utils";
 import type { DatabaseStatusData } from "./types";
 
 import { startContainer, stopContainer } from "../actions";
+import { state } from "./const";
 
 interface DatabaseActionsProps {
-  state: string;
+  initialState: string;
   id: string;
 }
 
-export function DatabaseActions({ id, state }: DatabaseActionsProps) {
+export function DatabaseActions({ id, initialState }: DatabaseActionsProps) {
   const { data } = useQuery<DatabaseStatusData>({ queryKey: [id] });
-  const canStopContainer = state === "running";
-  const canStartContainer = state === "exited" || state === "created";
+  const isProcessing = data && data.status !== "completed";
+
+  if (isProcessing) {
+    return (
+      <div className="flex gap-2">
+        <Loader2 className="animate-spin h-4 w-4" />
+      </div>
+    );
+  }
+
+  const isCompleted = data?.status === "completed";
+
+  if (isCompleted) {
+    const canStopContainer = state[data?.queueName] === "running";
+    const canStartContainer = state[data?.queueName] === "exited" || state[data?.queueName] === "created";
+    return (
+      <>
+        {canStopContainer && (
+          <StopButton containerId={id} className="text-xs">
+            <Ban className="stroke-destructive" />
+            Shutdown
+          </StopButton>
+        )}
+        {canStartContainer && (
+          <StartButton containerId={id} className="text-xs">
+            <Play className="stroke-primary" />
+            Start
+          </StartButton>
+        )}
+      </>
+    );
+  }
+
+  const canStopContainer = initialState === "running";
+  const canStartContainer = initialState === "exited" || initialState === "created";
+
   return (
     <>
       {canStopContainer && (
-        <StopButton containerId={id} className="text-xs" disabled={!!data}>
+        <StopButton containerId={id} className="text-xs">
           <Ban className="stroke-destructive" />
           Shutdown
         </StopButton>
       )}
       {canStartContainer && (
-        <StartButton containerId={id} className="text-xs" disabled={!!data}>
+        <StartButton containerId={id} className="text-xs">
           <Play className="stroke-primary" />
           Start
         </StartButton>

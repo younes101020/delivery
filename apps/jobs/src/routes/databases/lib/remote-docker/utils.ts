@@ -9,10 +9,9 @@ export const docker = new Docker({ protocol: "ssh", username: sshConfig.username
 
 export async function getDatabasesContainers() {
   const dbContainers = await docker.listContainers({ all: true });
-  return dbContainers.map(({ Image, Id, State, Status, Created }) => ({
+  return dbContainers.map(({ Image, Id, State, Created }) => ({
     name: Image.split(":")[0],
     id: Id,
-    status: Status,
     state: State as DatabaseSchema["state"],
     createdAt: Created,
     isProcessing: false,
