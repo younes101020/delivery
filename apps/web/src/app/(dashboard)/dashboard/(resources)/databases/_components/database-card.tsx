@@ -1,11 +1,9 @@
-import { ChevronsLeftRightEllipsis } from "lucide-react";
-
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/app/_components/ui/card";
 import { formatDate } from "@/app/_lib/utils";
 
 import { DatabaseActions } from "./database-actions";
 import { DatabaseStatus } from "./database-status";
-import { EnvButton } from "./env-button";
+import { EnvironmentVariableCard } from "./environment-variable-card";
 import { PostgresIcon } from "./ui/postgres-icon";
 
 interface DatabaseCardProps {
@@ -14,9 +12,13 @@ interface DatabaseCardProps {
   state: "created" | "restarting" | "running" | "removing" | "paused" | "exited" | "dead";
   isProcessing: boolean;
   createdAt: number;
+  applications: {
+    applicationId: number;
+    applicationName: string;
+  }[] | null;
 }
 
-export function DatabaseCard({ name, state, id, createdAt }: DatabaseCardProps) {
+export function DatabaseCard({ name, state, id, createdAt, applications }: DatabaseCardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -45,10 +47,7 @@ export function DatabaseCard({ name, state, id, createdAt }: DatabaseCardProps) 
       </CardContent>
       <CardFooter className="gap-2">
 
-        <EnvButton containerId={id} className="text-xs">
-          <ChevronsLeftRightEllipsis />
-          Link to application
-        </EnvButton>
+        {applications && <EnvironmentVariableCard containerId={id} applications={applications} />}
 
       </CardFooter>
     </Card>

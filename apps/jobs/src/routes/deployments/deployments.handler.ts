@@ -46,9 +46,9 @@ export const redeploy: AppRouteHandler<RedeployRoute> = async (c) => {
 export const streamPreview: AppRouteHandler<StreamPreview> = async (c) => {
   return streamSSE(c, async (stream) => {
     const { queueName } = c.req.valid("param");
-    const queue = new Queue(queueName, { connection: getBullConnection(connection), prefix: "application" });
+    const queue = new Queue(queueName, { connection: getBullConnection(connection), prefix: PREFIX });
 
-    const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection), prefix: "application" });
+    const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection), prefix: PREFIX });
     const job = await getJobs(queue);
 
     await stream.writeSSE({
@@ -98,8 +98,8 @@ export const streamPreview: AppRouteHandler<StreamPreview> = async (c) => {
 export const streamLog: AppRouteHandler<StreamLogsRoute> = async (c) => {
   return streamSSE(c, async (stream) => {
     const { queueName } = c.req.valid("param");
-    const queue = new Queue(queueName, { connection: getBullConnection(connection), prefix: "application" });
-    const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection), prefix: "application" });
+    const queue = new Queue(queueName, { connection: getBullConnection(connection), prefix: PREFIX });
+    const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection), prefix: PREFIX });
     const { name, data, id } = await getJobs(queue);
 
     await stream.writeSSE({
@@ -173,7 +173,7 @@ export const streamCurrentDeploymentsCount: AppRouteHandler<StreamCurrentDeploym
     const inMemoryQueueEvents: QueueEvents[] = [];
 
     for (const activeQueue of activeQueues) {
-      const queueEvents = new QueueEvents(activeQueue.name, { connection: getBullConnection(connection), prefix: "application" });
+      const queueEvents = new QueueEvents(activeQueue.name, { connection: getBullConnection(connection), prefix: PREFIX });
       inMemoryQueueEvents.push(queueEvents);
     }
     await stream.writeSSE({
@@ -232,7 +232,7 @@ const processorFile = join(dirname(fileURLToPath(import.meta.url)), "lib/tasks/w
 export const retryJob: AppRouteHandler<RetryRoute> = async (c) => {
   const { jobId } = c.req.valid("param");
   const { queueName } = c.req.valid("json");
-  const queue = new Queue(queueName, { connection: getBullConnection(connection), prefix: "application" });
+  const queue = new Queue(queueName, { connection: getBullConnection(connection), prefix: PREFIX });
   const faileJob = await Job.fromId(queue, jobId);
 
   if (!faileJob) {

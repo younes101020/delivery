@@ -10,12 +10,13 @@ import { DeploymentError } from "@/lib/error";
 import { connection, fetchQueueTitles, getBullConnection } from "@/lib/tasks/utils";
 
 import { JOBS } from ".";
+import { PREFIX } from "../const";
 
 export async function getCurrentDeploymentsState() {
-  const deployments = await fetchQueueTitles(connection, "application");
+  const deployments = await fetchQueueTitles(connection, PREFIX);
 
   const currentDeploymentsState = await Promise.all(deployments.map(async (deployment) => {
-    const queue = new Queue(deployment.queueName, { connection: getBullConnection(connection), prefix: "application" });
+    const queue = new Queue(deployment.queueName, { connection: getBullConnection(connection), prefix: PREFIX });
     const jobs = await queue.getJobs(["active", "failed"]);
 
     if (jobs.length < 1)
@@ -39,10 +40,10 @@ export async function getCurrentDeploymentsState() {
 }
 
 export async function getPreviousDeploymentsState() {
-  const deployments = await fetchQueueTitles(connection, "application");
+  const deployments = await fetchQueueTitles(connection, PREFIX);
 
   const previousDeploymentsState = await Promise.all(deployments.map(async (deployment) => {
-    const queue = new Queue(deployment.queueName, { connection: getBullConnection(connection), prefix: "application" });
+    const queue = new Queue(deployment.queueName, { connection: getBullConnection(connection), prefix: PREFIX });
     const jobs = await queue.getJobs(["completed"]);
 
     if (jobs.length < 1)
@@ -69,9 +70,9 @@ export async function getPreviousDeploymentsState() {
 }
 
 export async function getCurrentDeploymentCount() {
-  const deployments = await fetchQueueTitles(connection, "application");
+  const deployments = await fetchQueueTitles(connection, PREFIX);
   const queuesWithCounts = await Promise.all(deployments.map(async (deployment) => {
-    const queue = new Queue(deployment.queueName, { connection: getBullConnection(connection), prefix: "application" });
+    const queue = new Queue(deployment.queueName, { connection: getBullConnection(connection), prefix: PREFIX });
     const hasActiveJobs = await queue.getActiveCount() > 0;
     return hasActiveJobs ? queue : null;
   }));
@@ -95,7 +96,7 @@ export async function getJobs(queue: Queue) {
 }
 
 export async function deleteDeploymentJobs(queueName: string) {
-  const queue = new Queue(queueName, { connection: getBullConnection(connection), prefix: "application" });
+  const queue = new Queue(queueName, { connection: getBullConnection(connection), prefix: PREFIX });
   const completedJobs = await queue.getJobs(["completed"]);
   await Promise.all(completedJobs.map(job => job.remove()));
 }
@@ -106,7 +107,7 @@ export async function checkIfOngoingDeploymentExist(queue: Queue) {
 }
 
 export function waitForDeploymentToComplete(queueName: string, queue: Queue) {
-  const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection), prefix: "application" });
+  const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection), prefix: PREFIX });
   return new Promise<void>((res, rej) => {
     const timeout = setTimeout(() => {
       queueEvents.removeAllListeners();

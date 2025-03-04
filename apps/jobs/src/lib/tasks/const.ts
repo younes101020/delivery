@@ -1,1 +1,1 @@
-export type Resources = "application" | "database";
+export type Resources = "deployment" | "database";

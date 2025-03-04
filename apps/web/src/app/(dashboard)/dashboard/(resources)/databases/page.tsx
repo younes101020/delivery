@@ -9,7 +9,7 @@ import { Skeleton } from "@/app/_components/ui/skeleton";
 
 import { DatabaseCard } from "./_components/database-card";
 import { SubscribeToSSE } from "./_components/subscribe-to-sse";
-import { getDatabaseContainers } from "./_lib/queries";
+import { getApplications, getDatabaseContainers } from "./_lib/queries";
 
 export default function DatabasesPage() {
   return (
@@ -34,14 +34,14 @@ export default function DatabasesPage() {
 }
 
 async function DatabaseList() {
-  const dbContainers = await getDatabaseContainers();
+  const [dbContainers, apps] = await Promise.all([getDatabaseContainers(), getApplications()]);
 
   if (!dbContainers || dbContainers.length < 1) {
     return <NoDatabases />;
   }
 
   return dbContainers.map(dbContainer => (
-    <DatabaseCard key={dbContainer.id} {...dbContainer} />
+    <DatabaseCard key={dbContainer.id} {...dbContainer} applications={apps} />
   ));
 }
 
