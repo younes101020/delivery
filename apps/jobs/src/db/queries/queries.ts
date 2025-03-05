@@ -291,3 +291,25 @@ export async function getApplicationNameById(id: number) {
 
   return result?.name;
 }
+
+export async function getEnvironmentVariablesForApplication(applicationId: number) {
+  return await db
+    .select({
+      key: environmentVariables.key,
+      value: environmentVariables.value,
+      isBuildTime: environmentVariables.isBuildTime,
+    })
+    .from(applicationEnvironmentVariables)
+    .innerJoin(environmentVariables, eq(applicationEnvironmentVariables.environmentVariableId, environmentVariables.id))
+    .where(eq(applicationEnvironmentVariables.applicationId, applicationId));
+}
+
+export async function getApplicationIdByName(name: string) {
+  const [application] = await db
+    .select({ id: applications.id })
+    .from(applications)
+    .where(eq(applications.name, name))
+    .limit(1);
+
+  return application;
+}

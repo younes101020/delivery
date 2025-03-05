@@ -45,7 +45,7 @@ export function EnvironmentVariableCard({ containerId, applications }: Environme
       <DialogTrigger asChild>
         <Button variant="outline" className="text-xs">Link to application</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Link database to your application</DialogTitle>
           <DialogDescription>
@@ -58,7 +58,7 @@ export function EnvironmentVariableCard({ containerId, applications }: Environme
             <Label htmlFor="name">
               Application target
             </Label>
-            <Select>
+            <Select name="name">
               <SelectTrigger>
                 <SelectValue placeholder="Select a application" defaultValue={state.inputs.name} />
               </SelectTrigger>
@@ -85,9 +85,10 @@ export function EnvironmentVariableCard({ containerId, applications }: Environme
               className="col-span-3"
             />
           </div>
+          <input type="hidden" name="containerId" id="containerId" value={containerId} />
           <DialogFooter>
             <Button type="submit" disabled={pending} className="text-xs">
-              Start
+              Inject and redeploy
             </Button>
           </DialogFooter>
         </form>

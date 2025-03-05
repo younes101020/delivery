@@ -4,7 +4,7 @@ import { Job, Queue, QueueEvents } from "bullmq";
 import { HTTPException } from "hono/http-exception";
 import { basename } from "node:path";
 
-import type { CurrentJobSchema, DeploymentReferenceAndDataSchema, PreviousJobSchema } from "@/db/dto";
+import type { CurrentJobSchema, DeploymentReferenceAndDataSchema, InsertEnvironmentVariablesSchema, PreviousJobSchema } from "@/db/dto";
 
 import { DeploymentError } from "@/lib/error";
 import { connection, fetchQueueTitles, getBullConnection } from "@/lib/tasks/utils";
@@ -157,27 +157,39 @@ export function fromGitUrlToQueueName(repoUrl: string) {
   return basename(repoUrl, ".git").toLowerCase();
 }
 
+function plainEnvVarsToCmdEnvVars(envs: string) {
+  return envs
+    .trim()
+    .split(/\s+/)
+    .map(env => `-e ${env}`)
+    .join(" ");
+}
+
+function plainEnvVarsToPersistedEnvVars(envs: string) {
+  return envs
+    .trim()
+    .split(/\s+/)
+    .map((env) => {
+      const [key, value] = env.split("=");
+      return { key, value };
+    },
+    );
+}
+
+export function persistedEnvVarsToCmdEnvVars(envs: InsertEnvironmentVariablesSchema[]) {
+  return envs
+    .map(env => `-e ${env.key}=${env.value}`)
+    .join(" ");
+}
+
 export function transformEnvVars(envs: DeploymentReferenceAndDataSchema["env"]) {
   if (!envs) {
     return undefined;
   }
 
-  const cmdEnvVars = envs
-    .trim()
-    .split(/\s+/)
-    .map(env => `-e ${env}`)
-    .join(" ");
+  const cmdEnvVars = plainEnvVarsToCmdEnvVars(envs);
 
-  const persistedEnvVars = envs
-    .trim()
-    .split(/\s+/)
-    .map((env) => {
-      const [key, value] = env.split("=");
-      return {
-        key,
-        value,
-      };
-    });
+  const persistedEnvVars = plainEnvVarsToPersistedEnvVars(envs);
 
   return {
     cmdEnvVars,

@@ -7,12 +7,19 @@ import { validatedAction } from "@/app/_lib/form-middleware";
 
 const injectEnvSchema = z.object({
   containerId: z.string(),
+  name: z.string(),
 });
 
 export const injectEnv = validatedAction(injectEnvSchema, async (inputs) => {
-  // const { containerId } = inputs;
+  const response = await client.deployments.redeploy[":queueName"].$post({
+    param: { queueName: inputs.name },
+  });
 
-  return { success: "", inputs };
+  if (response.status !== 202) {
+    return { error: "Unable to inject the environment variable", inputs };
+  }
+
+  return { success: "Redeployment success", inputs };
 });
 
 const updateContainerStatusSchema = z.object({

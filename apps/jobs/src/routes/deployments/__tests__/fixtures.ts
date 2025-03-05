@@ -45,6 +45,10 @@ interface UTFixtures {
       }[];
     };
   }[];
+  persistedEnvVars: {
+    key: string;
+    value: string;
+  }[];
 }
 
 const gitusername = faker.internet.username().toLowerCase();
@@ -120,6 +124,11 @@ const completedJobs = [
   },
 ];
 
+const persistedEnvVars = [
+  { key: faker.string.alphanumeric(8), value: faker.string.alphanumeric(12) },
+  { key: faker.string.alphanumeric(8), value: faker.string.alphanumeric(12) },
+];
+
 export const it = base.extend<UTFixtures>({
   repoUrl: async ({}, use) => {
     await use(repoUrl);
@@ -135,5 +144,8 @@ export const it = base.extend<UTFixtures>({
   },
   completedJobs: async ({}, use) => {
     await use(completedJobs);
+  },
+  persistedEnvVars: async ({}, use) => {
+    await use(persistedEnvVars);
   },
 });

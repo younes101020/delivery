@@ -6,9 +6,9 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { DeploymentReferenceAndDataSchema } from "@/db/dto";
 
-import { getGithubAppByAppId, getSystemDomainName } from "@/db/queries/queries";
+import { getApplicationIdByName, getEnvironmentVariablesForApplication, getGithubAppByAppId, getSystemDomainName } from "@/db/queries/queries";
 import { connection, getBullConnection, subscribeWorkerTo } from "@/lib/tasks/utils";
-import { fromGitUrlToQueueName, parseAppHost, transformEnvVars, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
+import { fromGitUrlToQueueName, parseAppHost, persistedEnvVarsToCmdEnvVars, transformEnvVars, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
 
 import type { QueueDeploymentJobData } from "./types";
 
@@ -111,6 +111,11 @@ export const redeployApp = runDeployment(async (queueName) => {
     if (isDeploymentRunning)
       await waitForDeploymentToComplete(queueName, queue);
 
+    const application = await getApplicationIdByName(queueName);
+    const environmentVariables = await getEnvironmentVariablesForApplication(application.id);
+
+    const cmdEnvVars = persistedEnvVarsToCmdEnvVars(environmentVariables);
+
     const completedJobs = await queue.getJobs("completed");
     const jobMap = new Map(completedJobs.map(j => [j.name, j.data]));
     const overrideNonInitialQueueData = { isCriticalError: undefined, logs: undefined };
@@ -119,8 +124,8 @@ export const redeployApp = runDeployment(async (queueName) => {
 
     return {
       clone: { ...jobMap.get("clone"), ...overrideNonInitialQueueData },
-      build: { ...jobMap.get("build"), ...overrideNonInitialQueueData },
-      configure: { ...jobMap.get("configure"), ...overrideNonInitialQueueData },
+      build: { ...jobMap.get("build"), env: cmdEnvVars, ...overrideNonInitialQueueData },
+      configure: { ...jobMap.get("configure"), environmentVariable: environmentVariables, ...overrideNonInitialQueueData },
     };
   }
   throw new HTTPException(HttpStatusCodes.BAD_REQUEST, { message: "Invalid redeployment payload" });

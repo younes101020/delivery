@@ -7,7 +7,7 @@ import { ZodError } from "zod";
 import { insertDeploymentSchema } from "@/db/dto";
 import { DeploymentError } from "@/lib/error";
 import { it } from "@/routes/deployments/__tests__/fixtures";
-import { convertGitToAuthenticatedUrl, parseAppHost, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
+import { convertGitToAuthenticatedUrl, parseAppHost, persistedEnvVarsToCmdEnvVars, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
 
 const eventHandlers: Record<string, ({ jobId }: { jobId: string }) => void> = {};
 
@@ -93,5 +93,10 @@ describe("deployments utils unit tests", () => {
     await expect(promise).rejects.toThrowError();
 
     expect(queueEventsSpy).toBeCalledTimes(1);
+  });
+
+  it("return command environment variables", ({ persistedEnvVars }) => {
+    const expected = `-e ${persistedEnvVars[0].key}=${persistedEnvVars[0].value} -e ${persistedEnvVars[1].key}=${persistedEnvVars[1].value}`;
+    expect(persistedEnvVarsToCmdEnvVars(persistedEnvVars)).toBe(expected);
   });
 });
