@@ -33,6 +33,11 @@ export const databaseSchema = z.object({
   isProcessing: z.boolean(),
 });
 
+export const databaseLinkSchema = z.object({
+  environmentKey: z.string(),
+  applicationId: z.coerce.number(),
+});
+
 export type CreateDatabaseSchema = z.infer<typeof createDatabaseSchema>;
 export type DatabaseSchema = z.infer<typeof databaseSchema>;
 export type Database = z.infer<typeof database>;

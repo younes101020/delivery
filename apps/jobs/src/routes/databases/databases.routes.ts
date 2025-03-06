@@ -3,7 +3,7 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema } from "stoker/openapi/schemas";
 
-import { createDatabaseSchema, databaseSchema } from "@/db/dto/databases.dto";
+import { createDatabaseSchema, databaseLinkSchema, databaseSchema } from "@/db/dto/databases.dto";
 import { notFoundSchema } from "@/lib/constants";
 
 const tags = ["Databases"];
@@ -96,8 +96,38 @@ export const start = createRoute({
   },
 });
 
+export const link = createRoute({
+  path: "/databases/{id}/link",
+  method: "post",
+  description: "Link a database container to an application, the database url environment variable will be injected into the application.",
+  request: {
+    params: z.object({
+      id: z.string().describe("The ID of the database container to link"),
+    }),
+    body: jsonContentRequired(databaseLinkSchema, "The application to link to the database",
+    ),
+  },
+  tags,
+  responses: {
+    [HttpStatusCodes.OK]: {
+      description: "Database container linked to the application",
+    },
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Database container not found"),
+    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
+      createErrorSchema(
+        z.object({
+          id: z.string().describe("The ID of the database container to link"),
+        })
+          .or(databaseLinkSchema),
+      ),
+      "The validation error(s)",
+    ),
+  },
+});
+
 export type CreateRoute = typeof create;
 export type ListRoute = typeof list;
 export type StreamCurrentDatabaseRoute = typeof streamCurrentDatabase;
 export type StopRoute = typeof stop;
 export type StartRoute = typeof start;
+export type LinkRoute = typeof link;

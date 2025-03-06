@@ -55,10 +55,10 @@ export function EnvironmentVariableCard({ containerId, applications }: Environme
 
         <form action={formAction} className="space-y-4 mt-4">
           <div className="flex flex-col gap-4">
-            <Label htmlFor="name">
+            <Label htmlFor="application">
               Application target
             </Label>
-            <Select name="name">
+            <Select name="application">
               <SelectTrigger>
                 <SelectValue placeholder="Select a application" defaultValue={state.inputs.name} />
               </SelectTrigger>
@@ -66,7 +66,7 @@ export function EnvironmentVariableCard({ containerId, applications }: Environme
                 <SelectGroup>
                   <SelectLabel>Applications</SelectLabel>
                   {applications.map(application => (
-                    <SelectItem key={application.applicationId} value={application.applicationName}>
+                    <SelectItem key={application.applicationId} value={`${application.applicationId}:${application.applicationName}`}>
                       {application.applicationName}
                     </SelectItem>
                   ))}
@@ -81,7 +81,7 @@ export function EnvironmentVariableCard({ containerId, applications }: Environme
             <Input
               name="env"
               id="env"
-              placeholder="ex: DATABASE_URI"
+              placeholder="ex: DATABASE_URL"
               className="col-span-3"
             />
           </div>

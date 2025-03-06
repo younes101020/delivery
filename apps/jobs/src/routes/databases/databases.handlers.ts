@@ -3,9 +3,11 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import type { CreateRoute, ListRoute, StartRoute, StopRoute, StreamCurrentDatabaseRoute } from "./databases.routes";
+import { patchApplication } from "@/db/queries/queries";
 
-import { getDatabasesContainers } from "./lib/remote-docker/utils";
+import type { CreateRoute, LinkRoute, ListRoute, StartRoute, StopRoute, StreamCurrentDatabaseRoute } from "./databases.routes";
+
+import { getDatabaseEnvVarsByEnvVarKeys, getDatabasesContainers } from "./lib/remote-docker/utils";
 import { createDatabase } from "./lib/tasks/create-database";
 import { startDatabase } from "./lib/tasks/start-database";
 import { stopDatabase } from "./lib/tasks/stop-database";
@@ -120,4 +122,26 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
     });
     // casting cause: no typescript support for sse in hono https://github.com/honojs/hono/issues/3309
   }) as any;
+};
+
+export const link: AppRouteHandler<LinkRoute> = async (c) => {
+  const { id: containerId } = c.req.valid("param");
+  const { environmentKey, applicationId } = c.req.valid("json");
+
+  const dbCredentialsEnvVars = await getDatabaseEnvVarsByEnvVarKeys(containerId, ["POSTGRES_USER", "POSTGRES_PASSWORD"]);
+
+  const postgresUserEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("POSTGRES_USER"));
+  const postgresPasswordEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("POSTGRES_PASSWORD"));
+
+  const postgresUser = postgresUserEnv?.split("=")[1];
+  const postgresPassword = postgresPasswordEnv?.split("=")[1];
+
+  if (!postgresUser || !postgresPassword)
+    return c.json({ error: "Unable to link database" }, HttpStatusCodes.BAD_REQUEST);
+
+  const databaseUrl = `postgres://${postgresUser}:${postgresPassword}@localhost:5432`;
+
+  await patchApplication(applicationId, { applicationData: {}, environmentVariable: [{ key: environmentKey, value: databaseUrl }] });
+
+  return c.json(null, HttpStatusCodes.OK);
 };

@@ -1,4 +1,6 @@
 import Docker from "dockerode";
+import { HTTPException } from "hono/http-exception";
+import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { DatabaseSchema } from "@/db/dto/databases.dto";
 
@@ -26,4 +28,15 @@ export async function stopDatabaseContainer(containerId: string) {
 export async function startDatabaseContainer(containerId: string) {
   const container = docker.getContainer(containerId);
   await container.start();
+}
+
+export async function getDatabaseEnvVarsByEnvVarKeys(containerId: string, envVarKey: string[]) {
+  const containerMetadata = await docker.getContainer(containerId).inspect();
+
+  if (!containerMetadata)
+    throw new HTTPException(HttpStatusCodes.NOT_FOUND, { message: "Database container not found" });
+
+  const envVars = containerMetadata.Config.Env;
+
+  return envVars.filter(envVar => envVarKey.some(key => envVar.includes(key)));
 }

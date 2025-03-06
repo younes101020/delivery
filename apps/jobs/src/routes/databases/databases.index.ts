@@ -8,6 +8,7 @@ const router = createRouter()
   .openapi(routes.stop, handlers.stop)
   .openapi(routes.start, handlers.start)
   .openapi(routes.list, handlers.list)
-  .openapi(routes.streamCurrentDatabase, handlers.streamCurrentDatabase);
+  .openapi(routes.streamCurrentDatabase, handlers.streamCurrentDatabase)
+  .openapi(routes.link, handlers.link);
 
 export default router;
