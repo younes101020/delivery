@@ -1,6 +1,6 @@
 import { DatabaseError } from "@/lib/error";
+import { docker } from "@/lib/remote-docker";
 import { generateRandomString } from "@/lib/utils";
-import { docker } from "@/routes/databases/lib/remote-docker/utils";
 
 import type { CreateQueueDatabaseJob } from "../types";
 
@@ -27,6 +27,9 @@ export async function create(job: CreateQueueDatabaseJob<"create">) {
           },
         ],
       },
+    },
+    Labels: {
+      resource: "database",
     },
   });
 

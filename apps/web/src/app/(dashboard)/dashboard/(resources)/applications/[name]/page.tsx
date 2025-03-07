@@ -7,16 +7,59 @@ import { PageTitle } from "@/app/_components/ui/page-title";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { formatDate } from "@/app/_lib/utils";
 
-import { getApplicationById, getApplicationSreenshotUrl } from "../_lib/queries";
+import { getApplicationByName, getApplicationSreenshotUrl } from "../_lib/queries";
 import { AppForm } from "./_components/app-form";
 import DeleteAppForm from "./_components/delete-app-form";
 
-interface AppProps {
-  id: string;
+interface ApplicationPageProps {
+  params: Promise<{ name: string }>;
 }
 
-async function AppPreviewImage({ id }: AppProps) {
-  const appPreviewImg = await getApplicationSreenshotUrl(Number.parseInt(id));
+export default async function ApplicationPage({ params }: ApplicationPageProps) {
+  const appName = (await params).name;
+
+  return (
+    <section className="p-5 bg-background/50 border">
+      <PageTitle>Application configuration</PageTitle>
+      <div className="mt-8 grid grid-cols-4 gap-4">
+        <Suspense
+          fallback={(
+            <Skeleton className="flex justify-center items-center rounded-xl h-full w-full bg-secondary col-span-4 md:col-span-1 lg:col-span-2 2xl:col-span-1">
+              <p>Screenshot in progress...</p>
+            </Skeleton>
+          )}
+        >
+          <AppPreviewImage name={appName} />
+        </Suspense>
+        <Suspense
+          fallback={
+            <Skeleton className="rounded-xl col-span-4 md:col-span-3 lg:col-span-2 2xl:col-span-3" />
+          }
+        >
+          <AppDetails name={appName} />
+        </Suspense>
+
+        <div className="col-span-4 mt-4">
+          <h2 className="text-xl font-bold mb-2">Update application details</h2>
+          <Suspense fallback={<GetApplicationLoadingScreen />}>
+            <AppConfiguration name={appName} />
+          </Suspense>
+          <div className="p-3 text-destructive border border-dashed border-destructive">
+            <h3 className="text-lg font-bold mb-4">Danger zone</h3>
+            <DeleteAppForm name={appName} />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+interface AppProps {
+  name: string;
+}
+
+async function AppPreviewImage({ name }: AppProps) {
+  const appPreviewImg = await getApplicationSreenshotUrl(name);
   if (!appPreviewImg)
     return null;
 
@@ -36,8 +79,8 @@ async function AppPreviewImage({ id }: AppProps) {
   );
 }
 
-async function AppDetails({ id }: AppProps) {
-  const application = await getApplicationById(id);
+async function AppDetails({ name }: AppProps) {
+  const application = await getApplicationByName(name);
   if (!application)
     redirect("/dashboard/applications");
 
@@ -75,8 +118,8 @@ async function AppDetails({ id }: AppProps) {
   );
 }
 
-async function AppConfiguration({ id }: AppProps) {
-  const application = await getApplicationById(id);
+async function AppConfiguration({ name }: AppProps) {
+  const application = await getApplicationByName(name);
   if (!application)
     redirect("/dashboard/applications");
   const rawEnvs = application.environmentVariable
@@ -89,50 +132,8 @@ async function AppConfiguration({ id }: AppProps) {
       fqdn={application.fqdn}
       port={application.port}
       environmentVariables={rawEnvs}
-      id={application.id}
+      name={application.name}
     />
-  );
-}
-
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  const id = (await params).id;
-
-  if (!Number.parseInt(id))
-    redirect("/dashboard/applications");
-
-  return (
-    <section className="p-5 bg-background/50 border">
-      <PageTitle>Application configuration</PageTitle>
-      <div className="mt-8 grid grid-cols-4 gap-4">
-        <Suspense
-          fallback={(
-            <Skeleton className="flex justify-center items-center rounded-xl h-full w-full bg-secondary col-span-4 md:col-span-1 lg:col-span-2 2xl:col-span-1">
-              <p>Screenshot in progress...</p>
-            </Skeleton>
-          )}
-        >
-          <AppPreviewImage id={id} />
-        </Suspense>
-        <Suspense
-          fallback={
-            <Skeleton className="rounded-xl col-span-4 md:col-span-3 lg:col-span-2 2xl:col-span-3" />
-          }
-        >
-          <AppDetails id={id} />
-        </Suspense>
-
-        <div className="col-span-4 mt-4">
-          <h2 className="text-xl font-bold mb-2">Update application details</h2>
-          <Suspense fallback={<GetApplicationLoadingScreen />}>
-            <AppConfiguration id={id} />
-          </Suspense>
-          <div className="p-3 text-destructive border border-dashed border-destructive">
-            <h3 className="text-lg font-bold mb-4">Danger zone</h3>
-            <DeleteAppForm id={id} />
-          </div>
-        </div>
-      </div>
-    </section>
   );
 }
 

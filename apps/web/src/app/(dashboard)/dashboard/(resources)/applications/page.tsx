@@ -9,6 +9,7 @@ import { Skeleton } from "@/app/_components/ui/skeleton";
 import { formatDate } from "@/app/_lib/utils";
 
 import { AppCard } from "./_components/app-card";
+import { SubscribeToSSE } from "./_components/subscribe-to-sse";
 import { getApplications } from "./_lib/queries";
 
 export default async function ApplicationsPage() {
@@ -23,9 +24,11 @@ export default async function ApplicationsPage() {
       </div>
 
       <div className="mt-8 h-full">
-        <Suspense fallback={<Skeleton className="h-32 w-full" />}>
-          <ApplicationList />
-        </Suspense>
+        <SubscribeToSSE>
+          <Suspense fallback={<Skeleton className="h-32 w-full" />}>
+            <ApplicationList />
+          </Suspense>
+        </SubscribeToSSE>
       </div>
     </section>
   );
@@ -42,7 +45,7 @@ async function ApplicationList() {
           key={application.id}
           id={application.id}
           name={application.name}
-          fqdn={application.fqdn}
+          initialState={application.state}
           firstDeploymentAt={formatDate(application.createdAt) ?? "Unknown"}
         />
       ))}

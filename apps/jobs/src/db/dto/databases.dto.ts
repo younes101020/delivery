@@ -1,5 +1,7 @@
 import { z } from "@hono/zod-openapi";
 
+import { containersDto } from "./containers.dto";
+
 const database = z.union([
   z.literal("mysql"),
   z.literal("mariadb"),
@@ -17,25 +19,11 @@ export const createDatabaseSchemaResp = z.object({
   success: z.literal(true),
 });
 
-export const databaseSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  state: z.union([
-    z.literal("created"),
-    z.literal("restarting"),
-    z.literal("running"),
-    z.literal("removing"),
-    z.literal("paused"),
-    z.literal("exited"),
-    z.literal("dead"),
-  ]),
-  createdAt: z.number(),
-  isProcessing: z.boolean(),
-});
+export const databaseSchema = containersDto;
 
 export const databaseLinkSchema = z.object({
   environmentKey: z.string(),
-  applicationId: z.coerce.number(),
+  applicationName: z.string(),
 });
 
 export type CreateDatabaseSchema = z.infer<typeof createDatabaseSchema>;

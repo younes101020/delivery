@@ -3,12 +3,12 @@ import { unstable_cacheTag } from "next/cache";
 
 import { client } from "@/app/_lib/client-http";
 
-export async function getApplicationById(id: string) {
+export async function getApplicationByName(name: string) {
   "use cache";
-  unstable_cacheTag(`application-${id}`);
-  const response = await client.applications[":id"].$get({
+  unstable_cacheTag(`application-${name}`);
+  const response = await client.applications[":slug"].$get({
     param: {
-      id,
+      slug: name,
     },
   });
   if (response.status !== 200) {
@@ -18,12 +18,12 @@ export async function getApplicationById(id: string) {
 }
 
 export async function getApplicationSreenshotUrl(
-  applicationId: number,
+  applicationName: string,
   applicationUrl: string = "https://facebook.com",
 ) {
   const response = await client.screenshots.$post({
     json: {
-      applicationId,
+      applicationName,
       url: applicationUrl,
     },
   });

@@ -1,1 +1,3 @@
-export const PREFIX = "deployment";
+import { prefix } from "@/lib/tasks/const";
+
+export const PREFIX = prefix.DEPLOYMENT;

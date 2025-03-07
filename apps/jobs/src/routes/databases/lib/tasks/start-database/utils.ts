@@ -1,10 +1,11 @@
 import { Queue } from "bullmq";
 
+import { queueNames } from "@/lib/tasks/const";
 import { connection, getBullConnection } from "@/lib/tasks/utils";
 
 import type { AllStartQueueDatabaseJobsData } from "./types";
 
-import { PREFIX, queueNames } from "../const";
+import { PREFIX } from "../const";
 
 export const queueName = queueNames.START;
 

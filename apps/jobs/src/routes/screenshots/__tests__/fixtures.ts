@@ -4,19 +4,19 @@ import { db } from "@/db";
 import { applications } from "@/db/schema";
 
 interface Fixtures {
-  registeredApplicationId: number;
+  registeredApplicationName: string;
 }
 
-const registeredApplicationId = await getRandomRegisteredApplicationId();
+const registeredApplicationName = await getRandomRegisteredApplicationName();
 
 export const it = base.extend<Fixtures>({
   // eslint-disable-next-line no-empty-pattern
-  registeredApplicationId: async ({}, use) => {
-    await use(registeredApplicationId);
+  registeredApplicationName: async ({}, use) => {
+    await use(registeredApplicationName);
   },
 });
 
-async function getRandomRegisteredApplicationId() {
-  const [registeredApplication] = await db.select({ id: applications.id }).from(applications).limit(1);
-  return registeredApplication.id;
+async function getRandomRegisteredApplicationName() {
+  const [registeredApplication] = await db.select({ name: applications.name }).from(applications).limit(1);
+  return registeredApplication.name;
 }

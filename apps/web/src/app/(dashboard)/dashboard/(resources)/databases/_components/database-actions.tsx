@@ -11,8 +11,8 @@ import { cn } from "@/app/_lib/utils";
 
 import type { DatabaseStatusData } from "./types";
 
+import { state } from "../../const";
 import { startContainer, stopContainer } from "../actions";
-import { state } from "./const";
 
 interface DatabaseActionsProps {
   initialState: string;

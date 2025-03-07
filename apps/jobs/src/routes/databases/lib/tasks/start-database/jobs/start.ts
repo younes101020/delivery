@@ -1,5 +1,5 @@
 import { DatabaseError } from "@/lib/error";
-import { docker } from "@/routes/databases/lib/remote-docker/utils";
+import { docker } from "@/lib/remote-docker";
 
 import type { StartQueueDatabaseJob } from "../types";
 

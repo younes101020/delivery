@@ -5,8 +5,7 @@ import type { CreateDatabaseSchema } from "@/db/dto";
 
 import { subscribeWorkerTo } from "@/lib/tasks/utils";
 
-import { PREFIX } from "../const";
-import { getCreateDatabaseQueue, queueName } from "./utils";
+import { getCreateDatabaseQueue, PREFIX, queueName } from "./utils";
 
 const PROCESSOR_FILE = join(dirname(fileURLToPath(import.meta.url)), "../worker.ts");
 

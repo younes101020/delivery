@@ -23,7 +23,6 @@ import { injectEnv } from "../actions";
 interface EnvironmentVariableCardProps {
   containerId: string;
   applications: {
-    applicationId: number;
     applicationName: string;
   }[];
 }
@@ -55,10 +54,10 @@ export function EnvironmentVariableCard({ containerId, applications }: Environme
 
         <form action={formAction} className="space-y-4 mt-4">
           <div className="flex flex-col gap-4">
-            <Label htmlFor="application">
+            <Label htmlFor="applicationName">
               Application target
             </Label>
-            <Select name="application">
+            <Select name="applicationName">
               <SelectTrigger>
                 <SelectValue placeholder="Select a application" defaultValue={state.inputs.name} />
               </SelectTrigger>
@@ -66,7 +65,7 @@ export function EnvironmentVariableCard({ containerId, applications }: Environme
                 <SelectGroup>
                   <SelectLabel>Applications</SelectLabel>
                   {applications.map(application => (
-                    <SelectItem key={application.applicationId} value={`${application.applicationId}:${application.applicationName}`}>
+                    <SelectItem key={application.applicationName} value={application.applicationName}>
                       {application.applicationName}
                     </SelectItem>
                   ))}

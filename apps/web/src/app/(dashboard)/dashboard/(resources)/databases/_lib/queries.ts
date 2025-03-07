@@ -18,7 +18,6 @@ export async function getApplications() {
   const apps = await response.json();
 
   return apps.map(app => ({
-    applicationId: app.id,
     applicationName: app.name,
   }));
 }
