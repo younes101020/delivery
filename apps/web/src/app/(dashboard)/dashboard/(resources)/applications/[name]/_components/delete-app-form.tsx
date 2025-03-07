@@ -18,10 +18,10 @@ import {
 import { removeApplication } from "../../actions";
 
 interface DeleteAppProps {
-  id: string;
+  name: string;
 }
 
-export default function DeleteAppForm({ id }: DeleteAppProps) {
+export default function DeleteAppForm({ name }: DeleteAppProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -48,7 +48,7 @@ export default function DeleteAppForm({ id }: DeleteAppProps) {
             disabled={isLoading}
             onClick={async () => {
               setIsLoading(true);
-              const { success } = await removeApplication(id);
+              const { success } = await removeApplication(name);
               if (success)
                 router.push("/dashboard/applications");
               setIsLoading(false);

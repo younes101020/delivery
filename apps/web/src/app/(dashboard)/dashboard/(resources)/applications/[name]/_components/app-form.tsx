@@ -14,7 +14,7 @@ import { Textarea } from "@/app/_components/ui/textarea";
 import { editApplication } from "../../actions";
 
 interface AppFormProps {
-  id: number;
+  name: string;
   fqdn?: string | undefined;
   port?: number | undefined;
   environmentVariables?: string;
@@ -27,7 +27,7 @@ export function AppForm(applicationData: AppFormProps) {
       error: "",
       success: "",
       inputs: {
-        id: applicationData.id,
+        name: applicationData.name,
         fqdn: applicationData.fqdn,
         port: applicationData.port,
         environmentVariables: applicationData.environmentVariables,
@@ -72,7 +72,7 @@ export function AppForm(applicationData: AppFormProps) {
           className=" min-h-36"
         />
       </div>
-      <input type="hidden" name="id" id="id" defaultValue={state.inputs?.id} />
+      <input type="hidden" name="name" id="name" defaultValue={state.inputs?.name} />
 
       {state?.error && <div className="text-destructive text-sm">{state.error}</div>}
 

@@ -4,9 +4,8 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 import type { AppRouteHandler } from "@/lib/types";
 
 import {
-  deleteApplicationById,
-  getApplications,
-  getApplicationWithEnvVarsById,
+  deleteApplicationByName,
+  getApplicationWithEnvVarsByName,
   patchApplication,
 } from "@/db/queries/queries";
 import { APPLICATIONS_PATH, ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
@@ -20,15 +19,30 @@ import type {
 } from "./applications.routes";
 
 import { deleteDeploymentJobs } from "../deployments/lib/tasks/deploy/utils";
+import { getApplicationsContainers } from "./lib/remote-docker/utils";
+import { getApplicationsActiveJobs } from "./tasks/utils";
 
 export const list: AppRouteHandler<ListRoute> = async (c) => {
-  const applications = await getApplications();
-  return c.json(applications);
+  const [applications, activeJobs] = await Promise.all([
+    getApplicationsContainers(),
+    getApplicationsActiveJobs(),
+  ]);
+  const appsWithStatus = applications.map((app) => {
+    const activeJob = activeJobs.find(job => job.containerId === app.id);
+    if (activeJob) {
+      return {
+        ...app,
+        isProcessing: true,
+      };
+    }
+    return app;
+  });
+  return c.json(appsWithStatus, HttpStatusCodes.OK);
 };
 
 export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
-  const { id } = c.req.valid("param");
-  const application = await getApplicationWithEnvVarsById(id);
+  const { slug } = c.req.valid("param");
+  const application = await getApplicationWithEnvVarsByName(slug);
   if (!application) {
     return c.json(
       {
@@ -56,7 +70,7 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
 };
 
 export const patch: AppRouteHandler<PatchRoute> = async (c) => {
-  const { id } = c.req.valid("param");
+  const { slug } = c.req.valid("param");
   const updates = c.req.valid("json");
 
   const noUpdatesFound = Object.keys(updates.applicationData).length === 0 && (!Array.isArray(updates.environmentVariable) || Object.keys(updates.environmentVariable[0]).length === 0);
@@ -80,7 +94,7 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
     );
   }
 
-  const updatedField = await patchApplication(id, updates);
+  const updatedField = await patchApplication(slug, updates);
 
   if (!updatedField) {
     return c.json(
@@ -98,33 +112,25 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
 };
 
 export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
-  const { id } = c.req.valid("param");
-  const repoName = await deleteApplicationById(id);
+  const { slug } = c.req.valid("param");
 
-  if (!repoName) {
-    return c.json(
+  await Promise.all([
+    deleteApplicationByName(slug),
+    ssh(
+      `rm -Rvf ${slug} && sudo docker rm -f $(docker ps -a -q --filter ancestor=${slug}) && docker rmi ${slug}`,
       {
-        message: HttpStatusPhrases.NOT_FOUND,
+        cwd: `${APPLICATIONS_PATH}`,
       },
-      HttpStatusCodes.NOT_FOUND,
-    );
-  }
-
-  await ssh(
-    `rm -Rvf ${repoName} && sudo docker rm -f $(docker ps -a -q --filter ancestor=${repoName}) && docker rmi ${repoName}`,
-    {
-      cwd: `${APPLICATIONS_PATH}`,
-    },
-  ).catch((e) => {
-    return c.json(
-      {
-        message: e instanceof Error ? e.message : HttpStatusPhrases.INTERNAL_SERVER_ERROR,
-      },
-      HttpStatusCodes.INTERNAL_SERVER_ERROR,
-    );
-  });
-
-  await deleteDeploymentJobs(repoName);
+    ).catch((e) => {
+      return c.json(
+        {
+          message: e instanceof Error ? e.message : HttpStatusPhrases.INTERNAL_SERVER_ERROR,
+        },
+        HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      );
+    }),
+    deleteDeploymentJobs(slug),
+  ]);
 
   return c.body(null, HttpStatusCodes.NO_CONTENT);
 };

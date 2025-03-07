@@ -1,7 +1,3 @@
-export const PREFIX = "database";
+import { prefix } from "@/lib/tasks/const";
 
-export const queueNames = {
-  CREATE: "create",
-  START: "start",
-  STOP: "stop",
-};
+export const PREFIX = prefix.DATABASE;

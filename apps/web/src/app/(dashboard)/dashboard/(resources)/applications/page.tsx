@@ -40,9 +40,7 @@ async function ApplicationList() {
       {applications.map(application => (
         <AppCard
           key={application.id}
-          id={application.id}
           name={application.name}
-          fqdn={application.fqdn}
           firstDeploymentAt={formatDate(application.createdAt) ?? "Unknown"}
         />
       ))}

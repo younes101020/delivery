@@ -1,33 +1,22 @@
-import Docker from "dockerode";
 import { HTTPException } from "hono/http-exception";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
-import type { DatabaseSchema } from "@/db/dto/databases.dto";
+import type { ContainersDto } from "@/db/dto/containers.dto";
 
-import { loadConfig } from "@/lib/ssh/utils";
-
-const sshConfig = await loadConfig();
-export const docker = new Docker({ protocol: "ssh", username: sshConfig.username, sshOptions: sshConfig });
+import { docker } from "@/lib/remote-docker";
 
 export async function getDatabasesContainers() {
-  const dbContainers = await docker.listContainers({ all: true });
+  const dbContainers = await docker.listContainers({
+    all: true,
+    filters: { label: ["resource=database"] },
+  });
   return dbContainers.map(({ Image, Id, State, Created }) => ({
     name: Image.split(":")[0],
     id: Id,
-    state: State as DatabaseSchema["state"],
+    state: State as ContainersDto["state"],
     createdAt: Created,
     isProcessing: false,
   }));
-}
-
-export async function stopDatabaseContainer(containerId: string) {
-  const container = docker.getContainer(containerId);
-  await container.stop();
-}
-
-export async function startDatabaseContainer(containerId: string) {
-  const container = docker.getContainer(containerId);
-  await container.start();
 }
 
 export async function getDatabaseEnvVarsByEnvVarKeys(containerId: string, envVarKey: string[]) {

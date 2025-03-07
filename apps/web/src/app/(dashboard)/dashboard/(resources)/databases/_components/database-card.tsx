@@ -13,7 +13,6 @@ interface DatabaseCardProps {
   isProcessing: boolean;
   createdAt: number;
   applications: {
-    applicationId: number;
     applicationName: string;
   }[] | null;
 }

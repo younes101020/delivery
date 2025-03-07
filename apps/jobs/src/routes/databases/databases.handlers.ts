@@ -126,7 +126,7 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
 
 export const link: AppRouteHandler<LinkRoute> = async (c) => {
   const { id: containerId } = c.req.valid("param");
-  const { environmentKey, applicationId } = c.req.valid("json");
+  const { environmentKey, applicationName } = c.req.valid("json");
 
   const dbCredentialsEnvVars = await getDatabaseEnvVarsByEnvVarKeys(containerId, ["POSTGRES_USER", "POSTGRES_PASSWORD"]);
 
@@ -141,7 +141,7 @@ export const link: AppRouteHandler<LinkRoute> = async (c) => {
 
   const databaseUrl = `postgres://${postgresUser}:${postgresPassword}@localhost:5432`;
 
-  await patchApplication(applicationId, { applicationData: {}, environmentVariable: [{ key: environmentKey, value: databaseUrl }] });
+  await patchApplication(applicationName, { applicationData: {}, environmentVariable: [{ key: environmentKey, value: databaseUrl }] });
 
   return c.json(null, HttpStatusCodes.OK);
 };

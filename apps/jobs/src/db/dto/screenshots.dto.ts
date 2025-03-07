@@ -2,7 +2,7 @@ import { z } from "@hono/zod-openapi";
 
 export const selectScreenshotSchema = z.object({
   url: z.string().url(),
-  applicationId: z.coerce.number(),
+  applicationName: z.string(),
 });
 
 export const selectUrlScreenshotSchema = z.object({

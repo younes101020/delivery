@@ -1,7 +1,7 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
-import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
+import { createErrorSchema, SlugParamsSchema } from "stoker/openapi/schemas";
 
 import {
   patchApplicationsSchema,
@@ -25,10 +25,10 @@ export const list = createRoute({
 });
 
 export const getOne = createRoute({
-  path: "/applications/{id}",
+  path: "/applications/{slug}",
   method: "get",
   request: {
-    params: IdParamsSchema,
+    params: SlugParamsSchema,
   },
   tags,
   responses: {
@@ -38,17 +38,17 @@ export const getOne = createRoute({
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Application not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(IdParamsSchema),
-      "Invalid id error",
+      createErrorSchema(SlugParamsSchema),
+      "Invalid slug error",
     ),
   },
 });
 
 export const patch = createRoute({
-  path: "/applications/{id}",
+  path: "/applications/{slug}",
   method: "patch",
   request: {
-    params: IdParamsSchema,
+    params: SlugParamsSchema,
     body: jsonContentRequired(patchApplicationsSchema, "The application updates"),
   },
   tags,
@@ -59,17 +59,17 @@ export const patch = createRoute({
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Application not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(patchApplicationsSchema).or(createErrorSchema(IdParamsSchema)),
+      createErrorSchema(patchApplicationsSchema).or(createErrorSchema(SlugParamsSchema)),
       "The validation error(s)",
     ),
   },
 });
 
 export const remove = createRoute({
-  path: "/applications/{id}",
+  path: "/applications/{slug}",
   method: "delete",
   request: {
-    params: IdParamsSchema,
+    params: SlugParamsSchema,
   },
   tags,
   responses: {
@@ -78,8 +78,8 @@ export const remove = createRoute({
     },
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Application not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(IdParamsSchema),
-      "Invalid id error",
+      createErrorSchema(SlugParamsSchema),
+      "Invalid slug error",
     ),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(
       internalServerSchema,

@@ -16,18 +16,18 @@ const editApplicationSchema = z
       .number()
       .optional(),
     environmentVariables: z.string(),
-    id: z.coerce.number(),
+    name: z.string(),
   })
   .partial()
-  .required({ id: true });
+  .required({ name: true });
 
 export const editApplication = validatedAction(
   editApplicationSchema,
   async (data, _, prevState) => {
     const changes = getFormChangesAction(data, prevState);
     const { environmentVariables, ...applicationData } = changes;
-    const response = await client.applications[":id"].$patch({
-      param: { id: changes.id },
+    const response = await client.applications[":slug"].$patch({
+      param: { slug: changes.name },
       json: {
         applicationData,
         environmentVariable: transformEnvVars(environmentVariables),
@@ -39,21 +39,21 @@ export const editApplication = validatedAction(
         inputs: data,
       };
     }
-    revalidateTag(`application-${data.id}`);
+    revalidateTag(`application-${data.name}`);
     return { success: "Application updated successfully.", inputs: data };
   },
 );
 
-export async function removeApplication(id: string) {
-  const response = await client.applications[":id"].$delete({
-    param: { id },
+export async function removeApplication(name: string) {
+  const response = await client.applications[":slug"].$delete({
+    param: { slug: name },
   });
   if (response.status !== 204) {
     return {
       success: false,
     };
   }
-  revalidateTag(`application-${id}`);
+  revalidateTag(`application-${name}`);
   return {
     success: true,
   };

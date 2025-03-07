@@ -200,9 +200,17 @@ export async function getApplications() {
   return await db.query.applications.findMany();
 }
 
-export async function getApplicationWithEnvVarsById(id: number) {
+export async function getApplicationsNames() {
+  return await db.query.applications.findMany({
+    columns: {
+      name: true,
+    },
+  });
+}
+
+export async function getApplicationWithEnvVarsByName(name: string) {
   return await db.query.applications.findFirst({
-    where: eq(applications.id, id),
+    where: eq(applications.name, name),
     with: {
       applicationEnvironmentVariables: {
         with: {
@@ -213,17 +221,19 @@ export async function getApplicationWithEnvVarsById(id: number) {
   });
 }
 
-export async function patchApplication(id: number, updates: PatchApplicationSchema) {
+export async function patchApplication(name: string, updates: PatchApplicationSchema) {
   return await db.transaction(async (tx) => {
     const { applicationData, environmentVariable } = updates;
 
     let application: PatchApplicationSchema | null = null;
 
+    const [app] = await tx.select({ id: applications.id }).from(applications).where(eq(applications.name, name)).limit(1);
+
     if (Object.keys(applicationData).length > 0) {
       const [updatedApplication] = await tx
         .update(applications)
         .set({ ...applicationData, updatedAt: new Date() })
-        .where(eq(applications.id, id))
+        .where(eq(applications.name, name))
         .returning();
 
       application = Object.assign({}, { applicationData: updatedApplication });
@@ -253,7 +263,7 @@ export async function patchApplication(id: number, updates: PatchApplicationSche
               .returning();
 
             await tx.insert(applicationEnvironmentVariables).values({
-              applicationId: id,
+              applicationId: app.id,
               environmentVariableId: insertedEnvVar.id,
             });
 
@@ -274,22 +284,10 @@ export async function patchApplication(id: number, updates: PatchApplicationSche
   });
 }
 
-export async function deleteApplicationById(id: number) {
-  const [result] = await db
+export async function deleteApplicationByName(name: string) {
+  return await db
     .delete(applications)
-    .where(eq(applications.id, id))
-    .returning({ name: applications.name });
-  return result?.name;
-}
-
-export async function getApplicationNameById(id: number) {
-  const [result] = await db
-    .select({ name: applications.name })
-    .from(applications)
-    .where(eq(applications.id, id))
-    .limit(1);
-
-  return result?.name;
+    .where(eq(applications.name, name));
 }
 
 export async function getEnvironmentVariablesForApplication(applicationId: number) {

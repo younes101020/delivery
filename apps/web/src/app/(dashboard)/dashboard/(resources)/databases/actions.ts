@@ -8,18 +8,17 @@ import { validatedAction } from "@/app/_lib/form-middleware";
 const injectEnvSchema = z.object({
   containerId: z.string(),
   env: z.string(),
-  application: z.string(),
+  applicationName: z.string(),
 });
 
 export const injectEnv = validatedAction(injectEnvSchema, async (inputs) => {
-  const { containerId, env, application } = inputs;
-  const [applicationId, applicationName] = application.split(":");
+  const { containerId, env, applicationName } = inputs;
 
   const envResponse = await client.databases[":id"].link.$post({
     param: { id: containerId },
     json: {
       environmentKey: env,
-      applicationId: Number.parseInt(applicationId),
+      applicationName,
     },
   });
 

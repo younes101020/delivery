@@ -16,7 +16,7 @@ export async function build(job: QueueDeploymentJob<"build">) {
   await job.updateProgress({ logs: "\nImage will be built..." });
 
   const buildAndExtractStaticArtefactCmd = staticdeploy && `nixpacks build ./ --name buildonly-${repoName} --start-cmd "echo 'static web files extraction in progress...'; /bin/bash" ${!cache ? "--no-cache" : ""} && docker run -dt --name temp-${repoName} buildonly-${repoName} && mkdir ./build-artefact && cd ./build-artefact && docker container cp -a temp-${repoName}:/app${publishdir} ./ && docker ps -q --filter ancestor=buildonly-${repoName} | xargs -r docker stop && docker ps -aq --filter ancestor=buildonly-${repoName} | xargs -r docker rm && docker rmi buildonly-${repoName} &&`;
-  const deployCmd = `nixpacks build ./ --name ${repoName} ${!cache ? "--no-cache" : ""} -l "traefik.enable=true" -l "traefik.http.routers.${repoName}.rule=Host(\\\`${fqdn}\\\`)" -l "traefik.http.services.${repoName}.loadbalancer.server.port=${port}" && docker run ${env ?? ""} --network host_network -d ${repoName}`;
+  const deployCmd = `nixpacks build ./ --name ${repoName} ${!cache ? "--no-cache" : ""} -l "resource=application" -l "traefik.enable=true" -l "traefik.http.routers.${repoName}.rule=Host(\\\`${fqdn}\\\`)" -l "traefik.http.services.${repoName}.loadbalancer.server.port=${port}" && docker run ${env ?? ""} --network host_network -d ${repoName}`;
 
   const fullCmd = staticdeploy ? `${buildAndExtractStaticArtefactCmd} ${deployCmd}` : deployCmd;
 

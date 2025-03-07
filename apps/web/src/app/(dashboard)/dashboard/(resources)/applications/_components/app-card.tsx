@@ -1,22 +1,20 @@
 "use client";
 
-import { ExternalLink, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/app/_components/ui/button";
-import { Card, CardContent, CardFooter } from "@/app/_components/ui/card";
+import { Card, CardContent } from "@/app/_components/ui/card";
 
 interface AppCardProps {
-  id: number;
   name: string;
-  fqdn: string;
   firstDeploymentAt: string;
   lastDeployed?: string;
 }
 
-export function AppCard({ name, fqdn, firstDeploymentAt, id }: AppCardProps) {
+export function AppCard({ name, firstDeploymentAt }: AppCardProps) {
   return (
-    <Link href={`/dashboard/applications/${id}`} className="block">
+    <Link href={`/dashboard/applications/${name}`} className="block">
       <Card className="w-full transition-all">
         <CardContent className="p-6 bg-sidebar/50">
           <div className="flex items-center justify-between mb-4">
@@ -35,20 +33,6 @@ export function AppCard({ name, fqdn, firstDeploymentAt, id }: AppCardProps) {
             <dd className="text-xs">{firstDeploymentAt}</dd>
           </dl>
         </CardContent>
-        <CardFooter className="bg-muted/50 p-6">
-          <div className="flex justify-between items-center w-full">
-            <Button
-              variant="outline"
-              onClick={(e) => {
-                e.preventDefault();
-                window.open(`//${fqdn}`, "_blank");
-              }}
-            >
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Visit
-            </Button>
-          </div>
-        </CardFooter>
       </Card>
     </Link>
   );
