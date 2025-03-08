@@ -1,9 +1,7 @@
-import { Job, Queue, QueueEvents } from "bullmq";
+import { Queue, QueueEvents } from "bullmq";
 
 import { prefix, queueNames } from "@/lib/tasks/const";
 import { connection, getBullConnection } from "@/lib/tasks/utils";
-
-import type { AllQueueDatabaseJobsData } from "./types";
 
 export async function getDatabaseQueuesEvents() {
   const bullConnection = getBullConnection(connection);
@@ -30,21 +28,6 @@ export async function getDatabasesActiveJobs() {
   );
 
   return activeJobs.flat();
-}
-
-export async function getDatabaseJobAndQueueNameByJobId(jobId: string) {
-  const dbQueues = await getDatabaseQueues();
-
-  const jobsWithQueueName = await Promise.all(
-    dbQueues.map(async (queue) => {
-      const job = await Job.fromId<AllQueueDatabaseJobsData>(queue, jobId);
-      return { queueName: queue.name, job };
-    }),
-  );
-
-  const job = jobsWithQueueName.find(jwQueue => jwQueue.job !== null && jwQueue.job !== undefined) ?? null;
-
-  return job;
 }
 
 export async function getDatabaseQueues() {

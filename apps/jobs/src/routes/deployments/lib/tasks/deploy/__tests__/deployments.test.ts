@@ -18,18 +18,14 @@ describe("deployments tests", () => {
   });
 
   const mocks = vi.hoisted(() => {
+    const env = { key: "VAR", value: "VAL" };
     return {
       getGithubAppByAppId: vi.fn().mockResolvedValue({ secret: true }),
       getSystemDomainName: vi.fn().mockResolvedValue("https://domain.com"),
       fromGitUrlToQueueName: vi.fn().mockReturnValue("my-app"),
       waitForDeploymentToComplete: vi.fn(),
-      transformEnvVars: vi.fn().mockReturnValue(
-        {
-          cmdEnvVars: "-e VAR=VAL",
-          persistedEnvVars: [{ key: "VAR", value: "VAL" }],
-        },
-      ),
       parseAppHost: vi.fn().mockReturnValue("https://my-app.domain.com"),
+      transformEnvVars: vi.fn().mockReturnValue({ cmdEnvVars: `-e ${env.key}=${env.value}`, persistedEnvVars: [env] }),
     };
   });
 
@@ -46,18 +42,28 @@ describe("deployments tests", () => {
   });
 
   vi.mock("@/db/queries/queries", () => {
+    const env = { key: "VAR", value: "VAL" };
     return {
       getGithubAppByAppId: mocks.getGithubAppByAppId,
       getSystemDomainName: mocks.getSystemDomainName,
+      getApplicationIdByName: vi.fn().mockResolvedValue(1),
+      getEnvironmentVariablesForApplication: vi.fn().mockResolvedValue([env]),
     };
   });
 
   vi.mock("@/routes/deployments/lib/tasks/deploy/utils", () => {
+    const env = { key: "VAR", value: "VAL" };
     return {
       fromGitUrlToQueueName: mocks.fromGitUrlToQueueName,
-      transformEnvVars: mocks.transformEnvVars,
+      transformEnvVars: vi.fn().mockReturnValue(
+        {
+          cmdEnvVars: `-e ${env.key}=${env.value}`,
+          persistedEnvVars: [env],
+        },
+      ),
       parseAppHost: mocks.parseAppHost,
       waitForDeploymentToComplete: mocks.waitForDeploymentToComplete,
+      persistedEnvVarsToCmdEnvVars: vi.fn().mockReturnValue(`-e ${env.key}=${env.value}`),
     };
   });
 
@@ -168,6 +174,7 @@ describe("deployments tests", () => {
     });
 
     it("call the add method from bullmq flowproducer with jobs dependencies", async ({ completedJobs }) => {
+      const env = { key: "VAR", value: "VAL" };
       const jobMap = new Map(completedJobs.map(j => [j.name, j.data]));
       const overrideNonInitialQueueData = { isCriticalError: undefined, logs: undefined };
       const queueName = jobMap.get("configure")?.repoName;
@@ -179,12 +186,12 @@ describe("deployments tests", () => {
 
       expect(spy).toHaveBeenCalledWith({
         name: JOBS.configure,
-        data: { ...jobMap.get("configure"), ...overrideNonInitialQueueData },
+        data: { ...jobMap.get("configure"), environmentVariable: [env], ...overrideNonInitialQueueData },
         queueName,
         children: [
           {
             name: JOBS.build,
-            data: { ...jobMap.get("build"), ...overrideNonInitialQueueData },
+            data: { ...jobMap.get("build"), env: `-e ${env.key}=${env.value}`, ...overrideNonInitialQueueData },
             queueName,
             opts: { attempts: 3, failParentOnFailure: true },
             children: [

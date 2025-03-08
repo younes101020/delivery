@@ -11,7 +11,7 @@ import { queueName } from "./utils";
 
 export const PROCESSOR_FILE = join(dirname(fileURLToPath(import.meta.url)), "../worker.ts");
 
-export async function stopDatabase(containerId: string) {
+export async function stopApplication(containerId: string) {
   subscribeWorkerTo(queueName, PREFIX, PROCESSOR_FILE);
 
   const stopDbQueue = new Queue<AllStopQueueApplicationJobsData>(queueName, { connection: getBullConnection(connection), prefix: PREFIX });

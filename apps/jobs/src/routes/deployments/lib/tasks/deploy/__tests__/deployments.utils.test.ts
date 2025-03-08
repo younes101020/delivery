@@ -99,4 +99,9 @@ describe("deployments utils unit tests", () => {
     const expected = `-e ${persistedEnvVars[0].key}=${persistedEnvVars[0].value} -e ${persistedEnvVars[1].key}=${persistedEnvVars[1].value}`;
     expect(persistedEnvVarsToCmdEnvVars(persistedEnvVars)).toBe(expected);
   });
+
+  it("return command environment variables from objects env vars", ({ persistedEnvVars }) => {
+    const expected = `-e ${persistedEnvVars[0].key}=${persistedEnvVars[0].value} -e ${persistedEnvVars[1].key}=${persistedEnvVars[1].value}`;
+    expect(persistedEnvVarsToCmdEnvVars(persistedEnvVars)).toBe(expected);
+  });
 });

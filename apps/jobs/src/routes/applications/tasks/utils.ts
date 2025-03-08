@@ -1,8 +1,13 @@
-import { Queue } from "bullmq";
+import { Queue, QueueEvents } from "bullmq";
 
 import { getApplicationsNames } from "@/db/queries/queries";
 import { prefix } from "@/lib/tasks/const";
 import { connection, getBullConnection } from "@/lib/tasks/utils";
+
+import { PREFIX } from "./const";
+
+const bullConnection = getBullConnection(connection);
+const applicationsName = await getApplicationsNames();
 
 export async function getApplicationsActiveJobs() {
   const appQueues = await getApplicationQueues();
@@ -24,10 +29,13 @@ export async function getApplicationsActiveJobs() {
 }
 
 export async function getApplicationQueues() {
-  const bullConnection = getBullConnection(connection);
-  const applicationsName = await getApplicationsNames();
-
   return Object.values(applicationsName).map(({ name }) => {
     return new Queue(name, { connection: bullConnection, prefix: prefix.APPLICATION });
   });
+}
+
+export async function getApplicationQueuesEvents() {
+  const appQueueEvents = Object.values(applicationsName).map(({ name }) => new QueueEvents(name, { connection: bullConnection, prefix: PREFIX }));
+
+  return appQueueEvents;
 }

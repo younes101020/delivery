@@ -24,6 +24,64 @@ export const list = createRoute({
   },
 });
 
+export const streamCurrentApplication = createRoute({
+  path: "/applications/ongoing",
+  method: "get",
+  description: "Stream real-time updates about applications that are currently being started or stopped.",
+  tags,
+  responses: {
+    [HttpStatusCodes.OK]: {
+      content: {
+        "text/event-stream": {
+          schema: z.object({
+            id: z.string(),
+            timestamp: z.number(),
+            status: z.enum(["completed", "failed", "stopped"]),
+          }),
+        },
+      },
+      description: "Stream of application startup/stop status updates",
+    },
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "No applications are currently being started or stopped"),
+  },
+});
+
+export const stop = createRoute({
+  path: "/applications/{id}/stop",
+  method: "post",
+  description: "Stop a running application container.",
+  request: {
+    params: z.object({
+      id: z.string().describe("The ID of the application container to stop"),
+    }),
+  },
+  tags,
+  responses: {
+    [HttpStatusCodes.ACCEPTED]: {
+      description: "Application container stop request accepted",
+    },
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Application container not found"),
+  },
+});
+
+export const start = createRoute({
+  path: "/applications/{id}/start",
+  method: "post",
+  description: "Start a stopped application container.",
+  request: {
+    params: z.object({
+      id: z.string().describe("The ID of the application container to start"),
+    }),
+  },
+  tags,
+  responses: {
+    [HttpStatusCodes.ACCEPTED]: {
+      description: "Application container start request accepted",
+    },
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Application container not found"),
+  },
+});
+
 export const getOne = createRoute({
   path: "/applications/{slug}",
   method: "get",
@@ -89,6 +147,9 @@ export const remove = createRoute({
 });
 
 export type ListRoute = typeof list;
+export type StreamCurrentApplicationRoute = typeof streamCurrentApplication;
+export type StopRoute = typeof stop;
+export type StartRoute = typeof start;
 export type PatchRoute = typeof patch;
 export type GetOneRoute = typeof getOne;
 export type RemoveRoute = typeof remove;

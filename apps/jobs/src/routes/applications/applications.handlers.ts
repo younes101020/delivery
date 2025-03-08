@@ -1,3 +1,4 @@
+import { streamSSE } from "hono/streaming";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
@@ -10,17 +11,25 @@ import {
 } from "@/db/queries/queries";
 import { APPLICATIONS_PATH, ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
 import { ssh } from "@/lib/ssh";
+import { getJobAndQueueNameByJobId } from "@/lib/tasks/utils";
 
 import type {
   GetOneRoute,
   ListRoute,
   PatchRoute,
   RemoveRoute,
+  StartRoute,
+  StopRoute,
+  StreamCurrentApplicationRoute,
 } from "./applications.routes";
+import type { AllQueueApplicationJobsData } from "./tasks/types";
 
 import { deleteDeploymentJobs } from "../deployments/lib/tasks/deploy/utils";
 import { getApplicationsContainers } from "./lib/remote-docker/utils";
-import { getApplicationsActiveJobs } from "./tasks/utils";
+import { PREFIX, queueNames } from "./tasks/const";
+import { startApplication } from "./tasks/start-application";
+import { stopApplication } from "./tasks/stop-application";
+import { getApplicationQueuesEvents, getApplicationsActiveJobs } from "./tasks/utils";
 
 export const list: AppRouteHandler<ListRoute> = async (c) => {
   const [applications, activeJobs] = await Promise.all([
@@ -40,8 +49,6 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   return c.json(appsWithStatus, HttpStatusCodes.OK);
 };
 
-<<<<<<< Updated upstream
-=======
 export const stop: AppRouteHandler<StopRoute> = async (c) => {
   const { id } = c.req.valid("param");
 
@@ -129,7 +136,6 @@ export const streamCurrentApplication: AppRouteHandler<StreamCurrentApplicationR
   }) as any;
 };
 
->>>>>>> Stashed changes
 export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   const { slug } = c.req.valid("param");
   const application = await getApplicationWithEnvVarsByName(slug);
