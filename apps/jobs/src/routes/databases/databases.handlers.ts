@@ -4,14 +4,18 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import type { AppRouteHandler } from "@/lib/types";
 
 import { patchApplication } from "@/db/queries/queries";
+import { queueNames } from "@/lib/tasks/const";
+import { getJobAndQueueNameByJobId } from "@/lib/tasks/utils";
 
 import type { CreateRoute, LinkRoute, ListRoute, StartRoute, StopRoute, StreamCurrentDatabaseRoute } from "./databases.routes";
+import type { AllQueueDatabaseJobsData } from "./lib/tasks/types";
 
 import { getDatabaseEnvVarsByEnvVarKeys, getDatabasesContainers } from "./lib/remote-docker/utils";
+import { PREFIX } from "./lib/tasks/const";
 import { createDatabase } from "./lib/tasks/create-database";
 import { startDatabase } from "./lib/tasks/start-database";
 import { stopDatabase } from "./lib/tasks/stop-database";
-import { getDatabaseJobAndQueueNameByJobId, getDatabaseQueuesEvents, getDatabasesActiveJobs } from "./lib/tasks/utils";
+import { getDatabaseQueuesEvents, getDatabasesActiveJobs } from "./lib/tasks/utils";
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const databaseJobData = c.req.valid("json");
@@ -63,7 +67,7 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
     }
 
     async function activeHandler({ jobId }: { jobId: string }) {
-      const jobsWithQueueName = await getDatabaseJobAndQueueNameByJobId(jobId);
+      const jobsWithQueueName = await getJobAndQueueNameByJobId<AllQueueDatabaseJobsData>(jobId, queueNames, PREFIX);
 
       if (jobsWithQueueName?.job) {
         const { job, queueName } = jobsWithQueueName;
@@ -79,7 +83,7 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
     }
 
     async function completeHandler({ jobId }: { jobId: string }) {
-      const jobsWithQueueName = await getDatabaseJobAndQueueNameByJobId(jobId);
+      const jobsWithQueueName = await getJobAndQueueNameByJobId<AllQueueDatabaseJobsData>(jobId, queueNames, PREFIX);
 
       if (jobsWithQueueName?.job) {
         const { job, queueName } = jobsWithQueueName;
@@ -96,7 +100,7 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
     }
 
     async function failedHandler({ jobId }: { jobId: string }) {
-      const jobsWithQueueName = await getDatabaseJobAndQueueNameByJobId(jobId);
+      const jobsWithQueueName = await getJobAndQueueNameByJobId<AllQueueDatabaseJobsData>(jobId, queueNames, PREFIX);
 
       if (jobsWithQueueName?.job) {
         const { job, queueName } = jobsWithQueueName;

@@ -1,4 +1,4 @@
-import { Worker } from "bullmq";
+import { Job, Queue, Worker } from "bullmq";
 import Redis, { type RedisOptions } from "ioredis";
 import IORedis from "ioredis";
 
@@ -77,5 +77,28 @@ export async function fetchQueueTitles(redis: RedisType, prefix: Resources) {
       prefix: parts.slice(0, -2).join(":"),
       queueName: parts[parts.length - 2],
     };
+  });
+}
+
+export async function getJobAndQueueNameByJobId<T>(jobId: string, queueNames: Record<string, string>, prefix: string) {
+  const queues = await getQueuesByName(queueNames, prefix);
+
+  const jobsWithQueueName = await Promise.all(
+    queues.map(async (queue) => {
+      const job = await Job.fromId<T>(queue, jobId);
+      return { queueName: queue.name, job };
+    }),
+  );
+
+  const job = jobsWithQueueName.find(jwQueue => jwQueue.job !== null && jwQueue.job !== undefined) ?? null;
+
+  return job;
+}
+
+export async function getQueuesByName(queueNames: Record<string, string>, prefix: string) {
+  const bullConnection = getBullConnection(connection);
+
+  return Object.values(queueNames).map((queueName) => {
+    return new Queue(queueName, { connection: bullConnection, prefix });
   });
 }

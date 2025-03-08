@@ -244,6 +244,16 @@ export const retryJob: AppRouteHandler<RetryRoute> = async (c) => {
     );
   }
 
+  if (faileJob.name === "build") {
+    await ssh(
+      "git pull",
+      {
+        cwd: `${APPLICATIONS_PATH}/${queueName}`,
+        onStdout: () => Promise.resolve(),
+      },
+    );
+  }
+
   await faileJob?.retry();
   subscribeWorkerTo(queueName, PREFIX, processorFile);
   return c.json(null, HttpStatusCodes.ACCEPTED);
