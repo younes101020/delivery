@@ -10,12 +10,8 @@ import type { ApplicationStatusData } from "./types";
 
 import { state, variants } from "../../const";
 
-interface ApplicationStatusProps extends ContainerStatusProps {
-  name: string;
-}
-
-export function ApplicationStatus({ initialState, name }: ApplicationStatusProps) {
-  const { data } = useQuery<ApplicationStatusData>({ queryKey: [name] });
+export function ApplicationStatus({ initialState, id }: ContainerStatusProps) {
+  const { data } = useQuery<ApplicationStatusData>({ queryKey: [id] });
 
   const isProcessing = data && data.status !== "completed";
 

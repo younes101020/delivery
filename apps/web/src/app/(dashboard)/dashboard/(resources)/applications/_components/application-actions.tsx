@@ -17,11 +17,11 @@ import { startContainer, stopContainer } from "../actions";
 interface DatabaseActionsProps {
   initialState: string;
   id: string;
-  name: string;
 }
 
-export function ApplicationActions({ name, initialState, id }: DatabaseActionsProps) {
-  const { data } = useQuery<ApplicationStatusData>({ queryKey: [name] });
+export function ApplicationActions({ initialState, id }: DatabaseActionsProps) {
+  const { data } = useQuery<ApplicationStatusData>({ queryKey: [id] });
+
   const isProcessing = data && data.status !== "completed";
 
   if (isProcessing) {

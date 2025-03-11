@@ -24,7 +24,7 @@ describe("application routes / integration test", () => {
     }
   });
 
-  it("get /applications/{id} validates the param application id", async () => {
+  it("get /applications/{slug} validates the param application id", async () => {
     const response = await client.applications[":slug"].$get(
       {
         // @ts-expect-error test purpose
@@ -39,7 +39,7 @@ describe("application routes / integration test", () => {
     }
   });
 
-  it("patch /applications/{id} return application info when payload is submited", async ({ applicationName }) => {
+  it("patch /applications/{slug} return application info when payload is submited", async ({ applicationName }) => {
     const newPort = 7458;
     const response = await client.applications[":slug"].$patch(
       {

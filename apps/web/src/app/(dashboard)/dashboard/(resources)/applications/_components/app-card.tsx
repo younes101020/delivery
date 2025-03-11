@@ -22,7 +22,7 @@ export function AppCard({ name, firstDeploymentAt, id, initialState }: AppCardPr
       <CardHeader>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold truncate">{name}</h2>
-          <ApplicationActions id={id} name={name} initialState={initialState} />
+          <ApplicationActions id={id} initialState={initialState} />
         </div>
       </CardHeader>
       <Link href={`/dashboard/applications/${name}`} className="block">
@@ -30,7 +30,7 @@ export function AppCard({ name, firstDeploymentAt, id, initialState }: AppCardPr
 
           <dl className="text-xs pt-2">
             <dt className="text-muted-foreground">State</dt>
-            <ApplicationStatus name={name} initialState={initialState} />
+            <ApplicationStatus id={id} initialState={initialState} />
           </dl>
           <dl className="text-xs pt-2">
             <dt className="text-muted-foreground">First deployment at</dt>
