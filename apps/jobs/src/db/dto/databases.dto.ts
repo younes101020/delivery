@@ -5,10 +5,9 @@ import { containersDto } from "./containers.dto";
 const database = z.union([
   z.literal("mysql"),
   z.literal("mariadb"),
-  z.literal("postgresql"),
+  z.literal("postgres"),
   z.literal("mongodb"),
   z.literal("redis"),
-  z.literal("sqlite"),
 ]);
 
 export const createDatabaseSchema = z.object({

@@ -1,13 +1,13 @@
 "use client";
 
 import { Badge } from "@/app/_components/ui/badge";
-import { Button } from "@/app/_components/ui/button";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/app/_components/ui/card";
 import { Separator } from "@/app/_components/ui/separator";
 import { cn } from "@/app/_lib/utils";
 
 import { useMouse } from "../_hooks/use-mouse";
 import { PostgresIcon } from "../../_components/ui/postgres-icon";
+import { DatabaseCreateDialog } from "./create-database-dialog";
 
 export function DatabaseCard({
   title,
@@ -26,7 +26,7 @@ export function DatabaseCard({
       >
         <div
           className={cn(
-            "absolute -translate-x-1/2 -translate-y-1/2 transform-gpu bg-gradient-to-br from-[#3BC4F2] via-primary to-secondary transition-transform duration-500 group-hover:scale-[3]",
+            "absolute -translate-x-1/2 -translate-y-1/2 transform-gpu bg-gradient-to-br from-primary via-[#3BC4F2] to-secondary transition-transform duration-500 group-hover:scale-[3]",
             mouse.elementX === null || mouse.elementY === null
               ? "opacity-0"
               : "opacity-100",
@@ -52,7 +52,7 @@ export function DatabaseCard({
           </div>
           <Badge variant="outline" className="w-fit">SGBD</Badge>
           <Separator />
-          <CardDescription className="pt-2">
+          <CardDescription className="pt-2 line-clamp-5">
             PostgreSQL is a powerful, open source object-relational database system with over 35 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
           </CardDescription>
         </CardHeader>
@@ -60,7 +60,7 @@ export function DatabaseCard({
       </div>
       <CardFooter className="flex flex-col gap-2 items-start bg-secondary">
         <Separator />
-        <Button>Install</Button>
+        <DatabaseCreateDialog triggerText="Create" type="postgres" />
       </CardFooter>
 
     </Card>
