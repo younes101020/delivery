@@ -9,7 +9,7 @@ interface ITFixtures {
 export const it = base.extend<ITFixtures>({
   // eslint-disable-next-line no-empty-pattern
   database: async ({}, use) => {
-    const typePayload = ["mysql", "mariadb", "postgresql", "mongodb", "redis", "sqlite"] as const;
+    const typePayload = ["mysql", "mariadb", "postgres", "mongodb", "redis"] as const;
     const database: CreateDatabaseSchema = {
       type: typePayload[Math.floor(Math.random() * 6)],
     };
