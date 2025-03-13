@@ -15,6 +15,7 @@ export default antfu({
     "no-console": ["warn"],
     "antfu/no-top-level-await": ["off"],
     "node/prefer-global/process": ["off"],
+    "ts/no-empty-object-type": ["error", { allowObjectTypes: "always" }],
     "node/no-process-env": ["error"],
     "perfectionist/sort-imports": ["error", {
       internalPattern: ["^@/.*"],
