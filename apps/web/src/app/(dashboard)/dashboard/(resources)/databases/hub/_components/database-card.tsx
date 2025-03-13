@@ -5,17 +5,19 @@ import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/app/
 import { Separator } from "@/app/_components/ui/separator";
 import { cn } from "@/app/_lib/utils";
 
+import type { DatabaseVersionsCombobox } from "./types";
+
 import { useMouse } from "../_hooks/use-mouse";
 import { PostgresIcon } from "../../_components/ui/postgres-icon";
 import { DatabaseCreateDialog } from "./create-database-dialog";
 
-export function DatabaseCard({
-  title,
-  circleSize = 400,
-}: {
+interface DatabaseCardProps {
   title: string;
   circleSize?: number;
-}) {
+  versionsCombobox: DatabaseVersionsCombobox;
+}
+
+export function DatabaseCard({ title, circleSize = 400, versionsCombobox }: DatabaseCardProps) {
   const [mouse, parentRef] = useMouse();
 
   return (
@@ -60,7 +62,7 @@ export function DatabaseCard({
       </div>
       <CardFooter className="flex flex-col gap-2 items-start bg-secondary">
         <Separator />
-        <DatabaseCreateDialog triggerText="Create" type="postgres" />
+        <DatabaseCreateDialog triggerText="Create" type="postgres" versionsCombobox={versionsCombobox} />
       </CardFooter>
 
     </Card>

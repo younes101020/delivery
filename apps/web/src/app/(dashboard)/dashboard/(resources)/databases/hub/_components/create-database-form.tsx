@@ -20,16 +20,17 @@ import {
 } from "@/app/_components/ui/popover";
 import { cn } from "@/app/_lib/utils";
 
-import type { DatabaseType } from "./types";
+import type { DatabaseType, DatabaseVersionsCombobox } from "./types";
 
 import { createContainer } from "../actions";
 
 interface CreateDatabaseFormProps {
   type: DatabaseType;
   version: string;
+  versionsCombobox: DatabaseVersionsCombobox;
 }
 
-export function CreateDatabaseForm({ type, version }: CreateDatabaseFormProps) {
+export function CreateDatabaseForm({ type, version, versionsCombobox }: CreateDatabaseFormProps) {
   const initialInputs = {
     type,
     version,
@@ -48,7 +49,7 @@ export function CreateDatabaseForm({ type, version }: CreateDatabaseFormProps) {
         <Label htmlFor="version">
           Version
         </Label>
-        <DatabaseVersionCombobox value={state.inputs.version} isLoading={pending} />
+        <DatabaseVersionCombobox value={state.inputs.version} isLoading={pending} versionsCombobox={versionsCombobox} />
         <p className="text-muted-foreground text-xs">
           The version of the database image to use.
         </p>
@@ -73,16 +74,10 @@ export function CreateDatabaseForm({ type, version }: CreateDatabaseFormProps) {
 interface DatabaseVersionComboboxProps {
   value: string;
   isLoading?: boolean;
+  versionsCombobox: DatabaseVersionsCombobox;
 }
 
-const versions = [
-  {
-    value: "latest",
-    label: "Latest",
-  },
-];
-
-function DatabaseVersionCombobox({ value, isLoading }: DatabaseVersionComboboxProps) {
+function DatabaseVersionCombobox({ value, isLoading, versionsCombobox }: DatabaseVersionComboboxProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -104,7 +99,7 @@ function DatabaseVersionCombobox({ value, isLoading }: DatabaseVersionComboboxPr
           <CommandList>
             <CommandEmpty>No version found.</CommandEmpty>
             <CommandGroup>
-              {versions.map(v => (
+              {versionsCombobox.map(v => (
                 <CommandItem
                   key={v.value}
                   value={v.value}

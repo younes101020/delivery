@@ -10,18 +10,19 @@ import {
   DialogTrigger,
 } from "@/app/_components/ui/dialog";
 
-import type { DatabaseType } from "./types";
+import type { DatabaseType, DatabaseVersionsCombobox } from "./types";
 
 import { CreateDatabaseForm } from "./create-database-form";
 
 interface DatabaseCreateDialogProps {
   triggerText: string;
   type: DatabaseType;
+  versionsCombobox: DatabaseVersionsCombobox;
 }
 
 const DEFAULT_DATABASE_VERSION = "latest";
 
-export function DatabaseCreateDialog({ triggerText, type }: DatabaseCreateDialogProps) {
+export function DatabaseCreateDialog({ triggerText, type, versionsCombobox }: DatabaseCreateDialogProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -38,7 +39,7 @@ export function DatabaseCreateDialog({ triggerText, type }: DatabaseCreateDialog
             database. Click create when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
-        <CreateDatabaseForm type={type} version={DEFAULT_DATABASE_VERSION} />
+        <CreateDatabaseForm type={type} version={DEFAULT_DATABASE_VERSION} versionsCombobox={versionsCombobox} />
       </DialogContent>
     </Dialog>
   );
