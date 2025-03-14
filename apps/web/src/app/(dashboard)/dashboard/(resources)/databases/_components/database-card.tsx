@@ -1,7 +1,8 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/app/_components/ui/card";
-import { formatDate } from "@/app/_lib/utils";
 
 import { DatabaseActions } from "./database-actions";
+import { DatabaseDate } from "./database-date";
+import { DeleteDatabaseForm } from "./database-remove";
 import { DatabaseStatus } from "./database-status";
 import { EnvironmentVariableCard } from "./environment-variable-card";
 import { PostgresIcon } from "./ui/postgres-icon";
@@ -19,9 +20,9 @@ interface DatabaseCardProps {
 
 export function DatabaseCard({ name, state, id, createdAt, applications }: DatabaseCardProps) {
   return (
-    <Card>
+    <Card className="relative">
+      <DeleteDatabaseForm containerId={id} />
       <CardHeader className="flex flex-row items-center justify-between">
-
         <div className="flex gap-2 truncate">
           <PostgresIcon size={25} />
           <CardTitle className="text-lg truncate">{name}</CardTitle>
@@ -39,7 +40,7 @@ export function DatabaseCard({ name, state, id, createdAt, applications }: Datab
           </dl>
           <dl>
             <dt className="text-muted-foreground">Creation date</dt>
-            <dd>{formatDate(createdAt)}</dd>
+            <DatabaseDate date={createdAt} />
           </dl>
         </>
 

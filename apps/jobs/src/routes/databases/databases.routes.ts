@@ -96,6 +96,24 @@ export const start = createRoute({
   },
 });
 
+export const remove = createRoute({
+  path: "/databases/{id}",
+  method: "delete",
+  description: "Remove a database container.",
+  request: {
+    params: z.object({
+      id: z.string().describe("The ID of the database container to remove"),
+    }),
+  },
+  tags,
+  responses: {
+    [HttpStatusCodes.ACCEPTED]: {
+      description: "Database container removal request accepted",
+    },
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Database container not found"),
+  },
+});
+
 export const link = createRoute({
   path: "/databases/{id}/link",
   method: "post",
@@ -130,4 +148,5 @@ export type ListRoute = typeof list;
 export type StreamCurrentDatabaseRoute = typeof streamCurrentDatabase;
 export type StopRoute = typeof stop;
 export type StartRoute = typeof start;
+export type RemoveRoute = typeof remove;
 export type LinkRoute = typeof link;

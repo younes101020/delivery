@@ -1,3 +1,5 @@
+"use client";
+
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { useActionState, useState } from "react";
 
@@ -49,7 +51,7 @@ export function CreateDatabaseForm({ type, version, versionsCombobox }: CreateDa
         <Label htmlFor="version">
           Version
         </Label>
-        <DatabaseVersionCombobox value={state.inputs.version} isLoading={pending} versionsCombobox={versionsCombobox} />
+        <DatabaseVersionCombobox initialValue={state.inputs.version} isLoading={pending} versionsCombobox={versionsCombobox} />
         <p className="text-muted-foreground text-xs">
           The version of the database image to use.
         </p>
@@ -72,16 +74,17 @@ export function CreateDatabaseForm({ type, version, versionsCombobox }: CreateDa
 }
 
 interface DatabaseVersionComboboxProps {
-  value: string;
+  initialValue: string;
   isLoading?: boolean;
   versionsCombobox: DatabaseVersionsCombobox;
 }
 
-function DatabaseVersionCombobox({ value, isLoading, versionsCombobox }: DatabaseVersionComboboxProps) {
+function DatabaseVersionCombobox({ initialValue, isLoading, versionsCombobox }: DatabaseVersionComboboxProps) {
   const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(initialValue);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen} modal={true}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -103,7 +106,8 @@ function DatabaseVersionCombobox({ value, isLoading, versionsCombobox }: Databas
                 <CommandItem
                   key={v.value}
                   value={v.value}
-                  onSelect={() => {
+                  onSelect={(currentValue) => {
+                    setValue(currentValue === value ? "" : currentValue);
                     setOpen(false);
                   }}
                 >

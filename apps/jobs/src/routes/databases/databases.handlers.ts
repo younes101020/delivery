@@ -7,12 +7,13 @@ import { patchApplication } from "@/db/queries/queries";
 import { queueNames } from "@/lib/tasks/const";
 import { getJobAndQueueNameByJobId } from "@/lib/tasks/utils";
 
-import type { CreateRoute, LinkRoute, ListRoute, StartRoute, StopRoute, StreamCurrentDatabaseRoute } from "./databases.routes";
+import type { CreateRoute, LinkRoute, ListRoute, RemoveRoute, StartRoute, StopRoute, StreamCurrentDatabaseRoute } from "./databases.routes";
 import type { AllQueueDatabaseJobsData } from "./lib/tasks/types";
 
 import { getDatabaseEnvVarsByEnvVarKeys, getDatabasesContainers } from "./lib/remote-docker/utils";
 import { PREFIX } from "./lib/tasks/const";
 import { createDatabase } from "./lib/tasks/create-database";
+import { removeDatabase } from "./lib/tasks/remove-database";
 import { startDatabase } from "./lib/tasks/start-database";
 import { stopDatabase } from "./lib/tasks/stop-database";
 import { getDatabaseQueuesEvents, getDatabasesActiveJobs } from "./lib/tasks/utils";
@@ -52,6 +53,13 @@ export const stop: AppRouteHandler<StopRoute> = async (c) => {
 export const start: AppRouteHandler<StartRoute> = async (c) => {
   const { id } = c.req.valid("param");
   await startDatabase(id);
+
+  return c.json(null, HttpStatusCodes.ACCEPTED);
+};
+
+export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
+  const { id } = c.req.valid("param");
+  await removeDatabase(id);
 
   return c.json(null, HttpStatusCodes.ACCEPTED);
 };

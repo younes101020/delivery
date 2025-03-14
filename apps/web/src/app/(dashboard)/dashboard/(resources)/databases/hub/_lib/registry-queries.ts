@@ -6,13 +6,13 @@ interface DockerRegistryImageVersion {
 
 export async function getVersionsComboboxOptions() {
   const getDatabaseVersion = createAPIMethod<
-    { page: string; page_size: string },
+    {},
     DockerRegistryImageVersion
   >({
     method: "GET",
     url: `https://hub.docker.com/v2/repositories/library/postgres/tags`,
   });
-  const dbVersionsResponse = await getDatabaseVersion({ page: "2", page_size: "10" });
+  const dbVersionsResponse = await getDatabaseVersion({});
 
   return dbVersionsResponse.results.map(version => ({ value: version.name, label: version.name }));
 }

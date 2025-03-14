@@ -10,4 +10,5 @@ export const queueNames = {
   START: "start",
   STOP: "stop",
   CREATE: "create",
+  REMOVE: "remove",
 } as const;

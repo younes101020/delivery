@@ -23,7 +23,7 @@ export async function create(job: CreateQueueDatabaseJob<"create">) {
       PortBindings: {
         "5432/tcp": [
           {
-            HostPort: "5432",
+            HostPort: "",
           },
         ],
       },
@@ -31,6 +31,11 @@ export async function create(job: CreateQueueDatabaseJob<"create">) {
     Labels: {
       resource: "database",
     },
+  }).catch((error) => {
+    throw new DatabaseError({
+      name: "CREATE_DATABASE_ERROR",
+      message: error instanceof Error ? error.message : "Unexpected error",
+    });
   });
 
   await dbContainer.start()

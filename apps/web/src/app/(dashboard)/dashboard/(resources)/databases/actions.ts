@@ -68,3 +68,15 @@ export const startContainer = validatedAction(updateContainerStatusSchema, async
 
   return { success: "Container started", inputs };
 });
+
+export async function removeContainer(containerId: string) {
+  const response = await client.databases[":id"].$delete({
+    param: { id: containerId },
+  });
+
+  if (response.status !== 202) {
+    return { error: "Unable to delete the container" };
+  }
+
+  return { success: "Container deletion request accepted" };
+}

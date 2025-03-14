@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/app/_components/ui/button";
 import {
   Dialog,
@@ -10,19 +8,20 @@ import {
   DialogTrigger,
 } from "@/app/_components/ui/dialog";
 
-import type { DatabaseType, DatabaseVersionsCombobox } from "./types";
+import type { DatabaseType } from "./types";
 
+import { getVersionsComboboxOptions } from "../_lib/registry-queries";
 import { CreateDatabaseForm } from "./create-database-form";
 
 interface DatabaseCreateDialogProps {
   triggerText: string;
   type: DatabaseType;
-  versionsCombobox: DatabaseVersionsCombobox;
 }
 
 const DEFAULT_DATABASE_VERSION = "latest";
 
-export function DatabaseCreateDialog({ triggerText, type, versionsCombobox }: DatabaseCreateDialogProps) {
+export async function DatabaseCreateDialog({ triggerText, type }: DatabaseCreateDialogProps) {
+  const versionsCombobox = await getVersionsComboboxOptions();
   return (
     <Dialog>
       <DialogTrigger asChild>
