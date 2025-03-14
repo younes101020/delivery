@@ -21,19 +21,24 @@ export type Nullable<T> = {
   [K in keyof T]: T[K] | null;
 };
 
+function isNumeric(value: any): boolean {
+  return !Number.isNaN(value) && !Number.isNaN(Number.parseFloat(value));
+}
+
 export function formatDate(date: string | null | Date | number) {
-  if (!date)
-    return null;
-  const dateObj = typeof date === "string" ? new Date(date) : date;
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-  });
-  return formatter.format(dateObj);
+  const locale = Intl.DateTimeFormat().resolvedOptions().locale;
+
+  return isNumeric(date)
+    ? new Intl.DateTimeFormat(locale, {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }).format(new Date(Number(date) * 1000))
+    : "Invalid Date";
 }
 
 async function get(url: string, input: Record<string, string>) {
