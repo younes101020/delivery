@@ -1,7 +1,6 @@
 import { testClient } from "hono/testing";
 import { describe, expect } from "vitest";
 
-import { ZOD_ERROR_MESSAGES } from "@/lib/constants";
 import createApp from "@/lib/create-app";
 
 import router from "../applications.index";
