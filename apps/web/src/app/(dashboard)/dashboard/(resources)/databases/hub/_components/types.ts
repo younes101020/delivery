@@ -1,4 +1,6 @@
-export type DatabaseType = "mysql" | "redis" | "mongodb" | "postgres" | "mariadb";
+import type { database } from "../const";
+
+export type DatabaseType = (typeof database)[number]["value"];
 
 export type DatabaseVersionsCombobox = {
   value: string;

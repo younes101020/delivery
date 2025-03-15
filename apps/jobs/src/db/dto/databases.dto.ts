@@ -6,7 +6,7 @@ const database = z.union([
   z.literal("mysql"),
   z.literal("mariadb"),
   z.literal("postgres"),
-  z.literal("mongodb"),
+  z.literal("mongo"),
   z.literal("redis"),
 ]);
 

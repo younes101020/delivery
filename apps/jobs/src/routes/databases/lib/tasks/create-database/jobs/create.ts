@@ -7,30 +7,65 @@ import type { CreateQueueDatabaseJob } from "../types";
 export async function create(job: CreateQueueDatabaseJob<"create">) {
   const { type } = job.data;
 
-  const POSTGRES_PASSWORD = generateRandomString();
-  const POSTGRES_USER = generateRandomString();
+  const DB_USER = generateRandomString();
+  const DB_PASSWORD = generateRandomString();
+
+  let options;
+
+  switch (type) {
+    case "postgres":
+      options = {
+        Env: [
+          `POSTGRES_USER=${DB_USER}`,
+          `POSTGRES_PASSWORD=${DB_PASSWORD}`,
+        ],
+        ExposedPorts: {
+          "5432/tcp": {},
+        },
+        HostConfig: {
+          PortBindings: {
+            "5432/tcp": [
+              {
+                HostPort: "",
+              },
+            ],
+          },
+        },
+      };
+      break;
+    case "mongo":
+      options = {
+        Env: [
+          `MONGO_INITDB_ROOT_USERNAME=${DB_USER}`,
+          `MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}`,
+        ],
+        ExposedPorts: {
+          "27017/tcp": {},
+        },
+        HostConfig: {
+          PortBindings: {
+            "27017/tcp": [
+              {
+                HostPort: "",
+              },
+            ],
+          },
+        },
+      };
+      break;
+    default:
+      throw new DatabaseError({
+        name: "CREATE_DATABASE_ERROR",
+        message: "Database type not supported",
+      });
+  }
 
   const dbContainer = await docker.createContainer({
     Image: type,
-    Env: [
-      `POSTGRES_USER=${POSTGRES_USER}`,
-      `POSTGRES_PASSWORD=${POSTGRES_PASSWORD}`,
-    ],
-    ExposedPorts: {
-      "5432/tcp": {},
-    },
-    HostConfig: {
-      PortBindings: {
-        "5432/tcp": [
-          {
-            HostPort: "",
-          },
-        ],
-      },
-    },
     Labels: {
       resource: "database",
     },
+    ...options,
   }).catch((error) => {
     throw new DatabaseError({
       name: "CREATE_DATABASE_ERROR",

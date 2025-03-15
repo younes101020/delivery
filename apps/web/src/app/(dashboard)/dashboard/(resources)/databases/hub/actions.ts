@@ -10,7 +10,7 @@ const createDatabaseSchema = z.object({
     z.literal("mysql"),
     z.literal("mariadb"),
     z.literal("postgres"),
-    z.literal("mongodb"),
+    z.literal("mongo"),
     z.literal("redis"),
   ]),
   version: z.string().optional(),

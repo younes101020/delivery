@@ -27,7 +27,7 @@ export function DeleteDatabaseForm({ containerId }: DeleteAppProps) {
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <button className="after:absolute after:flex after:justify-center after:items-center after:top-0 after:right-0 after:h-5 after:w-20 after:bg-destructive after:text-destructive-foreground after:text-xs after:font-normal after:content-['delete']"></button>
+        <button className="w-full absolute after:absolute after:flex after:justify-center after:items-center after:top-0 after:right-0 after:h-5 after:w-20 after:bg-destructive after:text-destructive-foreground after:text-xs after:font-normal after:content-['delete']"></button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -48,6 +48,7 @@ export function DeleteDatabaseForm({ containerId }: DeleteAppProps) {
               setIsLoading(true);
               await removeContainer(containerId);
               setIsLoading(false);
+              setIsDialogOpen(false);
             }}
           >
             {isLoading
