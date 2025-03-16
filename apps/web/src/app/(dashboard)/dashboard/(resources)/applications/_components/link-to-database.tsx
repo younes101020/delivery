@@ -20,14 +20,14 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 
 import { injectEnv } from "../actions";
 
-interface EnvironmentVariableCardProps {
+interface InjectEnvCardProps {
   containerId: string;
   applications: {
     applicationName: string;
   }[];
 }
 
-export function EnvironmentVariableCard({ containerId, applications }: EnvironmentVariableCardProps) {
+export function InjectEnvCard({ containerId, applications }: InjectEnvCardProps) {
   const initialInputs = {
     containerId,
   };
@@ -42,7 +42,7 @@ export function EnvironmentVariableCard({ containerId, applications }: Environme
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" className="text-xs">Link to application</Button>
+        <Button className="text-xs">Link to application</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

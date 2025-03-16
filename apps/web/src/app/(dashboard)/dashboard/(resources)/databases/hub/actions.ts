@@ -14,14 +14,16 @@ const createDatabaseSchema = z.object({
     z.literal("redis"),
   ]),
   version: z.string().optional(),
+  name: z.string().refine(s => !s.includes(" "), "No Spaces for the name"),
 });
 
 export const createContainer = validatedAction(createDatabaseSchema, async (inputs) => {
-  const { type } = inputs;
+  const { type, name } = inputs;
 
   const response = await client.databases.$post({
     json: {
       type,
+      name,
     },
   });
 

@@ -23,13 +23,8 @@ export function DatabaseActions({ id, initialState }: DatabaseActionsProps) {
   const { data } = useQuery<DatabaseStatusData>({ queryKey: [id] });
   const isProcessing = data && data.status !== "completed";
 
-  if (isProcessing) {
-    return (
-      <div className="flex gap-2">
-        <Loader2 className="animate-spin h-4 w-4" />
-      </div>
-    );
-  }
+  if (isProcessing)
+    return null;
 
   const isCompleted = data?.status === "completed";
 

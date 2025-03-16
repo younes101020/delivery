@@ -90,3 +90,35 @@ export const startContainer = validatedAction(updateContainerStatusSchema, async
 
   return { success: "Container started", inputs };
 });
+
+const injectEnvSchema = z.object({
+  containerId: z.string(),
+  env: z.string(),
+  applicationName: z.string(),
+});
+
+export const injectEnv = validatedAction(injectEnvSchema, async (inputs) => {
+  const { containerId, env, applicationName } = inputs;
+
+  const envResponse = await client.databases[":id"].link.$post({
+    param: { id: containerId },
+    json: {
+      environmentKey: env,
+      applicationName,
+    },
+  });
+
+  if (envResponse.status !== 200) {
+    return { error: "Unable to inject the environment variable", inputs };
+  }
+
+  const redeployResponse = await client.deployments.redeploy[":queueName"].$post({
+    param: { queueName: applicationName },
+  });
+
+  if (redeployResponse.status !== 202) {
+    return { error: "Unable to redeploy the application", inputs };
+  }
+
+  return { success: "Redeployment success", inputs };
+});

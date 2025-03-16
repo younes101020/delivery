@@ -26,9 +26,10 @@ export function DatabaseCard({ label, colorEffectHexClassUtility, fillIcon, desc
   const Icon = IconComponentMap.get(label);
 
   return (
-    <Card>
+    <Card className="relative">
+      <Badge className="w-fit absolute top-0 right-0">{dbType}</Badge>
       <div
-        className="group relative overflow-hidden bg-secondary/10 p-2"
+        className="group relative overflow-hidden p-2"
         ref={parentRef}
       >
         <div
@@ -36,7 +37,7 @@ export function DatabaseCard({ label, colorEffectHexClassUtility, fillIcon, desc
             `absolute -translate-x-1/2 -translate-y-1/2 transform-gpu bg-gradient-to-br from-primary to-secondary transition-transform duration-500 group-hover:scale-[3]`,
             mouse.elementX === null || mouse.elementY === null
               ? "opacity-0"
-              : "opacity-100",
+              : "opacity-25",
             colorEffectHexClassUtility,
           )}
           style={{
@@ -49,7 +50,7 @@ export function DatabaseCard({ label, colorEffectHexClassUtility, fillIcon, desc
             top: `${mouse.elementY}px`,
           }}
         />
-        <div className="absolute inset-px bg-secondary/80" />
+        <div className="absolute inset-px" />
         <CardHeader className="relative px-4 pb-2 pt-4">
           <div className="flex items-center gap-2">
             {Icon && <Icon className={fillIcon} />}
@@ -58,7 +59,6 @@ export function DatabaseCard({ label, colorEffectHexClassUtility, fillIcon, desc
               {label}
             </CardTitle>
           </div>
-          <Badge variant="outline" className="w-fit">{dbType}</Badge>
           <Separator />
           <CardDescription className="pt-2 line-clamp-5">
             {description}
@@ -66,7 +66,7 @@ export function DatabaseCard({ label, colorEffectHexClassUtility, fillIcon, desc
         </CardHeader>
 
       </div>
-      <CardFooter className="flex flex-col gap-2 items-start bg-secondary">
+      <CardFooter className="flex flex-col gap-2 items-start">
         <Separator />
         {children}
       </CardFooter>

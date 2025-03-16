@@ -25,7 +25,7 @@ export async function DatabaseCreateDialog({ triggerText, type }: DatabaseCreate
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">{triggerText}</Button>
+        <Button>{triggerText}</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

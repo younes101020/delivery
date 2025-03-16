@@ -5,7 +5,7 @@ import { generateRandomString } from "@/lib/utils";
 import type { CreateQueueDatabaseJob } from "../types";
 
 export async function create(job: CreateQueueDatabaseJob<"create">) {
-  const { type } = job.data;
+  const { type, name } = job.data;
 
   const DB_USER = generateRandomString();
   const DB_PASSWORD = generateRandomString();
@@ -60,8 +60,9 @@ export async function create(job: CreateQueueDatabaseJob<"create">) {
       });
   }
 
-  const dbContainer = await docker.createContainer({
+  await docker.createContainer({
     Image: type,
+    name,
     Labels: {
       resource: "database",
     },
@@ -72,12 +73,4 @@ export async function create(job: CreateQueueDatabaseJob<"create">) {
       message: error instanceof Error ? error.message : "Unexpected error",
     });
   });
-
-  await dbContainer.start()
-    .catch((error) => {
-      throw new DatabaseError({
-        name: "START_DATABASE_ERROR",
-        message: error instanceof Error ? error.message : "Unexpected error",
-      });
-    });
 }

@@ -4,7 +4,6 @@ import { DatabaseActions } from "./database-actions";
 import { DatabaseDate } from "./database-date";
 import { DeleteDatabaseForm } from "./database-remove";
 import { DatabaseStatus } from "./database-status";
-import { EnvironmentVariableCard } from "./environment-variable-card";
 import { PostgresIcon } from "./ui/postgres-icon";
 
 interface DatabaseCardProps {
@@ -13,15 +12,11 @@ interface DatabaseCardProps {
   state: "created" | "restarting" | "running" | "removing" | "paused" | "exited" | "dead";
   isProcessing: boolean;
   createdAt: number;
-  applications: {
-    applicationName: string;
-  }[] | null;
 }
 
-export function DatabaseCard({ name, state, id, createdAt, applications }: DatabaseCardProps) {
+export function DatabaseCard({ name, state, id, createdAt }: DatabaseCardProps) {
   return (
     <Card className="relative">
-      <DeleteDatabaseForm containerId={id} />
       <CardHeader className="flex flex-row items-center justify-between">
         <div className="flex gap-2 truncate">
           <PostgresIcon size={25} />
@@ -45,10 +40,8 @@ export function DatabaseCard({ name, state, id, createdAt, applications }: Datab
         </>
 
       </CardContent>
-      <CardFooter className="gap-2">
-
-        {applications && <EnvironmentVariableCard containerId={id} applications={applications} />}
-
+      <CardFooter>
+        <DeleteDatabaseForm containerId={id} />
       </CardFooter>
     </Card>
   );

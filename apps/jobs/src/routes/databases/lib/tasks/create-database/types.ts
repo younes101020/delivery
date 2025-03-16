@@ -8,6 +8,7 @@ type dbType = CreateDatabaseSchema["type"];
 export interface CreateQueueDatabaseJobData {
   create: {
     type: dbType;
+    name: string;
   };
 }
 

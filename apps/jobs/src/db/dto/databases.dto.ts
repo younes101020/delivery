@@ -12,6 +12,7 @@ const database = z.union([
 
 export const createDatabaseSchema = z.object({
   type: database,
+  name: z.string(),
 });
 
 export const createDatabaseSchemaResp = z.object({

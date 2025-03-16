@@ -14,6 +14,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/app/_components/ui/command";
+import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
 import { Paragraph } from "@/app/_components/ui/paragraph";
 import {
@@ -47,7 +48,16 @@ export function CreateDatabaseForm({ type, version, versionsCombobox }: CreateDa
   );
 
   return (
-    <form className="w-full flex flex-col gap-4 pt-4" action={formAction}>
+    <form className="w-full flex flex-col gap-4 pt-2" action={formAction}>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="name">
+          Name
+        </Label>
+        <Input required defaultValue={state.inputs.name} name="name" id="name" placeholder="eg. MyDatabase" />
+        <p className="text-muted-foreground text-xs">
+          The name of the database.
+        </p>
+      </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="version">
           Version
@@ -57,9 +67,9 @@ export function CreateDatabaseForm({ type, version, versionsCombobox }: CreateDa
           The version of the database image to use.
         </p>
       </div>
-      <input type="hidden" name="type" value={type} />
-      <Button type="submit" disabled={pending} aria-label="submit" className="mt-2">
+      <input type="hidden" name="type" id="type" value={type} />
       {state?.error && <Paragraph variant="error">{state.error}</Paragraph>}
+      <Button type="submit" disabled={pending} aria-label="submit" className="mt-4">
         {pending
           ? (
               <>
