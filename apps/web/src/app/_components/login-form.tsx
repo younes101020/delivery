@@ -12,6 +12,7 @@ import { Label } from "@/app/_components/ui/label";
 import { signUp } from "@/app/actions";
 
 import { signIn } from "../(login)/actions";
+import { Paragraph } from "./ui/paragraph";
 
 export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
@@ -61,7 +62,7 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
         </div>
       </div>
 
-      {state?.error && <div className="text-destructive text-sm">{state.error}</div>}
+      {state?.error && <Paragraph variant="error">{state.error}</Paragraph>}
 
       <CardFooter className="flex px-0 pt-8 justify-end">
         <Button type="submit" disabled={pending} aria-label="submit">

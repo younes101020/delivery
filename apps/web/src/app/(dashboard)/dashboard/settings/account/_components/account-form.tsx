@@ -8,6 +8,7 @@ import type { ActionState } from "@/app/_lib/form-middleware";
 import { Button } from "@/app/_components/ui/button";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
+import { Paragraph } from "@/app/_components/ui/paragraph";
 import { useUser } from "@/app/_lib/user-provider";
 
 import { updateAccount } from "../actions";
@@ -44,10 +45,10 @@ export function AccountForm() {
         />
       </div>
       {state.error && (
-        <p className="text-red-500 text-sm">{state.error}</p>
+        <Paragraph variant="error">{state.error}</Paragraph>
       )}
       {state.success && (
-        <p className="text-green-500 text-sm">{state.success}</p>
+        <Paragraph variant="success">{state.success}</Paragraph>
       )}
       <Button
         type="submit"

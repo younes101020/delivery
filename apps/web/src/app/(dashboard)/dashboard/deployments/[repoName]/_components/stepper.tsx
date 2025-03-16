@@ -8,6 +8,7 @@ import type { ActionState } from "@/app/_lib/form-middleware";
 import type { Nullable } from "@/app/_lib/utils";
 
 import { Button } from "@/app/_components/ui/button";
+import { Paragraph } from "@/app/_components/ui/paragraph";
 import { useEventSource } from "@/app/_hooks/use-event-source";
 import { retryDeploy } from "@/app/actions";
 import { env } from "@/env";
@@ -82,7 +83,7 @@ export function Stepper({ repoName }: StepperProps) {
           <p className="text-xs text-destructive">Once you think you have resolved the issue, you can redeploy.</p>
           {jobId && (
             <div className="flex flex-col gap-2">
-              {state.error && <p className="text-xs text-destructive">{state.error}</p>}
+              {state.error && <Paragraph variant="error">{state.error}</Paragraph>}
               <form>
                 <input type="hidden" name="repoName" defaultValue={repoName} />
                 <input type="hidden" name="jobId" defaultValue={jobId} />

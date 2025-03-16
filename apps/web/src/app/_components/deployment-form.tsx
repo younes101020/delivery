@@ -18,6 +18,7 @@ import type { SelectedRepositoryProps } from "./deployment-repositories";
 import { deploy } from "../actions";
 import { DeploymentGithubAppList } from "./deployment-github-apps";
 import { DeploymentRepositories } from "./deployment-repositories";
+import { Paragraph } from "./ui/paragraph";
 
 interface DeploymentProps {
   repositories: GithubRepositories;
@@ -177,9 +178,9 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
             <input type="hidden" name="isOnboarding" id="isOnboarding" value="true" />
           )}
           {state?.error && (
-            <p className="text-destructive bg-destructive/15 p-2 text-sm border border-destructive">
+            <Paragraph variant="error">
               {state.error}
-            </p>
+            </Paragraph>
           )}
           <Button type="submit" disabled={!selected.name || pending} aria-label="submit">
             {pending
