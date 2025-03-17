@@ -10,7 +10,7 @@ import { formatDate } from "@/app/_lib/utils";
 
 import { AppCard } from "./_components/app-card";
 import { SubscribeToSSE } from "./_components/subscribe-to-sse";
-import { getApplications } from "./_lib/queries";
+import { getApplications, getRunningDatabaseContainers } from "./_lib/queries";
 
 export default async function ApplicationsPage() {
   return (
@@ -35,11 +35,11 @@ export default async function ApplicationsPage() {
 }
 
 async function ApplicationList() {
-  const applications = await getApplications();
+  const [applications, dbContainers] = await Promise.all([getApplications(), getRunningDatabaseContainers()]);
   if (!applications || applications.length < 1)
     return <NoApplications />;
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
       {applications.map(application => (
         <AppCard
           key={application.id}
@@ -47,6 +47,7 @@ async function ApplicationList() {
           name={application.name}
           initialState={application.state}
           firstDeploymentAt={formatDate(application.createdAt) ?? "Unknown"}
+          databases={dbContainers}
         />
       ))}
     </div>

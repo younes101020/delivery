@@ -35,5 +35,5 @@ export async function encryptSecret(secretKey: string) {
 }
 
 export function generateRandomString() {
-  return randomBytes(64).toString("hex");
+  return randomBytes(16).toString("hex");
 }

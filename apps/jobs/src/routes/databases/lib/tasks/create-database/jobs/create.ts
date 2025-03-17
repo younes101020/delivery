@@ -23,13 +23,10 @@ export async function create(job: CreateQueueDatabaseJob<"create">) {
           "5432/tcp": {},
         },
         HostConfig: {
-          PortBindings: {
-            "5432/tcp": [
-              {
-                HostPort: "",
-              },
-            ],
+          RestartPolicy: {
+            Name: "unless-stopped",
           },
+          PublishAllPorts: true,
         },
       };
       break;
@@ -43,13 +40,10 @@ export async function create(job: CreateQueueDatabaseJob<"create">) {
           "27017/tcp": {},
         },
         HostConfig: {
-          PortBindings: {
-            "27017/tcp": [
-              {
-                HostPort: "",
-              },
-            ],
+          RestartPolicy: {
+            Name: "unless-stopped",
           },
+          PublishAllPorts: true,
         },
       };
       break;

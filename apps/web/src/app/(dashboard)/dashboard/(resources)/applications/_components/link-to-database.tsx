@@ -16,20 +16,23 @@ import {
 } from "@/app/_components/ui/dialog";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
+import { Paragraph } from "@/app/_components/ui/paragraph";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/app/_components/ui/select";
 
 import { injectEnv } from "../actions";
 
 interface InjectEnvCardProps {
-  containerId: string;
-  applications: {
-    applicationName: string;
-  }[];
+  applicationName: string;
+  databases: {
+    name: string;
+    id: string;
+  }[] | null;
 }
 
-export function InjectEnvCard({ containerId, applications }: InjectEnvCardProps) {
+export function InjectEnvCard({ applicationName, databases }: InjectEnvCardProps) {
   const initialInputs = {
-    containerId,
+    applicationName,
+    databases,
   };
 
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
@@ -42,7 +45,7 @@ export function InjectEnvCard({ containerId, applications }: InjectEnvCardProps)
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="text-xs">Link to application</Button>
+        <Button variant="outline" className="text-xs">Link to database</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -54,19 +57,19 @@ export function InjectEnvCard({ containerId, applications }: InjectEnvCardProps)
 
         <form action={formAction} className="space-y-4 mt-4">
           <div className="flex flex-col gap-4">
-            <Label htmlFor="applicationName">
-              Application target
+            <Label htmlFor="dbId">
+              Database target
             </Label>
-            <Select name="applicationName">
+            <Select name="dbId">
               <SelectTrigger>
-                <SelectValue placeholder="Select a application" defaultValue={state.inputs.name} />
+                <SelectValue placeholder="Select a database" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectLabel>Applications</SelectLabel>
-                  {applications.map(application => (
-                    <SelectItem key={application.applicationName} value={application.applicationName}>
-                      {application.applicationName}
+                  <SelectLabel>Databases</SelectLabel>
+                  {databases && databases.map(database => (
+                    <SelectItem key={database.id} value={database.id}>
+                      {database.name}
                     </SelectItem>
                   ))}
                 </SelectGroup>
@@ -84,7 +87,8 @@ export function InjectEnvCard({ containerId, applications }: InjectEnvCardProps)
               className="col-span-3"
             />
           </div>
-          <input type="hidden" name="containerId" id="containerId" value={containerId} />
+          <input type="hidden" name="applicationName" id="applicationName" value={applicationName} />
+          {state?.error && <Paragraph variant="error">{state.error}</Paragraph>}
           <DialogFooter>
             <Button type="submit" disabled={pending} className="text-xs">
               Inject and redeploy

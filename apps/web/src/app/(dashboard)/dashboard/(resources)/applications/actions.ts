@@ -92,16 +92,16 @@ export const startContainer = validatedAction(updateContainerStatusSchema, async
 });
 
 const injectEnvSchema = z.object({
-  containerId: z.string(),
+  dbId: z.string(),
   env: z.string(),
   applicationName: z.string(),
 });
 
 export const injectEnv = validatedAction(injectEnvSchema, async (inputs) => {
-  const { containerId, env, applicationName } = inputs;
+  const { env, dbId, applicationName } = inputs;
 
   const envResponse = await client.databases[":id"].link.$post({
-    param: { id: containerId },
+    param: { id: dbId },
     json: {
       environmentKey: env,
       applicationName,

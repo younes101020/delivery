@@ -1,6 +1,5 @@
 "use client";
 
-import { Package } from "lucide-react";
 import Link from "next/link";
 
 import { buttonVariants } from "@/app/_components/ui/button";
@@ -16,17 +15,20 @@ interface AppCardProps {
   id: string;
   firstDeploymentAt: string;
   lastDeployed?: string;
+  databases: {
+    id: string;
+    name: string;
+  }[] | null;
 }
 
-export function AppCard({ name, firstDeploymentAt, id, initialState }: AppCardProps) {
+export function AppCard({ name, firstDeploymentAt, id, initialState, databases }: AppCardProps) {
   return (
 
     <Card className="w-full transition-all">
       <CardHeader>
         <div className="flex items-center justify-between gap-1">
           <div className="truncate flex gap-1">
-            <Package strokeWidth={1} className="mt-1" />
-            <h2 className="text-xl">{name}</h2>
+            <h2 className="decoration-primary underline">{name}</h2>
           </div>
 
           <ApplicationActions id={id} initialState={initialState} />
@@ -43,9 +45,9 @@ export function AppCard({ name, firstDeploymentAt, id, initialState }: AppCardPr
           <dd className="text-xs">{firstDeploymentAt}</dd>
         </dl>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex flex-wrap gap-2">
         <Link href={`/dashboard/applications/${name}`} className={buttonVariants()}>View details</Link>
-        <InjectEnvCard />
+        <InjectEnvCard applicationName={name} databases={databases} />
       </CardFooter>
     </Card>
 

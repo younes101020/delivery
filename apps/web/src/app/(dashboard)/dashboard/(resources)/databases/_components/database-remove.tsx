@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Trash } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/app/_components/ui/button";
@@ -28,8 +28,7 @@ export function DeleteDatabaseForm({ containerId }: DeleteAppProps) {
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
         <Button className="text-xs" variant="destructive">
-          <Trash />
-          <span>/</span>
+          <X />
           Delete
         </Button>
       </DialogTrigger>

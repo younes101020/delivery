@@ -4,6 +4,7 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import type { AppRouteHandler } from "@/lib/types";
 
 import { patchApplication } from "@/db/queries/queries";
+import { docker } from "@/lib/remote-docker";
 import { queueNames } from "@/lib/tasks/const";
 import { getJobAndQueueNameByJobId } from "@/lib/tasks/utils";
 
@@ -66,7 +67,21 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
 
 export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> = async (c) => {
   return streamSSE(c, async (stream) => {
-    const dbQueuesEvents = await getDatabaseQueuesEvents();
+    const [dbQueuesEvents, containerEventStream] = await Promise.all([
+      getDatabaseQueuesEvents(),
+      docker.getEvents({ filters: { label: ["resource=database"], type: ["container"] } }),
+    ]);
+
+    containerEventStream.on("data", async (chunk) => {
+      const event = JSON.parse(chunk.toString());
+      await stream.writeSSE({
+        data: JSON.stringify({
+          containerId: event.id,
+          queueName: event.status,
+        }),
+      });
+      // containerEventStream.removeAllListeners();
+    });
 
     for (const queueEvents of dbQueuesEvents) {
       queueEvents.on("active", activeHandler);

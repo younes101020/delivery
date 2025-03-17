@@ -27,17 +27,14 @@ export function DatabaseCard({ name, state, id, createdAt }: DatabaseCardProps) 
 
       </CardHeader>
       <CardContent className="text-xs space-y-2">
-
-        <>
-          <dl>
-            <dt className="text-muted-foreground">State</dt>
-            <DatabaseStatus id={id} initialState={state} />
-          </dl>
-          <dl>
-            <dt className="text-muted-foreground">Creation date</dt>
-            <DatabaseDate date={createdAt} />
-          </dl>
-        </>
+        <dl>
+          <dt className="text-muted-foreground">State</dt>
+          <DatabaseStatus id={id} initialState={state} />
+        </dl>
+        <dl>
+          <dt className="text-muted-foreground">Creation date</dt>
+          <DatabaseDate date={createdAt} />
+        </dl>
 
       </CardContent>
       <CardFooter>

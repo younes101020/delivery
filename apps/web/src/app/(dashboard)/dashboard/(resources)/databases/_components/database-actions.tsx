@@ -23,7 +23,7 @@ export function DatabaseActions({ id, initialState }: DatabaseActionsProps) {
   const { data } = useQuery<DatabaseStatusData>({ queryKey: [id] });
   const isProcessing = data && data.status !== "completed";
 
-  if (isProcessing)
+  if (isProcessing || data?.queueName === "remove")
     return null;
 
   const isCompleted = data?.status === "completed";

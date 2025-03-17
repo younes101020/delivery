@@ -41,3 +41,15 @@ export async function getApplications() {
   }
   return await response.json();
 }
+
+export async function getRunningDatabaseContainers() {
+  const response = await client.databases.$get();
+  if (response.status !== 200) {
+    return null;
+  }
+  const dbs = await response.json();
+  return dbs.filter(db => db.state === "running").map(db => ({
+    id: db.id,
+    name: db.name,
+  }));
+}

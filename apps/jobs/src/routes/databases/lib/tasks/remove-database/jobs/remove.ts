@@ -8,7 +8,7 @@ export async function remove(job: RemoveQueueDatabaseJob<"remove">) {
 
   const dbContainer = docker.getContainer(containerId);
 
-  await dbContainer.remove()
+  await dbContainer.remove({ force: true })
     .catch((error) => {
       throw new DatabaseError({
         name: "REMOVE_DATABASE_ERROR",
