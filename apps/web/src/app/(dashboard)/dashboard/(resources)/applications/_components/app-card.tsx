@@ -5,13 +5,15 @@ import Link from "next/link";
 import { buttonVariants } from "@/app/_components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/app/_components/ui/card";
 
+import type { ContainerStatusProps } from "../../types";
+
 import { ApplicationActions } from "./application-actions";
 import { ApplicationStatus } from "./application-status";
 import { InjectEnvCard } from "./link-to-database";
 
 interface AppCardProps {
   name: string;
-  initialState: "created" | "restarting" | "running" | "removing" | "paused" | "exited" | "dead";
+  initialState: ContainerStatusProps["initialState"];
   id: string;
   firstDeploymentAt: string;
   lastDeployed?: string;

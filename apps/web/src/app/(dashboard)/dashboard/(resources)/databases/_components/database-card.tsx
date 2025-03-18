@@ -1,5 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/_components/ui/card";
 
+import type { ContainerStatusProps } from "../../types";
+
 import { DatabaseActions } from "./database-actions";
 import { DatabaseDate } from "./database-date";
 import { DatabaseOptions } from "./database-options";
@@ -10,7 +12,7 @@ interface DatabaseCardProps {
   id: string;
   image: string;
   name: string;
-  state: "created" | "restarting" | "running" | "remove" | "paused" | "exited" | "dead";
+  state: ContainerStatusProps["initialState"];
   isProcessing: boolean;
   createdAt: number;
 }
