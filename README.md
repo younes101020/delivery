@@ -7,9 +7,19 @@ Delivery act as tiny wrapper around [Nixpacks](https://nixpacks.com/docs)
 allowing you to transform your github repository into a production-ready
 application.
 
-- **Technology stack**: BullMQ, NextJS, Tailwind, PostgreSQL, Hono
+- **Technology stack**: Hono + RPC, BullMQ, NextJS 15, ReactJS 19, Tailwind, ShadCN, PostgreSQL
 
 ---
+
+## Screenshots
+
+* Signin
+
+* Applications page
+  
+* Databases page
+
+* Databases hub page
 
 ## Contributor installation
 
