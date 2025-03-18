@@ -10,7 +10,7 @@ import { PostgresIcon } from "./ui/postgres-icon";
 
 interface DatabaseCardProps {
   id: string;
-  image: string;
+  image?: string;
   name: string;
   state: ContainerStatusProps["initialState"];
   isProcessing: boolean;
