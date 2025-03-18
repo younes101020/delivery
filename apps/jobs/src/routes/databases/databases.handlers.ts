@@ -1,3 +1,5 @@
+import type { Buffer } from "node:buffer";
+
 import { streamSSE } from "hono/streaming";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
@@ -72,21 +74,23 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
       docker.getEvents({ filters: { label: ["resource=database"], type: ["container"] } }),
     ]);
 
-    containerEventStream.on("data", async (chunk) => {
-      const event = JSON.parse(chunk.toString());
-      await stream.writeSSE({
-        data: JSON.stringify({
-          containerId: event.id,
-          queueName: event.status,
-        }),
-      });
-      // containerEventStream.removeAllListeners();
-    });
+    containerEventStream.on("data", onDatabaseContainerEventHandler);
 
     for (const queueEvents of dbQueuesEvents) {
       queueEvents.on("active", activeHandler);
       queueEvents.on("completed", completeHandler);
       queueEvents.on("failed", failedHandler);
+    }
+
+    async function onDatabaseContainerEventHandler(chunk: Buffer) {
+      const event = JSON.parse(chunk.toString());
+      const processName = event.status === "die" || event.status === "exited" ? "stop" : event.status;
+      await stream.writeSSE({
+        data: JSON.stringify({
+          containerId: event.id,
+          processName,
+        }),
+      });
     }
 
     async function activeHandler({ jobId }: { jobId: string }) {
@@ -144,6 +148,7 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
           queueEvents.removeListener("completed", completeHandler);
           queueEvents.removeListener("failed", failedHandler);
         }
+        containerEventStream.removeListener("data", onDatabaseContainerEventHandler);
         resolve();
       });
     });

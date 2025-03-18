@@ -21,16 +21,12 @@ interface DatabaseActionsProps {
 
 export function DatabaseActions({ id, initialState }: DatabaseActionsProps) {
   const { data } = useQuery<DatabaseStatusData>({ queryKey: [id] });
-  const isProcessing = data && data.status !== "completed";
 
-  if (isProcessing || data?.queueName === "remove")
-    return null;
+  if (data?.status === "completed" || !data || data.processName) {
+    const isProcessingCompleted = data?.status === "completed";
+    const canStopContainer = isProcessingCompleted ? state[data.queueName] === "running" : data?.processName ? state[data.processName] : initialState === "running";
+    const canStartContainer = isProcessingCompleted ? state[data.queueName] === "stop" || state[data.queueName] === "created" : data?.processName ? state[data?.processName] === "stop" || state[data?.processName] === "created" : initialState === "stop" || initialState === "created";
 
-  const isCompleted = data?.status === "completed";
-
-  if (isCompleted) {
-    const canStopContainer = state[data?.queueName] === "running";
-    const canStartContainer = state[data?.queueName] === "exited" || state[data?.queueName] === "created";
     return (
       <>
         {canStopContainer && (
@@ -48,26 +44,6 @@ export function DatabaseActions({ id, initialState }: DatabaseActionsProps) {
       </>
     );
   }
-
-  const canStopContainer = initialState === "running";
-  const canStartContainer = initialState === "exited" || initialState === "created";
-
-  return (
-    <>
-      {canStopContainer && (
-        <StopButton containerId={id} className="text-xs">
-          <Ban className="stroke-destructive" />
-          Shutdown
-        </StopButton>
-      )}
-      {canStartContainer && (
-        <StartButton containerId={id} className="text-xs">
-          <Play className="stroke-primary" />
-          Start
-        </StartButton>
-      )}
-    </>
-  );
 }
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

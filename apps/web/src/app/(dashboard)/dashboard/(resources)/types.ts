@@ -1,4 +1,4 @@
 export interface ContainerStatusProps {
-  initialState: "created" | "restarting" | "running" | "removing" | "paused" | "exited" | "dead";
+  initialState: "created" | "restarting" | "running" | "remove" | "paused" | "exited" | "dead";
   id: string;
 }

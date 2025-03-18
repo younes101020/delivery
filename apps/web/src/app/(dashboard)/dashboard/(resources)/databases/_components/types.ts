@@ -1,6 +1,8 @@
+type processName = "start" | "stop" | "create" | "remove";
 export interface DatabaseStatusData {
-  status: string;
+  status: "completed" | "failed" | "active";
   jobId: string;
   containerId: string;
-  queueName: "start" | "stop" | "create" | "remove";
+  queueName: processName;
+  processName: processName;
 }

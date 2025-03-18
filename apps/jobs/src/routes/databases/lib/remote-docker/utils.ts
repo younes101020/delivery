@@ -10,10 +10,11 @@ export async function getDatabasesContainers() {
     all: true,
     filters: { label: ["resource=database"] },
   });
-  return dbContainers.map(({ Image, Id, State, Created }) => ({
-    name: Image.split(":")[0],
+  return dbContainers.map(({ Image, Id, State, Created, Names }) => ({
+    image: Image.split(":")[0],
+    name: Names.map(name => name.slice(1)).join(", "),
     id: Id,
-    state: State as ContainersDto["state"],
+    state: (State === "exited" || State === "die" ? "stop" : State) as ContainersDto["state"],
     createdAt: Created,
     isProcessing: false,
   }));

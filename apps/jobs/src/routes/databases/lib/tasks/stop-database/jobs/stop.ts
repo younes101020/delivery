@@ -7,7 +7,7 @@ export async function stop(job: StopQueueDatabaseJob<"stop">) {
   const { containerId } = job.data;
 
   const dbContainer = docker.getContainer(containerId);
-  await dbContainer.stop()
+  await dbContainer.stop({ t: 10 })
     .catch((error) => {
       throw new DatabaseError({
         name: "STOP_DATABASE_ERROR",

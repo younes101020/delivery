@@ -1,18 +1,19 @@
 export const state = {
-  stop: "exited",
+  stop: "stop",
   start: "running",
-  create: "running",
+  create: "created",
+  remove: "removed",
 };
 
 export const variants = {
   stop: "failed",
   start: "active",
-  create: "primary",
+  create: "default",
   running: "active",
-  paused: "primary",
+  paused: "default",
   exited: "failed",
   dead: "failed",
   restarting: "active",
-  removing: "failed",
-  created: "primary",
+  remove: "failed",
+  created: "default",
 } as const;

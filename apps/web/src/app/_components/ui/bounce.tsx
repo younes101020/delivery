@@ -7,24 +7,21 @@ import { cn } from "@/app/_lib/utils";
 const bounceVariants = cva("bg-primary", {
   variants: {
     variant: {
-      primary: "bg-primary/50",
-      active: "bg-green-500/50",
-      failed: "bg-red-500/50",
-      process: "bg-yellow-500/50",
+      default: "bg-secondary/50",
     },
   },
   defaultVariants: {
-    variant: "primary",
+    variant: "default",
   },
 });
 
-interface BounceProps extends VariantProps<typeof bounceVariants> {
+export interface BounceProps extends VariantProps<typeof bounceVariants> {
   className?: string;
+  isActive?: boolean;
 }
 
-export function Bounce({ variant, className }: BounceProps) {
+export function Bounce({ variant, className, isActive }: BounceProps) {
   const bgColor = bounceVariants({ variant });
-  const isActive = variant === "active";
 
   return (
     <span className={cn("relative flex size-2 pt-[.25rem]", className)}>
