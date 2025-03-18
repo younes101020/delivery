@@ -8,6 +8,7 @@ const bounceVariants = cva("bg-primary", {
   variants: {
     variant: {
       default: "bg-secondary/50",
+      active: "bg-primary",
     },
   },
   defaultVariants: {
