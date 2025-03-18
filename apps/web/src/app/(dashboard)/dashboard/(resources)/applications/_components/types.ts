@@ -1,6 +1,9 @@
+type ProcessName = "start" | "stop" | "create" | "remove";
+
 export interface ApplicationStatusData {
-  status: string;
+  status: "active" | "completed" | "failed";
   jobId: string;
   containerId: string;
-  queueName: "start" | "stop";
+  queueName: ProcessName;
+  processName: ProcessName;
 }

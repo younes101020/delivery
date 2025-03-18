@@ -10,7 +10,7 @@ export async function getApplicationsContainers() {
   return appContainers.map(({ Image, Id, State, Created }) => ({
     name: Image,
     id: Id,
-    state: State as ContainersDto["state"],
+    state: (State === "exited" || State === "die" ? "stop" : State) as ContainersDto["state"],
     createdAt: Created,
     isProcessing: false,
   }));

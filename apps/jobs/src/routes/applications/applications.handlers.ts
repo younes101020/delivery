@@ -1,3 +1,5 @@
+import type { Buffer } from "node:buffer";
+
 import { streamSSE } from "hono/streaming";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
@@ -10,6 +12,7 @@ import {
   patchApplication,
 } from "@/db/queries/queries";
 import { APPLICATIONS_PATH, ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
+import { docker } from "@/lib/remote-docker";
 import { ssh } from "@/lib/ssh";
 import { getJobAndQueueNameByJobId } from "@/lib/tasks/utils";
 
@@ -66,12 +69,28 @@ export const start: AppRouteHandler<StartRoute> = async (c) => {
 
 export const streamCurrentApplication: AppRouteHandler<StreamCurrentApplicationRoute> = async (c) => {
   return streamSSE(c, async (stream) => {
-    const appQueuesEvents = await getApplicationQueuesEvents();
+    const [appQueuesEvents, containerEventStream] = await Promise.all([
+      getApplicationQueuesEvents(),
+      docker.getEvents({ filters: { label: ["resource=application"], type: ["container"] } }),
+    ]);
+
+    containerEventStream.on("data", onAppContainerEventHandler);
 
     for (const queueEvents of appQueuesEvents) {
       queueEvents.on("active", activeHandler);
       queueEvents.on("completed", completeHandler);
       queueEvents.on("failed", failedHandler);
+    }
+
+    async function onAppContainerEventHandler(chunk: Buffer) {
+      const event = JSON.parse(chunk.toString());
+      const processName = event.status === "die" || event.status === "exited" ? "stop" : event.status;
+      await stream.writeSSE({
+        data: JSON.stringify({
+          containerId: event.id,
+          processName,
+        }),
+      });
     }
 
     async function activeHandler({ jobId }: { jobId: string }) {
@@ -129,6 +148,7 @@ export const streamCurrentApplication: AppRouteHandler<StreamCurrentApplicationR
           queueEvents.removeListener("completed", completeHandler);
           queueEvents.removeListener("failed", failedHandler);
         }
+        containerEventStream.removeListener("data", onAppContainerEventHandler);
         resolve();
       });
     });

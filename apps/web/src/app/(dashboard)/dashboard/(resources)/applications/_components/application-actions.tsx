@@ -22,21 +22,11 @@ interface DatabaseActionsProps {
 export function ApplicationActions({ initialState, id }: DatabaseActionsProps) {
   const { data } = useQuery<ApplicationStatusData>({ queryKey: [id] });
 
-  const isProcessing = data && data.status !== "completed";
+  if (data?.status === "completed" || !data || data.processName) {
+    const isProcessingCompleted = data?.status === "completed";
+    const canStopContainer = isProcessingCompleted ? state[data.queueName] === "running" : data?.processName ? state[data.processName] === "start" : initialState === "running";
+    const canStartContainer = isProcessingCompleted ? state[data.queueName] === "stop" : data?.processName ? state[data?.processName] === "stop" : initialState === "stop";
 
-  if (isProcessing) {
-    return (
-      <div className="flex gap-2">
-        <Loader2 className="animate-spin h-4 w-4" />
-      </div>
-    );
-  }
-
-  const isCompleted = data?.status === "completed";
-
-  if (isCompleted) {
-    const canStopContainer = state[data?.queueName] === "running";
-    const canStartContainer = state[data?.queueName] === "exited" || state[data?.queueName] === "created";
     return (
       <>
         {canStopContainer && (
@@ -54,26 +44,6 @@ export function ApplicationActions({ initialState, id }: DatabaseActionsProps) {
       </>
     );
   }
-
-  const canStopContainer = initialState === "running";
-  const canStartContainer = initialState === "exited" || initialState === "created";
-
-  return (
-    <>
-      {canStopContainer && (
-        <StopButton containerId={id} className="text-xs">
-          <Ban className="stroke-destructive" />
-          Shutdown
-        </StopButton>
-      )}
-      {canStartContainer && (
-        <StartButton containerId={id} className="text-xs">
-          <Play className="stroke-primary" />
-          Start
-        </StartButton>
-      )}
-    </>
-  );
 }
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

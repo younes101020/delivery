@@ -24,7 +24,7 @@ export function DatabaseActions({ id, initialState }: DatabaseActionsProps) {
 
   if (data?.status === "completed" || !data || data.processName) {
     const isProcessingCompleted = data?.status === "completed";
-    const canStopContainer = isProcessingCompleted ? state[data.queueName] === "running" : data?.processName ? state[data.processName] : initialState === "running";
+    const canStopContainer = isProcessingCompleted ? state[data.queueName] === "running" : data?.processName ? state[data.processName] === "start" : initialState === "running";
     const canStartContainer = isProcessingCompleted ? state[data.queueName] === "stop" || state[data.queueName] === "created" : data?.processName ? state[data?.processName] === "stop" || state[data?.processName] === "created" : initialState === "stop" || initialState === "created";
 
     return (
