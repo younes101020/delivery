@@ -4,6 +4,7 @@ import { Suspense } from "react";
 
 import { WithBannerBadge } from "@/app/_components/banner";
 import { PageTitle } from "@/app/_components/ui/page-title";
+import { Separator } from "@/app/_components/ui/separator";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { formatDate } from "@/app/_lib/utils";
 
@@ -40,11 +41,13 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
         </Suspense>
 
         <div className="col-span-4 mt-4">
+          <Separator className="mb-4" />
           <h2 className="text-xl font-bold mb-2">Update application details</h2>
           <Suspense fallback={<GetApplicationLoadingScreen />}>
             <AppConfiguration name={appName} />
           </Suspense>
-          <div className="p-3 text-destructive border border-dashed border-destructive">
+          <Separator className="my-4" />
+          <div className="p-3 text-destructive">
             <h3 className="text-lg font-bold mb-4">Danger zone</h3>
             <DeleteAppForm name={appName} />
           </div>
