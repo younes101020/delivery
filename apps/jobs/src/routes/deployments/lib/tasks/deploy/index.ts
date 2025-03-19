@@ -107,15 +107,12 @@ export const redeployApp = runDeployment(async (queueName) => {
 
     const activeCount = await queue.getActiveCount();
     const isDeploymentRunning = activeCount > 0;
-
     if (isDeploymentRunning)
       await waitForDeploymentToComplete(queueName, queue);
 
     const application = await getApplicationIdByName(queueName);
     const environmentVariables = await getEnvironmentVariablesForApplication(application.id);
-
     const cmdEnvVars = persistedEnvVarsToCmdEnvVars(environmentVariables);
-
     const completedJobs = await queue.getJobs("completed");
     const jobMap = new Map(completedJobs.map(j => [j.name, j.data]));
     const overrideNonInitialQueueData = { isCriticalError: undefined, logs: undefined };

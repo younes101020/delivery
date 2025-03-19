@@ -91,6 +91,16 @@ export const startContainer = validatedAction(updateContainerStatusSchema, async
   return { success: "Container started", inputs };
 });
 
+export async function redeploy(applicationName: string) {
+  const response = await client.deployments.redeploy[":queueName"].$post({
+    param: { queueName: applicationName },
+  });
+  if (response.status !== 202) {
+    return { error: "Unable to redeploy the application" };
+  }
+  return { success: "Redeployment success" };
+}
+
 const injectEnvSchema = z.object({
   dbId: z.string(),
   env: z.string(),

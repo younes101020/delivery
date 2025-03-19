@@ -7,6 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/app/_components/ui/
 
 import type { ContainerStatusProps } from "../../types";
 
+import { AppOptions } from "./app-options";
 import { ApplicationActions } from "./application-actions";
 import { ApplicationStatus } from "./application-status";
 import { InjectEnvCard } from "./link-to-database";
@@ -33,7 +34,11 @@ export function AppCard({ name, firstDeploymentAt, id, initialState, databases }
             <h2 className="decoration-primary underline">{name}</h2>
           </div>
 
-          <ApplicationActions id={id} initialState={initialState} />
+          <div className="flex">
+            <ApplicationActions id={id} initialState={initialState} />
+            <AppOptions containerId={id} applicationName={name} />
+          </div>
+
         </div>
       </CardHeader>
       <CardContent className="px-6 pb-6">
