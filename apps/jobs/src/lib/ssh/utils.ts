@@ -55,6 +55,9 @@ export function getUserFromKeyPath(keyPath: string) {
 }
 
 export async function loadConfig() {
+  if (env.CI)
+    return null;
+
   const { keyPath, privateKey } = await findSSHKey();
   const username = getUserFromKeyPath(keyPath);
 
