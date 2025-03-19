@@ -6,9 +6,9 @@ import { WithBannerBadge } from "@/app/_components/banner";
 import { PageTitle } from "@/app/_components/ui/page-title";
 import { Separator } from "@/app/_components/ui/separator";
 import { Skeleton } from "@/app/_components/ui/skeleton";
-import { formatDate } from "@/app/_lib/utils";
 
 import { getApplicationByName, getApplicationSreenshotUrl } from "../_lib/queries";
+import { AppDate } from "./_components/app-date/app-date";
 import { AppForm } from "./_components/app-form";
 import DeleteAppForm from "./_components/delete-app-form";
 
@@ -109,14 +109,18 @@ async function AppDetails({ name }: AppProps) {
         <dt className="text-muted-foreground">Environment variables count</dt>
         <dd>{application.environmentVariable?.length || 0}</dd>
       </dl>
-      <dl>
-        <dt className="text-muted-foreground">Creation date</dt>
-        <dd>{formatDate(application.createdAt)}</dd>
-      </dl>
-      <dl>
-        <dt className="text-muted-foreground">Last updated</dt>
-        <dd>{formatDate(application.updatedAt)}</dd>
-      </dl>
+      {application.createdAt && (
+        <dl>
+          <dt className="text-muted-foreground">Creation date</dt>
+          <AppDate date={application.createdAt} />
+        </dl>
+      )}
+      {application.updatedAt && (
+        <dl>
+          <dt className="text-muted-foreground">Last updated</dt>
+          <AppDate date={application.updatedAt} />
+        </dl>
+      )}
     </div>
   );
 }

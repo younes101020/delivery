@@ -21,23 +21,28 @@ export type Nullable<T> = {
   [K in keyof T]: T[K] | null;
 };
 
-function isNumeric(value: any): boolean {
-  return !Number.isNaN(value) && !Number.isNaN(Number.parseFloat(value));
+function isValidTimestampMs(value: any) {
+  return !Number.isNaN(Number(value));
+}
+
+function isValidDate(date: string | null | Date | number) {
+  return !!Date.parse(date as string);
 }
 
 export function formatDate(date: string | null | Date | number) {
   const locale = Intl.DateTimeFormat().resolvedOptions().locale;
 
-  return isNumeric(date)
-    ? new Intl.DateTimeFormat(locale, {
-        weekday: "short",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      }).format(new Date(Number(date) * 1000))
+  const outputDateTemplate = new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+  });
+
+  return isValidTimestampMs(date) || isValidDate(date)
+    ? outputDateTemplate.format(new Date(isValidTimestampMs(date) ? (Number(date) * 1000) : date as Date))
     : "Invalid Date";
 }
 
