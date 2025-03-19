@@ -1,5 +1,3 @@
-export type Resources = "deployment" | "database";
-
 export const prefix = {
   DEPLOYMENT: "deployment",
   DATABASE: "database",

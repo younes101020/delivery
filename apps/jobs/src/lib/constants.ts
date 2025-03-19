@@ -18,3 +18,5 @@ export const internalServerSchema = createMessageObjectSchema(HttpStatusPhrases.
 export const okSchema = createMessageObjectSchema(HttpStatusPhrases.OK);
 
 export const APPLICATIONS_PATH = "/data/delivery/applications";
+
+export type Resources = "deployment" | "application" | "database";
