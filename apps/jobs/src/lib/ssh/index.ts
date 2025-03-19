@@ -7,6 +7,8 @@ import { loadConfig } from "./utils";
 export async function ssh(command: string, { onStdout, cwd }: ISSH = {}) {
   const conn = new Client();
   const config = await loadConfig();
+  if (!config)
+    return null;
   const fullCommand = cwd ? `cd ${cwd} && ${command}` : command;
   return new Promise<Chunk[] | Error>((resolve, reject) => {
     const result: Chunk[] = [];
