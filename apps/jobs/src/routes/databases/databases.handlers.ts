@@ -6,7 +6,7 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import type { AppRouteHandler } from "@/lib/types";
 
 import { patchApplication } from "@/db/queries/queries";
-import { docker } from "@/lib/remote-docker";
+import { getDockerResourceEvents } from "@/lib/remote-docker";
 import { queueNames } from "@/lib/tasks/const";
 import { getJobAndQueueNameByJobId } from "@/lib/tasks/utils";
 
@@ -71,7 +71,7 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
   return streamSSE(c, async (stream) => {
     const [dbQueuesEvents, containerEventStream] = await Promise.all([
       getDatabaseQueuesEvents(),
-      docker.getEvents({ filters: { label: ["resource=database"], type: ["container"] } }),
+      getDockerResourceEvents("database"),
     ]);
 
     containerEventStream.on("data", onDatabaseContainerEventHandler);

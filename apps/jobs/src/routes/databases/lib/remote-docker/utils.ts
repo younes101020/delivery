@@ -3,9 +3,10 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { ContainersDto } from "@/db/dto/containers.dto";
 
-import { docker } from "@/lib/remote-docker";
+import { getDocker } from "@/lib/remote-docker";
 
 export async function getDatabasesContainers() {
+  const docker = await getDocker();
   const dbContainers = await docker.listContainers({
     all: true,
     filters: { label: ["resource=database"] },
@@ -21,6 +22,7 @@ export async function getDatabasesContainers() {
 }
 
 export async function getDatabaseEnvVarsByEnvVarKeys(containerId: string, envVarKey: string[]) {
+  const docker = await getDocker();
   const containerMetadata = await docker.getContainer(containerId).inspect();
 
   if (!containerMetadata)

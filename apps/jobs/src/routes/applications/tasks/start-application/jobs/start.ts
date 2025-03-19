@@ -1,11 +1,12 @@
 import { ApplicationError } from "@/lib/error";
-import { docker } from "@/lib/remote-docker";
+import { getDocker } from "@/lib/remote-docker";
 
 import type { StartQueueApplicationJob } from "../types";
 
 export async function start(job: StartQueueApplicationJob<"start">) {
   const { containerId } = job.data;
 
+  const docker = await getDocker();
   const dbContainer = docker.getContainer(containerId);
 
   await dbContainer.start()

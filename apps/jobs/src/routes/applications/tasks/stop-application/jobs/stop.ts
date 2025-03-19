@@ -1,11 +1,12 @@
 import { ApplicationError } from "@/lib/error";
-import { docker } from "@/lib/remote-docker";
+import { getDocker } from "@/lib/remote-docker";
 
 import type { StopQueueApplicationJob } from "../types";
 
 export async function stop(job: StopQueueApplicationJob<"stop">) {
   const { containerId } = job.data;
 
+  const docker = await getDocker();
   const appContainer = docker.getContainer(containerId);
   await appContainer.stop()
     .catch((error) => {

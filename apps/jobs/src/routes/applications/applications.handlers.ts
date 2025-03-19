@@ -12,7 +12,7 @@ import {
   patchApplication,
 } from "@/db/queries/queries";
 import { APPLICATIONS_PATH, ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
-import { docker } from "@/lib/remote-docker";
+import { getDockerResourceEvents } from "@/lib/remote-docker";
 import { ssh } from "@/lib/ssh";
 import { getJobAndQueueNameByJobId } from "@/lib/tasks/utils";
 
@@ -71,7 +71,7 @@ export const streamCurrentApplication: AppRouteHandler<StreamCurrentApplicationR
   return streamSSE(c, async (stream) => {
     const [appQueuesEvents, containerEventStream] = await Promise.all([
       getApplicationQueuesEvents(),
-      docker.getEvents({ filters: { label: ["resource=application"], type: ["container"] } }),
+      getDockerResourceEvents("application"),
     ]);
 
     containerEventStream.on("data", onAppContainerEventHandler);

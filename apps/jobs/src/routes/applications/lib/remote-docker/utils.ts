@@ -1,8 +1,9 @@
 import type { ContainersDto } from "@/db/dto/containers.dto";
 
-import { docker } from "@/lib/remote-docker";
+import { getDocker } from "@/lib/remote-docker";
 
 export async function getApplicationsContainers() {
+  const docker = await getDocker();
   const appContainers = await docker.listContainers({
     all: true,
     filters: { label: ["resource=application"] },

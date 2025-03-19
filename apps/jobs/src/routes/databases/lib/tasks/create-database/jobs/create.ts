@@ -1,11 +1,12 @@
 import { DatabaseError } from "@/lib/error";
-import { docker } from "@/lib/remote-docker";
+import { getDocker } from "@/lib/remote-docker";
 import { generateRandomString } from "@/lib/utils";
 
 import type { CreateQueueDatabaseJob } from "../types";
 
 export async function create(job: CreateQueueDatabaseJob<"create">) {
   const { type, name } = job.data;
+  const docker = await getDocker();
 
   const DB_USER = generateRandomString();
   const DB_PASSWORD = generateRandomString();
