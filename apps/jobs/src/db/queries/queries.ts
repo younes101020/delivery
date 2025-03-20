@@ -285,9 +285,15 @@ export async function patchApplication(name: string, updates: PatchApplicationSc
 }
 
 export async function deleteApplicationByName(name: string) {
-  return await db
-    .delete(applications)
-    .where(eq(applications.name, name));
+  return await db.transaction(async (tx) => {
+    await tx
+      .delete(applicationEnvironmentVariables)
+      .where(eq(applicationEnvironmentVariables.applicationId, db.select({ id: applications.id }).from(applications).where(eq(applications.name, name)).limit(1)));
+
+    return await tx
+      .delete(applications)
+      .where(eq(applications.name, name));
+  });
 }
 
 export async function getEnvironmentVariablesForApplication(applicationId: number) {
