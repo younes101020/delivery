@@ -1,7 +1,6 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/app/_components/ui/button";
@@ -24,7 +23,6 @@ interface DeleteAppProps {
 export default function DeleteAppForm({ name }: DeleteAppProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -48,10 +46,7 @@ export default function DeleteAppForm({ name }: DeleteAppProps) {
             disabled={isLoading}
             onClick={async () => {
               setIsLoading(true);
-              const { success } = await removeApplication(name);
-              if (success)
-                router.push("/dashboard/applications");
-              setIsLoading(false);
+              await removeApplication(name, true);
             }}
           >
             {isLoading

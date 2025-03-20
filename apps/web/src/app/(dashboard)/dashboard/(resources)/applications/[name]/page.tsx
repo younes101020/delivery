@@ -84,6 +84,7 @@ async function AppPreviewImage({ name }: AppProps) {
 
 async function AppDetails({ name }: AppProps) {
   const application = await getApplicationByName(name);
+
   if (!application)
     redirect("/dashboard/applications");
 

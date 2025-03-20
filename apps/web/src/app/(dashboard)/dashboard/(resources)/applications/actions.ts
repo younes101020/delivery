@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidateTag } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { client } from "@/app/_lib/client-http";
@@ -44,7 +45,7 @@ export const editApplication = validatedAction(
   },
 );
 
-export async function removeApplication(name: string) {
+export async function removeApplication(name: string, redirectToList: boolean) {
   const response = await client.applications[":slug"].$delete({
     param: { slug: name },
   });
@@ -54,6 +55,8 @@ export async function removeApplication(name: string) {
     };
   }
   revalidateTag(`application-${name}`);
+  if (redirectToList)
+    redirect("/dashboard/applications");
   return {
     success: true,
   };
