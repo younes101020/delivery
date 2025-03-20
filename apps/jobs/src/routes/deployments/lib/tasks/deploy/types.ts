@@ -1,6 +1,7 @@
 import type { Job } from "bullmq";
 
 import type { InsertApplicationSchemaWithSharedEnv, InsertEnvironmentVariablesSchema, SelectedGithubAppSecretSchema, SelectedGithubAppsSchema } from "@/db/dto";
+import type { MergeSubJobs } from "@/lib/tasks/types";
 
 type Application = InsertApplicationSchemaWithSharedEnv["applicationData"];
 
@@ -34,3 +35,5 @@ export type QueueDeploymentJobName = keyof QueueDeploymentJobData;
 export type QueueDeploymentJob<T extends QueueDeploymentJobName> = Omit<Job, "data"> & { data: QueueDeploymentJobData[T] & { repoName: string } };
 
 export type QueueDeploymentJobFns = Record<string, (job: QueueDeploymentJob<any>) => Promise<unknown>>;
+
+export type AllQueueDeploymentJobsData = MergeSubJobs<QueueDeploymentJobData>;

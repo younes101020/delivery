@@ -9,6 +9,8 @@ import type { CurrentJobSchema, DeploymentReferenceAndDataSchema, InsertEnvironm
 import { DeploymentError } from "@/lib/error";
 import { connection, fetchQueueTitles, getBullConnection } from "@/lib/tasks/utils";
 
+import type { AllQueueDeploymentJobsData } from "./types";
+
 import { JOBS } from ".";
 import { PREFIX } from "../const";
 
@@ -37,6 +39,10 @@ export async function getCurrentDeploymentsState() {
   }
 
   return currentDeploymentsState.filter(isNotNull);
+}
+
+export function getDeploymentQueue(repoName: string) {
+  return new Queue<AllQueueDeploymentJobsData>(repoName, { connection: getBullConnection(connection), prefix: PREFIX });
 }
 
 export async function getPreviousDeploymentsState() {
