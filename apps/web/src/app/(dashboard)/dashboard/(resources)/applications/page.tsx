@@ -9,6 +9,7 @@ import { Skeleton } from "@/app/_components/ui/skeleton";
 import { formatDate } from "@/app/_lib/utils";
 
 import { AppCard } from "./_components/app-card";
+import { NewAppCard } from "./_components/new-app-card";
 import { SubscribeToSSE } from "./_components/subscribe-to-sse";
 import { getApplications, getRunningDatabaseContainers } from "./_lib/queries";
 
@@ -50,6 +51,7 @@ async function ApplicationList() {
           databases={dbContainers}
         />
       ))}
+      <NewAppCard />
     </div>
   );
 }
