@@ -92,7 +92,7 @@ export function DeploymentPreviewCard({
       <CardFooter className="px-0">
         {status === "completed"
           ? (
-              <Link href="/dashboard/applications" className={cn(buttonVariants({ variant: "default" }), "mt-4")}>
+              <Link href="/dashboard/applications" className={cn(buttonVariants({ variant: "default" }), "mt-4 mx-6")}>
                 Go to applications
               </Link>
             )
