@@ -38,7 +38,7 @@ function DeleteOption({ containerId }: ContainerOptionsProps) {
   return (
     <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <AlertDialogTrigger asChild>
-        <DropdownMenuItem className="text-destructive text-xs" onSelect={e => e.preventDefault()}>Delete</DropdownMenuItem>
+        <DropdownMenuItem className="text-destructive" onSelect={e => e.preventDefault()}>Delete</DropdownMenuItem>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
