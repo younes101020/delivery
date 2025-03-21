@@ -84,6 +84,7 @@ export const deployApp = runDeployment(async (payload) => {
       build: {
         port,
         staticdeploy,
+        isRedeploy: false,
         env: environmentVariables && environmentVariables.cmdEnvVars,
         cache,
         fqdn,
@@ -121,7 +122,7 @@ export const redeployApp = runDeployment(async (queueName) => {
 
     return {
       clone: { ...jobMap.get("clone"), ...overrideNonInitialQueueData },
-      build: { ...jobMap.get("build"), env: cmdEnvVars, ...overrideNonInitialQueueData },
+      build: { ...jobMap.get("build"), env: cmdEnvVars, isRedeploy: true, ...overrideNonInitialQueueData },
       configure: { ...jobMap.get("configure"), environmentVariable: environmentVariables, ...overrideNonInitialQueueData },
     };
   }

@@ -12,6 +12,7 @@ export interface QueueDeploymentJobData {
     repoName: string;
   };
   build: {
+    isRedeploy: boolean;
     env?: string;
     port: number;
     staticdeploy: boolean;

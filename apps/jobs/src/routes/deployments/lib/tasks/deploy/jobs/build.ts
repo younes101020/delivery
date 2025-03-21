@@ -12,11 +12,13 @@ export interface ISSH {
 }
 
 export async function build(job: QueueDeploymentJob<"build">) {
-  const { repoName, port, env, fqdn, cache, staticdeploy, publishdir } = job.data;
+  const { repoName, port, env, fqdn, cache, staticdeploy, publishdir, isRedeploy } = job.data;
   await job.updateProgress({ logs: "\nImage will be built..." });
 
-  const buildAndExtractStaticArtefactCmd = staticdeploy && `nixpacks build ./ --name buildonly-${repoName} --env CI=false --start-cmd "echo 'static web files extraction in progress...'; /bin/bash" ${!cache ? "--no-cache" : ""} && docker run -dt --name temp-${repoName} buildonly-${repoName} && mkdir ./build-artefact && cd ./build-artefact && docker container cp -a temp-${repoName}:/app${publishdir} ./ && docker ps -q --filter ancestor=buildonly-${repoName} | xargs -r docker stop && docker ps -aq --filter ancestor=buildonly-${repoName} | xargs -r docker rm && docker rmi buildonly-${repoName} &&`;
-  const deployCmd = `nixpacks build ./ --name ${repoName} --env CI=false ${env ?? ""} ${!cache ? "--no-cache" : ""} -l "resource=application" -l "traefik.enable=true" -l "traefik.http.routers.${repoName}.rule=Host(\\\`${fqdn}\\\`)" -l "traefik.http.services.${repoName}.loadbalancer.server.port=${port}" && docker run --restart unless-stopped --network host_network -d ${repoName}`;
+  const labelsCmd = `-l "resource=application" -l "traefik.enable=true" -l "traefik.http.routers.${repoName}.rule=Host(\\\`${fqdn}\\\`)" -l "traefik.http.services.${repoName}.loadbalancer.server.port=${port}"`;
+
+  const buildAndExtractStaticArtefactCmd = staticdeploy && `nixpacks build ./ --name buildonly-${repoName} --env CI=false --start-cmd "echo 'static web files extraction in progress...'; /bin/bash" ${!cache ? "--no-cache" : ""} && docker run -dt --name temp-${repoName} buildonly-${repoName} && mkdir -p ./build-artefact && pushd ./build-artefact && docker container cp temp-${repoName}:/app${publishdir} ./ && docker ps -aq --filter ancestor="buildonly-${repoName}" | xargs -r docker stop | xargs -r docker rm && docker rmi buildonly-${repoName} &&`;
+  const deployCmd = isRedeploy ? `nixpacks build ./ --name ${repoName} --env CI=false ${env ?? ""} && docker rm -f $(docker ps -a -q --filter "ancestor=${repoName}") && docker run --restart unless-stopped --network host_network -d ${repoName}` : `nixpacks build ./ --name ${repoName} --env CI=false ${env ?? ""} ${!cache ? "--no-cache" : ""} ${labelsCmd} && docker run --restart unless-stopped --network host_network -d ${repoName}`;
 
   const fullCmd = staticdeploy ? `${buildAndExtractStaticArtefactCmd} ${deployCmd}` : deployCmd;
 
