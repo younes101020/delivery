@@ -233,7 +233,7 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
   await Promise.all([
     deleteApplicationByName(slug),
     ssh(
-      `rm -Rvf ${slug} && sudo docker rm -f $(docker ps -a -q --filter ancestor=${slug}) && docker rmi ${slug}`,
+      `rm -Rvf ${slug} && sudo docker rm -f $(docker ps -a -q --filter "ancestor=${slug}") && docker rmi ${slug}`,
       {
         cwd: `${APPLICATIONS_PATH}`,
       },
