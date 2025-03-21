@@ -191,7 +191,7 @@ describe("deployments tests", () => {
         children: [
           {
             name: JOBS.build,
-            data: { ...jobMap.get("build"), env: `-e ${env.key}=${env.value}`, ...overrideNonInitialQueueData },
+            data: { ...jobMap.get("build"), env: `-e ${env.key}=${env.value}`, isRedeploy: true, ...overrideNonInitialQueueData },
             queueName,
             opts: { attempts: 3, failParentOnFailure: true },
             children: [
