@@ -124,7 +124,7 @@ describe("deployments tests", () => {
         children: [
           {
             name: JOBS.build,
-            data: { env: env.cmdEnvVars, cache, ...(staticdeploy && { publishdir }), port, staticdeploy, fqdn, repoName: queueName },
+            data: { env: env.cmdEnvVars, cache, ...(staticdeploy && { publishdir }), port, staticdeploy, fqdn, repoName: queueName, isRedeploy: false },
             queueName,
             opts: { attempts: 3, failParentOnFailure: true },
             children: [
