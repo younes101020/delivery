@@ -15,7 +15,7 @@ interface ContainerOptionsProps {
   applicationName: string;
 };
 
-export function AppOptions({ applicationName }: ContainerOptionsProps) {
+export function AppOptions({ applicationName, containerId }: ContainerOptionsProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   return (
@@ -45,17 +45,13 @@ export function AppOptions({ applicationName }: ContainerOptionsProps) {
               )}
         </DropdownMenuItem>
         <Separator />
-        <DeleteOption applicationName={applicationName} />
+        <DeleteOption applicationName={applicationName} containerId={containerId} />
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
 
-interface DeleteOptionProps {
-  applicationName: ContainerOptionsProps["applicationName"];
-}
-
-function DeleteOption({ applicationName }: DeleteOptionProps) {
+function DeleteOption({ applicationName, containerId }: ContainerOptionsProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -76,7 +72,7 @@ function DeleteOption({ applicationName }: DeleteOptionProps) {
           <AlertDialogAction
             onClick={async () => {
               setIsLoading(true);
-              await removeApplication(applicationName, false);
+              await removeApplication(applicationName, containerId, false);
               setIsLoading(false);
               setIsDialogOpen(false);
             }}

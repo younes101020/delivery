@@ -48,8 +48,11 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
           </Suspense>
           <Separator className="my-4" />
           <div className="p-3 text-destructive">
+
             <h3 className="text-lg font-bold mb-4">Danger zone</h3>
-            <DeleteAppForm name={appName} />
+            <Suspense fallback={<GetApplicationLoadingScreen />}>
+              <DeleteApp name={appName} />
+            </Suspense>
           </div>
         </div>
       </div>
@@ -143,6 +146,14 @@ async function AppConfiguration({ name }: AppProps) {
       name={application.name}
     />
   );
+}
+
+async function DeleteApp({ name }: AppProps) {
+  const application = await getApplicationByName(name);
+  if (!application)
+    redirect("/dashboard/applications");
+
+  return <DeleteAppForm name={application.name} containerId={application.containerId} />;
 }
 
 function GetApplicationLoadingScreen() {

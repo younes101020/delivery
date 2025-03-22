@@ -30,6 +30,7 @@ import type { AllQueueApplicationJobsData } from "./tasks/types";
 import { deleteDeploymentJobs } from "../deployments/lib/tasks/deploy/utils";
 import { getApplicationsContainers } from "./lib/remote-docker/utils";
 import { PREFIX, queueNames } from "./tasks/const";
+import { removeApplicationResource } from "./tasks/remove-application";
 import { startApplication } from "./tasks/start-application";
 import { stopApplication } from "./tasks/stop-application";
 import { getApplicationQueuesEvents, getApplicationsActiveJobs } from "./tasks/utils";
@@ -158,8 +159,8 @@ export const streamCurrentApplication: AppRouteHandler<StreamCurrentApplicationR
 
 export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   const { slug } = c.req.valid("param");
-  const application = await getApplicationWithEnvVarsByName(slug);
-  if (!application) {
+  const [application, appContainer] = await Promise.all([getApplicationWithEnvVarsByName(slug), getApplicationsContainers({ name: [slug] })]);
+  if (!application || appContainer.length === 0) {
     return c.json(
       {
         message: HttpStatusPhrases.NOT_FOUND,
@@ -171,6 +172,7 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   return c.json(
     {
       ...application,
+      containerId: appContainer[0]?.id,
       environmentVariables: application.applicationEnvironmentVariables.map(ev => ({
         id: ev.environmentVariable.id,
         key: ev.environmentVariable.key,
@@ -229,24 +231,26 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
 
 export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
   const { slug } = c.req.valid("param");
+  const { containerId } = c.req.valid("json");
 
   await Promise.all([
+    removeApplicationResource(containerId, slug),
     deleteApplicationByName(slug),
     ssh(
-      `rm -Rvf ${slug} && sudo docker rm -f $(docker ps -a -q --filter "ancestor=${slug}") && docker rmi ${slug}`,
+      `rm -Rvf ${slug}`,
       {
         cwd: `${APPLICATIONS_PATH}`,
       },
-    ).catch((e) => {
-      return c.json(
-        {
-          message: e instanceof Error ? e.message : HttpStatusPhrases.INTERNAL_SERVER_ERROR,
-        },
-        HttpStatusCodes.INTERNAL_SERVER_ERROR,
-      );
-    }),
+    ),
     deleteDeploymentJobs(slug),
-  ]);
+  ]).catch((e) => {
+    return c.json(
+      {
+        message: e instanceof Error ? e.message : HttpStatusPhrases.INTERNAL_SERVER_ERROR,
+      },
+      HttpStatusCodes.INTERNAL_SERVER_ERROR,
+    );
+  });
 
   return c.body(null, HttpStatusCodes.NO_CONTENT);
 };

@@ -1,12 +1,13 @@
 import { type Job, UnrecoverableError } from "bullmq";
 
-import { jobs as startDbJobs } from "./start-application/jobs";
-import { jobs as stopDbJobs } from "./stop-application/jobs";
+import { jobs as removeAppJobs } from "./remove-application/jobs";
+import { jobs as startAppJobs } from "./start-application/jobs";
+import { jobs as stopAppJobs } from "./stop-application/jobs";
 
 // This processor will timeout in 15 minutes.
 const MAX_TTL = 900_000;
 
-const jobs = Object.assign({}, startDbJobs, stopDbJobs);
+const jobs = Object.assign({}, removeAppJobs, startAppJobs, stopAppJobs);
 
 export default async function WorkerFactory(job: Job) {
   const hardKillTimeout = setTimeout(() => {

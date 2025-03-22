@@ -7,6 +7,7 @@ import { insertEnvironmentVariablesSchema } from "./envvars.dto";
 
 export const selectApplicationsSchemaWithSharedEnv = createSelectSchema(applications).extend({
   environmentVariable: z.array(createSelectSchema(environmentVariables)).optional(),
+  containerId: z.string(),
 });
 
 export const selectApplicationsSchema = containersDto;

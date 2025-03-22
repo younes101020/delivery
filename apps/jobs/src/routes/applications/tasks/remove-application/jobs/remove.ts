@@ -1,19 +1,22 @@
 import { ApplicationError } from "@/lib/error";
 import { getDocker } from "@/lib/remote-docker";
 
-import type { StartQueueApplicationJob } from "../types";
+import type { RemoveQueueApplicationJob } from "../types";
 
-export async function start(job: StartQueueApplicationJob<"start">) {
-  const { containerId } = job.data;
+export async function remove(job: RemoveQueueApplicationJob<"remove">) {
+  const { containerId, image } = job.data;
 
   const docker = await getDocker();
   const appContainer = docker.getContainer(containerId);
+  const appImage = docker.getImage(image);
 
-  await appContainer.start()
+  await appContainer.remove()
     .catch((error) => {
       throw new ApplicationError({
-        name: "START_APPLICATION_ERROR",
+        name: "REMOVE_APPLICATION_ERROR",
         message: error instanceof Error ? error.message : "Unexpected error",
       });
     });
+
+  await appImage.remove({ force: true });
 }

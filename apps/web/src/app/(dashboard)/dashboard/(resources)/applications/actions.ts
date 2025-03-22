@@ -45,9 +45,10 @@ export const editApplication = validatedAction(
   },
 );
 
-export async function removeApplication(name: string, redirectToList: boolean) {
+export async function removeApplication(name: string, containerId: string, redirectToList: boolean) {
   const response = await client.applications[":slug"].$delete({
     param: { slug: name },
+    json: { containerId },
   });
   if (response.status !== 204) {
     return {

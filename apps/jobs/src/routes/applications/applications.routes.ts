@@ -127,7 +127,8 @@ export const remove = createRoute({
   path: "/applications/{slug}",
   method: "delete",
   request: {
-    params: SlugParamsSchema,
+    params: SlugParamsSchema.describe("The application name"),
+    body: jsonContentRequired(z.object({ containerId: z.string() }), "The application container id"),
   },
   tags,
   responses: {
