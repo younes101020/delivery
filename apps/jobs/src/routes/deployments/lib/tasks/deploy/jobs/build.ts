@@ -1,6 +1,9 @@
 import { APPLICATIONS_PATH } from "@/lib/constants";
 import { DeploymentError } from "@/lib/error";
+import { getDocker } from "@/lib/remote-docker";
 import { ssh } from "@/lib/ssh";
+import { createApplicationServiceSpec } from "@/routes/deployments/lib/services/manifests/application";
+import { deleteAppServiceByName } from "@/routes/deployments/lib/services/utils";
 
 import type { QueueDeploymentJob } from "../types";
 
@@ -15,15 +18,16 @@ export async function build(job: QueueDeploymentJob<"build">) {
   const { repoName, port, env, fqdn, cache, staticdeploy, publishdir, isRedeploy } = job.data;
   await job.updateProgress({ logs: "\nImage will be built..." });
 
-  const labelsCmd = `-l "resource=application" -l "traefik.enable=true" -l "traefik.http.routers.${repoName}.rule=Host(\\\`${fqdn}\\\`)" -l "traefik.http.services.${repoName}.loadbalancer.server.port=${port}"`;
+  const docker = await getDocker();
 
-  const buildAndExtractStaticArtefactCmd = staticdeploy && `nixpacks build ./ --name buildonly-${repoName} --env CI=false --start-cmd "echo 'static web files extraction in progress...'; /bin/bash" ${!cache ? "--no-cache" : ""} && docker run -dt --name temp-${repoName} buildonly-${repoName} && mkdir -p ./build-artefact && pushd ./build-artefact && docker container cp temp-${repoName}:/app${publishdir} ./ && docker ps -aq --filter ancestor="buildonly-${repoName}" | xargs -r docker stop | xargs -r docker rm && docker rmi buildonly-${repoName} &&`;
-  const deployCmd = isRedeploy ? `nixpacks build ./ --name ${repoName} --env CI=false ${env ?? ""} --no-cache && docker rm -f $(docker ps -a -q --filter "ancestor=${repoName}") && docker run --name ${repoName} --restart unless-stopped ${env ?? ""} --network host_network ${labelsCmd} -d ${repoName}` : `nixpacks build ./ --name ${repoName} --env CI=false ${env ?? ""} ${!cache ? "--no-cache" : ""} ${labelsCmd} && docker run  --name ${repoName} --restart unless-stopped --network host_network -d ${repoName}`;
+  const buildImageFromSourceCmd = `nixpacks build ./ --name ${repoName} --env CI=false ${env ?? ""} ${!cache ? "--no-cache" : ""}`;
 
-  const fullCmd = staticdeploy ? `${buildAndExtractStaticArtefactCmd} ${deployCmd}` : deployCmd;
+  const extractStaticArtefactCmd = staticdeploy && `nixpacks build ./ --name buildonly-${repoName} --env CI=false --start-cmd "echo 'static web files extraction in progress...'; /bin/bash" ${!cache ? "--no-cache" : ""} && docker run -dt --name temp-${repoName} buildonly-${repoName} && mkdir -p ./build-artefact && pushd ./build-artefact && docker container cp temp-${repoName}:/app${publishdir} ./ && docker ps -aq --filter ancestor="buildonly-${repoName}" | xargs -r docker stop | xargs -r docker rm && docker rmi buildonly-${repoName} &&`;
+
+  const buildCmd = staticdeploy ? `${extractStaticArtefactCmd} ${buildImageFromSourceCmd}` : buildImageFromSourceCmd;
 
   await ssh(
-    fullCmd,
+    buildCmd,
     {
       cwd: `${APPLICATIONS_PATH}/${repoName}`,
       onStdout: async ({ chunk, chunks, isCriticalError }) => {
@@ -39,6 +43,18 @@ export async function build(job: QueueDeploymentJob<"build">) {
       message: error instanceof Error ? error.message : "Unexpected error",
     });
   });
+
+  if (isRedeploy)
+    await deleteAppServiceByName(repoName);
+
+  const appServiceSpec = createApplicationServiceSpec({
+    applicationName: repoName,
+    image: repoName,
+    fqdn,
+    port,
+    includeApplicationProxy: !isRedeploy,
+  });
+  await docker.createService(appServiceSpec);
 
   await job.updateProgress({ logs: "Your application is now online! 🚀" });
 }
