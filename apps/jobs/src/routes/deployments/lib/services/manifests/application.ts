@@ -7,11 +7,12 @@ interface ApplicationServiceSpec {
   port: number;
   plainEnv?: string[];
   includeApplicationProxy?: boolean;
+  networkId: string;
 }
 
 const APPLICATION_INSTANCE_REPLICAS = 3;
 
-export function createApplicationServiceSpec({ applicationName, image, fqdn, port, plainEnv, includeApplicationProxy = false }: ApplicationServiceSpec) {
+export function createApplicationServiceSpec({ applicationName, image, fqdn, port, plainEnv, includeApplicationProxy = false, networkId }: ApplicationServiceSpec) {
   const manifest: Dockerode.ServiceSpec = {
     Name: `${applicationName}-${Date.now()}`,
     TaskTemplate: {
@@ -30,6 +31,11 @@ export function createApplicationServiceSpec({ applicationName, image, fqdn, por
       Placement: {
         Constraints: ["node.role == worker"],
       },
+      Networks: [
+        {
+          Target: networkId,
+        },
+      ],
       RestartPolicy: {
         Condition: "on-failure",
         Delay: 5,
