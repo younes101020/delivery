@@ -39,16 +39,18 @@ interface UTFixtures {
         port: number;
         githubAppId: number;
       };
-      environmentVariable?: {
-        key: string;
-        value: string;
-      }[];
+      environmentVariable?: EnvironmentVariables["structured"];
     };
   }[];
-  persistedEnvVars: {
+  environmentVariable: EnvironmentVariables;
+}
+
+interface EnvironmentVariables {
+  structured: {
     key: string;
     value: string;
   }[];
+  plain: string;
 }
 
 const gitusername = faker.internet.username().toLowerCase();
@@ -124,10 +126,15 @@ const completedJobs = [
   },
 ];
 
-const persistedEnvVars = [
-  { key: faker.string.alphanumeric(8), value: faker.string.alphanumeric(12) },
-  { key: faker.string.alphanumeric(8), value: faker.string.alphanumeric(12) },
-];
+const randomEnvironmentVariable = {
+  key: faker.string.alphanumeric(8),
+  value: faker.string.alphanumeric(12),
+};
+
+const environmentVariable = {
+  plain: `${randomEnvironmentVariable.key}=${randomEnvironmentVariable.value} ${randomEnvironmentVariable.key}=${randomEnvironmentVariable.value}`,
+  structured: [randomEnvironmentVariable],
+};
 
 export const it = base.extend<UTFixtures>({
   repoUrl: async ({}, use) => {
@@ -145,7 +152,7 @@ export const it = base.extend<UTFixtures>({
   completedJobs: async ({}, use) => {
     await use(completedJobs);
   },
-  persistedEnvVars: async ({}, use) => {
-    await use(persistedEnvVars);
+  environmentVariable: async ({}, use) => {
+    await use(environmentVariable);
   },
 });

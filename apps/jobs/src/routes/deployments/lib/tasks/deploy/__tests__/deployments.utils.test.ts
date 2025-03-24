@@ -7,7 +7,7 @@ import { ZodError } from "zod";
 import { insertDeploymentSchema } from "@/db/dto";
 import { DeploymentError } from "@/lib/error";
 import { it } from "@/routes/deployments/__tests__/fixtures";
-import { convertGitToAuthenticatedUrl, parseAppHost, persistedEnvVarsToCmdEnvVars, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
+import { convertGitToAuthenticatedUrl, parseAppHost, persistedEnvVarsToCmdEnvVars, plainEnvVarsToGroupedEnvVars, plainEnvVarsToPersistedEnvVars, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
 
 const eventHandlers: Record<string, ({ jobId }: { jobId: string }) => void> = {};
 
@@ -95,13 +95,24 @@ describe("deployments utils unit tests", () => {
     expect(queueEventsSpy).toBeCalledTimes(1);
   });
 
-  it("return command environment variables", ({ persistedEnvVars }) => {
-    const expected = `-e ${persistedEnvVars[0].key}=${persistedEnvVars[0].value} -e ${persistedEnvVars[1].key}=${persistedEnvVars[1].value}`;
-    expect(persistedEnvVarsToCmdEnvVars(persistedEnvVars)).toBe(expected);
+  it("return command environment variables", ({ environmentVariable }) => {
+    const key = environmentVariable.structured[0].key;
+    const value = environmentVariable.structured[0].value;
+    const expected = [`--env ${key}=${value}`];
+    expect(persistedEnvVarsToCmdEnvVars(environmentVariable.structured)).toBe(expected);
   });
 
-  it("return command environment variables from objects env vars", ({ persistedEnvVars }) => {
-    const expected = `-e ${persistedEnvVars[0].key}=${persistedEnvVars[0].value} -e ${persistedEnvVars[1].key}=${persistedEnvVars[1].value}`;
-    expect(persistedEnvVarsToCmdEnvVars(persistedEnvVars)).toBe(expected);
+  it("return structured environment variables from plain env vars", ({ environmentVariable }) => {
+    const key = environmentVariable.structured[0].key;
+    const value = environmentVariable.structured[0].value;
+    const expected = [{ key, value }, { key, value }];
+    expect(plainEnvVarsToPersistedEnvVars(environmentVariable.plain)).toEqual(expected);
+  });
+
+  it("return grouped envvironment variables from plain env vars", ({ environmentVariable }) => {
+    const key = environmentVariable.structured[0].key;
+    const value = environmentVariable.structured[0].value;
+    const expected = [`${key}=${value}`, `${key}=${value}`];
+    expect(plainEnvVarsToGroupedEnvVars(environmentVariable.plain)).toBe(expected);
   });
 });

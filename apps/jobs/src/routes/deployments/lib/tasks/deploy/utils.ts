@@ -163,15 +163,7 @@ export function fromGitUrlToQueueName(repoUrl: string) {
   return basename(repoUrl, ".git").toLowerCase();
 }
 
-function plainEnvVarsToCmdEnvVars(envs: string) {
-  return envs
-    .trim()
-    .split(/\s+/)
-    .map(env => `-e ${env}`)
-    .join(" ");
-}
-
-function plainEnvVarsToPersistedEnvVars(envs: string) {
+export function plainEnvVarsToPersistedEnvVars(envs: string) {
   return envs
     .trim()
     .split(/\s+/)
@@ -184,7 +176,7 @@ function plainEnvVarsToPersistedEnvVars(envs: string) {
 
 export function persistedEnvVarsToCmdEnvVars(envs: InsertEnvironmentVariablesSchema[]) {
   return envs
-    .map(env => `-e ${env.key}=${env.value}`)
+    .map(env => `--env ${env.key}=${env.value}`)
     .join(" ");
 }
 
@@ -193,14 +185,18 @@ export function transformEnvVars(envs: DeploymentReferenceAndDataSchema["env"]) 
     return undefined;
   }
 
-  const cmdEnvVars = plainEnvVarsToCmdEnvVars(envs);
+  const groupedEnvVars = plainEnvVarsToGroupedEnvVars(envs);
 
   const persistedEnvVars = plainEnvVarsToPersistedEnvVars(envs);
 
   return {
-    cmdEnvVars,
+    groupedEnvVars,
     persistedEnvVars,
   };
+}
+
+export function plainEnvVarsToGroupedEnvVars(envs: string) {
+  return envs.trim().split(/\s+/);
 }
 
 export function parseAppHost(appName: string, hostName: string) {

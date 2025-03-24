@@ -25,7 +25,7 @@ describe("deployments tests", () => {
       fromGitUrlToQueueName: vi.fn().mockReturnValue("my-app"),
       waitForDeploymentToComplete: vi.fn(),
       parseAppHost: vi.fn().mockReturnValue("https://my-app.domain.com"),
-      transformEnvVars: vi.fn().mockReturnValue({ cmdEnvVars: `-e ${env.key}=${env.value}`, persistedEnvVars: [env] }),
+      transformEnvVars: vi.fn().mockReturnValue({ groupedEnvVars: [`${env.key}=${env.value}`], persistedEnvVars: [env] }),
     };
   });
 
@@ -57,13 +57,13 @@ describe("deployments tests", () => {
       fromGitUrlToQueueName: mocks.fromGitUrlToQueueName,
       transformEnvVars: vi.fn().mockReturnValue(
         {
-          cmdEnvVars: `-e ${env.key}=${env.value}`,
+          groupedEnvVars: [`${env.key}=${env.value}`],
           persistedEnvVars: [env],
         },
       ),
       parseAppHost: mocks.parseAppHost,
       waitForDeploymentToComplete: mocks.waitForDeploymentToComplete,
-      persistedEnvVarsToCmdEnvVars: vi.fn().mockReturnValue(`-e ${env.key}=${env.value}`),
+      persistedEnvVarsToCmdEnvVars: vi.fn().mockReturnValue(`--env ${env.key}=${env.value}`),
     };
   });
 
