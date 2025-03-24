@@ -10,7 +10,7 @@ export async function remove(job: RemoveQueueApplicationJob<"remove">) {
   const appContainer = docker.getContainer(containerId);
   const appImage = docker.getImage(image);
 
-  await appContainer.remove()
+  await appContainer.remove({ force: true })
     .catch((error) => {
       throw new ApplicationError({
         name: "REMOVE_APPLICATION_ERROR",
