@@ -106,8 +106,8 @@ export async function redeploy(applicationName: string) {
 }
 
 const injectEnvSchema = z.object({
-  dbId: z.string(),
-  env: z.string(),
+  dbId: z.string().min(1, "Please select a database"),
+  env: z.string().min(1, "Please choose an environment variable key"),
   applicationName: z.string(),
 });
 
