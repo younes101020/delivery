@@ -113,6 +113,6 @@ describe("deployments utils unit tests", () => {
     const key = environmentVariable.structured[0].key;
     const value = environmentVariable.structured[0].value;
     const expected = [`${key}=${value}`, `${key}=${value}`];
-    expect(plainEnvVarsToGroupedEnvVars(environmentVariable.plain)).toBe(expected);
+    expect(plainEnvVarsToGroupedEnvVars(environmentVariable.plain)).toStrictEqual(expected);
   });
 });

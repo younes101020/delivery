@@ -196,7 +196,7 @@ export function transformEnvVars(envs: DeploymentReferenceAndDataSchema["env"]) 
 }
 
 export function plainEnvVarsToGroupedEnvVars(envs: string) {
-  return envs.trim().split(/\s+/);
+  return envs.split(" ");
 }
 
 export function parseAppHost(appName: string, hostName: string) {
