@@ -94,6 +94,10 @@ services:
   
   traefik:
     image: "traefik:v3.2"
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     container_name: "traefik"
     command:
       - --api.dashboard=true

@@ -3,7 +3,7 @@ import { DeploymentError } from "@/lib/error";
 import { getDocker } from "@/lib/remote-docker";
 import { ssh } from "@/lib/ssh";
 import { createApplicationServiceSpec } from "@/routes/deployments/lib/services/manifests/application";
-import { deleteAppServiceByName } from "@/routes/deployments/lib/services/utils";
+import { deleteAppServiceByName, getApplicationNetworkID } from "@/routes/deployments/lib/services/utils";
 
 import type { QueueDeploymentJob } from "../types";
 
@@ -19,6 +19,8 @@ export async function build(job: QueueDeploymentJob<"build">) {
   await job.updateProgress({ logs: "\nImage will be built..." });
 
   const docker = await getDocker();
+
+  const networkId = await getApplicationNetworkID(repoName);
 
   const buildImageFromSourceCmd = `nixpacks build ./ --name ${repoName} --env CI=false ${env ?? ""} ${!cache ? "--no-cache" : ""}`;
 
@@ -53,6 +55,7 @@ export async function build(job: QueueDeploymentJob<"build">) {
     fqdn,
     port,
     includeApplicationProxy: !isRedeploy,
+    networkId,
   });
   await docker.createService(appServiceSpec);
 
