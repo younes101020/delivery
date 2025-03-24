@@ -13,13 +13,15 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 interface ContainerOptionsProps {
   containerId: string;
   applicationName: string;
+  setIsDropdownOpen?: (isOpen: boolean) => void;
 };
 
 export function AppOptions({ applicationName, containerId }: ContainerOptionsProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="size-8">
           <MoreVertical className="size-4" />
@@ -31,6 +33,7 @@ export function AppOptions({ applicationName, containerId }: ContainerOptionsPro
           setIsLoading(true);
           await redeploy(applicationName);
           setIsLoading(false);
+          setIsDropdownOpen(false);
         }}
         >
           {isLoading
@@ -45,13 +48,13 @@ export function AppOptions({ applicationName, containerId }: ContainerOptionsPro
               )}
         </DropdownMenuItem>
         <Separator />
-        <DeleteOption applicationName={applicationName} containerId={containerId} />
+        <DeleteOption applicationName={applicationName} containerId={containerId} setIsDropdownOpen={setIsDropdownOpen} />
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
 
-function DeleteOption({ applicationName, containerId }: ContainerOptionsProps) {
+function DeleteOption({ applicationName, containerId, setIsDropdownOpen }: ContainerOptionsProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -75,6 +78,7 @@ function DeleteOption({ applicationName, containerId }: ContainerOptionsProps) {
               await removeApplication(applicationName, containerId, false);
               setIsLoading(false);
               setIsDialogOpen(false);
+              setIsDropdownOpen && setIsDropdownOpen(false);
             }}
           >
             {isLoading
