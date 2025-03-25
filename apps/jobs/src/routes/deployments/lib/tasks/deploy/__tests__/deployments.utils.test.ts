@@ -98,7 +98,7 @@ describe("deployments utils unit tests", () => {
   it("return command environment variables", ({ environmentVariable }) => {
     const key = environmentVariable.structured[0].key;
     const value = environmentVariable.structured[0].value;
-    const expected = [`--env ${key}=${value}`];
+    const expected = `--env ${key}=${value}`;
     expect(persistedEnvVarsToCmdEnvVars(environmentVariable.structured)).toBe(expected);
   });
 
