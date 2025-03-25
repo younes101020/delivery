@@ -206,7 +206,7 @@ export function parseAppHost(appName: string, hostName: string) {
   }
   catch (error) {
     throw new DeploymentError({
-      name: "BUILD_APP_ERROR",
+      name: "DEPLOYMENT_APP_ERROR",
       message: "The provided host name is not a valid URL",
       cause: error,
     });
