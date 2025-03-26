@@ -2,8 +2,8 @@ import { APPLICATIONS_PATH } from "@/lib/constants";
 import { DeploymentError } from "@/lib/error";
 import { getDocker } from "@/lib/remote-docker";
 import { ssh } from "@/lib/ssh";
-import { createApplicationServiceSpecAsBlue, SwitchFromBlueToGreen } from "@/routes/deployments/lib/services/manifests/application";
-import { createGreenService, deleteAppServiceByName, getApplicationNetworkID, getBlueServiceSpecByApplicationName } from "@/routes/deployments/lib/services/utils";
+import { createApplicationServiceSpec } from "@/routes/deployments/lib/services/manifests/application";
+import { getApplicationNetworkID, synchroniseApplicationServiceWithLocalImage } from "@/routes/deployments/lib/services/utils";
 
 import type { QueueDeploymentJob } from "../types";
 
@@ -49,22 +49,23 @@ export async function build(job: QueueDeploymentJob<"build">) {
   const docker = await getDocker();
   const networkId = await getApplicationNetworkID(repoName, docker);
 
-  const blueService = isRedeploy && await getBlueServiceSpecByApplicationName(`${repoName}-blue`, docker);
-
-  if (blueService) {
-    await createGreenService({ blueService, docker });
-    await SwitchFromBlueToGreen(repoName, docker);
-    await deleteAppServiceByName(repoName, docker);
+  if (isRedeploy) {
+    await synchroniseApplicationServiceWithLocalImage(repoName, docker);
   }
   else {
-    const appServiceSpec = createApplicationServiceSpecAsBlue({
+    const appServiceSpec = createApplicationServiceSpec({
       applicationName: repoName,
       image: repoName,
       fqdn,
       port,
       networkId,
     });
-    await docker.createService(appServiceSpec);
+    await docker.createService(appServiceSpec).catch((error) => {
+      throw new DeploymentError({
+        name: "DEPLOYMENT_APP_ERROR",
+        message: error instanceof Error ? error.message : "Unexpected error occurred while creating the application service.",
+      });
+    });
   }
 
   await job.updateProgress({ logs: "Your application is now online! 🚀" });

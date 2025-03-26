@@ -4,7 +4,7 @@ import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema } from "stoker/openapi/schemas";
 
 import { createDatabaseSchema, databaseLinkSchema, databaseSchema } from "@/db/dto/databases.dto";
-import { notFoundSchema } from "@/lib/constants";
+import { internalServerSchema, notFoundSchema } from "@/lib/constants";
 
 const tags = ["Databases"];
 
@@ -131,6 +131,7 @@ export const link = createRoute({
       description: "Database container linked to the application",
     },
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Database container not found"),
+    [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(internalServerSchema, "Application target service not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(
         z.object({

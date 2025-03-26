@@ -91,7 +91,7 @@ export function InjectEnvCard({ applicationName, databases }: InjectEnvCardProps
           {state?.error && <Paragraph variant="error">{state.error}</Paragraph>}
           <DialogFooter>
             <Button type="submit" disabled={pending} className="text-xs">
-              Inject and redeploy
+              Submit
             </Button>
           </DialogFooter>
         </form>

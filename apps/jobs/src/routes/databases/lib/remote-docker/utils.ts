@@ -1,9 +1,12 @@
+import type Dockerode from "dockerode";
+
 import { HTTPException } from "hono/http-exception";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { ContainersDto } from "@/db/dto/containers.dto";
 
 import { getDocker } from "@/lib/remote-docker";
+import { getApplicationServiceByName } from "@/lib/remote-docker/utils";
 
 export async function getDatabasesContainers() {
   const docker = await getDocker();
@@ -31,4 +34,27 @@ export async function getDatabaseEnvVarsByEnvVarKeys(containerId: string, envVar
   const envVars = containerMetadata.Config.Env;
 
   return envVars.filter(envVar => envVarKey.some(key => envVar.includes(key)));
+}
+
+export async function addEnvironmentVariableToAppService(applicationServiceName: string, plainEnv: string, docker: Dockerode) {
+  const appService = await getApplicationServiceByName(applicationServiceName, docker);
+  if (!appService)
+    throw new HTTPException(HttpStatusCodes.INTERNAL_SERVER_ERROR, { message: "Application target service not found" });
+
+  const container = appService.Spec?.TaskTemplate as Dockerode.ContainerTaskSpec;
+  const currentEnvs = typeof container.ContainerSpec?.Env === "object" ? container.ContainerSpec.Env : [];
+
+  await appService.update({
+    ...appService.Spec,
+    TaskTemplate: {
+      ...appService.Spec?.TaskTemplate,
+      ContainerSpec: {
+        ...container.ContainerSpec,
+        Env: [
+          ...currentEnvs,
+          plainEnv,
+        ],
+      },
+    },
+  });
 }
