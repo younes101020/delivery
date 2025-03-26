@@ -1,5 +1,3 @@
-https://github.com/user-attachments/assets/6d9c58d7-800a-4699-ad08-c49bd4da7c14
-
 Self-hostable Coolify, Vercel, Heroku alternative focusing on one single thing:
 deploying your applications as simply as possible, without any vendor lock-in.
 
@@ -19,15 +17,15 @@ application.
 
 * Applications page
 
-![app_page](https://github.com/user-attachments/assets/fcd90d7e-e9be-4f91-ac3a-dbffbddb2222)
+  ![app_page](https://github.com/user-attachments/assets/fcd90d7e-e9be-4f91-ac3a-dbffbddb2222)
 
 * Databases page
 
-![db_page](https://github.com/user-attachments/assets/afa59c16-dc72-41f5-b785-1504b4119e4c)
+  ![db_page](https://github.com/user-attachments/assets/afa59c16-dc72-41f5-b785-1504b4119e4c)
 
 * Databases hub page
 
-![db_hub_page_dialog](https://github.com/user-attachments/assets/db0f0cdd-8a1d-4912-9d22-0b91ea2c9631)
+  ![db_hub_page_dialog](https://github.com/user-attachments/assets/db0f0cdd-8a1d-4912-9d22-0b91ea2c9631)
 
 ## Contributor installation
 
