@@ -2,15 +2,15 @@ import { z } from "@hono/zod-openapi";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 import { applications, environmentVariables } from "../schema";
-import { containersDto } from "./containers.dto";
 import { insertEnvironmentVariablesSchema } from "./envvars.dto";
+import { servicesDto } from "./services.dto";
 
 export const selectApplicationsSchemaWithSharedEnv = createSelectSchema(applications).extend({
   environmentVariable: z.array(createSelectSchema(environmentVariables)).optional(),
   containerId: z.string(),
 });
 
-export const selectApplicationsSchema = containersDto;
+export const selectApplicationsSchema = servicesDto;
 
 const insertApplicationsSchema = createInsertSchema(applications).omit({ name: true });
 export const insertApplicationWithSharedEnv = z.object({

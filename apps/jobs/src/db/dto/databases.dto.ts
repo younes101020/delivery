@@ -1,6 +1,6 @@
 import { z } from "@hono/zod-openapi";
 
-import { containersDto } from "./containers.dto";
+import { containersDto } from "./services.dto";
 
 const database = z.union([
   z.literal("mysql"),

@@ -1,5 +1,7 @@
 import type Dockerode from "dockerode";
 
+import { APPLICATION_INSTANCE_REPLICAS } from "@/routes/applications/lib/remote-docker/const";
+
 interface ApplicationServiceSpec {
   applicationName: string;
   image: string;
@@ -8,8 +10,6 @@ interface ApplicationServiceSpec {
   plainEnv?: string[];
   networkId: string;
 }
-
-const APPLICATION_INSTANCE_REPLICAS = 2;
 
 export function createApplicationServiceSpec({ applicationName, image, fqdn, port, plainEnv, networkId }: ApplicationServiceSpec) {
   const manifest: Dockerode.ServiceSpec = {

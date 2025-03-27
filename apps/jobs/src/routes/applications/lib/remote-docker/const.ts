@@ -1,0 +1,1 @@
+export const APPLICATION_INSTANCE_REPLICAS = 2;

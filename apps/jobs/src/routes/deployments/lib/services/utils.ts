@@ -1,7 +1,7 @@
 import type Dockerode from "dockerode";
 
 import { DeploymentError } from "@/lib/error";
-import { getApplicationServiceByName } from "@/lib/remote-docker/utils";
+import { getApplicationServiceByName } from "@/routes/applications/lib/remote-docker/utils";
 
 export async function getApplicationNetworkID(applicationName: string, docker: Dockerode) {
   const networks = await docker.listNetworks();
@@ -23,26 +23,8 @@ export async function getApplicationNetworkID(applicationName: string, docker: D
   return network.id;
 }
 
-export async function getBlueServiceSpecByApplicationName(applicationName: string, docker: Dockerode) {
-  const blueServices = await docker.listServices({
-    filters: {
-      label: ["deployment=blue"],
-    },
-  });
-  const blueAppService = blueServices.find(blueService => blueService.Spec?.Name?.includes(applicationName));
-
-  if (!blueAppService) {
-    throw new DeploymentError({
-      name: "DEPLOYMENT_APP_ERROR",
-      message: "Running application service not found, we can't get blue service.",
-    });
-  }
-
-  return blueAppService;
-}
-
-export async function synchroniseApplicationServiceWithLocalImage(targetApplicationServiceName: string, docker: Dockerode) {
-  const applicationService = await getApplicationServiceByName(targetApplicationServiceName, docker);
+export async function synchroniseApplicationServiceWithLocalImage(targetApplicationServiceName: string) {
+  const applicationService = await getApplicationServiceByName({ name: [targetApplicationServiceName] });
 
   if (!applicationService) {
     throw new DeploymentError({

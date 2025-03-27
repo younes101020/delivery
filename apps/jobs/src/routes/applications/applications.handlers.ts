@@ -28,7 +28,7 @@ import type {
 import type { AllQueueApplicationJobsData } from "./tasks/types";
 
 import { deleteDeploymentJobs } from "../deployments/lib/tasks/deploy/utils";
-import { getApplicationsContainers } from "./lib/remote-docker/utils";
+import { listApplicationServicesSpec } from "./lib/remote-docker/utils";
 import { PREFIX, queueNames } from "./tasks/const";
 import { removeApplicationResource } from "./tasks/remove-application";
 import { startApplication } from "./tasks/start-application";
@@ -36,19 +36,19 @@ import { stopApplication } from "./tasks/stop-application";
 import { getApplicationQueuesEvents, getApplicationsActiveJobs } from "./tasks/utils";
 
 export const list: AppRouteHandler<ListRoute> = async (c) => {
-  const [applications, activeJobs] = await Promise.all([
-    getApplicationsContainers(),
+  const [applicationsServices, activeJobs] = await Promise.all([
+    listApplicationServicesSpec(),
     getApplicationsActiveJobs(),
   ]);
-  const appsWithStatus = applications.map((app) => {
-    const activeJob = activeJobs.find(job => job.containerId === app.id);
+  const appsWithStatus = applicationsServices.map((applicationService) => {
+    const activeJob = activeJobs.find(job => job.containerId === applicationService.id);
     if (activeJob) {
       return {
-        ...app,
+        ...applicationService,
         isProcessing: true,
       };
     }
-    return app;
+    return applicationService;
   });
   return c.json(appsWithStatus, HttpStatusCodes.OK);
 };

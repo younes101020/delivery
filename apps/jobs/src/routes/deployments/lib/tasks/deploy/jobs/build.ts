@@ -50,7 +50,7 @@ export async function build(job: QueueDeploymentJob<"build">) {
   const networkId = await getApplicationNetworkID(repoName, docker);
 
   if (isRedeploy) {
-    await synchroniseApplicationServiceWithLocalImage(repoName, docker);
+    await synchroniseApplicationServiceWithLocalImage(repoName);
   }
   else {
     const appServiceSpec = createApplicationServiceSpec({
