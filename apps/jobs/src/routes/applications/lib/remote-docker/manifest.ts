@@ -1,6 +1,6 @@
 import type Dockerode from "dockerode";
 
-import { APPLICATION_INSTANCE_REPLICAS } from "@/routes/applications/lib/remote-docker/const";
+import { APPLICATION_INSTANCE_REPLICAS } from "./const";
 
 interface ApplicationServiceSpec {
   applicationName: string;

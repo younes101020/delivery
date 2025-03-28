@@ -33,5 +33,9 @@ export const patchApplicationsSchema = z.object({
   ).optional(),
 });
 
+export const AppParamsSchema = z.object({
+  name: z.string(),
+});
+
 export type InsertApplicationSchemaWithSharedEnv = z.infer<typeof insertApplicationWithSharedEnv>;
 export type PatchApplicationSchema = z.infer<typeof patchApplicationsSchema>;

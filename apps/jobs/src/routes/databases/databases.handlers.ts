@@ -13,7 +13,7 @@ import { getJobAndQueueNameByJobId } from "@/lib/tasks/utils";
 import type { CreateRoute, LinkRoute, ListRoute, RemoveRoute, StartRoute, StopRoute, StreamCurrentDatabaseRoute } from "./databases.routes";
 import type { AllQueueDatabaseJobsData } from "./lib/tasks/types";
 
-import { addEnvironmentVariableToAppService, getDatabaseEnvVarsByEnvVarKeys, getDatabasesContainers } from "./lib/remote-docker/utils";
+import { addEnvironmentVariableToAppService, getDatabaseCredentialsEnvVarsByName } from "./lib/remote-docker/utils";
 import { PREFIX } from "./lib/tasks/const";
 import { createDatabase } from "./lib/tasks/create-database";
 import { removeDatabase } from "./lib/tasks/remove-database";
@@ -157,10 +157,10 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
 };
 
 export const link: AppRouteHandler<LinkRoute> = async (c) => {
-  const { id: containerId } = c.req.valid("param");
+  const { name } = c.req.valid("param");
   const { environmentKey, applicationName } = c.req.valid("json");
 
-  const dbCredentialsEnvVars = await getDatabaseEnvVarsByEnvVarKeys(containerId, ["POSTGRES_USER", "POSTGRES_PASSWORD"]);
+  const dbCredentialsEnvVars = await getDatabaseCredentialsEnvVarsByName({ name: [name] });
 
   const postgresUserEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("POSTGRES_USER"));
   const postgresPasswordEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("POSTGRES_PASSWORD"));

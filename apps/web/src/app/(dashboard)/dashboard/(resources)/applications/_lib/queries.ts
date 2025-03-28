@@ -42,7 +42,7 @@ export async function getApplications() {
   return await response.json();
 }
 
-export async function getRunningDatabaseContainers() {
+export async function getRunningDatabases() {
   const response = await client.databases.$get();
   if (response.status !== 200) {
     return null;

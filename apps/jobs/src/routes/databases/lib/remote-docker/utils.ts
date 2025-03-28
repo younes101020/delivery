@@ -3,26 +3,31 @@ import type Dockerode from "dockerode";
 import { HTTPException } from "hono/http-exception";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
-import type { ContainersDto } from "@/db/dto/services.dto";
+import type { Database } from "@/db/dto";
 
 import { getDocker } from "@/lib/remote-docker";
-import { getApplicationServiceByName } from "@/lib/remote-docker/utils";
+import { getApplicationService } from "@/routes/applications/lib/remote-docker/utils";
 
-export async function getDatabasesContainers() {
-  const docker = await getDocker();
-  const dbContainers = await docker.listContainers({
-    all: true,
-    filters: { label: ["resource=database"] },
-  });
-  return dbContainers.map(({ Image, Id, State, Created, Names }) => ({
-    image: Image.split(":")[0],
-    name: Names.map(name => name.slice(1)).join(", "),
-    id: Id,
-    state: (State === "exited" || State === "die" ? "stop" : State) as ContainersDto["state"],
-    createdAt: Created,
-    isProcessing: false,
-  }));
-}
+import { credentialsEnvKeys, databases } from "./const";
+import { withRestDatabaseService } from "./middleware";
+
+export const getDatabaseCredentialsEnvVarsByName = withRestDatabaseService(
+  async (dbService) => {
+    const dbName = dbService.Spec?.Name;
+    const databaseExist = assertNameIsDatabaseNameGuard(dbName);
+    if (!databaseExist)
+      throw new Error("This database name is not supported yet.");
+    const envVarKeys = credentialsEnvKeys.postgres;
+    const taskTemplate = dbService.Spec?.TaskTemplate;
+    const containerSpecExist = assertTaskTemplateIsContainerTaskSpecGuard(taskTemplate);
+    if (!containerSpecExist)
+      throw new Error("Task template is not a container task spec");
+    const envVars = taskTemplate.ContainerSpec?.Env;
+    if (!envVars || envVars.length === 0)
+      throw new Error("No environment variables found in the database service");
+    return envVars.filter(envVar => envVarKeys.some(key => envVar.includes(key)));
+  },
+);
 
 export async function getDatabaseEnvVarsByEnvVarKeys(containerId: string, envVarKey: string[]) {
   const docker = await getDocker();
@@ -37,7 +42,7 @@ export async function getDatabaseEnvVarsByEnvVarKeys(containerId: string, envVar
 }
 
 export async function addEnvironmentVariableToAppService(applicationName: string, plainEnv: string) {
-  const appService = await getApplicationServiceByName({ applicationName });
+  const appService = await getApplicationService({ name: [applicationName] });
   if (!appService)
     throw new HTTPException(HttpStatusCodes.INTERNAL_SERVER_ERROR, { message: "Application target service not found" });
 
@@ -57,4 +62,13 @@ export async function addEnvironmentVariableToAppService(applicationName: string
       },
     },
   });
+}
+
+function assertNameIsDatabaseNameGuard(dbName?: string): dbName is Database {
+  return databases.includes(dbName!);
+}
+
+function assertTaskTemplateIsContainerTaskSpecGuard(taskTemplate?: Dockerode.ServiceSpec["TaskTemplate"]): taskTemplate is Dockerode.ContainerTaskSpec {
+  const taskTemplateType = taskTemplate as Dockerode.ContainerTaskSpec;
+  return taskTemplateType?.ContainerSpec !== undefined;
 }

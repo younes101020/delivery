@@ -1,8 +1,8 @@
-import { startApplicationServiceByName } from "@/routes/applications/lib/remote-docker/utils";
+import { startApplicationService } from "@/routes/applications/lib/remote-docker/service-tasks";
 
 import type { StartQueueApplicationJob } from "../types";
 
 export async function start(job: StartQueueApplicationJob<"start">) {
   const { serviceName: applicationName } = job.data;
-  await startApplicationServiceByName({ name: [applicationName] });
+  await startApplicationService({ name: [applicationName] });
 }

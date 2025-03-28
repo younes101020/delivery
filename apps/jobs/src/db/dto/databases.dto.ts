@@ -1,6 +1,6 @@
 import { z } from "@hono/zod-openapi";
 
-import { containersDto } from "./services.dto";
+import { servicesDto } from "./services.dto";
 
 const database = z.union([
   z.literal("mysql"),
@@ -19,11 +19,15 @@ export const createDatabaseSchemaResp = z.object({
   success: z.literal(true),
 });
 
-export const databaseSchema = containersDto;
+export const databaseSchema = servicesDto;
 
 export const databaseLinkSchema = z.object({
-  environmentKey: z.string(),
-  applicationName: z.string(),
+  environmentKey: z.string().describe("Used environment variable key which contains the database connection URI."),
+  applicationName: z.string().describe("Name of the application to link the database to."),
+});
+
+export const DatabaseParamsSchema = z.object({
+  name: z.string(),
 });
 
 export type CreateDatabaseSchema = z.infer<typeof createDatabaseSchema>;

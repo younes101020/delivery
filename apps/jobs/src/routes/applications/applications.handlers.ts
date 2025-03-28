@@ -28,6 +28,7 @@ import type {
 import type { AllQueueApplicationJobsData } from "./tasks/types";
 
 import { deleteDeploymentJobs } from "../deployments/lib/tasks/deploy/utils";
+import { getApplicationServiceSpec } from "./lib/remote-docker/service-tasks";
 import { listApplicationServicesSpec } from "./lib/remote-docker/utils";
 import { PREFIX, queueNames } from "./tasks/const";
 import { removeApplicationResource } from "./tasks/remove-application";
@@ -54,16 +55,16 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
 };
 
 export const stop: AppRouteHandler<StopRoute> = async (c) => {
-  const { id } = c.req.valid("param");
+  const { name } = c.req.valid("param");
 
-  await stopApplication(id);
+  await stopApplication(name);
 
   return c.json(null, HttpStatusCodes.ACCEPTED);
 };
 
 export const start: AppRouteHandler<StartRoute> = async (c) => {
-  const { id } = c.req.valid("param");
-  await startApplication(id);
+  const { name } = c.req.valid("param");
+  await startApplication(name);
 
   return c.json(null, HttpStatusCodes.ACCEPTED);
 };
@@ -102,7 +103,7 @@ export const streamCurrentApplication: AppRouteHandler<StreamCurrentApplicationR
         await stream.writeSSE({
           data: JSON.stringify({
             jobId,
-            containerId: job?.data.containerId,
+            serviceName: job?.data.serviceName,
             queueName,
             status: "active",
           }),
@@ -118,7 +119,7 @@ export const streamCurrentApplication: AppRouteHandler<StreamCurrentApplicationR
         await stream.writeSSE({
           data: JSON.stringify({
             jobId,
-            containerId: job?.data.containerId,
+            containerId: job?.data.serviceName,
             queueName,
             status: "completed",
           }),
@@ -135,7 +136,7 @@ export const streamCurrentApplication: AppRouteHandler<StreamCurrentApplicationR
         await stream.writeSSE({
           data: JSON.stringify({
             jobId,
-            containerId: job?.data.containerId,
+            containerId: job?.data.serviceName,
             queueName,
             status: "failed",
           }),
@@ -158,9 +159,9 @@ export const streamCurrentApplication: AppRouteHandler<StreamCurrentApplicationR
 };
 
 export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
-  const { slug } = c.req.valid("param");
-  const [application, appContainer] = await Promise.all([getApplicationWithEnvVarsByName(slug), getApplicationsContainers({ name: [slug] })]);
-  if (!application || appContainer.length === 0) {
+  const { name } = c.req.valid("param");
+  const [application, appService] = await Promise.all([getApplicationWithEnvVarsByName(name), getApplicationServiceSpec({ name: [name] })]);
+  if (!application || !appService) {
     return c.json(
       {
         message: HttpStatusPhrases.NOT_FOUND,
@@ -172,7 +173,7 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   return c.json(
     {
       ...application,
-      containerId: appContainer[0]?.id,
+      containerId: appService.id,
       environmentVariables: application.applicationEnvironmentVariables.map(ev => ({
         id: ev.environmentVariable.id,
         key: ev.environmentVariable.key,
@@ -188,7 +189,7 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
 };
 
 export const patch: AppRouteHandler<PatchRoute> = async (c) => {
-  const { slug } = c.req.valid("param");
+  const { name } = c.req.valid("param");
   const updates = c.req.valid("json");
 
   const noUpdatesFound = Object.keys(updates.applicationData).length === 0 && (!Array.isArray(updates.environmentVariable) || Object.keys(updates.environmentVariable[0]).length === 0);
@@ -212,7 +213,7 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
     );
   }
 
-  const updatedField = await patchApplication(slug, updates);
+  const updatedField = await patchApplication(name, updates);
 
   if (!updatedField) {
     return c.json(
@@ -230,19 +231,18 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
 };
 
 export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
-  const { slug } = c.req.valid("param");
-  const { containerId } = c.req.valid("json");
+  const { name } = c.req.valid("param");
 
   await Promise.all([
-    removeApplicationResource(containerId, slug),
-    deleteApplicationByName(slug),
+    removeApplicationResource(name),
+    deleteApplicationByName(name),
     ssh(
-      `rm -Rvf ${slug}`,
+      `rm -Rvf ${name}`,
       {
         cwd: `${APPLICATIONS_PATH}`,
       },
     ),
-    deleteDeploymentJobs(slug),
+    deleteDeploymentJobs(name),
   ]).catch((e) => {
     return c.json(
       {
