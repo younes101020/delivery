@@ -68,6 +68,32 @@ export async function addEnvironmentVariableToAppService(applicationName: string
   });
 }
 
+export function getDatabaseEnvVarsCredential(databaseImage: Database) {
+  if (databaseImage === "postgres") {
+    const DB_USER = generateRandomString();
+    const DB_PASSWORD = generateRandomString();
+    return [`POSTGRES_USER=${DB_USER}`, `POSTGRES_PASSWORD=${DB_PASSWORD}`];
+  }
+  if (databaseImage === "mongo") {
+    const DB_USER = generateRandomString();
+    const DB_PASSWORD = generateRandomString();
+    return [`MONGO_INITDB_ROOT_USERNAME=${DB_USER}`, `MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}`];
+  }
+  if (databaseImage === "redis") {
+    const DB_PASSWORD = generateRandomString();
+    return [`REDIS_PASSWORD=${DB_PASSWORD}`];
+  }
+  if (databaseImage === "mysql") {
+    const DB_USER = generateRandomString();
+    const DB_PASSWORD = generateRandomString();
+    return [`MYSQL_ROOT_PASSWORD=${DB_PASSWORD}`, `MYSQL_USER=${DB_USER}`, `MYSQL_PASSWORD=${DB_PASSWORD}`];
+  }
+  if (databaseImage === "mariadb") {
+    const DB_PASSWORD = generateRandomString();
+    return [`MARIADB_ROOT_PASSWORD=${DB_PASSWORD}`];
+  }
+}
+
 function assertNameIsDatabaseNameGuard(dbName?: string): dbName is Database {
   return databases.includes(dbName!);
 }

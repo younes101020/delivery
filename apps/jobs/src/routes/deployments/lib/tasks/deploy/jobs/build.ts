@@ -44,27 +44,12 @@ export async function build(job: QueueDeploymentJob<"build">) {
 
   // DEPLOY APP SERVICE FROM BUILD IMAGE
 
-  const docker = await getDocker();
-  const networkId = await getApplicationNetworkID(repoName, docker);
-
-  if (isRedeploy) {
-    await synchroniseApplicationServiceWithLocalImage(repoName);
-  }
-  else {
-    const appServiceSpec = createApplicationServiceSpec({
-      applicationName: repoName,
-      image: repoName,
-      fqdn,
-      port,
-      networkId,
-    });
-    await docker.createService(appServiceSpec).catch((error) => {
-      throw new DeploymentError({
-        name: "DEPLOYMENT_APP_ERROR",
-        message: error instanceof Error ? error.message : "Unexpected error occurred while creating the application service.",
-      });
-    });
-  }
+  defineApplicationServiceTask({
+    isRedeploy,
+    name: repoName,
+    fqdn,
+    port,
+  });
 
   await job.updateProgress({ logs: "Your application is now online! 🚀" });
 }

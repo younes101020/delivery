@@ -101,6 +101,8 @@ services:
     container_name: "traefik"
     command:
       - --api.dashboard=true
+      - "--providers.docker=true"
+      - "--providers.docker.swarmmode=true"
       - --log.level=INFO
       #- --log.filepath=/var/log/traefik.log
       - --accesslog=true
