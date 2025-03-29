@@ -1,9 +1,7 @@
 import { APPLICATIONS_PATH } from "@/lib/constants";
 import { DeploymentError } from "@/lib/error";
-import { getDocker } from "@/lib/remote-docker";
 import { ssh } from "@/lib/ssh";
-import { createApplicationServiceSpec } from "@/routes/applications/lib/remote-docker/manifest";
-import { getApplicationNetworkID, synchroniseApplicationServiceWithLocalImage } from "@/routes/applications/lib/remote-docker/utils";
+import { defineApplicationServiceTask } from "@/routes/deployments/lib/remote-docker/service-tasks";
 
 import type { QueueDeploymentJob } from "../types";
 

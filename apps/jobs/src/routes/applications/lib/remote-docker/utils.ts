@@ -48,30 +48,6 @@ export async function getApplicationNetworkID(applicationName: string, docker: D
   return network.id;
 }
 
-export async function synchroniseApplicationServiceWithLocalImage(targetApplicationServiceName: string) {
-  const applicationService = await getApplicationService({ name: [targetApplicationServiceName] });
-
-  if (!applicationService) {
-    throw new DeploymentError({
-      name: "DEPLOYMENT_APP_ERROR",
-      message: "Service not found, we can't update the service.",
-    });
-  }
-
-  await applicationService.update({
-    ...applicationService.Spec,
-    TaskTemplate: {
-      ...applicationService.Spec?.TaskTemplate,
-      ForceUpdate: 1,
-    },
-  }).catch((error) => {
-    throw new DeploymentError({
-      name: "DEPLOYMENT_APP_ERROR",
-      message: error instanceof Error ? error.message : "Unexpected error occurred while updating the service.",
-    });
-  });
-}
-
 function getNetworkByName(networks: Dockerode.NetworkInspectInfo[], networkName: string) {
   return networks.find(network => network.Name === networkName);
 }
