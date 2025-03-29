@@ -17,5 +17,4 @@ export function createDatabase({ databaseImage }: CreateDatabase) {
       message: DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE,
     });
   }
-  
 }

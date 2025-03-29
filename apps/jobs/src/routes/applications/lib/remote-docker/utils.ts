@@ -1,6 +1,5 @@
 import type Dockerode from "dockerode";
 
-import { DeploymentError } from "@/lib/error";
 import { getDocker } from "@/lib/remote-docker";
 
 import { withApplicationsServices } from "./middleware";
