@@ -1,19 +1,8 @@
-import { ApplicationError } from "@/lib/error";
-import { getDocker } from "@/lib/remote-docker";
+import { startApplicationService } from "@/routes/applications/lib/remote-docker/service-tasks";
 
 import type { StartQueueApplicationJob } from "../types";
 
 export async function start(job: StartQueueApplicationJob<"start">) {
-  const { containerId } = job.data;
-
-  const docker = await getDocker();
-  const appContainer = docker.getContainer(containerId);
-
-  await appContainer.start()
-    .catch((error) => {
-      throw new ApplicationError({
-        name: "START_APPLICATION_ERROR",
-        message: error instanceof Error ? error.message : "Unexpected error",
-      });
-    });
+  const { serviceName: applicationName } = job.data;
+  await startApplicationService({ name: [applicationName] });
 }

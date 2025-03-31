@@ -4,8 +4,7 @@ import type { MergeSubJobs } from "@/lib/tasks/types";
 
 export interface RemoveQueueApplicationJobData {
   remove: {
-    containerId: string;
-    image: string;
+    serviceName: string;
   };
 }
 

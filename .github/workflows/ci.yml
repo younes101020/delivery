@@ -3,8 +3,7 @@ name: Running UT/E2E and IT tests and release
 on:
   push:
     branches:
-      - main
-      - next
+      - "*"
 
 jobs:
   tests:

@@ -2,7 +2,7 @@ import { UnrecoverableError } from "bullmq";
 
 export const DEPLOYMENTERRORNAME = {
   clone: "CLONE_APP_ERROR",
-  build: "BUILD_APP_ERROR",
+  deployment: "DEPLOYMENT_APP_ERROR",
   configure: "CONFIGURE_APP_ERROR",
 } as const;
 

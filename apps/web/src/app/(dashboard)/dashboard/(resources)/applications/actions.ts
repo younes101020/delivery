@@ -63,15 +63,15 @@ export async function removeApplication(name: string, containerId: string, redir
   };
 }
 
-const updateContainerStatusSchema = z.object({
-  containerId: z.string(),
+const updateApplicationStateSchema = z.object({
+  applicationName: z.string(),
 });
 
-export const stopContainer = validatedAction(updateContainerStatusSchema, async (inputs) => {
-  const { containerId } = inputs;
+export const stopApplication = validatedAction(updateApplicationStateSchema, async (inputs) => {
+  const { applicationName } = inputs;
 
-  const response = await client.applications[":id"].stop.$post({
-    param: { id: containerId },
+  const response = await client.applications[":name"].stop.$post({
+    param: { name: applicationName },
   });
 
   if (response.status !== 202) {
@@ -81,11 +81,11 @@ export const stopContainer = validatedAction(updateContainerStatusSchema, async 
   return { success: "Container stopped", inputs };
 });
 
-export const startContainer = validatedAction(updateContainerStatusSchema, async (inputs) => {
-  const { containerId } = inputs;
+export const startApplication = validatedAction(updateApplicationStateSchema, async (inputs) => {
+  const { applicationName } = inputs;
 
-  const response = await client.applications[":id"].start.$post({
-    param: { id: containerId },
+  const response = await client.applications[":name"].start.$post({
+    param: { name: applicationName },
   });
 
   if (response.status !== 202) {

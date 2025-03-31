@@ -94,15 +94,19 @@ services:
   
   traefik:
     image: "traefik:v3.2"
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     container_name: "traefik"
     command:
       - --api.dashboard=true
+      - "--providers.docker=true"
+      - "--providers.docker.swarmmode=true"
       - --log.level=INFO
       #- --log.filepath=/var/log/traefik.log
       - --accesslog=true
       #- --accesslog.filepath=/var/log/traefik-access.log
-      - --providers.docker.network=proxy
-      - --providers.docker.exposedByDefault=false
       - --entrypoints.web.address=:80
       - --entrypoints.web.http.redirections.entrypoint.to=websecure
       - --entryPoints.web.http.redirections.entrypoint.scheme=https
