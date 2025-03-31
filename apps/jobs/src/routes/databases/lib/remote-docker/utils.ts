@@ -4,15 +4,14 @@ import { HTTPException } from "hono/http-exception";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { Database } from "@/db/dto";
-import type { ContainersDto } from "@/db/dto/containers.dto";
 
 import { getDocker } from "@/lib/remote-docker";
 import { generateRandomString } from "@/lib/utils";
 import { getApplicationService } from "@/routes/applications/lib/remote-docker/utils";
 
 import { databases, DATABASES_CONTAINER_NOT_FOUND_ERROR_MESSAGE, databasesName, DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE, NO_APPLICATION_TO_LINK_WITH_ERROR_MESSAGE, NO_CONTAINER_SERVICE_ERROR_MESSAGE, UNSUPPORTED_DATABASES_ERROR_MESSAGE } from "./const";
-import { withRestDatabaseService } from "./middleware";
 import { getDatabasePortAndCredsEnvVarByImage } from "./queries";
+import { withRestDatabaseService } from "./service-middleware";
 
 export const getDatabaseCredentialsEnvVarsByName = withRestDatabaseService(
   async (dbService) => {
