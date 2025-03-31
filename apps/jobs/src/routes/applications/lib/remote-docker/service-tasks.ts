@@ -16,6 +16,6 @@ export const removeApplicationService = withApplicationsServices(async (appServi
 });
 
 export const getApplicationServiceSpec = withApplicationsServices(async (appServices) => {
-  const appService = toApplicationServiceSpec(appServices);
-  return appService;
+  const appSpec = toServiceSpec(appServices);
+  return appSpec;
 });

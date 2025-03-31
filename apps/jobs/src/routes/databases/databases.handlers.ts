@@ -29,7 +29,7 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
 
 export const list: AppRouteHandler<ListRoute> = async (c) => {
   const [databases, activeJobs] = await Promise.all([
-    getDatabasesContainers(),
+    listDatabaseServicesSpec(),
     getDatabasesActiveJobs(),
   ]);
   const databasesWithStatus = databases.map((db) => {
