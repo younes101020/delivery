@@ -1,6 +1,7 @@
 import type Dockerode from "dockerode";
 
 import { getDocker } from "@/lib/remote-docker";
+import { withDocker } from "@/lib/remote-docker/middleware";
 
 import { withApplicationsServices } from "./middleware";
 
@@ -27,7 +28,7 @@ export async function listApplicationServicesSpec(opts?: Dockerode.ServiceListOp
   return appServices.map(toApplicationServiceSpec);
 }
 
-export async function getApplicationNetworkID(applicationName: string, docker: Dockerode) {
+export const getApplicationNetworkID = withDocker<string, string>(async (docker, applicationName) => {
   const networks = await docker.listNetworks();
   const appNetwork = getNetworkByName(networks, `${applicationName}-network`);
 
@@ -45,7 +46,7 @@ export async function getApplicationNetworkID(applicationName: string, docker: D
   });
 
   return network.id;
-}
+});
 
 function getNetworkByName(networks: Dockerode.NetworkInspectInfo[], networkName: string) {
   return networks.find(network => network.Name === networkName);
