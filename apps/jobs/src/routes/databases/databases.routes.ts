@@ -3,8 +3,8 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema } from "stoker/openapi/schemas";
 
-import { createDatabaseSchema, databaseLinkSchema, databaseSchema } from "@/db/dto/databases.dto";
-import { notFoundSchema } from "@/lib/constants";
+import { createDatabaseSchema, databaseLinkSchema, DatabaseParamsSchema, databaseSchema } from "@/db/dto/databases.dto";
+import { internalServerSchema, notFoundSchema } from "@/lib/constants";
 
 const tags = ["Databases"];
 
@@ -115,15 +115,12 @@ export const remove = createRoute({
 });
 
 export const link = createRoute({
-  path: "/databases/{id}/link",
+  path: "/databases/{name}/link",
   method: "post",
   description: "Link a database container to an application, the database url environment variable will be injected into the application.",
   request: {
-    params: z.object({
-      id: z.string().describe("The ID of the database container to link"),
-    }),
-    body: jsonContentRequired(databaseLinkSchema, "The application to link to the database",
-    ),
+    params: DatabaseParamsSchema,
+    body: jsonContentRequired(databaseLinkSchema, "Needed to link the database to the application"),
   },
   tags,
   responses: {
@@ -131,6 +128,7 @@ export const link = createRoute({
       description: "Database container linked to the application",
     },
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Database container not found"),
+    [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(internalServerSchema, "Application target service not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(
         z.object({

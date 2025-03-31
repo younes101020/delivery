@@ -4,6 +4,7 @@ import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, SlugParamsSchema } from "stoker/openapi/schemas";
 
 import {
+  AppParamsSchema,
   patchApplicationsSchema,
   selectApplicationsSchema,
   selectApplicationsSchemaWithSharedEnv,
@@ -47,31 +48,27 @@ export const streamCurrentApplication = createRoute({
 });
 
 export const stop = createRoute({
-  path: "/applications/{id}/stop",
+  path: "/applications/{name}/stop",
   method: "post",
-  description: "Stop a running application container.",
+  description: "Stop a running application.",
   request: {
-    params: z.object({
-      id: z.string().describe("The ID of the application container to stop"),
-    }),
+    params: AppParamsSchema,
   },
   tags,
   responses: {
     [HttpStatusCodes.ACCEPTED]: {
-      description: "Application container stop request accepted",
+      description: "Application stop request accepted",
     },
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Application container not found"),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Application not found"),
   },
 });
 
 export const start = createRoute({
-  path: "/applications/{id}/start",
+  path: "/applications/{name}/start",
   method: "post",
   description: "Start a stopped application container.",
   request: {
-    params: z.object({
-      id: z.string().describe("The ID of the application container to start"),
-    }),
+    params: AppParamsSchema,
   },
   tags,
   responses: {
@@ -83,10 +80,10 @@ export const start = createRoute({
 });
 
 export const getOne = createRoute({
-  path: "/applications/{slug}",
+  path: "/applications/{name}",
   method: "get",
   request: {
-    params: SlugParamsSchema,
+    params: AppParamsSchema,
   },
   tags,
   responses: {
@@ -103,10 +100,10 @@ export const getOne = createRoute({
 });
 
 export const patch = createRoute({
-  path: "/applications/{slug}",
+  path: "/applications/{name}",
   method: "patch",
   request: {
-    params: SlugParamsSchema,
+    params: AppParamsSchema,
     body: jsonContentRequired(patchApplicationsSchema, "The application updates"),
   },
   tags,
@@ -124,11 +121,10 @@ export const patch = createRoute({
 });
 
 export const remove = createRoute({
-  path: "/applications/{slug}",
+  path: "/applications/{name}",
   method: "delete",
   request: {
-    params: SlugParamsSchema.describe("The application name"),
-    body: jsonContentRequired(z.object({ containerId: z.string() }), "The application container id"),
+    params: AppParamsSchema,
   },
   tags,
   responses: {
@@ -138,11 +134,11 @@ export const remove = createRoute({
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Application not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(SlugParamsSchema),
-      "Invalid slug error",
+      "Invalid name error",
     ),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(
       internalServerSchema,
-      "Failed to clean up application files and Docker resources via SSH",
+      "Failed to clean up application source from disk.",
     ),
   },
 });

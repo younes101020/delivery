@@ -6,14 +6,14 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import type { AppRouteHandler } from "@/lib/types";
 
 import { patchApplication } from "@/db/queries/queries";
-import { getDockerResourceEvents } from "@/lib/remote-docker";
+import { getDocker, getDockerResourceEvents } from "@/lib/remote-docker";
 import { queueNames } from "@/lib/tasks/const";
 import { getJobAndQueueNameByJobId } from "@/lib/tasks/utils";
 
 import type { CreateRoute, LinkRoute, ListRoute, RemoveRoute, StartRoute, StopRoute, StreamCurrentDatabaseRoute } from "./databases.routes";
 import type { AllQueueDatabaseJobsData } from "./lib/tasks/types";
 
-import { getDatabaseEnvVarsByEnvVarKeys, getDatabasesContainers } from "./lib/remote-docker/utils";
+import { addEnvironmentVariableToAppService, getDatabaseCredentialsEnvVarsByName } from "./lib/remote-docker/utils";
 import { PREFIX } from "./lib/tasks/const";
 import { createDatabase } from "./lib/tasks/create-database";
 import { removeDatabase } from "./lib/tasks/remove-database";
@@ -157,10 +157,10 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
 };
 
 export const link: AppRouteHandler<LinkRoute> = async (c) => {
-  const { id: containerId } = c.req.valid("param");
+  const { name } = c.req.valid("param");
   const { environmentKey, applicationName } = c.req.valid("json");
 
-  const dbCredentialsEnvVars = await getDatabaseEnvVarsByEnvVarKeys(containerId, ["POSTGRES_USER", "POSTGRES_PASSWORD"]);
+  const dbCredentialsEnvVars = await getDatabaseCredentialsEnvVarsByName({ name: [name] });
 
   const postgresUserEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("POSTGRES_USER"));
   const postgresPasswordEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("POSTGRES_PASSWORD"));
@@ -173,7 +173,12 @@ export const link: AppRouteHandler<LinkRoute> = async (c) => {
 
   const databaseUrl = `postgres://${postgresUser}:${postgresPassword}@localhost:5432`;
 
-  await patchApplication(applicationName, { applicationData: {}, environmentVariable: [{ key: environmentKey, value: databaseUrl }] });
+  const docker = await getDocker();
+
+  await Promise.all([
+    patchApplication(applicationName, { applicationData: {}, environmentVariable: [{ key: environmentKey, value: databaseUrl }] }),
+    addEnvironmentVariableToAppService(applicationName, `${environmentKey}=${databaseUrl}`, docker),
+  ]);
 
   return c.json(null, HttpStatusCodes.OK);
 };

@@ -1,9 +1,8 @@
 import { APPLICATIONS_PATH } from "@/lib/constants";
 import { DeploymentError } from "@/lib/error";
-import { getDocker } from "@/lib/remote-docker";
 import { ssh } from "@/lib/ssh";
-import { createApplicationServiceSpec } from "@/routes/deployments/lib/services/manifests/application";
-import { deleteAppServiceByName, getApplicationNetworkID } from "@/routes/deployments/lib/services/utils";
+import { getApplicationNetworkID } from "@/routes/applications/lib/remote-docker/utils";
+import { defineApplicationServiceTask } from "@/routes/deployments/lib/remote-docker/service-tasks";
 
 import type { QueueDeploymentJob } from "../types";
 
@@ -18,9 +17,7 @@ export async function build(job: QueueDeploymentJob<"build">) {
   const { repoName, port, env, fqdn, cache, staticdeploy, publishdir, isRedeploy } = job.data;
   await job.updateProgress({ logs: "\nImage will be built..." });
 
-  const docker = await getDocker();
-
-  const networkId = await getApplicationNetworkID(repoName);
+  // BUILD APP IMAGE
 
   const buildImageFromSourceCmd = `nixpacks build ./ --name ${repoName} --env CI=false ${env ?? ""} ${!cache ? "--no-cache" : ""}`;
 
@@ -41,23 +38,19 @@ export async function build(job: QueueDeploymentJob<"build">) {
     },
   ).catch((error) => {
     throw new DeploymentError({
-      name: "BUILD_APP_ERROR",
-      message: error instanceof Error ? error.message : "Unexpected error",
+      name: "DEPLOYMENT_APP_ERROR",
+      message: error instanceof Error ? error.message : "Unexpected error occurred while building the application.",
     });
   });
 
-  if (isRedeploy)
-    await deleteAppServiceByName(repoName);
+  // DEPLOY APP SERVICE FROM BUILD IMAGE
 
-  const appServiceSpec = createApplicationServiceSpec({
-    applicationName: repoName,
-    image: repoName,
+  defineApplicationServiceTask({
+    isRedeploy,
+    name: repoName,
     fqdn,
     port,
-    includeApplicationProxy: !isRedeploy,
-    networkId,
   });
-  await docker.createService(appServiceSpec);
 
   await job.updateProgress({ logs: "Your application is now online! 🚀" });
 }

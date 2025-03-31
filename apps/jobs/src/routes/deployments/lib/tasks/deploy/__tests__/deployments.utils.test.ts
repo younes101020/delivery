@@ -58,14 +58,14 @@ describe("deployments utils unit tests", () => {
     expect(parseAppHost("weatherapp", "https://younes.fr")).toBe("weatherapp.younes.fr");
   });
 
-  it("throw BUILD_APP_ERROR error for invalid host name URL", () => {
+  it("throw DEPLOYMENT_APP_ERROR error for invalid host name URL", () => {
     try {
       parseAppHost("weatherapp", "invalid-hostname");
       expect(true).toBe(false);
     }
     catch (error) {
       if (error instanceof DeploymentError) {
-        expect(error.name).toBe("BUILD_APP_ERROR");
+        expect(error.name).toBe("DEPLOYMENT_APP_ERROR");
       }
     }
   });
@@ -98,7 +98,7 @@ describe("deployments utils unit tests", () => {
   it("return command environment variables", ({ environmentVariable }) => {
     const key = environmentVariable.structured[0].key;
     const value = environmentVariable.structured[0].value;
-    const expected = [`--env ${key}=${value}`];
+    const expected = `--env ${key}=${value}`;
     expect(persistedEnvVarsToCmdEnvVars(environmentVariable.structured)).toBe(expected);
   });
 

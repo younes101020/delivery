@@ -9,7 +9,7 @@ import { getDocker } from "@/lib/remote-docker";
 import { generateRandomString } from "@/lib/utils";
 import { getApplicationService } from "@/routes/applications/lib/remote-docker/utils";
 
-import { databases, DATABASES_CONTAINER_NOT_FOUND_ERROR_MESSAGE, databasesName, DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE, NO_APPLICATION_TO_LINK_WITH_ERROR_MESSAGE, NO_CONTAINER_SERVICE_ERROR_MESSAGE, UNSUPPORTED_DATABASES_ERROR_MESSAGE } from "./const";
+import { DATABASES_CONTAINER_NOT_FOUND_ERROR_MESSAGE, databasesName, DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE, NO_APPLICATION_TO_LINK_WITH_ERROR_MESSAGE, NO_CONTAINER_SERVICE_ERROR_MESSAGE, UNSUPPORTED_DATABASES_ERROR_MESSAGE } from "./const";
 import { getDatabasePortAndCredsEnvVarByImage } from "./queries";
 import { withRestDatabaseService } from "./service-middleware";
 
@@ -39,7 +39,7 @@ export async function getDatabaseEnvVarsByEnvVarKeys(containerId: string, envVar
   const containerMetadata = await docker.getContainer(containerId).inspect();
 
   if (!containerMetadata)
-    throw new HTTPException(HttpStatusCodes.NOT_FOUND, { message: "Database container not found" });
+    throw new HTTPException(HttpStatusCodes.NOT_FOUND, { message: DATABASES_CONTAINER_NOT_FOUND_ERROR_MESSAGE });
 
   const envVars = containerMetadata.Config.Env;
 
