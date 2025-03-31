@@ -101,7 +101,7 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
         await stream.writeSSE({
           data: JSON.stringify({
             jobId,
-            containerId: job?.data.containerId,
+            serviceName: job?.data.serviceName,
             queueName,
             status: "active",
           }),
@@ -117,7 +117,7 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
         await stream.writeSSE({
           data: JSON.stringify({
             jobId,
-            containerId: job?.data.containerId,
+            serviceName: job?.data.serviceName,
             queueName,
             status: "completed",
           }),
@@ -134,7 +134,7 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
         await stream.writeSSE({
           data: JSON.stringify({
             jobId,
-            containerId: job?.data.containerId,
+            serviceName: job?.data.serviceName,
             queueName,
             status: "failed",
           }),
