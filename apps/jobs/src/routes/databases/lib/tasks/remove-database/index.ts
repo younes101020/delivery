@@ -8,9 +8,9 @@ import { getRemoveDatabaseQueue, queueName } from "./utils";
 
 const PROCESSOR_FILE = join(dirname(fileURLToPath(import.meta.url)), "../worker.ts");
 
-export async function removeDatabase(containerId: string) {
+export async function removeDatabase(serviceName: string) {
   subscribeWorkerTo(queueName, PREFIX, PROCESSOR_FILE);
 
   const rmvDbQueue = getRemoveDatabaseQueue();
-  await rmvDbQueue.add(queueName, { containerId });
+  await rmvDbQueue.add(queueName, { serviceName });
 }

@@ -1,14 +1,11 @@
 import { DatabaseError } from "@/lib/error";
-import { getDocker } from "@/lib/remote-docker";
+import { stopDatabaseService } from "@/routes/databases/lib/remote-docker/service-tasks";
 
 import type { StopQueueDatabaseJob } from "../types";
 
 export async function stop(job: StopQueueDatabaseJob<"stop">) {
-  const { containerId } = job.data;
-
-  const docker = await getDocker();
-  const dbContainer = docker.getContainer(containerId);
-  await dbContainer.stop({ t: 10 })
+  const { serviceName } = job.data;
+  await stopDatabaseService({ name: [serviceName] })
     .catch((error) => {
       throw new DatabaseError({
         name: "STOP_DATABASE_ERROR",
