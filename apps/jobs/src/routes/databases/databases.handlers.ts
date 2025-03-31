@@ -6,14 +6,14 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import type { AppRouteHandler } from "@/lib/types";
 
 import { patchApplication } from "@/db/queries/queries";
-import { getDocker, getDockerResourceEvents } from "@/lib/remote-docker";
+import { getDockerResourceEvents } from "@/lib/remote-docker";
 import { queueNames } from "@/lib/tasks/const";
 import { getJobAndQueueNameByJobId } from "@/lib/tasks/utils";
 
 import type { CreateRoute, LinkRoute, ListRoute, RemoveRoute, StartRoute, StopRoute, StreamCurrentDatabaseRoute } from "./databases.routes";
 import type { AllQueueDatabaseJobsData } from "./lib/tasks/types";
 
-import { addEnvironmentVariableToAppService, getDatabaseCredentialsEnvVarsByName } from "./lib/remote-docker/utils";
+import { addEnvironmentVariableToAppService, getDatabaseCredentialsEnvVarsByName, listDatabaseServicesSpec } from "./lib/remote-docker/utils";
 import { PREFIX } from "./lib/tasks/const";
 import { createDatabase } from "./lib/tasks/create-database";
 import { removeDatabase } from "./lib/tasks/remove-database";
@@ -173,11 +173,9 @@ export const link: AppRouteHandler<LinkRoute> = async (c) => {
 
   const databaseUrl = `postgres://${postgresUser}:${postgresPassword}@localhost:5432`;
 
-  const docker = await getDocker();
-
   await Promise.all([
     patchApplication(applicationName, { applicationData: {}, environmentVariable: [{ key: environmentKey, value: databaseUrl }] }),
-    addEnvironmentVariableToAppService(applicationName, `${environmentKey}=${databaseUrl}`, docker),
+    addEnvironmentVariableToAppService({ name: [applicationName] }, `${environmentKey}=${databaseUrl}`),
   ]);
 
   return c.json(null, HttpStatusCodes.OK);
