@@ -4,6 +4,7 @@ import { DeploymentError } from "@/lib/error";
 import { withDocker } from "@/lib/remote-docker/middleware";
 import { getApplicationNetworkID } from "@/routes/applications/lib/remote-docker/utils";
 
+import { MISSING_DEPLOYMENT_DATA_ERROR_MESSAGE } from "./const";
 import { createApplicationServiceSpec } from "./manifest";
 import { synchroniseApplicationServiceWithLocalImage } from "./utils";
 
