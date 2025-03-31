@@ -46,23 +46,23 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
 };
 
 export const stop: AppRouteHandler<StopRoute> = async (c) => {
-  const { id } = c.req.valid("param");
+  const { name } = c.req.valid("param");
 
-  await stopDatabase(id);
+  await stopDatabase(name);
 
   return c.json(null, HttpStatusCodes.ACCEPTED);
 };
 
 export const start: AppRouteHandler<StartRoute> = async (c) => {
-  const { id } = c.req.valid("param");
-  await startDatabase(id);
+  const { name } = c.req.valid("param");
+  await startDatabase(name);
 
   return c.json(null, HttpStatusCodes.ACCEPTED);
 };
 
 export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
-  const { id } = c.req.valid("param");
-  await removeDatabase(id);
+  const { name } = c.req.valid("param");
+  await removeDatabase(name);
 
   return c.json(null, HttpStatusCodes.ACCEPTED);
 };
