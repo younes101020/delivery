@@ -14,8 +14,15 @@ interface DefineApplicationServiceTask {
   port: number;
 }
 
-export const defineApplicationServiceTask = withDocker<DefineApplicationServiceTask, void | Dockerode.Service>(
-  async (docker, { name, isRedeploy, fqdn, port }) => {
+export const defineApplicationServiceTask = withDocker<void | Dockerode.Service | DeploymentError, DefineApplicationServiceTask>(
+  async (docker, input) => {
+    if (!input) {
+      throw new DeploymentError({
+        name: "DEPLOYMENT_APP_ERROR",
+        message: MISSING_DEPLOYMENT_DATA_ERROR_MESSAGE,
+      });
+    }
+    const { name, isRedeploy, fqdn, port } = input;
     const networkId = await getApplicationNetworkID(name);
 
     if (isRedeploy)

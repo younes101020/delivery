@@ -1,6 +1,5 @@
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import path from "node:path";
-import { env } from "node:process";
 
 import { databases as databasesConst } from "@/routes/databases/lib/remote-docker/const";
 

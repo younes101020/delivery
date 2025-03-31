@@ -1,33 +1,21 @@
 import type Dockerode from "dockerode";
 
-import { getDocker } from "@/lib/remote-docker";
+import type { ServicesDto } from "@/db/dto/services.dto";
+
 import { withDocker } from "@/lib/remote-docker/middleware";
+import { toServiceSpec } from "@/lib/remote-docker/utils";
 
-import { withApplicationsServices } from "./middleware";
-
-export function toApplicationServiceSpec(service: Dockerode.Service) {
-  const taskTemplate = service.Spec?.TaskTemplate as Dockerode.ContainerTaskSpec;
-  const appInstanceCount = service.Spec?.Mode?.Replicated?.Replicas ?? 0;
-  const name = service.Spec?.Name ?? "Anonymous application";
-  return {
-    id: service.id,
-    name,
-    image: taskTemplate.ContainerSpec?.Image,
-    isActive: appInstanceCount > 0,
-    isProcessing: false,
-    createdAt: service.CreatedAt!,
-  };
-}
+import { withApplicationsServices } from "./service-middleware";
 
 export const getApplicationService = withApplicationsServices(async appServices => appServices);
 
-export async function listApplicationServicesSpec(opts?: Dockerode.ServiceListOptions) {
-  const docker = await getDocker();
-  const inputFilters = typeof opts?.filters === "object" ? opts.filters : {};
-  const appServices = await docker.listServices({ filters: { label: ["resource=application"], ...inputFilters } });
-  return appServices.map(toApplicationServiceSpec);
-}
-
+export const listApplicationServicesSpec = withDocker<ServicesDto[], Dockerode.ServiceListOptions | undefined>(
+  async (docker, opts) => {
+    const inputFilters = opts && typeof opts.filters === "object" ? opts.filters : {};
+    const appServices = await docker.listServices({ filters: { label: ["resource=application"], ...inputFilters } });
+    return appServices.map(toServiceSpec);
+  },
+);
 export const getApplicationNetworkID = withDocker<string, string>(async (docker, applicationName) => {
   const networks = await docker.listNetworks();
   const appNetwork = getNetworkByName(networks, `${applicationName}-network`);

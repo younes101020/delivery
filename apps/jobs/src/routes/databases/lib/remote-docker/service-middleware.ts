@@ -3,7 +3,14 @@ import type Dockerode from "dockerode";
 import { HTTPException } from "hono/http-exception";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
-import { getDocker } from "@/lib/remote-docker";
+import { withDocker } from "@/lib/remote-docker/middleware";
+
+const listDatabaseServices = withDocker<Dockerode.Service[], Dockerode.ServiceListOptions>(
+  async (docker, opts) => {
+    const inputFilters = opts && typeof opts.filters === "object" ? opts.filters : {};
+    return await docker.listServices({ filters: { label: ["resource=database"], ...inputFilters } });
+  },
+);
 
 export function withDatabaseService<T>(
   cb: (dbServices: Dockerode.Service) => Promise<T>,
@@ -30,10 +37,4 @@ export function withRestDatabaseService<T>(cb: (dbServices: Dockerode.Service) =
       });
     }
   };
-}
-
-async function listDatabaseServices(opts?: Dockerode.ServiceListOptions) {
-  const docker = await getDocker();
-  const inputFilters = typeof opts?.filters === "object" ? opts.filters : {};
-  return await docker.listServices({ filters: { label: ["resource=database"], ...inputFilters } });
 }

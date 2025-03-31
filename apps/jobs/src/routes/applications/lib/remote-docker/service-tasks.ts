@@ -1,7 +1,7 @@
+import { toServiceSpec } from "@/lib/remote-docker/utils";
 import { APPLICATION_INSTANCE_REPLICAS } from "@/routes/applications/lib/remote-docker/const";
 
-import { withApplicationsServices } from "./middleware";
-import { toApplicationServiceSpec } from "./utils";
+import { withApplicationsServices } from "./service-middleware";
 
 export const startApplicationService = withApplicationsServices(async (appServices) => {
   await appServices.update({ Spec: { Mode: { Replicated: { Replicas: APPLICATION_INSTANCE_REPLICAS } } } });

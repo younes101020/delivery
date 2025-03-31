@@ -1,7 +1,6 @@
 import { APPLICATIONS_PATH } from "@/lib/constants";
 import { DeploymentError } from "@/lib/error";
 import { ssh } from "@/lib/ssh";
-import { getApplicationNetworkID } from "@/routes/applications/lib/remote-docker/utils";
 import { defineApplicationServiceTask } from "@/routes/deployments/lib/remote-docker/service-tasks";
 
 import type { QueueDeploymentJob } from "../types";
