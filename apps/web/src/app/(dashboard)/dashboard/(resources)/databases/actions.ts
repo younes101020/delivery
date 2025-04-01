@@ -6,14 +6,14 @@ import { client } from "@/app/_lib/client-http";
 import { validatedAction } from "@/app/_lib/form-middleware";
 
 const updateContainerStatusSchema = z.object({
-  containerId: z.string(),
+  serviceName: z.string(),
 });
 
-export const stopContainer = validatedAction(updateContainerStatusSchema, async (inputs) => {
-  const { containerId } = inputs;
+export const stopDatabaseService = validatedAction(updateContainerStatusSchema, async (inputs) => {
+  const { serviceName } = inputs;
 
-  const response = await client.databases[":id"].stop.$post({
-    param: { id: containerId },
+  const response = await client.databases[":name"].stop.$post({
+    param: { name: serviceName },
   });
 
   if (response.status !== 202) {
@@ -23,11 +23,11 @@ export const stopContainer = validatedAction(updateContainerStatusSchema, async 
   return { success: "Container stopped", inputs };
 });
 
-export const startContainer = validatedAction(updateContainerStatusSchema, async (inputs) => {
-  const { containerId } = inputs;
+export const startDatabaseService = validatedAction(updateContainerStatusSchema, async (inputs) => {
+  const { serviceName } = inputs;
 
-  const response = await client.databases[":id"].start.$post({
-    param: { id: containerId },
+  const response = await client.databases[":name"].start.$post({
+    param: { name: serviceName },
   });
 
   if (response.status !== 202) {
@@ -37,9 +37,9 @@ export const startContainer = validatedAction(updateContainerStatusSchema, async
   return { success: "Container started", inputs };
 });
 
-export async function removeContainer(containerId: string) {
-  const response = await client.databases[":id"].$delete({
-    param: { id: containerId },
+export async function removeDatabaseService(serviceName: string) {
+  const response = await client.databases[":name"].$delete({
+    param: { name: serviceName },
   });
 
   if (response.status !== 202) {
