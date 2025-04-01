@@ -8,10 +8,9 @@ interface DatabaseServiceSpec {
   name: string;
   port: number;
   plainEnv?: string[];
-  networkId: string;
 }
 
-export function createDatabaseServiceSpec({ database, name, port, initialEnvCreds, networkId }: DatabaseServiceSpec) {
+export function createDatabaseServiceSpec({ database, name, port, initialEnvCreds }: DatabaseServiceSpec) {
   const manifest: Dockerode.ServiceSpec = {
     Name: name,
     TaskTemplate: {
@@ -22,11 +21,6 @@ export function createDatabaseServiceSpec({ database, name, port, initialEnvCred
       Placement: {
         Constraints: ["node.role == worker"],
       },
-      Networks: [
-        {
-          Target: networkId,
-        },
-      ],
       RestartPolicy: {
         Condition: "on-failure",
         Delay: 5,

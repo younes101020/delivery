@@ -4,13 +4,17 @@ import { HTTPException } from "hono/http-exception";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { Database } from "@/db/dto";
+import type { ServicesDto } from "@/db/dto/services.dto";
 
 import { getDocker } from "@/lib/remote-docker";
+import { withDocker } from "@/lib/remote-docker/middleware";
+import { toServiceSpec } from "@/lib/remote-docker/utils";
 import { generateRandomString } from "@/lib/utils";
-import { getApplicationService } from "@/routes/applications/lib/remote-docker/utils";
+import { withRestApplicationService } from "@/routes/applications/lib/remote-docker/service-middleware";
 
-import { credentialsEnvKeys, databases, DATABASES_CONTAINER_NOT_FOUND_ERROR_MESSAGE, DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE, NO_APPLICATION_TO_LINK_WITH_ERROR_MESSAGE, NO_CONTAINER_SERVICE_ERROR_MESSAGE, UNSUPPORTED_DATABASES_ERROR_MESSAGE } from "./const";
-import { withRestDatabaseService } from "./middleware";
+import { DATABASES_CONTAINER_NOT_FOUND_ERROR_MESSAGE, databasesName, DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE, NO_CONTAINER_SERVICE_ERROR_MESSAGE, UNSUPPORTED_DATABASES_ERROR_MESSAGE } from "./const";
+import { getDatabasePortAndCredsEnvVarByImage } from "./queries";
+import { withRestDatabaseService } from "./service-middleware";
 
 export const getDatabaseCredentialsEnvVarsByName = withRestDatabaseService(
   async (dbService) => {
@@ -19,7 +23,7 @@ export const getDatabaseCredentialsEnvVarsByName = withRestDatabaseService(
     if (!databaseExist)
       throw new Error(UNSUPPORTED_DATABASES_ERROR_MESSAGE);
 
-    const envVarKeys = credentialsEnvKeys.postgres;
+    const database = await getDatabasePortAndCredsEnvVarByImage(dbName);
     const taskTemplate = dbService.Spec?.TaskTemplate;
     const containerSpecExist = assertTaskTemplateIsContainerTaskSpecGuard(taskTemplate);
     if (!containerSpecExist)
@@ -29,7 +33,7 @@ export const getDatabaseCredentialsEnvVarsByName = withRestDatabaseService(
     if (!envVars || envVars.length === 0)
       throw new Error(DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE);
 
-    return envVars.filter(envVar => envVarKeys.some(key => envVar.includes(key)));
+    return envVars.filter(envVar => database.credentialsEnvVar.some(key => envVar.includes(key)));
   },
 );
 
@@ -45,30 +49,28 @@ export async function getDatabaseEnvVarsByEnvVarKeys(containerId: string, envVar
   return envVars.filter(envVar => envVarKey.some(key => envVar.includes(key)));
 }
 
-export async function addEnvironmentVariableToAppService(applicationName: string, plainEnv: string) {
-  const appService = await getApplicationService({ name: [applicationName] });
-  if (!appService)
-    throw new HTTPException(HttpStatusCodes.INTERNAL_SERVER_ERROR, { message: NO_APPLICATION_TO_LINK_WITH_ERROR_MESSAGE });
+export const addEnvironmentVariableToAppService = withRestApplicationService<string, void>(
+  async (appService, plainEnv) => {
+    const container = appService.Spec?.TaskTemplate as Dockerode.ContainerTaskSpec;
+    const currentEnvs = typeof container.ContainerSpec?.Env === "object" ? container.ContainerSpec.Env : [];
 
-  const container = appService.Spec?.TaskTemplate as Dockerode.ContainerTaskSpec;
-  const currentEnvs = typeof container.ContainerSpec?.Env === "object" ? container.ContainerSpec.Env : [];
-
-  await appService.update({
-    ...appService.Spec,
-    TaskTemplate: {
-      ...appService.Spec?.TaskTemplate,
-      ContainerSpec: {
-        ...container.ContainerSpec,
-        Env: [
-          ...currentEnvs,
-          plainEnv,
-        ],
+    await appService.update({
+      ...appService.Spec,
+      TaskTemplate: {
+        ...appService.Spec?.TaskTemplate,
+        ContainerSpec: {
+          ...container.ContainerSpec,
+          Env: [
+            ...currentEnvs,
+            plainEnv,
+          ],
+        },
       },
-    },
-  });
-}
+    });
+  },
+);
 
-export function getDatabaseEnvVarsCredential(databaseImage: Database) {
+export function createDatabaseEnvVarsCredential(databaseImage: Database) {
   if (databaseImage === "postgres") {
     const DB_USER = generateRandomString();
     const DB_PASSWORD = generateRandomString();
@@ -95,10 +97,18 @@ export function getDatabaseEnvVarsCredential(databaseImage: Database) {
 }
 
 function assertNameIsDatabaseNameGuard(dbName?: string): dbName is Database {
-  return databases.includes(dbName!);
+  return databasesName.includes(dbName!);
 }
 
 function assertTaskTemplateIsContainerTaskSpecGuard(taskTemplate?: Dockerode.ServiceSpec["TaskTemplate"]): taskTemplate is Dockerode.ContainerTaskSpec {
   const taskTemplateType = taskTemplate as Dockerode.ContainerTaskSpec;
   return taskTemplateType?.ContainerSpec !== undefined;
 }
+
+export const listDatabaseServicesSpec = withDocker<ServicesDto[], Dockerode.ServiceListOptions | undefined>(
+  async (docker, opts) => {
+    const inputFilters = opts && typeof opts.filters === "object" ? opts.filters : {};
+    const dbServices = await docker.listServices({ filters: { label: ["resource=database"], ...inputFilters } });
+    return dbServices.map(toServiceSpec);
+  },
+);

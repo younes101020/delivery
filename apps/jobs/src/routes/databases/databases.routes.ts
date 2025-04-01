@@ -61,56 +61,50 @@ export const streamCurrentDatabase = createRoute({
 });
 
 export const stop = createRoute({
-  path: "/databases/{id}/stop",
+  path: "/databases/{name}/stop",
   method: "post",
-  description: "Stop a running database container.",
+  description: "Stop a running database service.",
   request: {
-    params: z.object({
-      id: z.string().describe("The ID of the database container to stop"),
-    }),
+    params: DatabaseParamsSchema,
   },
   tags,
   responses: {
     [HttpStatusCodes.ACCEPTED]: {
-      description: "Database container stop request accepted",
+      description: "Database service stop request accepted",
     },
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Database container not found"),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Database service not found"),
   },
 });
 
 export const start = createRoute({
-  path: "/databases/{id}/start",
+  path: "/databases/{name}/start",
   method: "post",
-  description: "Start a stopped database container.",
+  description: "Start a stopped database service.",
   request: {
-    params: z.object({
-      id: z.string().describe("The ID of the database container to start"),
-    }),
+    params: DatabaseParamsSchema,
   },
   tags,
   responses: {
     [HttpStatusCodes.ACCEPTED]: {
-      description: "Database container start request accepted",
+      description: "Database service start request accepted",
     },
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Database container not found"),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Database service not found"),
   },
 });
 
 export const remove = createRoute({
-  path: "/databases/{id}",
+  path: "/databases/{name}",
   method: "delete",
-  description: "Remove a database container.",
+  description: "Remove a database service.",
   request: {
-    params: z.object({
-      id: z.string().describe("The ID of the database container to remove"),
-    }),
+    params: DatabaseParamsSchema,
   },
   tags,
   responses: {
     [HttpStatusCodes.ACCEPTED]: {
-      description: "Database container removal request accepted",
+      description: "Database service removal request accepted",
     },
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Database container not found"),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Database service not found"),
   },
 });
 
@@ -125,14 +119,14 @@ export const link = createRoute({
   tags,
   responses: {
     [HttpStatusCodes.OK]: {
-      description: "Database container linked to the application",
+      description: "Database service linked to the application",
     },
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Database container not found"),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Database service not found"),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(internalServerSchema, "Application target service not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(
         z.object({
-          id: z.string().describe("The ID of the database container to link"),
+          id: z.string().describe("The ID of the database service to link"),
         })
           .or(databaseLinkSchema),
       ),

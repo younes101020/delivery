@@ -28,7 +28,7 @@ export const databaseLinkSchema = z.object({
 
 export const DatabaseParamsSchema = z.object({
   name: z.string(),
-});
+}).describe("The database service name identifier.");
 
 export type CreateDatabaseSchema = z.infer<typeof createDatabaseSchema>;
 export type DatabaseSchema = z.infer<typeof databaseSchema>;
