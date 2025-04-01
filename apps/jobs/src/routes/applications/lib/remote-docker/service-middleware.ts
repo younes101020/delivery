@@ -2,7 +2,6 @@ import type Dockerode from "dockerode";
 
 import { HTTPException } from "hono/http-exception";
 
-import { ApplicationError } from "@/lib/error";
 import { withDocker } from "@/lib/remote-docker/middleware";
 
 const listApplicationServices = withDocker<Dockerode.Service[], Dockerode.ServiceListOptions>(
