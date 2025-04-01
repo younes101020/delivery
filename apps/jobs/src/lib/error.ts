@@ -9,6 +9,7 @@ export const DEPLOYMENTERRORNAME = {
 export const APPLICATIONERRORNAME = {
   start: "START_APP_ERROR",
   stop: "STOP_APP_ERROR",
+  remove: "REMOVE_APP_ERROR",
 } as const;
 
 export const DATABASEERRORNAME = {
@@ -63,7 +64,7 @@ export class ApplicationError extends UnrecoverableError {
     message,
     cause,
   }: {
-    name: string;
+    name: ApplicationErrorNameType;
     message: string;
     cause?: unknown;
   }) {
