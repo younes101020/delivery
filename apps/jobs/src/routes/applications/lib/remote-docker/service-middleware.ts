@@ -16,19 +16,10 @@ export function withApplicationsServices<T>(
   cb: (appServices: Dockerode.Service) => Promise<T>,
 ) {
   return async (appQuery: Dockerode.ServiceListOptions["filters"]) => {
-    try {
-      const servicesList = await listApplicationServices({ filters: appQuery });
-      if (servicesList.length === 0)
-        throw new Error("Application service not found.");
-      return cb(servicesList[0]);
-    }
-    catch (error) {
-      console.error(error);
-      throw new ApplicationError({
-        name: "APPLICATION_ERROR",
-        message: error instanceof Error ? error.message : "Unexpected error",
-      });
-    }
+    const servicesList = await listApplicationServices({ filters: appQuery });
+    if (servicesList.length === 0)
+      throw new Error("Application service not found.");
+    return cb(servicesList[0]);
   };
 }
 
