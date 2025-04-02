@@ -3,26 +3,10 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 
-import { insertUsersSchema, selectUsersSchema } from "@/db/dto/users.dto";
+import { patchUserSchema, selectUserSchema } from "@/db/dto/users.dto";
 import { notFoundSchema } from "@/lib/constants";
 
 const tags = ["Users"];
-
-export const create = createRoute({
-  path: "/users",
-  method: "post",
-  request: {
-    body: jsonContentRequired(insertUsersSchema, "The user to create"),
-  },
-  tags,
-  responses: {
-    [HttpStatusCodes.OK]: jsonContent(selectUsersSchema, "The created user"),
-    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(insertUsersSchema),
-      "The validation error(s)",
-    ),
-  },
-});
 
 export const getOne = createRoute({
   path: "/users/{id}",
@@ -32,7 +16,7 @@ export const getOne = createRoute({
   },
   tags,
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(selectUsersSchema, "The requested user"),
+    [HttpStatusCodes.OK]: jsonContent(selectUserSchema, "The requested user"),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "User not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
@@ -41,5 +25,23 @@ export const getOne = createRoute({
   },
 });
 
-export type CreateRoute = typeof create;
+export const patch = createRoute({
+  path: "/users/{id}",
+  method: "patch",
+  request: {
+    params: IdParamsSchema,
+    body: jsonContentRequired(patchUserSchema, "The user updates"),
+  },
+  tags,
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(selectUserSchema.pick({ id: true }), "The updated user id"),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "User not found"),
+    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
+      createErrorSchema(patchUserSchema).or(createErrorSchema(IdParamsSchema)),
+      "The validation error(s)",
+    ),
+  },
+});
+
 export type GetOneRoute = typeof getOne;
+export type PatchRoute = typeof patch;

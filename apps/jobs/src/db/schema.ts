@@ -1,14 +1,13 @@
-import { relations } from "drizzle-orm";
-import { boolean, pgTable, serial, text, timestamp, uuid } from "drizzle-orm/pg-core";
-// eslint-disable-next-line ts/consistent-type-imports
-import { z } from "zod";
-// eslint-disable-next-line ts/consistent-type-imports
-import { selectGithubAppsSchema } from "./dto/githubapps.dto";
-// eslint-disable-next-line ts/consistent-type-imports
-import { selectUsersSchema } from "./dto/users.dto";
+import type { z } from "zod";
+
+import { relations, sql, type SQL } from "drizzle-orm";
+import { boolean, integer, pgTable, primaryKey, serial, text, timestamp } from "drizzle-orm/pg-core";
+
+import type { selectUserSchema } from "./dto";
+import type { selectGithubAppsSchema } from "./dto/githubapps.dto";
 
 export const systemConfig = pgTable("system_config", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: serial("id").primaryKey(),
   onboardingCompleted: boolean("onboarding_completed").default(false),
   onboardingCompletedAt: timestamp("onboarding_completed_at"),
   completedByUserId: text("completed_by_user_id"),
@@ -29,30 +28,33 @@ export const users = pgTable("users", {
   emailVerificationTokenExpiresAt: timestamp("email_verification_token_expires_at"),
 });
 
+export const githubApp = pgTable("github_app", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  webhookSecret: text("webhook_secret").notNull(),
+  clientId: text("client_id").notNull(),
+  clientSecret: text("client_secret").notNull(),
+  installationId: serial("installation_id"),
+  appId: integer("app_id").notNull(),
+});
+
 export const githubAppSecret = pgTable("github_app_secret", {
   id: serial("id").primaryKey(),
   encryptedData: text("encrypted_data").notNull(),
   iv: text("iv").notNull(),
   key: text("key").notNull(),
-});
-
-export const githubApp = pgTable("github_app", {
-  id: serial("id").primaryKey(),
-  webhookSecret: text("webhook_secret").notNull(),
-  clientId: text("client_id").notNull(),
-  clientSecret: text("client_secret").notNull(),
-  installationId: serial("installation_id"),
-  appId: serial("app_id").notNull(),
-  secretId: serial("secret_id").references(() => githubAppSecret.id),
+  githubAppId: integer("github_app_id").notNull().references(() => githubApp.id),
 });
 
 export const applications = pgTable("applications", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull(),
+  name: text("name")
+    .notNull()
+    .generatedAlwaysAs((): SQL => sql`split_part(${applications.fqdn}, '.', 1)`),
   fqdn: text("fqdn").notNull().unique(),
   logs: text("logs"),
-  githubAppId: serial("github_app_id").references(() => githubApp.id),
-  githubAppName: text("github_app_name").notNull(),
+  port: integer("port").notNull(),
+  githubAppId: integer("github_app_id").notNull().references(() => githubApp.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   deletedAt: timestamp("deleted_at"),
@@ -69,26 +71,53 @@ export const environmentVariables = pgTable("environment_variables", {
 });
 
 export const applicationEnvironmentVariables = pgTable("application_environment_variables", {
-  id: serial("id").primaryKey(),
-  applicationId: serial("application_id")
+  applicationId: integer("application_id")
     .notNull()
     .references(() => applications.id),
-  environmentVariableId: serial("environment_variable_id")
+  environmentVariableId: integer("environment_variable_id")
     .notNull()
     .references(() => environmentVariables.id),
-});
+}, (t) => { return [{ pk: primaryKey({ columns: [t.applicationId, t.environmentVariableId] }) }]; });
 
-export const githubAppRelations = relations(githubApp, ({ one }) => ({
-  secret: one(githubAppSecret, {
-    fields: [githubApp.secretId],
-    references: [githubAppSecret.id],
+export const applicationEnvironmentVariablesRelations = relations(
+  applicationEnvironmentVariables,
+  ({ one }) => ({
+    application: one(applications, {
+      fields: [applicationEnvironmentVariables.applicationId],
+      references: [applications.id],
+    }),
+    environmentVariable: one(environmentVariables, {
+      fields: [applicationEnvironmentVariables.environmentVariableId],
+      references: [environmentVariables.id],
+    }),
   }),
+);
+
+export const applicationRelations = relations(applications, ({ many, one }) => ({
+  applicationEnvironmentVariables: many(applicationEnvironmentVariables),
+  githubApp: one(githubApp, {
+    fields: [applications.githubAppId],
+    references: [githubApp.id],
+  }),
+}));
+
+export const environmentVariablesRelations = relations(environmentVariables, ({ many }) => ({
+  applicationEnvironmentVariables: many(applicationEnvironmentVariables),
+}));
+
+export const githubAppRelations = relations(githubApp, ({ one, many }) => ({
+  secret: one(githubAppSecret),
+  applications: many(applications),
+}));
+
+export const githubAppSecretRelations = relations(githubAppSecret, ({ one }) => ({
+  githubApp: one(githubApp, { fields: [githubAppSecret.githubAppId], references: [githubApp.id] }),
 }));
 
 // Shared types
 // workaround to https://github.com/honojs/hono/issues/1800
 type NewUserWithoutDateTypes = Omit<
-  z.infer<typeof selectUsersSchema>,
+  z.infer<typeof selectUserSchema>,
   "createdAt" | "updatedAt" | "deletedAt" | "emailVerificationTokenExpiresAt"
 >;
 export type NewUser = NewUserWithoutDateTypes & {

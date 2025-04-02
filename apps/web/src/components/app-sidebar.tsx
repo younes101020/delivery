@@ -1,20 +1,9 @@
 "use client";
 
-import {
-  BookOpen,
-  Frame,
-  LifeBuoy,
-  Map,
-  Package,
-  PieChart,
-  Send,
-  Settings2,
-  Truck,
-} from "lucide-react";
+import { Package, Settings2, Truck } from "lucide-react";
 import * as React from "react";
 
 import { NavMain } from "@/components/nav-main";
-import { NavProjects } from "@/components/nav-projects";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
 import {
@@ -26,28 +15,20 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+
 import { Logo } from "./ui/logo";
 
 const data = {
-  user: {
-    name: "youyou",
-    email: "m@example.com",
-    avatar: "/avatars/youyou.jpg",
-  },
   navMain: [
     {
       title: "Applications",
-      url: "#",
+      url: "/dashboard/applications",
       icon: Package,
       isActive: true,
       items: [
         {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
+          title: "New",
+          url: "/dashboard/applications/new",
         },
       ],
     },
@@ -55,43 +36,7 @@ const data = {
       title: "Deployments",
       url: "/dashboard/deployments",
       icon: Truck,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
+      items: [],
     },
     {
       title: "Settings",
@@ -100,7 +45,7 @@ const data = {
       items: [
         {
           title: "General",
-          url: "#",
+          url: "/dashboard/settings/general",
         },
         {
           title: "Team",
@@ -117,35 +62,7 @@ const data = {
       ],
     },
   ],
-  navSecondary: [
-    {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: Send,
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
+  navSecondary: [],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -164,11 +81,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   );

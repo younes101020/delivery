@@ -1,4 +1,6 @@
-import React, { CSSProperties } from "react";
+import type { CSSProperties } from "react";
+
+import React from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -9,12 +11,12 @@ interface RippleProps {
   className?: string;
 }
 
-const Ripple = React.memo(function Ripple({
+const Ripple = React.memo(({
   mainCircleSize = 210,
   mainCircleOpacity = 0.24,
   numCircles = 8,
   className,
-}: RippleProps) {
+}: RippleProps) => {
   return (
     <div
       className={cn(

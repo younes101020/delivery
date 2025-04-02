@@ -1,0 +1,42 @@
+import { faker } from "@faker-js/faker";
+import { eq, not } from "drizzle-orm";
+import { it as base } from "vitest";
+
+import type { AuthRegisterSchema, AuthVerifySchema } from "@/db/dto";
+
+import { db } from "@/db";
+import { users } from "@/db/schema";
+import env from "@/env";
+
+interface Fixtures {
+  authRegisteredUser: AuthVerifySchema;
+  authUnregisteredUser: AuthRegisterSchema;
+}
+
+const authRegisteredUser = {
+  email: "",
+  password: env.TEST_USERS_PASSWORD!,
+};
+
+const authUnregisteredUser = {
+  email: faker.internet.email(),
+  password: faker.internet.password(),
+};
+
+export const it = base.extend<Fixtures>({
+  // eslint-disable-next-line no-empty-pattern
+  authRegisteredUser: async ({}, use) => {
+    //  For each test, use a different email
+    const [user] = await getRandomUserEmail(authRegisteredUser.email);
+    authRegisteredUser.email = user.email;
+    await use(authRegisteredUser);
+  },
+  // eslint-disable-next-line no-empty-pattern
+  authUnregisteredUser: async ({}, use) => {
+    await use(authUnregisteredUser);
+  },
+});
+
+function getRandomUserEmail(previousEmail: string) {
+  return db.select({ email: users.email }).from(users).where(not(eq(users.email, previousEmail))).limit(1);
+}

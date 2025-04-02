@@ -1,30 +1,25 @@
 import { Job, Queue, QueueEvents } from "bullmq";
 import { streamSSE } from "hono/streaming";
-import { basename } from "node:path";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import { db } from "@/db";
-import { startDeploy } from "@/lib/tasks/deploy";
-import { connection } from "@/lib/tasks/worker";
+import { getApplicationByName } from "@/db/queries/queries";
+import { subscribeWorkerTo } from "@/routes/deployments/lib/tasks";
+import { startDeploy } from "@/routes/deployments/lib/tasks/deploy";
+import { prepareDataForProcessing } from "@/routes/deployments/lib/tasks/deploy/jobs/utils";
+import { checkIfOngoingDeploymentExist, getCurrentDeploymentsState, getJobs } from "@/routes/deployments/lib/tasks/deploy/utils";
+import { connection, getBullConnection, jobCanceler } from "@/routes/deployments/lib/tasks/utils";
 
-import type { CreateRoute, StreamRoute } from "./deployments.routes";
+import type { CancelRoute, CreateRoute, GetCurrentDeploymentStep, RetryRoute, StreamPreview, StreamRoute } from "./deployments.routes";
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const deployment = c.req.valid("json");
 
-  const githubApp = await db.query.githubApp.findFirst({
-    where(fields, operators) {
-      return operators.eq(fields.appId, deployment.githubAppId);
-    },
-    with: {
-      secret: true,
-    },
-  });
+  const data = await prepareDataForProcessing(deployment);
 
-  if (!githubApp) {
+  if (!data) {
     return c.json(
       {
         message: HttpStatusPhrases.NOT_FOUND,
@@ -33,58 +28,206 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
     );
   }
 
-  const repoName = basename(deployment.repoUrl, ".git");
+  const queueName = await startDeploy(data);
 
-  const tracking = await startDeploy({
-    clone: { ...githubApp, repoUrl: deployment.repoUrl, repoName },
-    build: { repoName, port: deployment.port, env: deployment.env },
-  });
-
-  return c.json(tracking, HttpStatusCodes.OK);
+  return c.json(queueName, HttpStatusCodes.OK);
 };
 
-export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
-  return streamSSE(c, async (stream) => {
-    const { slug } = c.req.valid("param");
+export const streamPreview: AppRouteHandler<StreamPreview> = async (c) => {
+  const { queueName } = c.req.valid("param");
+  const queue = new Queue(queueName, { connection: getBullConnection(connection) });
+  const ongoingDeploymentExist = await checkIfOngoingDeploymentExist(queue);
 
-    const queue = new Queue(slug, { connection: connection.duplicate() });
-    const queueEvents = new QueueEvents(slug, { connection: connection.duplicate() });
-    async function progressHandler({ data, jobId }: { data: number | object; jobId: string }) {
-      const jobState = await Job.fromId(queue, jobId);
-      const sseData = JSON.stringify({
-        jobName: jobState?.name,
-        ...(typeof data === "object" && "logs" in data ? { logs: data.logs } : {}),
-      });
-      switch (jobState?.name) {
-        case "clone":
-          await stream.writeSSE({
-            data: sseData,
-            event: `${jobState.data.repoName}-build-logs`,
-          });
-          break;
-        case "build":
-          await stream.writeSSE({
-            data: sseData,
-            event: `${jobState.data.repoName}-build-logs`,
-          });
-          break;
-      }
+  if (!ongoingDeploymentExist) {
+    const hasAlreadyBeenDeployed = await getApplicationByName(queueName);
+    if (hasAlreadyBeenDeployed) {
+      return c.json(
+        {
+          message: HttpStatusPhrases.GONE,
+        },
+        HttpStatusCodes.GONE,
+      );
     }
-    async function completeHandler(job: { jobId: string }) {
-      const jobState = await Job.fromId(queue, job.jobId);
-      if (jobState?.name === "build") {
-        stream.close();
-      }
-    }
-    queueEvents.on("progress", progressHandler);
-    queueEvents.on("completed", completeHandler);
-    stream.onAbort(() => {
-      queueEvents.removeListener("progress", progressHandler);
-      queueEvents.removeListener("completed", completeHandler);
+    return c.json(
+      {
+        message: HttpStatusPhrases.NOT_FOUND,
+      },
+      HttpStatusCodes.NOT_FOUND,
+    );
+  }
+
+  const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection) });
+  const job = await getJobs(queue);
+
+  return streamSSE(c, async (stream) => {
+    await stream.writeSSE({
+      data: JSON.stringify({ step: job.name, status: await job.getState() }),
     });
+
+    async function activeHandler(job: { jobId: string }) {
+      const jobState = await Job.fromId(queue, job.jobId);
+      await stream.writeSSE({
+        data: JSON.stringify({ step: jobState?.name, status: "active" }),
+      });
+    }
+
+    async function failedHandler({ jobId }: { jobId: string }) {
+      const jobState = await Job.fromId(queue, jobId);
+      await stream.writeSSE({
+        data: JSON.stringify({ step: jobState?.name, status: "failed" }),
+      });
+    }
+
+    async function completedHandler({ jobId }: { jobId: string }) {
+      const jobState = await Job.fromId(queue, jobId);
+      const isLastDeploymentStep = jobState?.name === "configure";
+      if (isLastDeploymentStep) {
+        await stream.writeSSE({
+          data: JSON.stringify({ step: jobState?.name, status: "completed" }),
+        });
+      }
+    }
+
+    queueEvents.on("active", activeHandler);
+    queueEvents.on("failed", failedHandler);
+    queueEvents.on("completed", completedHandler);
+
+    stream.onAbort(() => {
+      queueEvents.removeListener("active", activeHandler);
+      queueEvents.removeListener("failed", failedHandler);
+      queueEvents.on("completed", completedHandler);
+    });
+
     while (true) {
       await stream.sleep(4000);
     }
     // casting cause: no typescript support for sse in hono https://github.com/honojs/hono/issues/3309
   }) as any;
+};
+
+export const streamLog: AppRouteHandler<StreamRoute> = async (c) => {
+  const { queueName } = c.req.valid("param");
+  const queue = new Queue(queueName, { connection: getBullConnection(connection) });
+  const ongoingDeploymentExist = await checkIfOngoingDeploymentExist(queue);
+
+  if (!ongoingDeploymentExist) {
+    const hasAlreadyBeenDeployed = await getApplicationByName(queueName);
+    if (hasAlreadyBeenDeployed) {
+      return c.json(
+        {
+          message: HttpStatusPhrases.GONE,
+        },
+        HttpStatusCodes.GONE,
+      );
+    }
+    return c.json(
+      {
+        message: HttpStatusPhrases.NOT_FOUND,
+      },
+      HttpStatusCodes.NOT_FOUND,
+    );
+  }
+
+  const queueEvents = new QueueEvents(queueName, { connection: getBullConnection(connection) });
+  const { name, data, id } = await getJobs(queue);
+
+  return streamSSE(c, async (stream) => {
+    await stream.writeSSE({
+      data: JSON.stringify({ jobName: name, logs: data.logs, isCriticalError: data.isCriticalError, jobId: id }),
+    });
+
+    async function progressHandler({ data, jobId }: { data: number | object; jobId: string }) {
+      const jobState = await Job.fromId(queue, jobId);
+      const sseData = JSON.stringify({
+        jobName: jobState?.name,
+        ...(typeof data === "object" && "logs" in data ? { logs: data.logs } : {}),
+        ...(typeof data === "object" && "isCriticalError" in data ? { isCriticalError: data.isCriticalError } : {}),
+      });
+      await stream.writeSSE({
+        data: sseData,
+      });
+    }
+
+    async function completeHandler(job: { jobId: string }) {
+      const jobState = await Job.fromId(queue, job.jobId);
+      if (jobState?.name === "configure") {
+        const applicationId = jobState.returnvalue;
+        await stream.writeSSE({
+          data: JSON.stringify({ completed: true, appId: applicationId }),
+        });
+      }
+    }
+
+    async function failedHandler({ jobId }: { jobId: string }) {
+      const jobState = await Job.fromId(queue, jobId);
+      await stream.writeSSE({
+        data: JSON.stringify({ jobName: jobState?.name, logs: jobState?.data.logs, isCriticalError: true, jobId }),
+      });
+    }
+
+    queueEvents.on("progress", progressHandler);
+    queueEvents.on("completed", completeHandler);
+    queueEvents.on("failed", failedHandler);
+
+    stream.onAbort(() => {
+      queueEvents.removeListener("progress", progressHandler);
+      queueEvents.removeListener("completed", completeHandler);
+      queueEvents.removeListener("failed", failedHandler);
+    });
+
+    while (true) {
+      await stream.sleep(4000);
+    }
+    // casting cause: no typescript support for sse in hono https://github.com/honojs/hono/issues/3309
+  }) as any;
+};
+
+export const getCurrentDeploymentsStep: AppRouteHandler<GetCurrentDeploymentStep> = async (c) => {
+  const currentDeploymentsState = await getCurrentDeploymentsState();
+
+  return c.json(currentDeploymentsState);
+};
+
+export const retryJob: AppRouteHandler<RetryRoute> = async (c) => {
+  const { jobId } = c.req.valid("param");
+  const { queueName } = c.req.valid("json");
+  const queue = new Queue(queueName, { connection: getBullConnection(connection) });
+  const faileJob = await Job.fromId(queue, jobId);
+
+  if (!faileJob) {
+    return c.json(
+      {
+        message: HttpStatusPhrases.NOT_FOUND,
+      },
+      HttpStatusCodes.NOT_FOUND,
+    );
+  }
+
+  const response = await faileJob?.retry();
+  await subscribeWorkerTo(queueName);
+
+  return c.json(
+    { response },
+    HttpStatusCodes.OK,
+  );
+};
+
+export const cancelJob: AppRouteHandler<CancelRoute> = async (c) => {
+  const { jobId } = c.req.valid("param");
+  const { queueName } = c.req.valid("json");
+  const queue = new Queue(queueName, { connection: getBullConnection(connection) });
+  const job = await Job.fromId(queue, jobId);
+
+  if (!job) {
+    return c.json(
+      {
+        message: HttpStatusPhrases.NOT_FOUND,
+      },
+      HttpStatusCodes.NOT_FOUND,
+    );
+  }
+
+  jobCanceler.cancel(jobId);
+
+  return c.body(null, HttpStatusCodes.NO_CONTENT);
 };

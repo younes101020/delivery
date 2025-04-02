@@ -1,19 +1,22 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
+import { useActionState } from "react";
+
+import type { ActionState } from "@/app/_lib/form-middleware";
+
+import { signUp } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ActionState } from "@/lib/auth/middleware";
-import { Loader2 } from "lucide-react";
-import { useActionState } from "react";
+
 import { signIn } from "../(login)/actions";
-import { signUp } from "../(onboarding)/onboarding/actions";
 
 export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
     mode === "signin" ? signIn : signUp,
-    { error: "" },
+    { error: "", inputs: {} },
   );
 
   return (
@@ -33,7 +36,7 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
             maxLength={50}
             className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
             placeholder="Enter your email"
-            defaultValue={state.email ?? ""}
+            defaultValue={state.inputs.email ?? ""}
           />
         </div>
       </div>
@@ -51,10 +54,9 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
             autoComplete={mode === "signin" ? "current-password" : "new-password"}
             required
             minLength={8}
-            maxLength={100}
             className="appearance-none relative block w-full px-3 py-2 border focus:outline-none focus:z-10 sm:text-sm"
             placeholder="Enter your password"
-            defaultValue={state.passwordHash ?? ""}
+            defaultValue={state.inputs.passwordHash ?? ""}
           />
         </div>
       </div>
@@ -63,16 +65,20 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
 
       <CardFooter className="flex px-0 pt-8">
         <Button type="submit" disabled={pending} aria-label="submit" className="w-full">
-          {pending ? (
-            <>
-              <Loader2 className="animate-spin mr-2 h-4 w-4" />
-              Loading...
-            </>
-          ) : mode === "signin" ? (
-            "Sign in"
-          ) : (
-            "Sign up"
-          )}
+          {pending
+            ? (
+                <>
+                  <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                  Loading...
+                </>
+              )
+            : mode === "signin"
+              ? (
+                  "Sign in"
+                )
+              : (
+                  "Sign up"
+                )}
         </Button>
       </CardFooter>
     </form>

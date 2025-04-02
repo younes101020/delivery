@@ -3,26 +3,43 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema } from "stoker/openapi/schemas";
 
-import { requiredAuthSchema, selectUserSchema } from "@/db/dto/auth.dto";
+import { authRegisterSchema, authVerifySchema, selectUserSchema } from "@/db/dto";
 import { unauthorizedSchema } from "@/lib/constants";
 
 const tags = ["Auth"];
 
 export const verify = createRoute({
-  path: "/auth",
+  path: "/auth/verify",
   method: "post",
   request: {
-    body: jsonContentRequired(requiredAuthSchema, "The authentication credentials"),
+    body: jsonContentRequired(authVerifySchema, "The authentication credentials"),
   },
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(selectUserSchema, "The authenticated user"),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(unauthorizedSchema, "Invalid user credentials"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(requiredAuthSchema),
+      createErrorSchema(authVerifySchema),
+      "The validation error(s)",
+    ),
+  },
+});
+
+export const register = createRoute({
+  path: "/auth/register",
+  method: "post",
+  request: {
+    body: jsonContentRequired(authRegisterSchema, "The user informations"),
+  },
+  tags,
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(selectUserSchema, "The registered user"),
+    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
+      createErrorSchema(authRegisterSchema),
       "The validation error(s)",
     ),
   },
 });
 
 export type VerifyRoute = typeof verify;
+export type RegisterRoute = typeof register;

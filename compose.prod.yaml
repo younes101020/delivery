@@ -32,6 +32,12 @@ services:
       - NODE_ENV=${NODE_ENV}
       - SSH_HOST=${SSH_HOST}
       - BEARER_TOKEN=${BEARER_TOKEN}
+      - MINIO_SERVER_ACCESS_KEY=${MINIO_SERVER_ACCESS_KEY}
+      - MINIO_SERVER_SECRET_KEY=${MINIO_SERVER_SECRET_KEY}
+      - MINIO_PUBLIC_DOMAIN=${MINIO_PUBLIC_DOMAIN}
+      - TEST_USERS_PASSWORD=${TEST_USERS_PASSWORD}
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
     volumes:
       - /data/delivery/ssh/keys:/var/ssh/keys
     restart: always
@@ -55,6 +61,19 @@ services:
       - ${PWD}/db-data/:/var/lib/postgresql@16/data:rw
     restart: always
   
+  screenshots-storage:
+    image: bitnami/minio:latest
+    ports:
+      - 9000:9000
+      - 9001:9001
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - MINIO_DEFAULT_BUCKETS=${MINIO_DEFAULT_BUCKETS}
+    networks:
+      - host_network
+    restart: always
+  
   bull_queue:
     image: redis
     container_name: delivery-bull-queue
@@ -69,7 +88,7 @@ services:
     image: adminer
     restart: always
     ports:
-      - 8080:8080
+      - 3050:8080
     networks:
       - host_network
   

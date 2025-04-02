@@ -5,22 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1733422406012,
-      "tag": "0000_stale_tarantula",
+      "when": 1738769944862,
+      "tag": "0000_strong_loa",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1733428145502,
-      "tag": "0001_overjoyed_scarecrow",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1735773021301,
-      "tag": "0002_flawless_ozymandias",
+      "when": 1739212728904,
+      "tag": "0001_tearful_manta",
       "breakpoints": true
     }
   ]

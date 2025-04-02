@@ -1,23 +1,19 @@
+import { z } from "@hono/zod-openapi";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-// eslint-disable-next-line ts/consistent-type-imports
-import { z } from "zod";
 
 import { users } from "../schema";
 
-export const selectUsersSchema = createSelectSchema(users).omit({
+export const selectUserSchema = createSelectSchema(users).omit({
   passwordHash: true,
 });
-export const insertUsersSchema = createInsertSchema(users, {
-  name: schema => schema.name.min(1).max(500),
-})
-  .required({
-    email: true,
+export const insertUserSchema = createInsertSchema(users)
+  .omit({
     passwordHash: true,
   })
-  .omit({
-    id: true,
-    createdAt: true,
-    updatedAt: true,
+  .extend({
+    password: z.string().min(8).max(100),
   });
+export const patchUserSchema = insertUserSchema.partial();
 
-export type InsertUsersSchema = z.infer<typeof insertUsersSchema>;
+export type InsertUserSchema = z.infer<typeof insertUserSchema>;
+export type SelectUserSchema = z.infer<typeof selectUserSchema>;
