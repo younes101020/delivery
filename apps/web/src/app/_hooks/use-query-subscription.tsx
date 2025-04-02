@@ -11,7 +11,7 @@ export function useQuerySubscription(endpoints: `/${string}`) {
     const eventSource = new EventSource(`${env.NEXT_PUBLIC_BASEURL}/api${endpoints}`);
     eventSource.onmessage = (event) => {
       const queryData = JSON.parse(event.data);
-      const queryKey = queryData.serviceName ? [queryData.serviceName] : ["sse"];
+      const queryKey = queryData.serviceId ? [queryData.serviceId] : ["sse"];
       queryClient.setQueriesData({ queryKey }, queryData);
     };
     return () => {

@@ -2,13 +2,11 @@ import type Dockerode from "dockerode";
 
 import type { Database } from "@/db/dto";
 
-import { DatabaseError } from "@/lib/error";
-import { withDocker } from "@/lib/remote-docker/middleware";
+import { withDocker, withSwarmService } from "@/lib/remote-docker/middleware";
 
 import { DATABASE_INSTANCE_REPLICAS, DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE, MISSING_DATABASE_NAME_AND_IMAGE_ERROR_MESSAGE } from "./const";
 import { createDatabaseServiceSpec } from "./manifest";
 import { getDatabasePortAndCredsEnvVarByImage } from "./queries";
-import { withDatabaseService } from "./service-middleware";
 import { createDatabaseEnvVarsCredential } from "./utils";
 
 interface CreateDatabase {
@@ -16,21 +14,15 @@ interface CreateDatabase {
   databaseName: string;
 }
 
-export const createDatabaseService = withDocker<DatabaseError | Dockerode.Service, CreateDatabase>(
+export const createDatabaseService = withDocker<Error | Dockerode.Service, CreateDatabase>(
   async (docker, input) => {
     if (!input) {
-      throw new DatabaseError({
-        name: "CREATE_DATABASE_ERROR",
-        message: MISSING_DATABASE_NAME_AND_IMAGE_ERROR_MESSAGE,
-      });
+      throw new Error(MISSING_DATABASE_NAME_AND_IMAGE_ERROR_MESSAGE);
     }
     const { databaseImage, databaseName } = input;
     const credentialsEnvVars = createDatabaseEnvVarsCredential(databaseImage);
     if (!credentialsEnvVars) {
-      throw new DatabaseError({
-        name: "CREATE_DATABASE_ERROR",
-        message: DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE,
-      });
+      throw new Error(DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE);
     }
     const database = await getDatabasePortAndCredsEnvVarByImage(databaseImage);
     const dbSpec = createDatabaseServiceSpec({
@@ -41,27 +33,40 @@ export const createDatabaseService = withDocker<DatabaseError | Dockerode.Servic
     });
     return await docker.createService(dbSpec)
       .catch((error) => {
-        throw new DatabaseError({
-          name: "CREATE_DATABASE_ERROR",
-          message: error instanceof Error ? error.message : "Unexpected error occurred while creating the database service.",
-        });
+        throw new Error(error instanceof Error ? error.message : "Unexpected error occurred while creating the database service.");
       });
   },
 );
 
-export const startDatabaseService = withDatabaseService(
+export const startDatabaseService = withSwarmService(
   async (dbService) => {
-    await dbService.update({ Spec: { Mode: { Replicated: { Replicas: DATABASE_INSTANCE_REPLICAS } } } });
+    const currentServiceSpec = await dbService.inspect();
+    await dbService.update({ ...currentServiceSpec.Spec, version: Number.parseInt(currentServiceSpec.Version.Index), Spec: {
+      Mode: {
+        Replicated: {
+          Replicas: DATABASE_INSTANCE_REPLICAS,
+        },
+      },
+    } });
   },
 );
 
-export const stopDatabaseService = withDatabaseService(
+export const stopDatabaseService = withSwarmService(
   async (dbService) => {
-    await dbService.update({ Spec: { Mode: { Replicated: { Replicas: 0 } } } });
+    const currentServiceSpec = await dbService.inspect();
+    await dbService.update(
+      { ...currentServiceSpec.Spec, version: Number.parseInt(currentServiceSpec.Version.Index), Spec: {
+        Mode: {
+          Replicated: {
+            Replicas: 0,
+          },
+        },
+      } },
+    );
   },
 );
 
-export const removeDatabaseService = withDatabaseService(
+export const removeDatabaseService = withSwarmService(
   async (dbService) => {
     await dbService.remove();
   },

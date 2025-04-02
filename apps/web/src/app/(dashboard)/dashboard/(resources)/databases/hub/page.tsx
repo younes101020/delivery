@@ -1,10 +1,10 @@
 "use cache";
 
 import { PageTitle } from "@/app/_components/ui/page-title";
+import { database } from "@/app/(dashboard)/dashboard/(resources)/databases/const";
 
 import { DatabaseCreateDialog } from "./_components/create-database-dialog";
 import { DatabaseCard } from "./_components/database-card";
-import { database } from "./const";
 
 export default async function DatabasesPage() {
   return (

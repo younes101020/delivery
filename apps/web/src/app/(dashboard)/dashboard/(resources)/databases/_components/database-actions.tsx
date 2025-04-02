@@ -16,11 +16,12 @@ import { startDatabaseService, stopDatabaseService } from "../actions";
 
 interface DatabaseActionsProps {
   initialState: string;
-  serviceName: string;
+  serviceId: string;
 }
 
-export function DatabaseActions({ initialState, serviceName }: DatabaseActionsProps) {
-  const { data } = useQuery<DatabaseStatusData>({ queryKey: [serviceName] });
+export function DatabaseActions({ initialState, serviceId }: DatabaseActionsProps) {
+  const { data } = useQuery<DatabaseStatusData>({ queryKey: [serviceId] });
+  console.log("DatabaseActions", data);
 
   if (data?.status === "completed" || !data || data.processName) {
     const isProcessingCompleted = data?.status === "completed";
@@ -30,13 +31,13 @@ export function DatabaseActions({ initialState, serviceName }: DatabaseActionsPr
     return (
       <>
         {canStopContainer && (
-          <StopButton serviceName={serviceName} className="text-xs">
+          <StopButton serviceId={serviceId} className="text-xs">
             <Ban className="stroke-destructive" />
             Shutdown
           </StopButton>
         )}
         {canStartContainer && (
-          <StartButton serviceName={serviceName} className="text-xs">
+          <StartButton serviceId={serviceId} className="text-xs">
             <Play className="stroke-primary" />
             Start
           </StartButton>
@@ -48,19 +49,19 @@ export function DatabaseActions({ initialState, serviceName }: DatabaseActionsPr
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
-  serviceName: string;
+  serviceId: string;
 }
 
 function StartButton({
   children,
   className,
-  serviceName,
+  serviceId,
 }: ButtonProps) {
   const initialInputs = {
-    serviceName,
+    serviceId,
   };
 
-  const [state, formAction, pending] = useActionState<ActionState<{ serviceName: string }>, FormData>(
+  const [state, formAction, pending] = useActionState<ActionState<{ serviceId: string }>, FormData>(
     startDatabaseService,
     {
       inputs: initialInputs,
@@ -69,7 +70,7 @@ function StartButton({
 
   return (
     <form>
-      <input type="hidden" name="containerId" value={serviceName} />
+      <input type="hidden" name="serviceId" value={serviceId} />
       <Button
         variant="outline"
         className={cn(className)}
@@ -95,13 +96,13 @@ function StartButton({
 function StopButton({
   children,
   className,
-  serviceName,
+  serviceId,
 }: ButtonProps) {
   const initialInputs = {
-    serviceName,
+    serviceId,
   };
 
-  const [state, formAction, pending] = useActionState<ActionState<{ serviceName: string }>, FormData>(
+  const [state, formAction, pending] = useActionState<ActionState<{ serviceId: string }>, FormData>(
     stopDatabaseService,
     {
       inputs: initialInputs,
@@ -110,7 +111,7 @@ function StopButton({
 
   return (
     <form>
-      <input type="hidden" name="containerId" value={serviceName} />
+      <input type="hidden" name="serviceId" value={serviceId} />
       <Button
         variant="outline"
         className={cn(className)}

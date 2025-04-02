@@ -7,16 +7,15 @@ import type { Database } from "@/db/dto";
 import type { ServicesDto } from "@/db/dto/services.dto";
 
 import { getDocker } from "@/lib/remote-docker";
-import { withDocker } from "@/lib/remote-docker/middleware";
+import { withDocker, withSwarmService } from "@/lib/remote-docker/middleware";
 import { toServiceSpec } from "@/lib/remote-docker/utils";
 import { generateRandomString } from "@/lib/utils";
 import { withRestApplicationService } from "@/routes/applications/lib/remote-docker/service-middleware";
 
 import { DATABASES_CONTAINER_NOT_FOUND_ERROR_MESSAGE, databasesName, DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE, NO_CONTAINER_SERVICE_ERROR_MESSAGE, UNSUPPORTED_DATABASES_ERROR_MESSAGE } from "./const";
 import { getDatabasePortAndCredsEnvVarByImage } from "./queries";
-import { withRestDatabaseService } from "./service-middleware";
 
-export const getDatabaseCredentialsEnvVarsByName = withRestDatabaseService(
+export const getDatabaseCredentialsEnvVarsByName = withSwarmService(
   async (dbService) => {
     const dbName = dbService.Spec?.Name;
     const databaseExist = assertNameIsDatabaseNameGuard(dbName);

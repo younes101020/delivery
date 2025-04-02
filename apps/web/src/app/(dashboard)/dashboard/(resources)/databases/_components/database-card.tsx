@@ -31,7 +31,7 @@ export function DatabaseCard({ name, id, createdAt, image, isActive }: DatabaseC
         </div>
 
         <div className="flex">
-          <DatabaseActions initialState={state} serviceName={name} />
+          <DatabaseActions initialState={state} serviceId={id} />
           <DatabaseOptions serviceName={name} />
         </div>
 

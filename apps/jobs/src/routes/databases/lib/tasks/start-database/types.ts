@@ -4,7 +4,7 @@ import type { MergeSubJobs } from "@/lib/tasks/types";
 
 export interface StartQueueDatabaseJobData {
   start: {
-    serviceName: string;
+    serviceId: string;
   };
 }
 

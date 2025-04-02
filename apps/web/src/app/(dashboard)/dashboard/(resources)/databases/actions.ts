@@ -6,14 +6,14 @@ import { client } from "@/app/_lib/client-http";
 import { validatedAction } from "@/app/_lib/form-middleware";
 
 const updateContainerStatusSchema = z.object({
-  serviceName: z.string(),
+  serviceId: z.string(),
 });
 
 export const stopDatabaseService = validatedAction(updateContainerStatusSchema, async (inputs) => {
-  const { serviceName } = inputs;
+  const { serviceId } = inputs;
 
-  const response = await client.databases[":name"].stop.$post({
-    param: { name: serviceName },
+  const response = await client.databases[":id"].stop.$post({
+    param: { id: serviceId },
   });
 
   if (response.status !== 202) {
@@ -24,10 +24,10 @@ export const stopDatabaseService = validatedAction(updateContainerStatusSchema, 
 });
 
 export const startDatabaseService = validatedAction(updateContainerStatusSchema, async (inputs) => {
-  const { serviceName } = inputs;
+  const { serviceId } = inputs;
 
-  const response = await client.databases[":name"].start.$post({
-    param: { name: serviceName },
+  const response = await client.databases[":id"].start.$post({
+    param: { id: serviceId },
   });
 
   if (response.status !== 202) {
@@ -37,9 +37,9 @@ export const startDatabaseService = validatedAction(updateContainerStatusSchema,
   return { success: "Container started", inputs };
 });
 
-export async function removeDatabaseService(serviceName: string) {
-  const response = await client.databases[":name"].$delete({
-    param: { name: serviceName },
+export async function removeDatabaseService(serviceId: string) {
+  const response = await client.databases[":id"].$delete({
+    param: { id: serviceId },
   });
 
   if (response.status !== 202) {

@@ -41,7 +41,7 @@ async function DatabaseList() {
   }
 
   return dbContainers.map(dbContainer => (
-    <DatabaseCard key={dbContainer.id} {...dbContainer} />
+    <DatabaseCard key={dbContainer.name} {...dbContainer} />
   ));
 }
 
