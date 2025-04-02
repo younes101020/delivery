@@ -1,6 +1,4 @@
-<div align="center">
-  <img src="https://github.com/user-attachments/assets/904f879b-1a7a-4f9c-8250-b595caf89dbb">
-</div>
+https://github.com/user-attachments/assets/6d9c58d7-800a-4699-ad08-c49bd4da7c14
 
 Self-hostable Coolify, Vercel, Heroku alternative focusing on one single thing:
 deploying your applications as simply as possible, without any vendor lock-in.
@@ -9,9 +7,19 @@ Delivery act as tiny wrapper around [Nixpacks](https://nixpacks.com/docs)
 allowing you to transform your github repository into a production-ready
 application.
 
-- **Technology stack**: BullMQ, NextJS, Tailwind, PostgreSQL, Hono
+- **Technology stack**: Hono + RPC, BullMQ, NextJS 15, ReactJS 19, Tailwind, ShadCN, PostgreSQL
 
 ---
+
+## Screenshots
+
+* Signin
+
+* Applications page
+  
+* Databases page
+
+* Databases hub page
 
 ## Contributor installation
 
