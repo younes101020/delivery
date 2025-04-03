@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { formatDate } from "@/app/_lib/utils";
 
 interface DatabaseDateProps {
-  date: number;
+  date: string;
 }
 
 export function DatabaseDate({ date }: DatabaseDateProps) {

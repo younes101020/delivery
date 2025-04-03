@@ -1,3 +1,5 @@
+export const DEFAULT_DATABASE_VERSION = "latest";
+
 export const database = [
   {
     label: "Postgres",

@@ -1,4 +1,5 @@
 import { z } from "@hono/zod-openapi";
+import { IdParamsSchema } from "stoker/openapi/schemas";
 
 import { servicesDto } from "./services.dto";
 
@@ -26,9 +27,7 @@ export const databaseLinkSchema = z.object({
   applicationName: z.string().describe("Name of the application to link the database to."),
 });
 
-export const DatabaseParamsSchema = z.object({
-  name: z.string(),
-}).describe("The database service name identifier.");
+export const DatabaseParamsSchema = IdParamsSchema.extend({ id: z.string() }).describe("The database swarm service id.");
 
 export type CreateDatabaseSchema = z.infer<typeof createDatabaseSchema>;
 export type DatabaseSchema = z.infer<typeof databaseSchema>;

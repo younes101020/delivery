@@ -7,6 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/app/_components/ui/dialog";
+import { DEFAULT_DATABASE_VERSION } from "@/app/(dashboard)/dashboard/(resources)/databases/const";
 
 import type { DatabaseType } from "./types";
 
@@ -17,8 +18,6 @@ interface DatabaseCreateDialogProps {
   triggerText: string;
   type: DatabaseType;
 }
-
-const DEFAULT_DATABASE_VERSION = "latest";
 
 export async function DatabaseCreateDialog({ triggerText, type }: DatabaseCreateDialogProps) {
   const versionsCombobox = await getVersionsComboboxOptions();

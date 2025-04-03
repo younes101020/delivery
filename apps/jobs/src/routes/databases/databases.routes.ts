@@ -61,7 +61,7 @@ export const streamCurrentDatabase = createRoute({
 });
 
 export const stop = createRoute({
-  path: "/databases/{name}/stop",
+  path: "/databases/{id}/stop",
   method: "post",
   description: "Stop a running database service.",
   request: {
@@ -77,7 +77,7 @@ export const stop = createRoute({
 });
 
 export const start = createRoute({
-  path: "/databases/{name}/start",
+  path: "/databases/{id}/start",
   method: "post",
   description: "Start a stopped database service.",
   request: {
@@ -93,7 +93,7 @@ export const start = createRoute({
 });
 
 export const remove = createRoute({
-  path: "/databases/{name}",
+  path: "/databases/{id}",
   method: "delete",
   description: "Remove a database service.",
   request: {
@@ -109,7 +109,7 @@ export const remove = createRoute({
 });
 
 export const link = createRoute({
-  path: "/databases/{name}/link",
+  path: "/databases/{id}/link",
   method: "post",
   description: "Link a database container to an application, the database url environment variable will be injected into the application.",
   request: {

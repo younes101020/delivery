@@ -46,23 +46,23 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
 };
 
 export const stop: AppRouteHandler<StopRoute> = async (c) => {
-  const { name } = c.req.valid("param");
+  const { id } = c.req.valid("param");
 
-  await stopDatabase(name);
+  await stopDatabase(id);
 
   return c.json(null, HttpStatusCodes.ACCEPTED);
 };
 
 export const start: AppRouteHandler<StartRoute> = async (c) => {
-  const { name } = c.req.valid("param");
-  await startDatabase(name);
+  const { id } = c.req.valid("param");
+  await startDatabase(id);
 
   return c.json(null, HttpStatusCodes.ACCEPTED);
 };
 
 export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
-  const { name } = c.req.valid("param");
-  await removeDatabase(name);
+  const { id } = c.req.valid("param");
+  await removeDatabase(id);
 
   return c.json(null, HttpStatusCodes.ACCEPTED);
 };
@@ -101,7 +101,7 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
         await stream.writeSSE({
           data: JSON.stringify({
             jobId,
-            serviceName: job?.data.serviceName,
+            serviceId: job?.data.serviceId,
             queueName,
             status: "active",
           }),
@@ -117,7 +117,7 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
         await stream.writeSSE({
           data: JSON.stringify({
             jobId,
-            serviceName: job?.data.serviceName,
+            serviceId: job?.data.serviceId,
             queueName,
             status: "completed",
           }),
@@ -134,7 +134,7 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
         await stream.writeSSE({
           data: JSON.stringify({
             jobId,
-            serviceName: job?.data.serviceName,
+            serviceName: job?.data.serviceId,
             queueName,
             status: "failed",
           }),
@@ -157,10 +157,10 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
 };
 
 export const link: AppRouteHandler<LinkRoute> = async (c) => {
-  const { name } = c.req.valid("param");
+  const { id } = c.req.valid("param");
   const { environmentKey, applicationName } = c.req.valid("json");
 
-  const dbCredentialsEnvVars = await getDatabaseCredentialsEnvVarsByName({ name: [name] });
+  const dbCredentialsEnvVars = await getDatabaseCredentialsEnvVarsByName(id);
 
   const postgresUserEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("POSTGRES_USER"));
   const postgresPasswordEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("POSTGRES_PASSWORD"));

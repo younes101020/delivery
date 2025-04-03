@@ -4,8 +4,8 @@ import { removeDatabaseService } from "@/routes/databases/lib/remote-docker/serv
 import type { RemoveQueueDatabaseJob } from "../types";
 
 export async function remove(job: RemoveQueueDatabaseJob<"remove">) {
-  const { serviceName } = job.data;
-  await removeDatabaseService({ name: [serviceName] })
+  const { serviceId } = job.data;
+  await removeDatabaseService(serviceId)
     .catch((error) => {
       throw new DatabaseError({
         name: "REMOVE_DATABASE_ERROR",

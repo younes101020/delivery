@@ -6,14 +6,14 @@ import { useState } from "react";
 import { Button } from "@/app/_components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/app/_components/ui/dropdown-menu";
 
-import { removeContainer } from "../actions";
+import { removeDatabaseService } from "../actions";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./../../../_components/ui/alert-dialog";
 
 interface ContainerOptionsProps {
-  containerId: string;
+  serviceName: string;
 };
 
-export function DatabaseOptions({ containerId }: ContainerOptionsProps) {
+export function DatabaseOptions({ serviceName }: ContainerOptionsProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -24,14 +24,14 @@ export function DatabaseOptions({ containerId }: ContainerOptionsProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem asChild>
-          <DeleteOption containerId={containerId} />
+          <DeleteOption serviceName={serviceName} />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
 
-function DeleteOption({ containerId }: ContainerOptionsProps) {
+function DeleteOption({ serviceName }: ContainerOptionsProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -51,7 +51,7 @@ function DeleteOption({ containerId }: ContainerOptionsProps) {
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction onClick={async () => {
             setIsLoading(true);
-            await removeContainer(containerId);
+            await removeDatabaseService(serviceName);
             setIsLoading(false);
             setIsDialogOpen(false);
           }}
