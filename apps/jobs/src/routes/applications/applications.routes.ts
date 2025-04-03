@@ -4,7 +4,8 @@ import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, SlugParamsSchema } from "stoker/openapi/schemas";
 
 import {
-  AppParamsSchema,
+  ApplicationParamsSchema,
+  ApplicationServiceParamsSchema,
   patchApplicationsSchema,
   selectApplicationsSchema,
   selectApplicationsSchemaWithSharedEnv,
@@ -48,11 +49,11 @@ export const streamCurrentApplication = createRoute({
 });
 
 export const stop = createRoute({
-  path: "/applications/{name}/stop",
+  path: "/applications/{id}/stop",
   method: "post",
   description: "Stop a running application.",
   request: {
-    params: AppParamsSchema,
+    params: ApplicationServiceParamsSchema,
   },
   tags,
   responses: {
@@ -64,11 +65,11 @@ export const stop = createRoute({
 });
 
 export const start = createRoute({
-  path: "/applications/{name}/start",
+  path: "/applications/{id}/start",
   method: "post",
   description: "Start a stopped application container.",
   request: {
-    params: AppParamsSchema,
+    params: ApplicationServiceParamsSchema,
   },
   tags,
   responses: {
@@ -83,7 +84,7 @@ export const getOne = createRoute({
   path: "/applications/{name}",
   method: "get",
   request: {
-    params: AppParamsSchema,
+    params: ApplicationParamsSchema,
   },
   tags,
   responses: {
@@ -103,7 +104,7 @@ export const patch = createRoute({
   path: "/applications/{name}",
   method: "patch",
   request: {
-    params: AppParamsSchema,
+    params: ApplicationParamsSchema,
     body: jsonContentRequired(patchApplicationsSchema, "The application updates"),
   },
   tags,
@@ -124,7 +125,7 @@ export const remove = createRoute({
   path: "/applications/{name}",
   method: "delete",
   request: {
-    params: AppParamsSchema,
+    params: ApplicationParamsSchema,
   },
   tags,
   responses: {

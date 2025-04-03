@@ -6,9 +6,9 @@ import { client } from "@/app/_lib/client-http";
 export async function getApplicationByName(name: string) {
   "use cache";
   unstable_cacheTag(`application-${name}`);
-  const response = await client.applications[":slug"].$get({
+  const response = await client.applications[":name"].$get({
     param: {
-      slug: name,
+      name,
     },
   });
   if (response.status !== 200) {
@@ -48,7 +48,7 @@ export async function getRunningDatabases() {
     return null;
   }
   const dbs = await response.json();
-  return dbs.filter(db => db.state === "running").map(db => ({
+  return dbs.filter(db => db.isActive).map(db => ({
     id: db.id,
     name: db.name,
   }));

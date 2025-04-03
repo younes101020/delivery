@@ -175,7 +175,7 @@ export const link: AppRouteHandler<LinkRoute> = async (c) => {
 
   await Promise.all([
     patchApplication(applicationName, { applicationData: {}, environmentVariable: [{ key: environmentKey, value: databaseUrl }] }),
-    addEnvironmentVariableToAppService({ name: [applicationName] }, `${environmentKey}=${databaseUrl}`),
+    addEnvironmentVariableToAppService(id, `${environmentKey}=${databaseUrl}`),
   ]);
 
   return c.json(null, HttpStatusCodes.OK);

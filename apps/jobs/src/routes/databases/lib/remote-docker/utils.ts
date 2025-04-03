@@ -10,7 +10,6 @@ import { getDocker } from "@/lib/remote-docker";
 import { withDocker, withSwarmService } from "@/lib/remote-docker/middleware";
 import { toServiceSpec } from "@/lib/remote-docker/utils";
 import { generateRandomString } from "@/lib/utils";
-import { withRestApplicationService } from "@/routes/applications/lib/remote-docker/service-middleware";
 
 import { DATABASES_CONTAINER_NOT_FOUND_ERROR_MESSAGE, databasesName, DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE, NO_CONTAINER_SERVICE_ERROR_MESSAGE, UNSUPPORTED_DATABASES_ERROR_MESSAGE } from "./const";
 import { getDatabasePortAndCredsEnvVarByImage } from "./queries";
@@ -48,7 +47,7 @@ export async function getDatabaseEnvVarsByEnvVarKeys(containerId: string, envVar
   return envVars.filter(envVar => envVarKey.some(key => envVar.includes(key)));
 }
 
-export const addEnvironmentVariableToAppService = withRestApplicationService<string, void>(
+export const addEnvironmentVariableToAppService = withSwarmService(
   async (appService, plainEnv) => {
     const container = appService.Spec?.TaskTemplate as Dockerode.ContainerTaskSpec;
     const currentEnvs = typeof container.ContainerSpec?.Env === "object" ? container.ContainerSpec.Env : [];

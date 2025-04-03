@@ -10,11 +10,11 @@ export function withDocker<T, K>(fn: (docker: Dockerode, args?: K) => Promise<T>
   };
 }
 
-export function withSwarmService<T>(
-  cb: (dbServices: Dockerode.Service) => Promise<T>,
+export function withSwarmService<T, V>(
+  cb: (dbServices: Dockerode.Service, args?: V) => Promise<T>,
 ) {
-  return async (databaseServiceId: string) => {
+  return async (databaseServiceId: string, args?: V) => {
     const swarmService = await getSwarmServiceById(databaseServiceId);
-    return cb(swarmService);
+    return cb(swarmService, args);
   };
 }

@@ -4,8 +4,8 @@ import { stopApplicationService } from "@/routes/applications/lib/remote-docker/
 import type { StopQueueApplicationJob } from "../types";
 
 export async function stop(job: StopQueueApplicationJob<"stop">) {
-  const { serviceName: applicationName } = job.data;
-  await stopApplicationService({ name: [applicationName] })
+  const { serviceId } = job.data;
+  await stopApplicationService(serviceId)
     .catch((error) => {
       throw new ApplicationError({
         name: "STOP_APP_ERROR",
