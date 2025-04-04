@@ -27,8 +27,8 @@ export const editApplication = validatedAction(
   async (data, _, prevState) => {
     const changes = getFormChangesAction(data, prevState);
     const { environmentVariables, ...applicationData } = changes;
-    const response = await client.applications[":slug"].$patch({
-      param: { slug: changes.name },
+    const response = await client.applications[":name"].$patch({
+      param: { name: changes.name },
       json: {
         applicationData,
         environmentVariable: transformEnvVars(environmentVariables),
@@ -45,10 +45,9 @@ export const editApplication = validatedAction(
   },
 );
 
-export async function removeApplication(name: string, containerId: string, redirectToList: boolean) {
-  const response = await client.applications[":id"].$delete({
-    param: { slug: name },
-    json: { containerId },
+export async function removeApplication(name: string, redirectToList: boolean) {
+  const response = await client.applications[":name"].$delete({
+    param: { name },
   });
   if (response.status !== 204) {
     return {
@@ -64,35 +63,35 @@ export async function removeApplication(name: string, containerId: string, redir
 }
 
 const updateApplicationStateSchema = z.object({
-  applicationName: z.string(),
+  serviceId: z.string(),
 });
 
 export const stopApplication = validatedAction(updateApplicationStateSchema, async (inputs) => {
-  const { applicationName } = inputs;
+  const { serviceId } = inputs;
 
-  const response = await client.applications[":name"].stop.$post({
-    param: { name: applicationName },
+  const response = await client.applications[":id"].stop.$post({
+    param: { id: serviceId },
   });
 
   if (response.status !== 202) {
-    return { error: "Unable to stop the container", inputs };
+    return { error: "Unable to stop the service", inputs };
   }
 
-  return { success: "Container stopped", inputs };
+  return { success: "Service stopped", inputs };
 });
 
 export const startApplication = validatedAction(updateApplicationStateSchema, async (inputs) => {
-  const { applicationName } = inputs;
+  const { serviceId } = inputs;
 
-  const response = await client.applications[":name"].start.$post({
-    param: { name: applicationName },
+  const response = await client.applications[":id"].start.$post({
+    param: { id: serviceId },
   });
 
   if (response.status !== 202) {
-    return { error: "Unable to start the container", inputs };
+    return { error: "Unable to start the service", inputs };
   }
 
-  return { success: "Container started", inputs };
+  return { success: "Service started", inputs };
 });
 
 export async function redeploy(applicationName: string) {
