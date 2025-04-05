@@ -3,11 +3,29 @@ import { toServiceSpec } from "@/lib/remote-docker/utils";
 import { APPLICATION_INSTANCE_REPLICAS } from "@/routes/applications/lib/remote-docker/const";
 
 export const startApplicationService = withSwarmService(async (appServices) => {
-  await appServices.update({ Spec: { Mode: { Replicated: { Replicas: APPLICATION_INSTANCE_REPLICAS } } } });
+  const currentServiceSpec = await appServices.inspect();
+  await appServices.update(
+    { ...currentServiceSpec.Spec, version: Number.parseInt(currentServiceSpec.Version.Index), Spec: {
+      Mode: {
+        Replicated: {
+          Replicas: APPLICATION_INSTANCE_REPLICAS,
+        },
+      },
+    } },
+  );
 });
 
 export const stopApplicationService = withSwarmService(async (appService) => {
-  await appService.update({ Spec: { Mode: { Replicated: { Replicas: 0 } } } });
+  const currentServiceSpec = await appService.inspect();
+  await appService.update(
+    { ...currentServiceSpec.Spec, version: Number.parseInt(currentServiceSpec.Version.Index), Spec: {
+      Mode: {
+        Replicated: {
+          Replicas: 0,
+        },
+      },
+    } },
+  );
 });
 
 export const removeApplicationService = withSwarmService(async (appService) => {
