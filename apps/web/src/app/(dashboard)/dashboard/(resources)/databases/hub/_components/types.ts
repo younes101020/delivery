@@ -1,4 +1,4 @@
-import type { database } from "../const";
+import type { database } from "../../const";
 
 export type DatabaseType = (typeof database)[number]["value"];
 
