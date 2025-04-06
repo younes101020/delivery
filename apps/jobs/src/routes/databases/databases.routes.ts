@@ -4,7 +4,9 @@ import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema } from "stoker/openapi/schemas";
 
 import { createDatabaseSchema, databaseLinkSchema, DatabaseParamsSchema, databaseSchema } from "@/db/dto/databases.dto";
-import { internalServerSchema, notFoundSchema } from "@/lib/constants";
+import { badRequestSchema, internalServerSchema, notFoundSchema } from "@/lib/constants";
+
+import { DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE, NO_CONTAINER_SERVICE_ERROR_MESSAGE, UNSUPPORTED_DATABASES_ERROR_MESSAGE } from "./lib/remote-docker/const";
 
 const tags = ["Databases"];
 
@@ -122,7 +124,8 @@ export const link = createRoute({
       description: "Database service linked to the application",
     },
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Database service not found"),
-    [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(internalServerSchema, "Application target service not found"),
+    [HttpStatusCodes.BAD_REQUEST]: jsonContent(badRequestSchema, UNSUPPORTED_DATABASES_ERROR_MESSAGE),
+    [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(internalServerSchema, `${NO_CONTAINER_SERVICE_ERROR_MESSAGE}, ${DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE}`),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(
         z.object({
