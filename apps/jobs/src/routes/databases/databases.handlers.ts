@@ -13,7 +13,7 @@ import { getJobAndQueueNameByJobId } from "@/lib/tasks/utils";
 import type { CreateRoute, LinkRoute, ListRoute, RemoveRoute, StartRoute, StopRoute, StreamCurrentDatabaseRoute } from "./databases.routes";
 import type { AllQueueDatabaseJobsData } from "./lib/tasks/types";
 
-import { addEnvironmentVariableToAppService, getDatabaseCredentialsEnvVarsByName, listDatabaseServicesSpec } from "./lib/remote-docker/utils";
+import { addEnvironmentVariableToAppService, buildDatabaseUriFromEnvVars, getDbCredentialsEnvVarsAndDatabaseByServiceId, listDatabaseServicesSpec } from "./lib/remote-docker/utils";
 import { PREFIX } from "./lib/tasks/const";
 import { createDatabase } from "./lib/tasks/create-database";
 import { removeDatabase } from "./lib/tasks/remove-database";
@@ -160,22 +160,13 @@ export const link: AppRouteHandler<LinkRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const { environmentKey, applicationName } = c.req.valid("json");
 
-  const dbCredentialsEnvVars = await getDatabaseCredentialsEnvVarsByName(id);
+  const { credentialsEnvVars, database } = await getDbCredentialsEnvVarsAndDatabaseByServiceId(id);
 
-  const postgresUserEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("POSTGRES_USER"));
-  const postgresPasswordEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("POSTGRES_PASSWORD"));
-
-  const postgresUser = postgresUserEnv?.split("=")[1];
-  const postgresPassword = postgresPasswordEnv?.split("=")[1];
-
-  if (!postgresUser || !postgresPassword)
-    return c.json({ error: "Unable to link database" }, HttpStatusCodes.BAD_REQUEST);
-
-  const databaseUrl = `postgres://${postgresUser}:${postgresPassword}@localhost:5432`;
+  const databaseUri = buildDatabaseUriFromEnvVars(credentialsEnvVars, database);
 
   await Promise.all([
-    patchApplication(applicationName, { applicationData: {}, environmentVariable: [{ key: environmentKey, value: databaseUrl }] }),
-    addEnvironmentVariableToAppService(id, `${environmentKey}=${databaseUrl}`),
+    patchApplication(applicationName, { applicationData: {}, environmentVariable: [{ key: environmentKey, value: databaseUri! }] }),
+    addEnvironmentVariableToAppService(id, `${environmentKey}=${databaseUri}`),
   ]);
 
   return c.json(null, HttpStatusCodes.OK);

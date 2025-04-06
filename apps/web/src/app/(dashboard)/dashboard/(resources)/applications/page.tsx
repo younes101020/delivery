@@ -37,7 +37,7 @@ export default async function ApplicationsPage() {
 }
 
 async function ApplicationList() {
-  const [applications, dbContainers] = await Promise.all([getApplications(), getActiveDatabaseServices()]);
+  const [applications, dbServices] = await Promise.all([getApplications(), getActiveDatabaseServices()]);
   if (!applications || applications.length < 1)
     return <NoApplications />;
   return (
@@ -49,7 +49,7 @@ async function ApplicationList() {
           name={application.name}
           initialState={application.isActive ? "running" : "stop"}
           firstDeploymentAt={formatDate(application.createdAt) ?? "Unknown"}
-          databases={dbContainers}
+          databases={dbServices}
         />
       ))}
       <NewAppCard />

@@ -13,7 +13,7 @@ export const databases = [
   },
   {
     image: "redis",
-    databaseCredentialsEnvVar: ["REDIS_PASSWORD"],
+    databaseCredentialsEnvVar: ["REDIS_PASSWORD", "REDIS_USER"],
     port: 6379,
   },
   {

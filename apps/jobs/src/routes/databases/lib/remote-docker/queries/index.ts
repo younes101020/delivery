@@ -19,3 +19,11 @@ export const getDatabasePortAndCredsEnvVarByImage = withCache<DatabaseData>(asyn
 
   return database;
 });
+
+export const getDatabasesName = withCache<string[]>(async () => {
+  const databasesName = await db.select({
+    databasesName: databases.image,
+  }).from(databases);
+
+  return databasesName.map(db => db.databasesName);
+});

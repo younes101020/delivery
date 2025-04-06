@@ -12,6 +12,7 @@ export const ZOD_ERROR_CODES = {
 };
 
 export const notFoundSchema = createMessageObjectSchema(HttpStatusPhrases.NOT_FOUND);
+export const badRequestSchema = createMessageObjectSchema(HttpStatusPhrases.BAD_REQUEST);
 export const unauthorizedSchema = createMessageObjectSchema(HttpStatusPhrases.UNAUTHORIZED);
 export const goneSchema = createMessageObjectSchema(HttpStatusPhrases.GONE);
 export const internalServerSchema = createMessageObjectSchema(HttpStatusPhrases.INTERNAL_SERVER_ERROR);
