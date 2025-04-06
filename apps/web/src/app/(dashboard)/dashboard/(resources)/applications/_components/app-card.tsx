@@ -35,8 +35,8 @@ export function AppCard({ name, firstDeploymentAt, id, initialState, databases }
           </div>
 
           <div className="flex">
-            <ApplicationActions applicationName={name} initialState={initialState} />
-            <AppOptions containerId={id} applicationName={name} />
+            <ApplicationActions serviceId={id} initialState={initialState} />
+            <AppOptions applicationName={name} />
           </div>
 
         </div>

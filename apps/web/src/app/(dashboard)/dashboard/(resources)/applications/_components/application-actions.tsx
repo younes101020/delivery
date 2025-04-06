@@ -16,11 +16,11 @@ import { startApplication, stopApplication } from "../actions";
 
 interface DatabaseActionsProps {
   initialState: string;
-  applicationName: string;
+  serviceId: string;
 }
 
-export function ApplicationActions({ initialState, applicationName }: DatabaseActionsProps) {
-  const { data } = useQuery<ApplicationStatusData>({ queryKey: [applicationName] });
+export function ApplicationActions({ initialState, serviceId }: DatabaseActionsProps) {
+  const { data } = useQuery<ApplicationStatusData>({ queryKey: [serviceId] });
 
   if (data?.status === "completed" || !data || data.processName) {
     const isProcessingCompleted = data?.status === "completed";
@@ -30,13 +30,13 @@ export function ApplicationActions({ initialState, applicationName }: DatabaseAc
     return (
       <>
         {canStopContainer && (
-          <StopButton applicationName={applicationName} className="text-xs">
+          <StopButton serviceId={serviceId} className="text-xs">
             <Ban className="stroke-destructive" />
             Shutdown
           </StopButton>
         )}
         {canStartContainer && (
-          <StartButton applicationName={applicationName} className="text-xs">
+          <StartButton serviceId={serviceId} className="text-xs">
             <Play className="stroke-primary" />
             Start
           </StartButton>
@@ -48,19 +48,19 @@ export function ApplicationActions({ initialState, applicationName }: DatabaseAc
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
-  applicationName: string;
+  serviceId: string;
 }
 
 function StartButton({
   children,
   className,
-  applicationName,
+  serviceId,
 }: ButtonProps) {
   const initialInputs = {
-    applicationName,
+    serviceId,
   };
 
-  const [state, formAction, pending] = useActionState<ActionState<{ applicationName: string }>, FormData>(
+  const [state, formAction, pending] = useActionState<ActionState<{ serviceId: string }>, FormData>(
     startApplication,
     {
       inputs: initialInputs,
@@ -69,7 +69,7 @@ function StartButton({
 
   return (
     <form>
-      <input type="hidden" name="applicationName" value={applicationName} />
+      <input type="hidden" name="serviceId" value={serviceId} />
       <Button
         variant="outline"
         className={cn(className)}
@@ -95,13 +95,13 @@ function StartButton({
 function StopButton({
   children,
   className,
-  applicationName,
+  serviceId,
 }: ButtonProps) {
   const initialInputs = {
-    applicationName,
+    serviceId,
   };
 
-  const [state, formAction, pending] = useActionState<ActionState<{ applicationName: string }>, FormData>(
+  const [state, formAction, pending] = useActionState<ActionState<{ serviceId: string }>, FormData>(
     stopApplication,
     {
       inputs: initialInputs,
@@ -110,7 +110,7 @@ function StopButton({
 
   return (
     <form>
-      <input type="hidden" name="applicationName" value={applicationName} />
+      <input type="hidden" name="serviceId" value={serviceId} />
       <Button
         variant="outline"
         className={cn(className)}

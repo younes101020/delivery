@@ -7,11 +7,12 @@ import { EmptyState } from "@/app/_components/ui/empty-state";
 import { PageTitle } from "@/app/_components/ui/page-title";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { formatDate } from "@/app/_lib/utils";
+import { getActiveDatabaseServices } from "@/app/(dashboard)/dashboard/(resources)/databases/_lib/queries";
 
 import { AppCard } from "./_components/app-card";
 import { NewAppCard } from "./_components/new-app-card";
 import { SubscribeToSSE } from "./_components/subscribe-to-sse";
-import { getApplications, getRunningDatabaseContainers } from "./_lib/queries";
+import { getApplications } from "./_lib/queries";
 
 export default async function ApplicationsPage() {
   return (
@@ -36,7 +37,7 @@ export default async function ApplicationsPage() {
 }
 
 async function ApplicationList() {
-  const [applications, dbContainers] = await Promise.all([getApplications(), getRunningDatabaseContainers()]);
+  const [applications, dbContainers] = await Promise.all([getApplications(), getActiveDatabaseServices()]);
   if (!applications || applications.length < 1)
     return <NoApplications />;
   return (
@@ -46,7 +47,7 @@ async function ApplicationList() {
           key={application.id}
           id={application.id}
           name={application.name}
-          initialState={application.state}
+          initialState={application.isActive ? "running" : "stop"}
           firstDeploymentAt={formatDate(application.createdAt) ?? "Unknown"}
           databases={dbContainers}
         />

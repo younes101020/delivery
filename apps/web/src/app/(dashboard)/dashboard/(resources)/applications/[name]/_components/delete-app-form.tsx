@@ -18,10 +18,9 @@ import { removeApplication } from "../../actions";
 
 interface DeleteAppProps {
   name: string;
-  containerId: string;
 }
 
-export default function DeleteAppForm({ name, containerId }: DeleteAppProps) {
+export default function DeleteAppForm({ name }: DeleteAppProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -47,7 +46,7 @@ export default function DeleteAppForm({ name, containerId }: DeleteAppProps) {
             disabled={isLoading}
             onClick={async () => {
               setIsLoading(true);
-              await removeApplication(name, containerId, true);
+              await removeApplication(name, true);
             }}
           >
             {isLoading

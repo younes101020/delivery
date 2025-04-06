@@ -5,10 +5,6 @@ import type { ServicesDto } from "@/db/dto/services.dto";
 import { withDocker } from "@/lib/remote-docker/middleware";
 import { toServiceSpec } from "@/lib/remote-docker/utils";
 
-import { withApplicationsServices } from "./service-middleware";
-
-export const getApplicationService = withApplicationsServices(async appServices => appServices);
-
 export const listApplicationServicesSpec = withDocker<ServicesDto[], Dockerode.ServiceListOptions | undefined>(
   async (docker, opts) => {
     const inputFilters = opts && typeof opts.filters === "object" ? opts.filters : {};

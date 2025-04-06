@@ -9,3 +9,12 @@ export async function getDatabaseService() {
   }
   return await response.json();
 }
+
+export async function getActiveDatabaseServices() {
+  const response = await client.databases.$get();
+  if (response.status !== 200) {
+    return null;
+  }
+  const data = await response.json();
+  return data.filter(service => service.isActive);
+}

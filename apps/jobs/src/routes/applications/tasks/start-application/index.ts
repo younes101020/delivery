@@ -8,9 +8,9 @@ import { getStartDatabaseQueue, queueName } from "./utils";
 
 const PROCESSOR_FILE = join(dirname(fileURLToPath(import.meta.url)), "../worker.ts");
 
-export async function startApplication(serviceName: string) {
+export async function startApplication(serviceId: string) {
   subscribeWorkerTo(queueName, PREFIX, PROCESSOR_FILE);
 
   const startDbQueue = getStartDatabaseQueue();
-  await startDbQueue.add(queueName, { serviceName });
+  await startDbQueue.add(queueName, { serviceId });
 }

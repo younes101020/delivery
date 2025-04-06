@@ -1,5 +1,7 @@
+import type { StatusCode } from "hono/utils/http-status";
 import type { Buffer } from "node:buffer";
 
+import { HTTPException } from "hono/http-exception";
 import { streamSSE } from "hono/streaming";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
@@ -13,6 +15,7 @@ import {
 } from "@/db/queries/queries";
 import { APPLICATIONS_PATH, ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
 import { getDockerResourceEvents } from "@/lib/remote-docker";
+import { getSwarmServiceByName } from "@/lib/remote-docker/utils";
 import { ssh } from "@/lib/ssh";
 import { getJobAndQueueNameByJobId } from "@/lib/tasks/utils";
 
@@ -28,7 +31,6 @@ import type {
 import type { AllQueueApplicationJobsData } from "./tasks/types";
 
 import { deleteDeploymentJobs } from "../deployments/lib/tasks/deploy/utils";
-import { getApplicationServiceSpec } from "./lib/remote-docker/service-tasks";
 import { listApplicationServicesSpec } from "./lib/remote-docker/utils";
 import { PREFIX, queueNames } from "./tasks/const";
 import { removeApplicationResource } from "./tasks/remove-application";
@@ -55,16 +57,17 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
 };
 
 export const stop: AppRouteHandler<StopRoute> = async (c) => {
-  const { name } = c.req.valid("param");
+  const { id } = c.req.valid("param");
 
-  await stopApplication(name);
+  await stopApplication(id);
 
   return c.json(null, HttpStatusCodes.ACCEPTED);
 };
 
 export const start: AppRouteHandler<StartRoute> = async (c) => {
-  const { name } = c.req.valid("param");
-  await startApplication(name);
+  const { id } = c.req.valid("param");
+
+  await startApplication(id);
 
   return c.json(null, HttpStatusCodes.ACCEPTED);
 };
@@ -103,7 +106,7 @@ export const streamCurrentApplication: AppRouteHandler<StreamCurrentApplicationR
         await stream.writeSSE({
           data: JSON.stringify({
             jobId,
-            serviceName: job?.data.serviceName,
+            serviceId: job?.data.serviceId,
             queueName,
             status: "active",
           }),
@@ -119,7 +122,7 @@ export const streamCurrentApplication: AppRouteHandler<StreamCurrentApplicationR
         await stream.writeSSE({
           data: JSON.stringify({
             jobId,
-            containerId: job?.data.serviceName,
+            serviceId: job?.data.serviceId,
             queueName,
             status: "completed",
           }),
@@ -136,7 +139,7 @@ export const streamCurrentApplication: AppRouteHandler<StreamCurrentApplicationR
         await stream.writeSSE({
           data: JSON.stringify({
             jobId,
-            containerId: job?.data.serviceName,
+            serviceId: job?.data.serviceId,
             queueName,
             status: "failed",
           }),
@@ -160,8 +163,9 @@ export const streamCurrentApplication: AppRouteHandler<StreamCurrentApplicationR
 
 export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   const { name } = c.req.valid("param");
-  const [application, appService] = await Promise.all([getApplicationWithEnvVarsByName(name), getApplicationServiceSpec({ name: [name] })]);
-  if (!application || !appService) {
+  const [application, applicationService] = await Promise.all([getApplicationWithEnvVarsByName(name), getSwarmServiceByName(name)]);
+
+  if (!application) {
     return c.json(
       {
         message: HttpStatusPhrases.NOT_FOUND,
@@ -173,7 +177,7 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   return c.json(
     {
       ...application,
-      containerId: appService.id,
+      serviceId: applicationService.id,
       environmentVariables: application.applicationEnvironmentVariables.map(ev => ({
         id: ev.environmentVariable.id,
         key: ev.environmentVariable.key,
@@ -233,8 +237,19 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
 export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
   const { name } = c.req.valid("param");
 
+  const applicationService = await getSwarmServiceByName(name)
+    .catch((error) => {
+      if (error instanceof Error) {
+        const errorResponse = error instanceof HTTPException && error.getResponse();
+        if (!errorResponse || HttpStatusCodes.NOT_FOUND !== errorResponse.status) {
+          const errorCode = (errorResponse ? errorResponse.status : HttpStatusCodes.INTERNAL_SERVER_ERROR) as StatusCode;
+          throw new HTTPException(errorCode, { message: error.message });
+        }
+      }
+    });
+
   await Promise.all([
-    removeApplicationResource(name),
+    ...(applicationService ? [removeApplicationResource(applicationService.id)] : []),
     deleteApplicationByName(name),
     ssh(
       `rm -Rvf ${name}`,

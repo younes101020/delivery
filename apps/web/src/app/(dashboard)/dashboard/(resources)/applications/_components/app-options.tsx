@@ -11,12 +11,11 @@ import { redeploy, removeApplication } from "../actions";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./../../../_components/ui/alert-dialog";
 
 interface ContainerOptionsProps {
-  containerId: string;
   applicationName: string;
   setIsDropdownOpen?: (isOpen: boolean) => void;
 };
 
-export function AppOptions({ applicationName, containerId }: ContainerOptionsProps) {
+export function AppOptions({ applicationName }: ContainerOptionsProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -48,13 +47,13 @@ export function AppOptions({ applicationName, containerId }: ContainerOptionsPro
               )}
         </DropdownMenuItem>
         <Separator />
-        <DeleteOption applicationName={applicationName} containerId={containerId} setIsDropdownOpen={setIsDropdownOpen} />
+        <DeleteOption applicationName={applicationName} setIsDropdownOpen={setIsDropdownOpen} />
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
 
-function DeleteOption({ applicationName, containerId, setIsDropdownOpen }: ContainerOptionsProps) {
+function DeleteOption({ applicationName, setIsDropdownOpen }: ContainerOptionsProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -75,7 +74,7 @@ function DeleteOption({ applicationName, containerId, setIsDropdownOpen }: Conta
           <AlertDialogAction
             onClick={async () => {
               setIsLoading(true);
-              await removeApplication(applicationName, containerId, false);
+              await removeApplication(applicationName, false);
               setIsLoading(false);
               setIsDialogOpen(false);
               setIsDropdownOpen && setIsDropdownOpen(false);

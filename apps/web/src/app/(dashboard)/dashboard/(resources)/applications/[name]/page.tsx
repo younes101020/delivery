@@ -153,7 +153,7 @@ async function DeleteApp({ name }: AppProps) {
   if (!application)
     redirect("/dashboard/applications");
 
-  return <DeleteAppForm name={application.name} containerId={application.containerId} />;
+  return <DeleteAppForm name={application.name} />;
 }
 
 function GetApplicationLoadingScreen() {

@@ -1,20 +1,20 @@
 import { DeploymentError } from "@/lib/error";
-import { getApplicationService } from "@/routes/applications/lib/remote-docker/utils";
-
-import { NO_APPLICATION_SERVICE_ERROR_MESSAGE } from "./const";
+import { getSwarmServiceByName } from "@/lib/remote-docker/utils";
 
 export async function synchroniseApplicationServiceWithLocalImage(targetApplicationServiceName: string) {
-  const applicationService = await getApplicationService({ name: [targetApplicationServiceName] });
-
-  if (!applicationService) {
-    throw new DeploymentError({
-      name: "DEPLOYMENT_APP_ERROR",
-      message: NO_APPLICATION_SERVICE_ERROR_MESSAGE,
+  const applicationService = await getSwarmServiceByName(targetApplicationServiceName)
+    .catch((error) => {
+      throw new DeploymentError({
+        name: "DEPLOYMENT_APP_ERROR",
+        message: error instanceof Error ? error.message : "Unexpected error occurred while fetching the application service.",
+      });
     });
-  }
+
+  const currentServiceSpec = await applicationService.inspect();
 
   await applicationService.update({
     ...applicationService.Spec,
+    version: Number.parseInt(currentServiceSpec.Version.Index),
     TaskTemplate: {
       ...applicationService.Spec?.TaskTemplate,
       ForceUpdate: 1,

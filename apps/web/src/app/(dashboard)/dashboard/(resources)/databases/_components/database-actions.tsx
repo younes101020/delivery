@@ -21,7 +21,6 @@ interface DatabaseActionsProps {
 
 export function DatabaseActions({ initialState, serviceId }: DatabaseActionsProps) {
   const { data } = useQuery<DatabaseStatusData>({ queryKey: [serviceId] });
-  console.log("DatabaseActions", data);
 
   if (data?.status === "completed" || !data || data.processName) {
     const isProcessingCompleted = data?.status === "completed";
