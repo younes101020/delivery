@@ -9,7 +9,7 @@ import { it } from "./fixtures";
 const client = testClient(createApp().route("/", router));
 
 describe("application routes / integration test", () => {
-  it("patch /applications/{slug} return application info when payload is submited", async ({ applicationName }) => {
+  it("patch /applications/{name} return application info when payload is submited", async ({ applicationName }) => {
     const newPort = 7458;
     const response = await client.applications[":name"].$patch(
       {

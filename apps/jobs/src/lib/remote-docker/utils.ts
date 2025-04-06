@@ -3,7 +3,7 @@ import type Dockerode from "dockerode";
 import { HTTPException } from "hono/http-exception";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
-import { withDocker } from "./middleware";
+import { getDocker } from ".";
 
 export function toServiceSpec(service: Dockerode.Service) {
   const taskTemplate = service.Spec?.TaskTemplate as Dockerode.ContainerTaskSpec;
@@ -16,6 +16,13 @@ export function toServiceSpec(service: Dockerode.Service) {
     isActive: serviceInstanceCount > 0,
     isProcessing: false,
     createdAt: service.CreatedAt!,
+  };
+}
+
+export function withDocker<T, K>(fn: (docker: Dockerode, args?: K) => Promise<T>) {
+  return async (args?: K) => {
+    const docker = await getDocker();
+    return fn(docker, args);
   };
 }
 
