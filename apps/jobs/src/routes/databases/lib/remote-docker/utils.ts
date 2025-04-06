@@ -11,28 +11,27 @@ import { withDocker, withSwarmService } from "@/lib/remote-docker/middleware";
 import { toServiceSpec } from "@/lib/remote-docker/utils";
 import { generateRandomString } from "@/lib/utils";
 
-import { DATABASES_CONTAINER_NOT_FOUND_ERROR_MESSAGE, databasesName, DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE, NO_CONTAINER_SERVICE_ERROR_MESSAGE, UNSUPPORTED_DATABASES_ERROR_MESSAGE } from "./const";
-import { getDatabasePortAndCredsEnvVarByImage } from "./queries";
-
-export const getDatabaseCredentialsEnvVarsByName = withSwarmService(
-  async (dbService) => {
-    const dbName = dbService.Spec?.Name;
     const databaseExist = assertNameIsDatabaseNameGuard(dbName);
     if (!databaseExist)
-      throw new Error(UNSUPPORTED_DATABASES_ERROR_MESSAGE);
+import { DATABASES_CONTAINER_NOT_FOUND_ERROR_MESSAGE, DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE, NO_CONTAINER_SERVICE_ERROR_MESSAGE, UNSUPPORTED_DATABASES_ERROR_MESSAGE } from "./const";
+import { getDatabasePortAndCredsEnvVarByImage, getDatabasesName } from "./queries";
 
-    const database = await getDatabasePortAndCredsEnvVarByImage(dbName);
-    const taskTemplate = dbService.Spec?.TaskTemplate;
-    const containerSpecExist = assertTaskTemplateIsContainerTaskSpecGuard(taskTemplate);
-    if (!containerSpecExist)
-      throw new Error(NO_CONTAINER_SERVICE_ERROR_MESSAGE);
+export const getDatabaseCredentialsEnvVarsByName = withSwarmService(async (dbService) => {
+  const dbName = dbService.Spec?.Name;
+    throw new HTTPException(HttpStatusCodes.BAD_REQUEST, { message: UNSUPPORTED_DATABASES_ERROR_MESSAGE });
 
-    const envVars = taskTemplate.ContainerSpec?.Env;
-    if (!envVars || envVars.length === 0)
-      throw new Error(DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE);
+  const database = await getDatabasePortAndCredsEnvVarByImage(dbName);
+  const taskTemplate = dbService.Spec?.TaskTemplate;
+  const containerSpecExist = assertTaskTemplateIsContainerTaskSpecGuard(taskTemplate);
+  if (!containerSpecExist)
+    throw new HTTPException(HttpStatusCodes.INTERNAL_SERVER_ERROR, { message: NO_CONTAINER_SERVICE_ERROR_MESSAGE });
 
-    return envVars.filter(envVar => database.credentialsEnvVar.some(key => envVar.includes(key)));
-  },
+  const envVars = taskTemplate.ContainerSpec?.Env;
+  if (!envVars || envVars.length === 0)
+    throw new HTTPException(HttpStatusCodes.INTERNAL_SERVER_ERROR, { message: DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE });
+
+  return envVars.filter(envVar => database.credentialsEnvVar.some(key => envVar.includes(key)));
+},
 );
 
 export async function getDatabaseEnvVarsByEnvVarKeys(containerId: string, envVarKey: string[]) {
