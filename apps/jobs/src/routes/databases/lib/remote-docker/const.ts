@@ -28,8 +28,6 @@ export const databases = [
   },
 ];
 
-export const databasesName = databases.map(db => db.image);
-
 export const UNSUPPORTED_DATABASES_ERROR_MESSAGE = "Database type not supported.";
 export const MISSING_DATABASE_NAME_AND_IMAGE_ERROR_MESSAGE = "Database name and image are required.";
 export const DATABASES_CONTAINER_NOT_FOUND_ERROR_MESSAGE = "Database container not found.";
