@@ -4,27 +4,23 @@ import { APPLICATION_INSTANCE_REPLICAS } from "@/routes/applications/lib/remote-
 
 export const startApplicationService = withSwarmService(async (appServices) => {
   const currentServiceSpec = await appServices.inspect();
+  currentServiceSpec.Spec.Mode.Replicated.Replicas = APPLICATION_INSTANCE_REPLICAS;
   await appServices.update(
-    { ...currentServiceSpec.Spec, version: Number.parseInt(currentServiceSpec.Version.Index), Spec: {
-      Mode: {
-        Replicated: {
-          Replicas: APPLICATION_INSTANCE_REPLICAS,
-        },
-      },
-    } },
+    {
+      ...currentServiceSpec.Spec,
+      version: Number.parseInt(currentServiceSpec.Version.Index),
+    },
   );
 });
 
 export const stopApplicationService = withSwarmService(async (appService) => {
   const currentServiceSpec = await appService.inspect();
+  currentServiceSpec.Spec.Mode.Replicated.Replicas = 0;
   await appService.update(
-    { ...currentServiceSpec.Spec, version: Number.parseInt(currentServiceSpec.Version.Index), Spec: {
-      Mode: {
-        Replicated: {
-          Replicas: 0,
-        },
-      },
-    } },
+    {
+      ...currentServiceSpec.Spec,
+      version: Number.parseInt(currentServiceSpec.Version.Index),
+    },
   );
 });
 

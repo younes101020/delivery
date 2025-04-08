@@ -41,27 +41,22 @@ export const createDatabaseService = withDocker<Error | Dockerode.Service, Creat
 export const startDatabaseService = withSwarmService(
   async (dbService) => {
     const currentServiceSpec = await dbService.inspect();
-    await dbService.update({ ...currentServiceSpec.Spec, version: Number.parseInt(currentServiceSpec.Version.Index), Spec: {
-      Mode: {
-        Replicated: {
-          Replicas: DATABASE_INSTANCE_REPLICAS,
-        },
-      },
-    } });
+    currentServiceSpec.Spec.Mode.Replicated.Replicas = DATABASE_INSTANCE_REPLICAS;
+    await dbService.update({
+      ...currentServiceSpec.Spec,
+      version: Number.parseInt(currentServiceSpec.Version.Index),
+    });
   },
 );
 
 export const stopDatabaseService = withSwarmService(
   async (dbService) => {
     const currentServiceSpec = await dbService.inspect();
-    await dbService.update(
-      { ...currentServiceSpec.Spec, version: Number.parseInt(currentServiceSpec.Version.Index), Spec: {
-        Mode: {
-          Replicated: {
-            Replicas: 0,
-          },
-        },
-      } },
+    currentServiceSpec.Spec.Mode.Replicated.Replicas = 0;
+    await dbService.update({
+      ...currentServiceSpec.Spec,
+      version: Number.parseInt(currentServiceSpec.Version.Index),
+    },
     );
   },
 );

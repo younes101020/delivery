@@ -85,23 +85,27 @@ export async function getDatabaseEnvVarsByEnvVarKeys(containerId: string, envVar
   return envVars.filter(envVar => envVarKey.some(key => envVar.includes(key)));
 }
 
-export const addEnvironmentVariableToAppService = withSwarmService(
-  async (appService, plainEnv) => {
-    const container = appService.Spec?.TaskTemplate as Dockerode.ContainerTaskSpec;
-    const currentEnvs = typeof container.ContainerSpec?.Env === "object" ? container.ContainerSpec.Env : [];
+export const addEnvironmentVariableToAppService = withDocker<void, { serviceName: string; plainEnv: string }>(
+  async (docker, ctx) => {
+    const appServiceMetadata = await getSwarmServiceByName(ctx?.serviceName);
+
+    const appService = docker.getService(appServiceMetadata.ID);
+    const appServiceInspect = await appService.inspect();
+
+    const appServiceSpec = appServiceInspect.Spec;
+
+    let currentEnv = [];
+    if (appServiceSpec.TaskTemplate.ContainerSpec.Env) {
+      currentEnv = appServiceSpec.TaskTemplate.ContainerSpec.Env;
+    }
+
+    currentEnv.push(ctx?.plainEnv);
+
+    appServiceSpec.TaskTemplate.ContainerSpec.Env = currentEnv;
 
     await appService.update({
-      ...appService.Spec,
-      TaskTemplate: {
-        ...appService.Spec?.TaskTemplate,
-        ContainerSpec: {
-          ...container.ContainerSpec,
-          Env: [
-            ...currentEnvs,
-            plainEnv,
-          ],
-        },
-      },
+      ...appServiceSpec,
+      version: Number.parseInt(appServiceInspect.Version.Index),
     });
   },
 );
