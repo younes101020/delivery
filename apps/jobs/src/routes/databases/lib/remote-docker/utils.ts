@@ -141,6 +141,7 @@ export const listDatabaseServicesSpec = withDocker<ServicesDto[], Dockerode.Serv
   async (docker, opts) => {
     const inputFilters = opts && typeof opts.filters === "object" ? opts.filters : {};
     const dbServices = await docker.listServices({ filters: { label: ["resource=database"], ...inputFilters } });
-    return dbServices.map(toServiceSpec);
+    const servicesSpec = await Promise.all(dbServices.map(toServiceSpec));
+    return servicesSpec;
   },
 );

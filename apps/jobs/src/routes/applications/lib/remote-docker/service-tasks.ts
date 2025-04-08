@@ -33,6 +33,6 @@ export const removeApplicationService = withSwarmService(async (appService) => {
 });
 
 export const getApplicationServiceSpec = withSwarmService(async (appService) => {
-  const appSpec = toServiceSpec(appService);
+  const appSpec = await toServiceSpec(appService);
   return appSpec;
 });
