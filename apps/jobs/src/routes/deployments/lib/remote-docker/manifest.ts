@@ -19,9 +19,6 @@ export function createApplicationServiceSpec({ applicationName, image, fqdn, por
         Image: image,
         Env: plainEnv ? ["CI=false", ...plainEnv] : ["CI=false"],
       },
-      Placement: {
-        Constraints: ["node.role == worker"],
-      },
       Networks: [
         {
           Target: networkId,

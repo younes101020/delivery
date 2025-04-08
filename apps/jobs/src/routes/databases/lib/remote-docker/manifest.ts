@@ -18,9 +18,6 @@ export function createDatabaseServiceSpec({ database, name, port, initialEnvCred
         Image: database,
         Env: initialEnvCreds,
       },
-      Placement: {
-        Constraints: ["node.role == worker"],
-      },
       RestartPolicy: {
         Condition: "on-failure",
         Delay: 5,

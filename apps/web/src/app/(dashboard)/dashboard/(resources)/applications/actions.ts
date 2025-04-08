@@ -125,13 +125,5 @@ export const injectEnv = validatedAction(injectEnvSchema, async (inputs) => {
     return { error: "Unable to inject the environment variable", inputs };
   }
 
-  const redeployResponse = await client.deployments.redeploy[":queueName"].$post({
-    param: { queueName: applicationName },
-  });
-
-  if (redeployResponse.status !== 202) {
-    return { error: "Unable to redeploy the application", inputs };
-  }
-
-  return { success: "Redeployment success", inputs };
+  return { success: "Environment variable successfully injected", inputs };
 });

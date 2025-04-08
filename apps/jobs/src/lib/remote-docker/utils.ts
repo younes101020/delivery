@@ -5,15 +5,23 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import { getDocker } from ".";
 
-export function toServiceSpec(service: Dockerode.Service) {
+const checkIfResourceRunning = withDocker<boolean, string>(async (docker, serviceName) => {
+  const serviceTask = await docker.listTasks({ filters: { service: [serviceName] } });
+  if (serviceTask.length > 0) {
+    return serviceTask.some(t => t.Status.State === "running");
+  }
+  return false;
+});
+
+export async function toServiceSpec(service: Dockerode.Service) {
   const taskTemplate = service.Spec?.TaskTemplate as Dockerode.ContainerTaskSpec;
-  const serviceInstanceCount = service.Spec?.Mode?.Replicated?.Replicas ?? 0;
   const name = service.Spec?.Name ?? "Anonymous";
+  const isActive = await checkIfResourceRunning(service.Spec?.Name);
   return {
     id: service.ID,
     name,
     image: taskTemplate.ContainerSpec?.Image,
-    isActive: serviceInstanceCount > 0,
+    isActive,
     isProcessing: false,
     createdAt: service.CreatedAt!,
   };
@@ -27,9 +35,7 @@ export function withDocker<T, K>(fn: (docker: Dockerode, args?: K) => Promise<T>
 }
 
 export const getSwarmServiceById = withDocker<Dockerode.Service, string>(async (docker, id) => {
-  const service = docker.getService(id!);
-  const serviceMetadata = await service.inspect();
-  return serviceMetadata;
+  return docker.getService(id!);
 });
 
 export const getSwarmServiceByName = withDocker<Dockerode.Service, string>(async (docker, name) => {

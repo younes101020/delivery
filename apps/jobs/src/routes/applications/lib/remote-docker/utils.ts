@@ -9,7 +9,8 @@ export const listApplicationServicesSpec = withDocker<ServicesDto[], Dockerode.S
   async (docker, opts) => {
     const inputFilters = opts && typeof opts.filters === "object" ? opts.filters : {};
     const appServices = await docker.listServices({ filters: { label: ["resource=application"], ...inputFilters } });
-    return appServices.map(toServiceSpec);
+    const servicesSpec = await Promise.all(appServices.map(toServiceSpec));
+    return servicesSpec;
   },
 );
 export const getApplicationNetworkID = withDocker<string, string>(async (docker, applicationName) => {

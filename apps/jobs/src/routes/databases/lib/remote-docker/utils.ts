@@ -8,20 +8,24 @@ import type { ServicesDto } from "@/db/dto/services.dto";
 
 import { getDocker } from "@/lib/remote-docker";
 import { withDocker, withSwarmService } from "@/lib/remote-docker/middleware";
-import { toServiceSpec } from "@/lib/remote-docker/utils";
+import { getSwarmServiceByName, toServiceSpec } from "@/lib/remote-docker/utils";
 import { generateRandomString } from "@/lib/utils";
 
 import { DATABASES_CONTAINER_NOT_FOUND_ERROR_MESSAGE, DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE, NO_CONTAINER_SERVICE_ERROR_MESSAGE, UNSUPPORTED_DATABASES_ERROR_MESSAGE } from "./const";
 import { getDatabasePortAndCredsEnvVarByImage, getDatabasesName } from "./queries";
 
 export const getDbCredentialsEnvVarsAndDatabaseByServiceId = withSwarmService(async (dbService) => {
-  const taskTemplate = dbService.Spec?.TaskTemplate;
+  const inspectedService = await dbService.inspect();
+  const taskTemplate = inspectedService.Spec?.TaskTemplate;
+
   const containerSpecExist = assertTaskTemplateIsContainerTaskSpecGuard(taskTemplate);
   if (!containerSpecExist)
     throw new HTTPException(HttpStatusCodes.INTERNAL_SERVER_ERROR, { message: NO_CONTAINER_SERVICE_ERROR_MESSAGE });
 
-  const database = taskTemplate?.ContainerSpec?.Image;
-  const databaseExist = await checkIfDatabaseExist(database);
+  // Get database name (excluding the version tag)
+  const database = taskTemplate?.ContainerSpec?.Image!.split(":")[0];
+
+  const databaseExist = await checkIfDatabaseExist(database || "");
   if (!databaseExist || !database)
     throw new HTTPException(HttpStatusCodes.BAD_REQUEST, { message: UNSUPPORTED_DATABASES_ERROR_MESSAGE });
 
@@ -85,23 +89,27 @@ export async function getDatabaseEnvVarsByEnvVarKeys(containerId: string, envVar
   return envVars.filter(envVar => envVarKey.some(key => envVar.includes(key)));
 }
 
-export const addEnvironmentVariableToAppService = withSwarmService(
-  async (appService, plainEnv) => {
-    const container = appService.Spec?.TaskTemplate as Dockerode.ContainerTaskSpec;
-    const currentEnvs = typeof container.ContainerSpec?.Env === "object" ? container.ContainerSpec.Env : [];
+export const addEnvironmentVariableToAppService = withDocker<void, { serviceName: string; plainEnv: string }>(
+  async (docker, ctx) => {
+    const appServiceMetadata = await getSwarmServiceByName(ctx?.serviceName);
+
+    const appService = docker.getService(appServiceMetadata.ID);
+    const appServiceInspect = await appService.inspect();
+
+    const appServiceSpec = appServiceInspect.Spec;
+
+    let currentEnv = [];
+    if (appServiceSpec.TaskTemplate.ContainerSpec.Env) {
+      currentEnv = appServiceSpec.TaskTemplate.ContainerSpec.Env;
+    }
+
+    currentEnv.push(ctx?.plainEnv);
+
+    appServiceSpec.TaskTemplate.ContainerSpec.Env = currentEnv;
 
     await appService.update({
-      ...appService.Spec,
-      TaskTemplate: {
-        ...appService.Spec?.TaskTemplate,
-        ContainerSpec: {
-          ...container.ContainerSpec,
-          Env: [
-            ...currentEnvs,
-            plainEnv,
-          ],
-        },
-      },
+      ...appServiceSpec,
+      version: Number.parseInt(appServiceInspect.Version.Index),
     });
   },
 );
@@ -127,9 +135,9 @@ export function createDatabaseEnvVarsCredential(databaseImage: Database) {
   }
 }
 
-async function checkIfDatabaseExist(dbName?: string) {
+async function checkIfDatabaseExist(dbName: string) {
   const dbNames = await getDatabasesName();
-  return dbNames.includes(dbName!);
+  return dbNames.includes(dbName);
 }
 
 function assertTaskTemplateIsContainerTaskSpecGuard(taskTemplate?: Dockerode.ServiceSpec["TaskTemplate"]): taskTemplate is Dockerode.ContainerTaskSpec {
@@ -141,6 +149,7 @@ export const listDatabaseServicesSpec = withDocker<ServicesDto[], Dockerode.Serv
   async (docker, opts) => {
     const inputFilters = opts && typeof opts.filters === "object" ? opts.filters : {};
     const dbServices = await docker.listServices({ filters: { label: ["resource=database"], ...inputFilters } });
-    return dbServices.map(toServiceSpec);
+    const servicesSpec = await Promise.all(dbServices.map(toServiceSpec));
+    return servicesSpec;
   },
 );

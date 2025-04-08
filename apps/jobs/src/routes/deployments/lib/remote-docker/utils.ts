@@ -12,13 +12,11 @@ export async function synchroniseApplicationServiceWithLocalImage(targetApplicat
 
   const currentServiceSpec = await applicationService.inspect();
 
+  currentServiceSpec.Spec.TaskTemplate.ForceUpdate = 1;
+
   await applicationService.update({
     ...applicationService.Spec,
     version: Number.parseInt(currentServiceSpec.Version.Index),
-    TaskTemplate: {
-      ...applicationService.Spec?.TaskTemplate,
-      ForceUpdate: 1,
-    },
   }).catch((error) => {
     throw new DeploymentError({
       name: "DEPLOYMENT_APP_ERROR",

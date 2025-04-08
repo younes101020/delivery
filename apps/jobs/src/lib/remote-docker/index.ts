@@ -13,6 +13,6 @@ export async function getDocker() {
 
 export const getDockerResourceEvents = withDocker<NodeJS.ReadableStream, Resources>(
   async (docker, resource) => {
-    return docker.getEvents({ filters: { label: [`resource=${resource}`], type: ["container"] } });
+    return docker.getEvents({ filters: { label: [`resource=${resource}`], type: ["service"] } });
   },
 );
