@@ -20,8 +20,10 @@ export const getDbCredentialsEnvVarsAndDatabaseByServiceId = withSwarmService(as
   if (!containerSpecExist)
     throw new HTTPException(HttpStatusCodes.INTERNAL_SERVER_ERROR, { message: NO_CONTAINER_SERVICE_ERROR_MESSAGE });
 
-  const database = taskTemplate?.ContainerSpec?.Image;
-  const databaseExist = await checkIfDatabaseExist(database);
+  // Get database name (excluding the version tag)
+  const database = taskTemplate?.ContainerSpec?.Image!.split(":")[0];
+
+  const databaseExist = await checkIfDatabaseExist(database || "");
   if (!databaseExist || !database)
     throw new HTTPException(HttpStatusCodes.BAD_REQUEST, { message: UNSUPPORTED_DATABASES_ERROR_MESSAGE });
 
@@ -131,9 +133,9 @@ export function createDatabaseEnvVarsCredential(databaseImage: Database) {
   }
 }
 
-async function checkIfDatabaseExist(dbName?: string) {
+async function checkIfDatabaseExist(dbName: string) {
   const dbNames = await getDatabasesName();
-  return dbNames.includes(dbName!);
+  return dbNames.includes(dbName);
 }
 
 function assertTaskTemplateIsContainerTaskSpecGuard(taskTemplate?: Dockerode.ServiceSpec["TaskTemplate"]): taskTemplate is Dockerode.ContainerTaskSpec {
