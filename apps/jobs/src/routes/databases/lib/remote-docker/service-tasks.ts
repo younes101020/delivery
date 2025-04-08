@@ -29,7 +29,7 @@ export const createDatabaseService = withDocker<Error | Dockerode.Service, Creat
       database: databaseImage,
       name: databaseName,
       port: database.port,
-      initialEnvCreds: database.credentialsEnvVar,
+      initialEnvCreds: credentialsEnvVars,
     });
     return await docker.createService(dbSpec)
       .catch((error) => {
