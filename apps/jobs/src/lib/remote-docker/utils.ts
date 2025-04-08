@@ -35,9 +35,7 @@ export function withDocker<T, K>(fn: (docker: Dockerode, args?: K) => Promise<T>
 }
 
 export const getSwarmServiceById = withDocker<Dockerode.Service, string>(async (docker, id) => {
-  const service = docker.getService(id!);
-  const serviceMetadata = await service.inspect();
-  return serviceMetadata;
+  return docker.getService(id!);
 });
 
 export const getSwarmServiceByName = withDocker<Dockerode.Service, string>(async (docker, name) => {
