@@ -8,14 +8,16 @@ import type { ServicesDto } from "@/db/dto/services.dto";
 
 import { getDocker } from "@/lib/remote-docker";
 import { withDocker, withSwarmService } from "@/lib/remote-docker/middleware";
-import { toServiceSpec } from "@/lib/remote-docker/utils";
+import { getSwarmServiceByName, toServiceSpec } from "@/lib/remote-docker/utils";
 import { generateRandomString } from "@/lib/utils";
 
 import { DATABASES_CONTAINER_NOT_FOUND_ERROR_MESSAGE, DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE, NO_CONTAINER_SERVICE_ERROR_MESSAGE, UNSUPPORTED_DATABASES_ERROR_MESSAGE } from "./const";
 import { getDatabasePortAndCredsEnvVarByImage, getDatabasesName } from "./queries";
 
 export const getDbCredentialsEnvVarsAndDatabaseByServiceId = withSwarmService(async (dbService) => {
-  const taskTemplate = dbService.Spec?.TaskTemplate;
+  const inspectedService = await dbService.inspect();
+  const taskTemplate = inspectedService.Spec?.TaskTemplate;
+
   const containerSpecExist = assertTaskTemplateIsContainerTaskSpecGuard(taskTemplate);
   if (!containerSpecExist)
     throw new HTTPException(HttpStatusCodes.INTERNAL_SERVER_ERROR, { message: NO_CONTAINER_SERVICE_ERROR_MESSAGE });
