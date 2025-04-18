@@ -249,7 +249,7 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
     });
 
   await Promise.all([
-    ...(applicationService ? [removeApplicationResource(applicationService.id)] : []),
+    ...(applicationService ? [removeApplicationResource(applicationService.ID)] : []),
     deleteApplicationByName(name),
     ssh(
       `rm -Rvf ${name}`,
