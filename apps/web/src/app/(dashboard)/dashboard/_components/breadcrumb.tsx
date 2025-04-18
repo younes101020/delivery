@@ -10,13 +10,14 @@ import {
 } from "@/app/_components/ui/breadcrumb";
 
 export function DynamicBreadcrumb() {
-  const segments = useSelectedLayoutSegments();
-  const withSeparator = segments
-    .filter(segment => !segment.startsWith("("))
-    .map((segment, index) => {
-      const href = `/dashboard/${segments.slice(0, index + 1).join("/")}`;
+  const allSegments = useSelectedLayoutSegments();
+  const routedSegments = allSegments.filter(segment => !segment.includes("("));
 
-      return index === segments.length - 1
+  const withSeparator = routedSegments
+    .map((segment, index) => {
+      const href = `/dashboard/${routedSegments.slice(0, index + 1).join("/")}`;
+
+      return index === routedSegments.length - 1
         ? (
             <BreadcrumbItem key={`breadcrumb-${segment}-${index}`}>
               <BreadcrumbPage>{segment}</BreadcrumbPage>
