@@ -31,7 +31,7 @@ import type {
 import type { AllQueueApplicationJobsData } from "./tasks/types";
 
 import { deleteDeploymentJobs } from "../deployments/lib/tasks/deploy/utils";
-import { listApplicationServicesSpec } from "./lib/remote-docker/utils";
+import { listApplicationServicesSpec, patchApplicationService } from "./lib/remote-docker/utils";
 import { PREFIX, queueNames } from "./tasks/const";
 import { removeApplicationResource } from "./tasks/remove-application";
 import { startApplication } from "./tasks/start-application";
@@ -217,7 +217,14 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
     );
   }
 
-  const updatedField = await patchApplication(name, updates);
+  const [updatedField, _] = await Promise.all([
+    patchApplication(name, updates),
+    patchApplicationService({
+      serviceName: name,
+      envs: updates.environmentVariable,
+      port: updates.applicationData.port,
+    }),
+  ]);
 
   if (!updatedField) {
     return c.json(
