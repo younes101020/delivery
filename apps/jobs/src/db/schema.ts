@@ -1,6 +1,6 @@
 import type { z } from "zod";
 
-import { relations, sql, type SQL } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import { boolean, integer, json, pgTable, primaryKey, serial, text, timestamp } from "drizzle-orm/pg-core";
 
 import type { selectUserSchema } from "./dto";
