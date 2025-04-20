@@ -48,9 +48,7 @@ export const githubAppSecret = pgTable("github_app_secret", {
 
 export const applications = pgTable("applications", {
   id: serial("id").primaryKey(),
-  name: text("name")
-    .notNull()
-    .generatedAlwaysAs((): SQL => sql`split_part(${applications.fqdn}, '.', 1)`),
+  name: text("name").notNull(),
   fqdn: text("fqdn").notNull().unique(),
   logs: text("logs"),
   port: integer("port").notNull(),

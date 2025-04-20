@@ -7,13 +7,13 @@ import { insertEnvironmentVariablesSchema } from "./envvars.dto";
 import { servicesDto } from "./services.dto";
 
 export const selectApplicationsSchemaWithSharedEnv = createSelectSchema(applications).extend({
-  environmentVariable: z.array(createSelectSchema(environmentVariables)).optional(),
+  environmentVariables: z.array(createSelectSchema(environmentVariables)).optional(),
   serviceId: z.string(),
 });
 
 export const selectApplicationsSchema = servicesDto;
 
-const insertApplicationsSchema = createInsertSchema(applications).omit({ name: true });
+const insertApplicationsSchema = createInsertSchema(applications);
 export const insertApplicationWithSharedEnv = z.object({
   applicationData: insertApplicationsSchema,
   envVars: z.array(insertEnvironmentVariablesSchema).optional(),

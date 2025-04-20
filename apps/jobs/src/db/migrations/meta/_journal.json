@@ -29,6 +29,13 @@
       "when": 1743367775442,
       "tag": "0003_pretty_banshee",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1745181247147,
+      "tag": "0004_wooden_skin",
+      "breakpoints": true
     }
   ]
 }

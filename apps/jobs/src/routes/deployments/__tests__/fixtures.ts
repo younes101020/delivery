@@ -38,6 +38,7 @@ interface UTFixtures {
       application?: {
         port: number;
         githubAppId: number;
+        name: string;
       };
       environmentVariable?: EnvironmentVariables["structured"];
     };
@@ -115,6 +116,7 @@ const completedJobs = [
       application: {
         port: staticdeploy ? 80 : deployAppPayload.port,
         githubAppId: githubApp.id,
+        name: gitreponame,
       },
       environmentVariable: [
         { key: "VAR1", value: "VAL1" },
