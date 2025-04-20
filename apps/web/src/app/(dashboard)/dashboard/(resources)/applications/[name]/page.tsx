@@ -42,7 +42,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
 
         <div className="col-span-4 mt-4">
           <Separator className="mb-4" />
-          <h2 className="text-xl font-bold mb-2">Update application details</h2>
+          <h2 className="text-xl mb-2">Update application details</h2>
           <Suspense fallback={<GetApplicationLoadingScreen />}>
             <AppConfiguration name={appName} />
           </Suspense>
@@ -111,7 +111,7 @@ async function AppDetails({ name }: AppProps) {
       </dl>
       <dl>
         <dt className="text-muted-foreground">Environment variables count</dt>
-        <dd>{application.environmentVariable?.length || 0}</dd>
+        <dd>{application.environmentVariables?.length || 0}</dd>
       </dl>
       {application.createdAt && (
         <dl>
@@ -133,7 +133,7 @@ async function AppConfiguration({ name }: AppProps) {
   const application = await getApplicationByName(name);
   if (!application)
     redirect("/dashboard/applications");
-  const rawEnvs = application.environmentVariable
+  const rawEnvs = application.environmentVariables
     ?.map(({ key, value }) => `${key}=${value}`)
     .filter(rawEnv => !(rawEnv.length <= 1))
     .join(" ");
@@ -158,9 +158,9 @@ async function DeleteApp({ name }: AppProps) {
 
 function GetApplicationLoadingScreen() {
   return (
-    <div className="flex flex-col gap-4">
-      <Skeleton className="h-8 w-full" />
-      <Skeleton className="h-8 w-full" />
+    <div className="flex flex-col gap-4 h-full">
+      <Skeleton />
+      <Skeleton />
     </div>
   );
 }

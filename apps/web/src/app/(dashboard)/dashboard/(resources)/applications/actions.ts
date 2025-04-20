@@ -7,7 +7,7 @@ import { z } from "zod";
 import { client } from "@/app/_lib/client-http";
 import { getFormChangesAction, validatedAction } from "@/app/_lib/form-middleware";
 
-import { transformEnvVars } from "./_lib/utils";
+import { plainEnvVarsToStructured } from "./_lib/utils";
 
 const editApplicationSchema = z
   .object({
@@ -34,13 +34,16 @@ const editApplicationSchema = z
 export const editApplication = validatedAction(
   editApplicationSchema,
   async (data, _, prevState) => {
+    const { name } = data;
     const changes = getFormChangesAction(data, prevState);
     const { environmentVariables, ...applicationData } = changes;
+    const environmentVariable = environmentVariables ? plainEnvVarsToStructured(environmentVariables) : typeof environmentVariables === "string" ? [] : undefined;
+
     const response = await client.applications[":name"].$patch({
-      param: { name: changes.name },
+      param: { name },
       json: {
         applicationData,
-        environmentVariable: transformEnvVars(environmentVariables),
+        environmentVariable,
       },
     });
     if (response.status !== 200) {
@@ -49,7 +52,7 @@ export const editApplication = validatedAction(
         inputs: data,
       };
     }
-    revalidateTag(`application-${data.name}`);
+    revalidateTag(`application-${name}`);
     return { success: "Application updated successfully.", inputs: data };
   },
 );

@@ -42,6 +42,7 @@ interface PatchApplication {
   serviceName: string;
   envs?: PatchEnvironmentVariablesSchema[];
   port?: number;
+  fqdn?: string;
 }
 
 export const patchApplicationService = withDocker<void, PatchApplication>(
@@ -54,24 +55,21 @@ export const patchApplicationService = withDocker<void, PatchApplication>(
 
     if (ctx?.envs) {
       const envs = ctx?.envs.map(env => `${env.key}=${env.value}`);
-
-      let currentEnv = [];
-      if (appServiceSpec.TaskTemplate.ContainerSpec.Env) {
-        currentEnv = appServiceSpec.TaskTemplate.ContainerSpec.Env;
-      }
-
-      currentEnv.push(...envs);
-      appServiceSpec.TaskTemplate.ContainerSpec.Env = currentEnv;
+      appServiceSpec.TaskTemplate.ContainerSpec.Env = envs;
     }
 
-    if (ctx?.port) {
-      let currentLabels: Record<string, string> = {};
-      if (appServiceSpec.Labels) {
-        currentLabels = appServiceSpec.Labels;
-      }
+    let currentLabels: Record<string, string> = {};
+
+    if (appServiceSpec.Labels) {
+      currentLabels = appServiceSpec.Labels;
+    }
+    if (ctx?.port)
       currentLabels[`traefik.http.services.${ctx?.serviceName}.loadbalancer.server.port`] = ctx?.port.toString();
-      appServiceSpec.Labels = currentLabels;
-    }
+
+    if (ctx?.fqdn)
+      currentLabels[`traefik.http.routers.${ctx?.serviceName}.rule`] = `Host(\`${ctx?.fqdn}\`)`;
+
+    appServiceSpec.Labels = currentLabels;
 
     await appService.update({
       ...appServiceSpec,

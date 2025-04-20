@@ -1,8 +1,4 @@
-export function transformEnvVars(envs: string) {
-  if (!envs) {
-    return [];
-  }
-
+export function plainEnvVarsToStructured(envs: string) {
   return envs
     .trim()
     .split(/\s+/)
