@@ -1,6 +1,6 @@
 import type { z } from "zod";
 
-import { relations, sql, type SQL } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import { boolean, integer, json, pgTable, primaryKey, serial, text, timestamp } from "drizzle-orm/pg-core";
 
 import type { selectUserSchema } from "./dto";
@@ -48,9 +48,7 @@ export const githubAppSecret = pgTable("github_app_secret", {
 
 export const applications = pgTable("applications", {
   id: serial("id").primaryKey(),
-  name: text("name")
-    .notNull()
-    .generatedAlwaysAs((): SQL => sql`split_part(${applications.fqdn}, '.', 1)`),
+  name: text("name").notNull(),
   fqdn: text("fqdn").notNull().unique(),
   logs: text("logs"),
   port: integer("port").notNull(),

@@ -225,7 +225,7 @@ export async function patchApplication(name: string, updates: PatchApplicationSc
   return await db.transaction(async (tx) => {
     const { applicationData, environmentVariable } = updates;
 
-    let application: PatchApplicationSchema | null = null;
+    let application: Omit<PatchApplicationSchema, "environmentVariable"> | null = null;
 
     const [app] = await tx.select({ id: applications.id }).from(applications).where(eq(applications.name, name)).limit(1);
 
@@ -241,36 +241,43 @@ export async function patchApplication(name: string, updates: PatchApplicationSc
 
     const environmentVariablesRelatedToApp: PatchApplicationSchema["environmentVariable"] = [];
 
-    if (environmentVariable?.length) {
-      await Promise.all(
-        environmentVariable.map(async (envVar) => {
+    if (environmentVariable) {
+      if (environmentVariable?.length === 0) {
+        await tx
+          .delete(applicationEnvironmentVariables)
+          .where(eq(applicationEnvironmentVariables.applicationId, app.id));
+      }
+      else {
+        await Promise.all(
+          environmentVariable.map(async (envVar) => {
           // PATCH ENV CASE
-          if ("id" in envVar && envVar.id) {
-            const [updatedEnvVar] = await tx
-              .update(environmentVariables)
-              .set({ ...envVar, updatedAt: new Date() })
-              .where(eq(environmentVariables.id, envVar.id))
-              .returning();
+            if ("id" in envVar && envVar.id) {
+              const [updatedEnvVar] = await tx
+                .update(environmentVariables)
+                .set({ ...envVar, updatedAt: new Date() })
+                .where(eq(environmentVariables.id, envVar.id))
+                .returning();
 
-            environmentVariablesRelatedToApp.push(updatedEnvVar);
-          }
-          // INSERT ENV CASE
-          else if (envVar.key && envVar.value) {
-            const { key, value } = envVar;
-            const [insertedEnvVar] = await tx
-              .insert(environmentVariables)
-              .values({ key, value })
-              .returning();
+              environmentVariablesRelatedToApp.push(updatedEnvVar);
+            }
+            // INSERT ENV CASE
+            else if (envVar.key && envVar.value) {
+              const { key, value } = envVar;
+              const [insertedEnvVar] = await tx
+                .insert(environmentVariables)
+                .values({ key, value })
+                .returning();
 
-            await tx.insert(applicationEnvironmentVariables).values({
-              applicationId: app.id,
-              environmentVariableId: insertedEnvVar.id,
-            });
+              await tx.insert(applicationEnvironmentVariables).values({
+                applicationId: app.id,
+                environmentVariableId: insertedEnvVar.id,
+              });
 
-            environmentVariablesRelatedToApp.push(insertedEnvVar);
-          }
-        }),
-      );
+              environmentVariablesRelatedToApp.push(insertedEnvVar);
+            }
+          }),
+        );
+      }
     }
 
     return {

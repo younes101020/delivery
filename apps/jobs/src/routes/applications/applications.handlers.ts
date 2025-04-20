@@ -31,7 +31,7 @@ import type {
 import type { AllQueueApplicationJobsData } from "./tasks/types";
 
 import { deleteDeploymentJobs } from "../deployments/lib/tasks/deploy/utils";
-import { listApplicationServicesSpec } from "./lib/remote-docker/utils";
+import { listApplicationServicesSpec, patchApplicationService } from "./lib/remote-docker/utils";
 import { PREFIX, queueNames } from "./tasks/const";
 import { removeApplicationResource } from "./tasks/remove-application";
 import { startApplication } from "./tasks/start-application";
@@ -174,11 +174,13 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
     );
   }
 
+  const { applicationEnvironmentVariables, ...appDetails } = application;
+
   return c.json(
     {
-      ...application,
+      ...appDetails,
       serviceId: applicationService.id,
-      environmentVariables: application.applicationEnvironmentVariables.map(ev => ({
+      environmentVariables: applicationEnvironmentVariables.map(ev => ({
         id: ev.environmentVariable.id,
         key: ev.environmentVariable.key,
         value: ev.environmentVariable.value,
@@ -196,7 +198,7 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
   const { name } = c.req.valid("param");
   const updates = c.req.valid("json");
 
-  const noUpdatesFound = Object.keys(updates.applicationData).length === 0 && (!Array.isArray(updates.environmentVariable) || Object.keys(updates.environmentVariable[0]).length === 0);
+  const noUpdatesFound = Object.keys(updates.applicationData).length === 0 && !updates.environmentVariable;
 
   if (noUpdatesFound) {
     return c.json(
@@ -217,7 +219,14 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
     );
   }
 
-  const updatedField = await patchApplication(name, updates);
+  const [updatedField, _] = await Promise.all([
+    patchApplication(name, updates),
+    patchApplicationService({
+      serviceName: name,
+      envs: updates.environmentVariable,
+      port: updates.applicationData.port,
+    }),
+  ]);
 
   if (!updatedField) {
     return c.json(

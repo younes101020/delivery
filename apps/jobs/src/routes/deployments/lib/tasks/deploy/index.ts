@@ -92,7 +92,7 @@ export const deployApp = runDeployment(async (payload) => {
         ...(staticdeploy && { publishdir }),
       },
       configure: {
-        application: { port, githubAppId: githubApp.id },
+        application: { port, githubAppId: githubApp.id, name: repoName },
         environmentVariable: environmentVariables && environmentVariables.persistedEnvVars,
         fqdn,
         repoName,

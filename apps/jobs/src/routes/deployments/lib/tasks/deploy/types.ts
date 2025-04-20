@@ -24,7 +24,7 @@ export interface QueueDeploymentJobData {
     repoName: string;
   };
   configure: {
-    application: Pick<Application, "port" | "githubAppId">;
+    application: Pick<Application, "port" | "githubAppId" | "name">;
     environmentVariable: InsertEnvironmentVariablesSchema[] | undefined;
     fqdn: string;
     repoName: string;

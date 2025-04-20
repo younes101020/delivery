@@ -49,6 +49,9 @@ export function AppForm(applicationData: AppFormProps) {
           className="rounded-r-none"
           defaultValue={state.inputs?.fqdn}
         />
+        <p className="text-muted-foreground text-xs pt-2">
+          The domain name of your application. This is the name that will be used to access your application.
+        </p>
       </div>
       <div>
         <Label htmlFor="port">Port</Label>
@@ -61,17 +64,23 @@ export function AppForm(applicationData: AppFormProps) {
           required
           defaultValue={state.inputs?.port}
         />
+        <p className="text-muted-foreground text-xs pt-2">
+          Exposed port of your application. This is the port that will be used to access your application.
+        </p>
       </div>
       <div>
         <Label htmlFor="environmentVariables">Environment variables</Label>
         <Textarea
           id="environmentVariables"
           name="environmentVariables"
-          placeholder="eg: NODE_ENV=PRODUCTION"
+          placeholder="eg: NODE_ENV=PRODUCTION NEXT_PUBLIC_API_KEY=123456789"
           aria-label="environmentVariables"
           defaultValue={state.inputs?.environmentVariables}
           className=" min-h-36"
         />
+        <p className="text-muted-foreground text-xs pt-2">
+          The environment variables to set for your application. Must be in format KEY=VALUE and separated by spaces.
+        </p>
       </div>
       <input type="hidden" name="name" id="name" defaultValue={state.inputs?.name} />
       {state?.error && <Paragraph variant="error">{state.error}</Paragraph>}
