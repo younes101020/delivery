@@ -98,8 +98,9 @@ describe("deployments tests", () => {
       expect(spy).toHaveBeenCalled();
     });
 
-    it("call the add method from bullmq flowproducer with jobs dependencies", async ({ githubApp, deployAppPayload }) => {
+    it("call the add method from bullmq flowproducer with jobs dependencies", async ({ githubApp, deployAppPayload, completedJobs }) => {
       const { repoUrl, cache, publishdir, port: exposedPort, staticdeploy } = deployAppPayload;
+      const appName = completedJobs[0].data.repoName;
       const queueName = mocks.fromGitUrlToQueueName();
       const env = mocks.transformEnvVars();
       const fqdn = mocks.parseAppHost();
@@ -115,6 +116,7 @@ describe("deployments tests", () => {
           application: {
             port,
             githubAppId: githubApp.id,
+            name: appName,
           },
           environmentVariable: env.persistedEnvVars,
           fqdn,
