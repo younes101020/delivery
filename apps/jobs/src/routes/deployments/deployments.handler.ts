@@ -52,20 +52,20 @@ export const streamPreview: AppRouteHandler<StreamPreview> = async (c) => {
     const job = await getJobs(queue);
 
     await stream.writeSSE({
-      data: JSON.stringify({ step: job.name, status: await job.getState() }),
+      data: JSON.stringify({ step: job.name, status: await job.getState(), repoName: queueName }),
     });
 
     async function activeHandler(job: { jobId: string }) {
       const jobState = await Job.fromId(queue, job.jobId);
       await stream.writeSSE({
-        data: JSON.stringify({ step: jobState?.name, status: "active" }),
+        data: JSON.stringify({ step: jobState?.name, status: "active", repoName: queueName }),
       });
     }
 
     async function failedHandler({ jobId }: { jobId: string }) {
       const jobState = await Job.fromId(queue, jobId);
       await stream.writeSSE({
-        data: JSON.stringify({ step: jobState?.name, status: "failed" }),
+        data: JSON.stringify({ step: jobState?.name, status: "failed", repoName: queueName }),
       });
     }
 
@@ -74,7 +74,7 @@ export const streamPreview: AppRouteHandler<StreamPreview> = async (c) => {
       const isLastDeploymentStep = jobState?.name === "configure";
       if (isLastDeploymentStep) {
         await stream.writeSSE({
-          data: JSON.stringify({ step: jobState?.name, status: "completed" }),
+          data: JSON.stringify({ step: jobState?.name, status: "completed", repoName: queueName }),
         });
       }
     }
@@ -177,27 +177,27 @@ export const streamCurrentDeploymentsCount: AppRouteHandler<StreamCurrentDeploym
       inMemoryQueueEvents.push(queueEvents);
     }
     await stream.writeSSE({
-      data: JSON.stringify({ isActiveDeployment: inMemoryActiveDeploymentCount > 0 }),
+      data: JSON.stringify({ isActiveDeployment: inMemoryActiveDeploymentCount > 0, queryKey: "deployment-tracker" }),
     });
 
     async function completeHandler() {
       inMemoryActiveDeploymentCount--;
       await stream.writeSSE({
-        data: JSON.stringify({ isActiveDeployment: inMemoryActiveDeploymentCount > 0 }),
+        data: JSON.stringify({ isActiveDeployment: inMemoryActiveDeploymentCount > 0, queryKey: "deployment-tracker" }),
       });
     }
 
     async function failedHandler() {
       inMemoryActiveDeploymentCount--;
       await stream.writeSSE({
-        data: JSON.stringify({ isActiveDeployment: inMemoryActiveDeploymentCount > 0 }),
+        data: JSON.stringify({ isActiveDeployment: inMemoryActiveDeploymentCount > 0, queryKey: "deployment-tracker" }),
       });
     }
 
     async function activeHandler() {
       inMemoryActiveDeploymentCount++;
       await stream.writeSSE({
-        data: JSON.stringify({ isActiveDeployment: true }),
+        data: JSON.stringify({ isActiveDeployment: true, queryKey: "deployment-tracker" }),
       });
     }
 

@@ -1,17 +1,16 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-
-import type { Nullable } from "@/app/_lib/utils";
 
 import { Badge } from "@/app/_components/ui/badge";
 import { Bounce } from "@/app/_components/ui/bounce";
 import { buttonVariants } from "@/app/_components/ui/button";
 import { Card, CardContent, CardFooter } from "@/app/_components/ui/card";
 import { Skeleton } from "@/app/_components/ui/skeleton";
-import { useEventSource } from "@/app/_hooks/use-event-source";
 import { cn, formatDate } from "@/app/_lib/utils";
-import { env } from "@/env";
+
+import type { DeploymentPreviewState } from "../types";
 
 interface DeploymentPreviewCardProps {
   id: string;
@@ -20,30 +19,15 @@ interface DeploymentPreviewCardProps {
   stacktrace: (string | null)[];
 }
 
-export type DeploymentPreview = Nullable<{
-  step: "clone" | "build" | "configure";
-  status: "completed" | "failed" | "active" | "delayed" | "prioritized" | "waiting" | "waiting-children" | "unknown";
-  logs?: string;
-}>;
-
-const DEFAULT_STATE = { step: null, status: null };
-
 export function DeploymentPreviewCard({
   timestamp,
   repoName,
 }: DeploymentPreviewCardProps) {
   const date = formatDate(timestamp);
-  const onMessage = (prev: DeploymentPreview, data: DeploymentPreview) => {
-    return data.logs ? { ...data, logs: prev.logs ? `${prev.logs}${data.logs}` : data.logs } : data;
-  };
-  const { status, step } = useEventSource<DeploymentPreview>({
-    eventUrl: `${env.NEXT_PUBLIC_BASEURL}/api/deployments-proxy/preview/${repoName}`,
-    initialState: DEFAULT_STATE,
-    onMessage,
-  });
+  const { data } = useQuery<DeploymentPreviewState>({ queryKey: [repoName] });
 
-  const previousStep = step === "build" ? "clone" : step === "configure" ? "build" : null;
-  const nextStep = step === "clone" ? "build" : step === "build" ? "configure" : null;
+  const previousStep = data?.step === "build" ? "clone" : data?.step === "configure" ? "build" : null;
+  const nextStep = data?.step === "clone" ? "build" : data?.step === "build" ? "configure" : null;
 
   return (
     <Card
@@ -63,7 +47,7 @@ export function DeploymentPreviewCard({
                 <Bounce variant="active" />
               </dt>
               <dd className="flex gap-2 align-middle">
-                {step}
+                {data?.step}
               </dd>
             </dl>
             <dl className="text-xs">
@@ -78,10 +62,10 @@ export function DeploymentPreviewCard({
           <span className="group-hover/feature:translate-x-2 transition duration-200 inline-block mb-2">
             {repoName}
           </span>
-          {status
+          {data?.status
             ? (
-                <Badge variant={status === "failed" ? "destructive" : "success"} className="w-fit">
-                  {status}
+                <Badge variant={data.status === "failed" ? "destructive" : "success"} className="w-fit">
+                  {data.status}
                 </Badge>
               )
             : <Skeleton className="inline-flex items-center h-7 px-2.5 py-0.5 text-xs border w-fit">Checking status...</Skeleton>}
@@ -90,7 +74,7 @@ export function DeploymentPreviewCard({
       </CardContent>
 
       <CardFooter className="px-0">
-        {status === "completed"
+        {data?.status === "completed"
           ? (
               <Link href="/dashboard/applications" className={cn(buttonVariants({ variant: "default" }), "mt-4 mx-6")}>
                 Go to applications
@@ -98,7 +82,7 @@ export function DeploymentPreviewCard({
             )
           : (
               <div className="text-xs max-w-xs relative z-10 px-10">
-                {status && status !== "failed" && (
+                {data?.status && data.status !== "failed" && (
                   <dl>
                     <dt className="text-muted-foreground">This step started at</dt>
                     <dd>
@@ -106,8 +90,8 @@ export function DeploymentPreviewCard({
                     </dd>
                   </dl>
                 )}
-                {status && (
-                  <Link href={`/dashboard/deployments/${repoName}`} className={cn(buttonVariants({ variant: status === "failed" ? "destructive" : status === "active" ? "default" : "ghost" }), "mt-4")}>
+                {data?.status && (
+                  <Link href={`/dashboard/deployments/${repoName}`} className={cn(buttonVariants({ variant: data.status === "failed" ? "destructive" : data.status === "active" ? "default" : "ghost" }), "mt-4")}>
                     View details
                   </Link>
                 )}

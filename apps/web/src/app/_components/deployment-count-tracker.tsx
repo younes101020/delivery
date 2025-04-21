@@ -1,30 +1,17 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
+
 import { Spinner } from "@/app/_components/ui/spinner";
-import { env } from "@/env";
 
-import { useEventSource } from "../_hooks/use-event-source";
-
-interface DeploymentTrackerEventData {
-  isActiveDeployment: boolean;
-  logs?: string;
-};
-
-const DEFAULT_STATE = { isActiveDeployment: false };
+import type { DeploymentCountState } from "../types";
 
 export function DeploymentTracker() {
-  const onMessage = (prev: DeploymentTrackerEventData, data: DeploymentTrackerEventData) => {
-    return data.logs ? { ...data, logs: prev.logs ? `${prev.logs}${data.logs}` : data.logs } : data;
-  };
-  const { isActiveDeployment } = useEventSource<DeploymentTrackerEventData>({
-    eventUrl: `${env.NEXT_PUBLIC_BASEURL}/api/deployments-proxy/count`,
-    initialState: DEFAULT_STATE,
-    onMessage,
-  });
+  const { data } = useQuery<DeploymentCountState>({ queryKey: ["deployment-tracker"] });
 
   return (
     <div className="p-4 flex items-center gap-4 bg-gradient-to-l from-primary to-primary/75 border-dashed border-secondary border mb-2">
-      {isActiveDeployment
+      {data?.isActiveDeployment
         ? (
             <>
               <Spinner />

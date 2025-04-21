@@ -8,6 +8,7 @@ import { EmptyState } from "@/app/_components/ui/empty-state";
 import { PageTitle } from "@/app/_components/ui/page-title";
 import { Separator } from "@/app/_components/ui/separator";
 import { Skeleton } from "@/app/_components/ui/skeleton";
+import { SubscribeToSSE } from "@/app/(dashboard)/dashboard/deployments/_components/subscribe-to-sse";
 
 import { DeploymentPreviewCard } from "./_components/deployment-preview-card";
 import { PreviousDeploymentPreviewCard } from "./_components/previous-deployment-card";
@@ -44,7 +45,9 @@ async function OngoingDeploymentPreview() {
     return <NoDeployments title="No ongoing deployment" description="You can preview all your ongoing deployments here." Icon={Truck} />;
 
   return deployments.map(deployment => (
-    <DeploymentPreviewCard key={deployment.id} {...deployment} />
+    <SubscribeToSSE key={deployment.id} repoName={deployment.repoName}>
+      <DeploymentPreviewCard {...deployment} />
+    </SubscribeToSSE>
   ));
 }
 
