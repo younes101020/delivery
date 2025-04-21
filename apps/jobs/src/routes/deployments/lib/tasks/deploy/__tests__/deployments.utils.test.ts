@@ -7,7 +7,7 @@ import { ZodError } from "zod";
 import { insertDeploymentSchema } from "@/db/dto";
 import { DeploymentError } from "@/lib/error";
 import { it } from "@/routes/deployments/__tests__/fixtures";
-import { convertGitToAuthenticatedUrl, parseAppHost, persistedEnvVarsToCmdEnvVars, plainEnvVarsToGroupedEnvVars, plainEnvVarsToPersistedEnvVars, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
+import { convertGitToAuthenticatedUrl, parseAppHost, persistedEnvVarsToCmdEnvVars, plainEnvVarsToCmdEnvVars, plainEnvVarsToPersistedEnvVars, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
 
 const eventHandlers: Record<string, ({ jobId }: { jobId: string }) => void> = {};
 
@@ -112,7 +112,7 @@ describe("deployments utils unit tests", () => {
   it("return grouped envvironment variables from plain env vars", ({ environmentVariable }) => {
     const key = environmentVariable.structured[0].key;
     const value = environmentVariable.structured[0].value;
-    const expected = [`${key}=${value}`, `${key}=${value}`];
-    expect(plainEnvVarsToGroupedEnvVars(environmentVariable.plain)).toStrictEqual(expected);
+    const expected = `--env ${key}=${value} --env ${key}=${value}`;
+    expect(plainEnvVarsToCmdEnvVars(environmentVariable.plain)).toStrictEqual(expected);
   });
 });

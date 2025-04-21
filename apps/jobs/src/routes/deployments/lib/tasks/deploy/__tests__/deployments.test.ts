@@ -25,7 +25,7 @@ describe("deployments tests", () => {
       fromGitUrlToQueueName: vi.fn().mockReturnValue("my-app"),
       waitForDeploymentToComplete: vi.fn(),
       parseAppHost: vi.fn().mockReturnValue("https://my-app.domain.com"),
-      transformEnvVars: vi.fn().mockReturnValue({ groupedEnvVars: [`${env.key}=${env.value}`], persistedEnvVars: [env] }),
+      transformEnvVars: vi.fn().mockReturnValue({ cmdEnvVars: `--env ${env.key}=${env.value}`, persistedEnvVars: [env] }),
     };
   });
 
@@ -57,7 +57,7 @@ describe("deployments tests", () => {
       fromGitUrlToQueueName: mocks.fromGitUrlToQueueName,
       transformEnvVars: vi.fn().mockReturnValue(
         {
-          groupedEnvVars: [`${env.key}=${env.value}`],
+          cmdEnvVars: `--env ${env.key}=${env.value}`,
           persistedEnvVars: [env],
         },
       ),
@@ -124,7 +124,7 @@ describe("deployments tests", () => {
         children: [
           {
             name: JOBS.build,
-            data: { env: env.groupedEnvVars, cache, ...(staticdeploy && { publishdir }), port, staticdeploy, fqdn, repoName: queueName, isRedeploy: false },
+            data: { env: env.cmdEnvVars, cache, ...(staticdeploy && { publishdir }), port, staticdeploy, fqdn, repoName: queueName, isRedeploy: false },
             queueName,
             opts: { attempts: 3, failParentOnFailure: true },
             children: [

@@ -185,18 +185,23 @@ export function transformEnvVars(envs: DeploymentReferenceAndDataSchema["env"]) 
     return undefined;
   }
 
-  const groupedEnvVars = plainEnvVarsToGroupedEnvVars(envs);
-
+  const cmdEnvVars = plainEnvVarsToCmdEnvVars(envs);
   const persistedEnvVars = plainEnvVarsToPersistedEnvVars(envs);
 
   return {
-    groupedEnvVars,
     persistedEnvVars,
+    cmdEnvVars,
   };
 }
 
-export function plainEnvVarsToGroupedEnvVars(envs: string) {
-  return envs.split(" ");
+export function plainEnvVarsToCmdEnvVars(envs: string) {
+  return envs.split(" ")
+    .map((env) => {
+      const [key, value] = env.split("=");
+      return `--env ${key}=${value}`;
+    },
+    )
+    .join(" ");
 }
 
 export function parseAppHost(appName: string, hostName: string) {
