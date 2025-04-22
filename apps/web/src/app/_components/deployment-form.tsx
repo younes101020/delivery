@@ -116,7 +116,7 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
             Application source
           </p>
           <div className="grid grid-cols-4 gap-4">
-            <DeploymentGithubAppList githubApps={githubApps} />
+            <DeploymentGithubAppList githubApps={githubApps} initialGithubAppId={repositories.githubApp.appId} />
             <DeploymentRepositories githubApp={repositories.githubApp} repositories={repositories} selected={selected} setSelected={setSelected} />
           </div>
 

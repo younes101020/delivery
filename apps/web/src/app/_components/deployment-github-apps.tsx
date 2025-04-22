@@ -7,41 +7,51 @@ import type { GithubApp } from "../_lib/github/types";
 
 interface DeploymentGithubAppsProps {
   githubApps: GithubApp[];
+  initialGithubAppId: number;
 }
 
-export function DeploymentGithubAppList({ githubApps }: DeploymentGithubAppsProps) {
+export function DeploymentGithubAppList({ githubApps, initialGithubAppId }: DeploymentGithubAppsProps) {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const { replace } = useRouter();
+  const params = new URLSearchParams(searchParams);
+  const githubAppSearchParam = params.get("githubapp") ? Number.parseInt(params.get("githubapp") as string) : initialGithubAppId;
+
+  const handleGithubAppClick = (appId: number) => {
+    params.set("githubapp", `${appId}`);
+    replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
   return (
     <div className="col-span-1 flex flex-col gap-2">
-      {githubApps.map(ghApp => <DeploymentGithubApp key={ghApp.appId} githubApp={ghApp} />)}
+      {githubApps.map(
+        ghApp => (
+          <DeploymentGithubApp
+            key={ghApp.appId}
+            githubApp={ghApp}
+            handleGithubAppClick={handleGithubAppClick}
+            isSelected={githubAppSearchParam === ghApp.appId}
+          />
+        ),
+      )}
     </div>
   );
 }
 
 interface DeploymentGithubAppProps {
   githubApp: GithubApp;
+  isSelected: boolean;
+  handleGithubAppClick: (githubAppId: number) => void;
 }
 
-function DeploymentGithubApp({ githubApp }: DeploymentGithubAppProps) {
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const { replace } = useRouter();
-  const params = new URLSearchParams(searchParams);
-  const githubAppSearchParam = params.get("githubapp");
-
-  const isSelected = githubAppSearchParam ? Number.parseInt(githubAppSearchParam) === githubApp.appId : false;
-
-  const handleGithubAppClick = () => {
-    params.set("githubapp", `${githubApp.appId}`);
-    replace(`${pathname}?${params.toString()}`, { scroll: false });
-  };
-
+function DeploymentGithubApp({ githubApp, isSelected, handleGithubAppClick }: DeploymentGithubAppProps) {
   return (
     <motion.section
       whileHover={{ scale: 1 }}
       whileTap={{ scale: 1.01 }}
       className="cursor-pointer"
       data-testid={`${githubApp.appId}-ghapp-card`}
-      onClick={handleGithubAppClick}
+      onClick={() => handleGithubAppClick(githubApp.appId)}
     >
       <Card className={`overflow-hidden relative ${isSelected && "border-primary"}`}>
         <CardHeader>
