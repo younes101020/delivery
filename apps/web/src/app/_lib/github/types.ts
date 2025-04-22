@@ -1,6 +1,7 @@
 export interface Repository {
   id: number;
   full_name: string;
+  name: string;
   git_url: string;
   description: string | null;
 }

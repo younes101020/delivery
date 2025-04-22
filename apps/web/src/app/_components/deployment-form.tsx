@@ -18,6 +18,7 @@ import type { SelectedRepositoryProps } from "./deployment-repositories";
 import { deploy } from "../actions";
 import { DeploymentGithubAppList } from "./deployment-github-apps";
 import { DeploymentRepositories } from "./deployment-repositories";
+import { RepositorySearch } from "./deployment-repository-search";
 import { Paragraph } from "./ui/paragraph";
 
 interface DeploymentProps {
@@ -117,7 +118,10 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
           </p>
           <div className="grid grid-cols-4 gap-4">
             <DeploymentGithubAppList githubApps={githubApps} initialGithubAppId={repositories.githubApp.appId} />
-            <DeploymentRepositories githubApp={repositories.githubApp} repositories={repositories} selected={selected} setSelected={setSelected} />
+            <div className="col-span-3">
+              <RepositorySearch />
+              <DeploymentRepositories githubApp={repositories.githubApp} repositories={repositories} selected={selected} setSelected={setSelected} />
+            </div>
           </div>
 
         </div>

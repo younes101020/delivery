@@ -47,8 +47,8 @@ export function DeploymentRepositories({ repositories, githubApp, selected, setS
   }, [isIntersecting, pathname, replace, hasTriggered, searchParams]);
 
   return (
-    <ScrollArea className="col-span-3 max-h-52">
-      <div className="max-h-96 grid grid-cols-1 md:grid-cols-2 gap-2">
+    <ScrollArea>
+      <div className="max-h-52 grid grid-cols-1 md:grid-cols-2 gap-2">
         {repositories.repositories.map(repo => (
           <RepositorySection
             repo={repo}
@@ -66,7 +66,6 @@ export function DeploymentRepositories({ repositories, githubApp, selected, setS
         )}
       </div>
     </ScrollArea>
-
   );
 }
 
