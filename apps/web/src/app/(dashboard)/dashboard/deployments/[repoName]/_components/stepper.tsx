@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { ExternalLink as ExternalLinkIcon, Loader2, RotateCcw } from "lucide-react";
-import { redirect, usePathname } from "next/navigation";
+import { redirect } from "next/navigation";
 import { useActionState } from "react";
 
 import type { ActionState } from "@/app/_lib/form-middleware";
@@ -14,6 +14,7 @@ import { retryDeploy } from "@/app/actions";
 
 import type { DeploymentLogState } from "../types";
 
+import { useGetRepoName } from "../_hooks/use-get-repo-name";
 import { LogsTerminal } from "../../_components/deployment-logs";
 import BoxReveal from "./ui/box-reveal";
 import Ripple from "./ui/ripple";
@@ -43,8 +44,7 @@ export const DEPLOYMENTMETADATA = {
 };
 
 export function Stepper() {
-  const path = usePathname();
-  const repoName = path.split("/").slice(2)[0];
+  const repoName = useGetRepoName();
 
   const { data } = useQuery<DeploymentLogState>({ queryKey: ["deployment"] });
 

@@ -2,19 +2,18 @@
 
 import type { ReactNode } from "react";
 
-import { usePathname } from "next/navigation";
-
 import { useQuerySubscription } from "@/app/_hooks/use-query-subscription";
 
 import type { DeploymentLogState } from "../types";
+
+import { useGetRepoName } from "../_hooks/use-get-repo-name";
 
 interface SubscribeToSSEProps {
   children: ReactNode;
 }
 
 export function SubscribeToSSE({ children }: SubscribeToSSEProps) {
-  const path = usePathname();
-  const repoName = path.split("/").slice(2)[0];
+  const repoName = useGetRepoName();
 
   const stateCallback = (data: DeploymentLogState, prevData: DeploymentLogState) => {
     const shouldMergeLogs = "logs" in data && data.logs && "logs" in prevData && prevData.logs;
