@@ -28,6 +28,8 @@ export function RepositorySearch() {
       <Input
         type="text"
         className="w-full border-0"
+        placeholder="Search repositories..."
+        autoComplete="off"
         defaultValue={searchParams.get("query")?.toString()}
         onChange={(e) => {
           handleRepositorySearch(e.target.value);
