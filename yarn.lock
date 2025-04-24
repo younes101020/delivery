@@ -488,6 +488,7 @@ __metadata:
     "@radix-ui/react-tooltip": "npm:^1.1.6"
     "@t3-oss/env-nextjs": "npm:^0.12.0"
     "@tanstack/react-query": "npm:^5.66.9"
+    "@tanstack/react-query-devtools": "npm:5.0.0-alpha.91"
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.1.0"
     "@testing-library/user-event": "npm:^14.5.2"
@@ -4402,6 +4403,26 @@ __metadata:
   version: 5.66.4
   resolution: "@tanstack/query-core@npm:5.66.4"
   checksum: 10c0/ef0ebf572e0109791e53e9a7c2790a93cbfe1c6f3fb462793c621c0f2d44c0b38f78f22a32526e124790f69a017ae3254877281f418ffef06d83f4edb82df51a
+  languageName: node
+  linkType: hard
+
+"@tanstack/query-devtools@npm:5.0.0-alpha.89":
+  version: 5.0.0-alpha.89
+  resolution: "@tanstack/query-devtools@npm:5.0.0-alpha.89"
+  checksum: 10c0/3d8fa662bd80b7989fbd7d126cc80a90844ae589522eb5b3d56dcb81bdd09638eae1c2a27ff3dd72dc0eae1139e3fe8ce75c88c27e648866fa1b97527f0da825
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-query-devtools@npm:5.0.0-alpha.91":
+  version: 5.0.0-alpha.91
+  resolution: "@tanstack/react-query-devtools@npm:5.0.0-alpha.91"
+  dependencies:
+    "@tanstack/query-devtools": "npm:5.0.0-alpha.89"
+  peerDependencies:
+    "@tanstack/react-query": 5.0.0-alpha.91
+    react: ^18.0.0
+    react-dom: ^18.0.0
+  checksum: 10c0/f4180db668cfe3ad6bfc706a5b5ace6e33038360026d0a210e88cf93590334f4878570e71a3f3dcf80c314c527468aa370b547f88dbd3d399624b65e09ec72c4
   languageName: node
   linkType: hard
 
