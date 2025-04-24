@@ -16,7 +16,7 @@ export function SubscribeToSSE({ children }: SubscribeToSSEProps) {
   const repoName = useGetRepoName();
 
   const stateCallback = (data: DeploymentLogState, prevData: DeploymentLogState) => {
-    const shouldMergeLogs = "logs" in data && data.logs && "logs" in prevData && prevData.logs;
+    const shouldMergeLogs = "logs" in data && data.logs && prevData && "logs" in prevData && prevData.logs;
     return shouldMergeLogs ? { ...data, logs: prevData.logs ? `${prevData.logs}${data.logs}` : data.logs } : data;
   };
 
