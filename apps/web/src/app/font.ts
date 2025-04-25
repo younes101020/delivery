@@ -7,3 +7,11 @@ export const roboto = Roboto({
   display: "swap",
   variable: "--font-roboto",
 });
+
+export const robotoLight = Roboto({
+  weight: "300",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-roboto-thin",
+});
