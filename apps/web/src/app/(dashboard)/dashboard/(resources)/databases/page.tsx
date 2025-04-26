@@ -4,6 +4,7 @@ import { Suspense } from "react";
 
 import { buttonVariants } from "@/app/_components/ui/button";
 import { EmptyState } from "@/app/_components/ui/empty-state";
+import { PageDescription } from "@/app/_components/ui/page-description";
 import { PageTitle } from "@/app/_components/ui/page-title";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 
@@ -15,7 +16,11 @@ export default function DatabasesPage() {
   return (
     <section className="p-5 bg-background/50 border">
       <div className="flex justify-between gap-2">
-        <PageTitle>My databases</PageTitle>
+        <div>
+          <PageTitle>My databases</PageTitle>
+          <PageDescription>A list of all your databases.</PageDescription>
+        </div>
+
         <Link href="/dashboard/applications/hub" className={buttonVariants({ variant: "outline" })}>
           <Boxes className="mr-1 mt-[.1rem] stroke-1" />
           Database Hub

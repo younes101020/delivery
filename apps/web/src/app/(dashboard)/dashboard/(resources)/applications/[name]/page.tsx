@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { WithBannerBadge } from "@/app/_components/banner";
+import { PageDescription } from "@/app/_components/ui/page-description";
 import { PageTitle } from "@/app/_components/ui/page-title";
 import { Separator } from "@/app/_components/ui/separator";
 import { Skeleton } from "@/app/_components/ui/skeleton";
@@ -22,6 +23,12 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
   return (
     <section className="p-5 bg-background/50 border">
       <PageTitle>Application configuration</PageTitle>
+      <PageDescription>
+        {appName}
+        {" "}
+        related informations, configure details from here.
+      </PageDescription>
+
       <div className="mt-8 grid grid-cols-4 gap-4">
         <Suspense
           fallback={(

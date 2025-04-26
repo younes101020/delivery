@@ -27,7 +27,7 @@ export function PreviousDeploymentPreviewCard({
       <div className="opacity-0 group-hover/feature:opacity-100 transition duration-200 absolute inset-0 h-full w-full bg-gradient-to-t to-transparent pointer-events-none from-primary/25" />
 
       <CardContent className="px-0">
-        <div className="text-lg font-bold mb-2 relative z-10 px-10 flex flex-col">
+        <div className="text-lg mb-2 relative z-10 px-10 flex flex-col">
           <span className="group-hover/feature:translate-x-2 transition duration-200 inline-block">
             {repoName}
           </span>

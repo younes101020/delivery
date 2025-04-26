@@ -58,7 +58,7 @@ export function DeploymentPreviewCard({
           </div>
         )}
 
-        <div className="text-lg font-bold mb-2 relative z-10 px-10 flex flex-col">
+        <div className="text-lg relative z-10 px-10 flex flex-col">
           <span className="group-hover/feature:translate-x-2 transition duration-200 inline-block mb-2">
             {repoName}
           </span>
@@ -91,7 +91,7 @@ export function DeploymentPreviewCard({
                   </dl>
                 )}
                 {data?.status && (
-                  <Link href={`/dashboard/deployments/${repoName}`} className={cn(buttonVariants({ variant: data.status === "failed" ? "destructive" : data.status === "active" ? "default" : "ghost" }), "mt-4")}>
+                  <Link href={`/dashboard/deployments/${repoName}`} className={cn(buttonVariants({ variant: data.status === "failed" ? "destructive" : data.status === "active" ? "default" : "ghost" }), "mt-2")}>
                     View details
                   </Link>
                 )}

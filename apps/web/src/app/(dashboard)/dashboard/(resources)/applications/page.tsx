@@ -4,6 +4,7 @@ import { Suspense } from "react";
 
 import { buttonVariants } from "@/app/_components/ui/button";
 import { EmptyState } from "@/app/_components/ui/empty-state";
+import { PageDescription } from "@/app/_components/ui/page-description";
 import { PageTitle } from "@/app/_components/ui/page-title";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { formatDate } from "@/app/_lib/utils";
@@ -18,7 +19,11 @@ export default async function ApplicationsPage() {
   return (
     <section className="p-5 bg-background/50 border h-[90%]">
       <div className="flex justify-between gap-2">
-        <PageTitle>My applications</PageTitle>
+        <div>
+          <PageTitle>My applications</PageTitle>
+          <PageDescription>A list of all your applications.</PageDescription>
+        </div>
+
         <Link href="/dashboard/applications/new" className={buttonVariants({ variant: "outline" })}>
           <PackagePlus className="mr-1 mt-[.1rem]" />
           Deploy
