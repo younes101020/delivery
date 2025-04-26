@@ -113,7 +113,7 @@ export async function redeploy(applicationName: string) {
   if (response.status !== 202) {
     return { error: "Unable to redeploy the application" };
   }
-  return { success: "Redeployment success" };
+  redirect(`/dashboard/deployments/${applicationName}`);
 }
 
 const injectEnvSchema = z.object({
