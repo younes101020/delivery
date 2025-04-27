@@ -22,7 +22,7 @@ export function Spinner({ className }: SpinnerProps) {
         repeatDelay: 1,
       }}
       className={cn(
-        "bg-transparent border border-primary-foreground border-dashed size-2",
+        "bg-transparent border border-primary border-dashed size-2",
         className,
       )}
     />

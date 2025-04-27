@@ -13,20 +13,23 @@ export function DeploymentTracker() {
 
   return (
     <div className={`${roboto.className} p-4 flex items-center gap-4 bg-secondary border mb-2 text-xs`}>
-      {data?.isActiveDeployment
-        ? (
-            <>
-              <Spinner />
-              <p>Deployment in progress.</p>
-            </>
-          )
-        : (
-            <p className="flex items-center gap-2">
-              <PowerOff size={14} />
-              <span className="font-thin">/</span>
-              No deployment.
-            </p>
-          )}
+      <div className="flex items-center gap-2">
+        {data?.isActiveDeployment
+          ? (
+              <>
+                <Spinner />
+                <span className="font-thin">/</span>
+                <p>Deployment in progress.</p>
+              </>
+            )
+          : (
+              <>
+                <PowerOff size={14} />
+                <span className="font-thin">/</span>
+                No deployment.
+              </>
+            )}
+      </div>
 
     </div>
   );
