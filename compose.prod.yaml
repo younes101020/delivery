@@ -27,7 +27,6 @@ services:
     environment:
       - PORT=${PORT}
       - DATABASE_URL=${DATABASE_URL}
-      - DATABASE_AUTH_TOKEN=${DATABASE_AUTH_TOKEN}
       - LOG_LEVEL=${LOG_LEVEL}
       - NODE_ENV=${NODE_ENV}
       - SSH_HOST=${SSH_HOST}
