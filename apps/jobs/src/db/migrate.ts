@@ -8,7 +8,7 @@ import { databases } from "./schema";
 
 async function main() {
   await migrate(db, {
-    migrationsFolder: path.join(process.cwd(), "/src/db/migrations"),
+    migrationsFolder: path.join(process.cwd(), "/apps/jobs/src/db/migrations"),
   });
 
   await seedWithDatabaseConstants();

@@ -1,4 +1,4 @@
-FROM node:20-alpine AS base
+FROM node:23-alpine AS base
 
 FROM base AS builder
 RUN apk update
@@ -43,4 +43,4 @@ COPY --from=installer --chown=hono:nodejs /app/apps/jobs/src/db/migrations ./app
 USER hono
 EXPOSE 3090
 
-CMD node apps/jobs/dist/src/db/migrate.js && node apps/jobs/dist/src/index.js
+CMD ["node", "apps/jobs/dist/src/db/migrate.js"] && ["node", "apps/jobs/dist/src/index.js"]
