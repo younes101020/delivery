@@ -11,7 +11,6 @@ services:
       - NEXT_PUBLIC_BASEURL=${NEXT_PUBLIC_BASEURL}
     volumes:
       - ./apps/web/src:/app/src
-    restart: always
     ports:
       - 3000:3000
     networks:
@@ -39,7 +38,6 @@ services:
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
     volumes:
       - /data/delivery/ssh/keys:/var/ssh/keys
-    restart: always
     ports:
       - 3090:3090
     networks:
