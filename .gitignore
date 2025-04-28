@@ -2,4 +2,7 @@ node_modules
 /.env
 db-data
 .turbo
-.yarn/install-state.gz
+/.yarn/install-state.gz
+config.yml
+letsencrypt
+config

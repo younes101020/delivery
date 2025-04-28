@@ -4,7 +4,6 @@ import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema } from "stoker/openapi/schemas";
 
 import { selectScreenshotSchema, selectUrlScreenshotSchema } from "@/db/dto/screenshots.dto";
-import { notFoundSchema } from "@/lib/constants";
 
 const tags = ["Website screenshot"];
 
@@ -21,7 +20,6 @@ export const getImageUrl = createRoute({
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(selectUrlScreenshotSchema, "The uploaded image url"),
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Application not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(createErrorSchema(selectScreenshotSchema), "The validation error(s)"),
   },
 });

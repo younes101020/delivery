@@ -1,7 +1,7 @@
 import type { z } from "zod";
 
-import { relations, sql, type SQL } from "drizzle-orm";
-import { boolean, integer, pgTable, primaryKey, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+import { boolean, integer, json, pgTable, primaryKey, serial, text, timestamp } from "drizzle-orm/pg-core";
 
 import type { selectUserSchema } from "./dto";
 import type { selectGithubAppsSchema } from "./dto/githubapps.dto";
@@ -48,9 +48,7 @@ export const githubAppSecret = pgTable("github_app_secret", {
 
 export const applications = pgTable("applications", {
   id: serial("id").primaryKey(),
-  name: text("name")
-    .notNull()
-    .generatedAlwaysAs((): SQL => sql`split_part(${applications.fqdn}, '.', 1)`),
+  name: text("name").notNull(),
   fqdn: text("fqdn").notNull().unique(),
   logs: text("logs"),
   port: integer("port").notNull(),
@@ -65,6 +63,16 @@ export const environmentVariables = pgTable("environment_variables", {
   key: text("key").notNull(),
   value: text("value").notNull(),
   isBuildTime: boolean("is_build_time").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  deletedAt: timestamp("deleted_at"),
+});
+
+export const databases = pgTable("databases", {
+  id: serial("id").primaryKey(),
+  image: text("image").notNull(),
+  port: integer("port").notNull(),
+  credentialsEnvVar: json().$type<string[]>().notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   deletedAt: timestamp("deleted_at"),

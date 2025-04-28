@@ -5,9 +5,8 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { client } from "./_lib/client-http";
-import { validatedAction } from "./_lib/form-middleware";
+import { validatedAction, validatedActionWithUser } from "./_lib/form-middleware";
 import { setSession } from "./_lib/session";
-import { getUser } from "./_lib/user-session";
 
 const signUpSchema = z.object({
   email: z.string().email(),
@@ -79,34 +78,36 @@ const deploySchema = z.object({
   }
 });
 
-export const deploy = validatedAction(deploySchema, async (data) => {
-  const user = await getUser();
-  const deploymentResponse = await client.deployments.$post({
-    json: data,
-  });
-  if (deploymentResponse.status !== 200) {
-    return { error: "Impossible to start the deployment.", inputs: data };
-  }
-
-  if (data.isOnboarding) {
-    const response = await client.serverconfig.$patch({
-      json: {
-        completedByUserId: user?.id.toString(),
-        onboardingCompleted: true,
-      },
+export const deploy = validatedActionWithUser(
+  deploySchema,
+  async (data, _, user) => {
+    const deploymentResponse = await client.deployments.$post({
+      json: data,
     });
-    if (!response.ok) {
-      return { error: "Something went wrong, please retry later.", inputs: data };
+    if (deploymentResponse.status !== 202) {
+      return { error: "Impossible to start the deployment.", inputs: data };
     }
-    (await cookies()).set("skiponboarding", "true", {
-      maxAge: 60 * 60 * 24 * 7,
-      path: "/",
-    });
-  }
 
-  const result = await deploymentResponse.json();
-  redirect(`/dashboard/deployments/${result.queueName}`);
-});
+    if (data.isOnboarding) {
+      const response = await client.serverconfig.$patch({
+        json: {
+          completedByUserId: user.id.toString(),
+          onboardingCompleted: true,
+        },
+      });
+      if (!response.ok) {
+        return { error: "Something went wrong, please retry later.", inputs: data };
+      }
+      (await cookies()).set("skiponboarding", "true", {
+        maxAge: 60 * 60 * 24 * 7,
+        path: "/",
+      });
+    }
+
+    const result = await deploymentResponse.json();
+    redirect(`/dashboard/deployments/${result.queueName}`);
+  },
+);
 
 const retryDeploySchema = z.object({
   repoName: z.string(),

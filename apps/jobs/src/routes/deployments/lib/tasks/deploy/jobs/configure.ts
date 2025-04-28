@@ -9,7 +9,7 @@ export async function configure(job: QueueDeploymentJob<"configure">) {
   let applicationId;
 
   try {
-    const persistedApplication = await createApplication({
+    const { id: ApplicationId } = await createApplication({
       applicationData: { ...application, fqdn, port: application.port },
       envVars: environmentVariable,
     });
@@ -17,7 +17,7 @@ export async function configure(job: QueueDeploymentJob<"configure">) {
       logs: `\nApplication configuration saved to database 🗄️`,
       jobId: job.id,
     });
-    applicationId = persistedApplication.id;
+    applicationId = ApplicationId ?? 0;
   }
   catch (error) {
     const expectedError = error instanceof Error;

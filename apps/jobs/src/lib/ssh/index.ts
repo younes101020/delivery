@@ -4,28 +4,33 @@ import type { Chunk, ISSH } from "../../routes/deployments/lib/tasks/deploy/jobs
 
 import { loadConfig } from "./utils";
 
-export async function ssh(command: string, { onStdout, cwd }: ISSH) {
+export async function ssh(command: string, { onStdout, cwd }: ISSH = {}) {
   const conn = new Client();
   const config = await loadConfig();
+  if (!config)
+    return null;
   const fullCommand = cwd ? `cd ${cwd} && ${command}` : command;
   return new Promise<Chunk[] | Error>((resolve, reject) => {
     const result: Chunk[] = [];
 
-    const timeout = setTimeout(() => {
-      conn.end();
-      const errorMessage = "SSH connection timed out after 30 minutes";
-      result.push(errorMessage);
-      onStdout({ chunk: errorMessage, chunks: result, isCriticalError: true });
-      reject(new Error(errorMessage));
-    }, 1_800_000); // 30min
-
     conn
       .on("ready", () => {
         conn.exec(fullCommand, (err, stream) => {
+          const timeout = setTimeout(async () => {
+            const errorMessage = "SSH connection timed out after 30 minutes";
+            result.push(errorMessage);
+            if (onStdout) {
+              await onStdout({ chunk: errorMessage, chunks: result, isCriticalError: true });
+            }
+            stream.close();
+            reject(new Error(errorMessage));
+          }, 1_800_000); // 30min
+
           if (err) {
             clearTimeout(timeout);
             throw err;
           }
+
           stream
             .setEncoding("utf-8")
             .on("close", () => {
@@ -33,17 +38,21 @@ export async function ssh(command: string, { onStdout, cwd }: ISSH) {
               conn.end();
               resolve(result);
             })
-            .on("data", (data: string) => {
+            .on("data", async (data: string) => {
               result.push(data);
-              onStdout({ chunk: data, chunks: result });
+              if (onStdout) {
+                await onStdout({ chunk: data, chunks: result });
+              }
             })
             .stderr
             .setEncoding("utf-8")
-            .on("data", (data: string) => {
+            .on("data", async (data: string) => {
               const errorMessage = data.toLowerCase();
               const isCriticalError = /fatal:|error:/i.test(errorMessage);
               result.push(data);
-              onStdout({ chunk: data, chunks: result, isCriticalError });
+              if (onStdout) {
+                await onStdout({ chunk: data, chunks: result, isCriticalError });
+              }
               if (/already exists/i.test(errorMessage)) {
                 clearTimeout(timeout);
                 resolve(result);
@@ -58,7 +67,6 @@ export async function ssh(command: string, { onStdout, cwd }: ISSH) {
       .connect(config);
 
     conn.on("error", (err) => {
-      clearTimeout(timeout);
       conn.end();
       reject(err);
     });

@@ -3,12 +3,12 @@ import { motion } from "motion/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import type { Nullable } from "@/lib/utils";
+import type { Nullable } from "@/app/_lib/utils";
 
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/app/_components/ui/card";
+import { ScrollArea } from "@/app/_components/ui/scroll-area";
+import { Skeleton } from "@/app/_components/ui/skeleton";
+import { useIntersectionObserver } from "@/app/_hooks/use-intersection-observer";
 
 import type { GithubApp, GithubRepositories, Repository } from "../_lib/github/types";
 
@@ -47,8 +47,8 @@ export function DeploymentRepositories({ repositories, githubApp, selected, setS
   }, [isIntersecting, pathname, replace, hasTriggered, searchParams]);
 
   return (
-    <ScrollArea className="col-span-3 max-h-80">
-      <div className="max-h-96 grid grid-cols-1 md:grid-cols-2 gap-2">
+    <ScrollArea>
+      <div className="max-h-52 grid grid-cols-1 md:grid-cols-2 gap-2">
         {repositories.repositories.map(repo => (
           <RepositorySection
             repo={repo}
@@ -66,7 +66,6 @@ export function DeploymentRepositories({ repositories, githubApp, selected, setS
         )}
       </div>
     </ScrollArea>
-
   );
 }
 

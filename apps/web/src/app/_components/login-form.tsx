@@ -5,13 +5,14 @@ import { useActionState } from "react";
 
 import type { ActionState } from "@/app/_lib/form-middleware";
 
+import { Button } from "@/app/_components/ui/button";
+import { CardFooter } from "@/app/_components/ui/card";
+import { Input } from "@/app/_components/ui/input";
+import { Label } from "@/app/_components/ui/label";
 import { signUp } from "@/app/actions";
-import { Button } from "@/components/ui/button";
-import { CardFooter } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 import { signIn } from "../(login)/actions";
+import { Paragraph } from "./ui/paragraph";
 
 export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
@@ -61,10 +62,10 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
         </div>
       </div>
 
-      {state?.error && <div className="text-destructive text-sm">{state.error}</div>}
+      {state?.error && <Paragraph variant="error">{state.error}</Paragraph>}
 
-      <CardFooter className="flex px-0 pt-8">
-        <Button type="submit" disabled={pending} aria-label="submit" className="w-full">
+      <CardFooter className="flex px-0 pt-8 justify-end">
+        <Button type="submit" disabled={pending} aria-label="submit">
           {pending
             ? (
                 <>

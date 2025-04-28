@@ -7,10 +7,10 @@ import { useActionState, useState } from "react";
 
 import type { GithubApp, GithubRepositories } from "@/app/_lib/github/types";
 
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/app/_components/ui/button";
+import { Checkbox } from "@/app/_components/ui/checkbox";
+import { Input } from "@/app/_components/ui/input";
+import { Label } from "@/app/_components/ui/label";
 
 import type { ActionState } from "../_lib/form-middleware";
 import type { SelectedRepositoryProps } from "./deployment-repositories";
@@ -18,6 +18,8 @@ import type { SelectedRepositoryProps } from "./deployment-repositories";
 import { deploy } from "../actions";
 import { DeploymentGithubAppList } from "./deployment-github-apps";
 import { DeploymentRepositories } from "./deployment-repositories";
+import { RepositorySearch } from "./deployment-repository-search";
+import { Paragraph } from "./ui/paragraph";
 
 interface DeploymentProps {
   repositories: GithubRepositories;
@@ -73,7 +75,7 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
           : (
               <div>
                 <Label htmlFor="port" className="block text-sm font-medium">
-                  Exposed or mapped port
+                  Running port
                 </Label>
                 <div className="mt-1">
                   <Input
@@ -83,11 +85,11 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
                     required={!isStaticDeployment}
                     defaultValue={state.inputs.port}
                     className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
-                    placeholder="ex: 3000 or 5695:3000"
+                    placeholder="ex: 3000"
                   />
                 </div>
                 <p className="text-muted-foreground text-xs pt-1">
-                  This port will be used by the reverse proxy to make your application accessible.
+                  Port on which your application runs.
                 </p>
               </div>
             )}
@@ -115,53 +117,59 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
             Application source
           </p>
           <div className="grid grid-cols-4 gap-4">
-            <DeploymentGithubAppList githubApps={githubApps} />
-            <DeploymentRepositories githubApp={repositories.githubApp} repositories={repositories} selected={selected} setSelected={setSelected} />
+            <DeploymentGithubAppList githubApps={githubApps} initialGithubAppId={repositories.githubApp.appId} />
+            <div className="col-span-3">
+              <RepositorySearch />
+              <DeploymentRepositories githubApp={repositories.githubApp} repositories={repositories} selected={selected} setSelected={setSelected} />
+            </div>
           </div>
 
         </div>
         <p className="text-muted-foreground text-xs">
           This GitHub repository will be the source of your application.
         </p>
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="staticdeploy"
-            name="staticdeploy"
-            defaultChecked={!!(state.inputs.staticdeploy === "on" || state.inputs.staticdeploy)}
-            key={state.inputs.staticdeploy}
-            onCheckedChange={isChecked => setIsTaticDeployment(isChecked)}
-          />
-          <div className="flex flex-col">
-            <label
-              htmlFor="terms"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              Build and serve static files
-            </label>
-            <p className="block text-xs text-muted-foreground">
-              Your source code will be built, and the output static files will be served via Nginx
-            </p>
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="staticdeploy"
+              name="staticdeploy"
+              defaultChecked={!!(state.inputs.staticdeploy === "on" || state.inputs.staticdeploy)}
+              key={state.inputs.staticdeploy}
+              onCheckedChange={isChecked => setIsTaticDeployment(isChecked)}
+            />
+            <div className="flex flex-col">
+              <label
+                htmlFor="terms"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Build and serve static files
+              </label>
+              <p className="block text-xs text-muted-foreground">
+                Your source code will be built, and the output static files will be served via Nginx
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="cache"
+              name="cache"
+              defaultChecked={!!(state.inputs.cache === "on" || state.inputs.cache)}
+              key={state.inputs.cache}
+            />
+            <div className="flex flex-col">
+              <label
+                htmlFor="terms"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Enable caching
+              </label>
+              <p className="block text-xs text-muted-foreground">
+                Unchanged dependencies will not be reinstalled
+              </p>
+            </div>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="cache"
-            name="cache"
-            defaultChecked={!!(state.inputs.cache === "on" || state.inputs.cache)}
-            key={state.inputs.cache}
-          />
-          <div className="flex flex-col">
-            <label
-              htmlFor="terms"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              Enable caching
-            </label>
-            <p className="block text-xs text-muted-foreground">
-              Unchanged dependencies will not be reinstalled
-            </p>
-          </div>
-        </div>
+
         <div className={`flex ${state.error ? "justify-between" : "justify-end"}`}>
           <input type="hidden" name="repoUrl" id="repoUrl" value={selected.gitUrl ?? "no-url"} />
           <input
@@ -174,9 +182,9 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
             <input type="hidden" name="isOnboarding" id="isOnboarding" value="true" />
           )}
           {state?.error && (
-            <p className="text-destructive bg-destructive/15 p-2 text-sm border border-destructive">
+            <Paragraph variant="error">
               {state.error}
-            </p>
+            </Paragraph>
           )}
           <Button type="submit" disabled={!selected.name || pending} aria-label="submit">
             {pending

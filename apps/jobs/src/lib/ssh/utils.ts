@@ -1,7 +1,19 @@
-import fs, { existsSync } from "node:fs";
+import { existsSync } from "node:fs";
+import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
 import env from "@/env";
+
+export async function loadConfig() {
+  const { keyPath, privateKey } = await findSSHKey();
+  const username = getUserFromKeyPath(keyPath);
+
+  return {
+    host: env.SSH_HOST,
+    username,
+    privateKey,
+  };
+}
 
 interface SSHKey {
   keyPath: string;
@@ -10,7 +22,7 @@ interface SSHKey {
 
 const keyCache = new Set<SSHKey>();
 
-export async function findSSHKey() {
+async function findSSHKey() {
   const [cachedKey] = keyCache;
   if (cachedKey) {
     return cachedKey;
@@ -19,7 +31,7 @@ export async function findSSHKey() {
   try {
     const isContainerized = await checkIsContainerized();
     const keyDirectory = isContainerized ? "/var/ssh/keys" : "/data/delivery/ssh/keys";
-    const files = await fs.promises.readdir(keyDirectory);
+    const files = await readdir(keyDirectory);
 
     const keyFile = files.find(
       file => file.startsWith("id.") && file.endsWith("@host.docker.internal"),
@@ -30,7 +42,7 @@ export async function findSSHKey() {
     }
 
     const keyPath = path.join(keyDirectory, keyFile);
-    const privateKey = await fs.promises.readFile(keyPath, "utf-8");
+    const privateKey = await readFile(keyPath, "utf-8");
     const key = { keyPath, privateKey };
     keyCache.add(key);
 
@@ -44,23 +56,12 @@ export async function findSSHKey() {
   }
 }
 
-export async function checkIsContainerized() {
-  return existsSync("/.dockerenv");
-}
-
-export function getUserFromKeyPath(keyPath: string) {
+function getUserFromKeyPath(keyPath: string) {
   const filename = path.basename(keyPath);
   const match = filename.match(/^id\.(.+)@host\.docker\.internal$/)!;
   return match[1];
 }
 
-export async function loadConfig() {
-  const { keyPath, privateKey } = await findSSHKey();
-  const username = getUserFromKeyPath(keyPath);
-
-  return {
-    host: env.SSH_HOST,
-    username,
-    privateKey,
-  };
+async function checkIsContainerized() {
+  return existsSync("/.dockerenv");
 }

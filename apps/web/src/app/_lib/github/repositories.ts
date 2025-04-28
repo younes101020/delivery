@@ -1,10 +1,10 @@
-import { createAppAuth } from "@octokit/auth-app";
-import { Octokit } from "@octokit/rest";
+import type { GithubRepositories, Repository } from "./types";
 
-import { getAllGithubApp } from "./queries";
+import { getGithubApp } from "./client";
+import { getAllGithubAppCreds } from "./queries";
 
-export async function getGithubRepositoriesByGithubAppId(repoPage: number, githubAppId?: number) {
-  const githubApps = await getAllGithubApp();
+export async function getGithubRepositoriesByGithubAppId(repoPage: number, githubAppId?: number, query?: string) {
+  const githubApps = await getAllGithubAppCreds();
   if (!githubApps)
     return null;
 
@@ -13,7 +13,13 @@ export async function getGithubRepositoriesByGithubAppId(repoPage: number, githu
   if (!githubApp)
     return null;
 
-  const repositories = await aggregateGithubRepositories({ appId: githubApp.appId.toString(), privateKey: githubApp.privateKey, installationId: githubApp.installationId.toString(), repoPage });
+  const repositories = await getGithubRepositories({
+    appId: githubApp.appId.toString(),
+    privateKey: githubApp.privateKey,
+    installationId: githubApp.installationId.toString(),
+    repoPage,
+    query,
+  });
 
   return {
     repositories: { ...repositories, githubApp },
@@ -21,17 +27,45 @@ export async function getGithubRepositoriesByGithubAppId(repoPage: number, githu
   };
 }
 
-async function aggregateGithubRepositories({ appId, privateKey, installationId, repoPage }:
-{ appId: string; privateKey: string | null; installationId: string; repoPage: number }) {
-  const repositoriesResponse = await listGithubRepositories({
+interface GetGithubRepositories {
+  appId: string;
+  privateKey: string | null;
+  installationId: string;
+  repoPage: number;
+  query?: string;
+}
+
+async function getGithubRepositories({ query, appId, privateKey, installationId, repoPage }: GetGithubRepositories) {
+  const githubApp = await getGithubApp({ appId, privateKey, installationId, authType: "installation" });
+
+  if (query) {
+    const UNREACHABLE_REPOSITORY_COUNT = 500;
+
+    const repositories = await githubApp.listReposAccessibleToInstallation({
+      per_page: UNREACHABLE_REPOSITORY_COUNT,
+      page: 1,
+    });
+
+    const filteredRepositories = queryRepositoriesByName(repositories.data.repositories, query);
+
+    return toRepository({
+      repositories: filteredRepositories,
+      hasMore: repositories.data.total_count > UNREACHABLE_REPOSITORY_COUNT,
+    });
+  }
+
+  const repositoriesResponse = await listGithubRepositoriesByPagination({
     appId,
     privateKey,
     installationId,
     repoPage,
   });
 
-  const { repositories, hasMore } = repositoriesResponse;
+  return toRepository(repositoriesResponse);
+}
 
+function toRepository(githubRepositories: Omit<GithubRepositories, "githubApp">) {
+  const { repositories, hasMore } = githubRepositories;
   return {
     repositories: repositories
       ? repositories.map(repo => ({
@@ -39,14 +73,15 @@ async function aggregateGithubRepositories({ appId, privateKey, installationId, 
           full_name: repo.full_name,
           git_url: repo.git_url,
           description: repo.description,
+          name: repo.name,
         }))
       : [],
     hasMore: typeof hasMore === "undefined" ? false : hasMore,
   };
 }
 
-// This function fetches paginated github repositories data from a single GitHub installation
-async function listGithubRepositories({
+// This function fetches paginated github repositories data from a single GitHub app installation
+async function listGithubRepositoriesByPagination({
   appId,
   privateKey,
   installationId,
@@ -60,54 +95,26 @@ async function listGithubRepositories({
   repoPage?: number;
 }) {
   "use cache";
-  try {
-    const installation = await getGithubAppInstallation({ appId, privateKey, installationId });
+  const githubApp = await getGithubApp({ appId, privateKey, installationId, authType: "installation" });
 
-    const reposPromises = Array.from({ length: repoPage }, (_, pageIndex) =>
-      installation.apps.listReposAccessibleToInstallation({
-        per_page: repoPerPage,
-        page: pageIndex + 1,
-        type: "all",
-      }));
-    const iteratedRepos = await Promise.all(reposPromises);
-    const repositories = iteratedRepos.map(repo => repo.data.repositories.reverse()).flat();
-    const hasMore = repoPerPage * repoPage < iteratedRepos[0].data.total_count;
+  const reposPromises = Array.from({ length: repoPage }, (_, pageIndex) =>
+    githubApp.listReposAccessibleToInstallation({
+      per_page: repoPerPage,
+      page: pageIndex + 1,
+    }));
+  const iteratedRepos = await Promise.all(reposPromises);
+  const repositories = iteratedRepos.map(repo => repo.data.repositories.reverse()).flat();
+  const hasMore = repoPerPage * repoPage < iteratedRepos[0].data.total_count;
 
-    return {
-      success: true,
-      repositories,
-      hasMore,
-    };
-  }
-  catch (error) {
-    if (error instanceof Error) {
-      return {
-        success: false,
-        error: error.message,
-      };
-    }
-    return { success: false, error: "We can't list github repositories" };
-  }
+  return {
+    repositories,
+    hasMore,
+  };
 }
 
-// see: https://docs.github.com/en/rest/apps/installations?apiVersion=2022-11-28
-async function getGithubAppInstallation({ appId, privateKey, installationId }: { appId: string; privateKey: string | null; installationId: string }) {
-  const octokit = new Octokit({
-    authStrategy: createAppAuth,
-    auth: {
-      appId,
-      privateKey,
-      installationId,
-    },
+function queryRepositoriesByName(repositories: Repository[], query: string) {
+  return repositories.filter((repo) => {
+    const lowerCaseQuery = query.toLowerCase();
+    return repo.name.toLowerCase().includes(lowerCaseQuery) || repo.full_name.toLowerCase().includes(lowerCaseQuery);
   });
-
-  const { token } = (await octokit.auth({
-    type: "installation",
-  })) as { token: string };
-
-  const installation = new Octokit({
-    auth: token,
-  });
-
-  return installation;
 }

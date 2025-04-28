@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { signToken, verifyToken } from "@/app/_lib/session";
-import { parseSetCookie } from "@/lib/utils";
+import { parseSetCookie } from "@/app/_lib/utils";
 
 const protectedRoutes = "/dashboard";
 const onboardingRoute = "/onboarding";

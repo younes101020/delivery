@@ -12,6 +12,7 @@ const geistSans = localFont({
   variable: "--font-geist-sans",
   weight: "100 900",
 });
+
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
@@ -35,7 +36,9 @@ export default function RootLayout({
         className={`${geistSans.className} ${geistMono.className} antialiased absolute inset-0 h-full w-full bg-background bg-[linear-gradient(to_right,rgb(156_163_175_/_0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgb(156_163_175_/_0.1)_1px,transparent_1px)] bg-[size:24px_24px]`}
       >
         <Suspense>
-          <UserProvider userPromise={userPromise}>{children}</UserProvider>
+          <UserProvider userPromise={userPromise}>
+            {children}
+          </UserProvider>
         </Suspense>
       </body>
     </html>

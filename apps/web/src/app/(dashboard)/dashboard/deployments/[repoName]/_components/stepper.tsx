@@ -1,24 +1,23 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { ExternalLink as ExternalLinkIcon, Loader2, RotateCcw } from "lucide-react";
 import { redirect } from "next/navigation";
-import { useActionState, useEffect } from "react";
+import { useActionState } from "react";
 
 import type { ActionState } from "@/app/_lib/form-middleware";
-import type { Nullable } from "@/lib/utils";
+import type { Nullable } from "@/app/_lib/utils";
 
+import { Button } from "@/app/_components/ui/button";
+import { Paragraph } from "@/app/_components/ui/paragraph";
 import { retryDeploy } from "@/app/actions";
-import { Button } from "@/components/ui/button";
 
-import { useEventSource } from "../../_hooks/use-event-source";
+import type { DeploymentLogState } from "../types";
+
+import { useGetRepoName } from "../_hooks/use-get-repo-name";
+import { LogsTerminal } from "../../_components/deployment-logs";
 import BoxReveal from "./ui/box-reveal";
-import { LogsTerminal } from "./ui/logsterminal";
 import Ripple from "./ui/ripple";
-
-interface StepperProps {
-  baseUrl: string;
-  repoName: string;
-}
 
 export type DeploymentData = Nullable<{
   jobName: keyof typeof DEPLOYMENTMETADATA;
@@ -44,83 +43,68 @@ export const DEPLOYMENTMETADATA = {
   },
 };
 
-const DEFAULT_STATE = { jobName: null, logs: null };
+export function Stepper() {
+  const repoName = useGetRepoName();
 
-export function Stepper({ repoName, baseUrl }: StepperProps) {
-  const onMessage = (_: DeploymentData, data: DeploymentData) => {
-    if (data.completed && data.appId) {
-      redirect(`/dashboard/applications/${data.appId}`);
-    }
-  };
-  const { jobName, logs, isCriticalError, jobId, reconnect } = useEventSource<DeploymentData>({
-    eventUrl: `${baseUrl}/api/deployments/logs/${repoName}`,
-    initialState: DEFAULT_STATE,
-    onMessage,
-  });
+  const { data } = useQuery<DeploymentLogState>({ queryKey: ["deployment"] });
+
+  if (data && "completed" in data) {
+    redirect(`/dashboard/applications/${data.appId}`);
+  }
+
+  const [state, formAction, isPending] = useActionState<ActionState, FormData>(
+    retryDeploy,
+    { error: "", success: "", inputs: { repoName, jobId: data?.jobId } },
+  );
 
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden gap-4">
       <BoxReveal duration={0.5}>
         <p className="text-xl font-semibold">
-          {jobName && DEPLOYMENTMETADATA[jobName].phrase}
+          {data?.jobName && DEPLOYMENTMETADATA[data?.jobName].phrase}
           <span className="text-primary">.</span>
         </p>
       </BoxReveal>
       <div className="flex gap-2">
-        <p className="text-xs text-primary">{jobName && DEPLOYMENTMETADATA[jobName].position}</p>
-        <LogsTerminalButton logs={logs} />
+        <p className="text-xs text-primary">{data?.jobName && DEPLOYMENTMETADATA[data.jobName].position}</p>
+        <LogsTerminalButton logs={data?.logs} />
       </div>
-      {isCriticalError && (
+      {data?.isCriticalError && (
         <div className="flex flex-col gap-2 text-center items-center">
           <p className="text-destructive font-semibold">We were unable to deploy your application</p>
           <p className="text-xs text-destructive">Once you think you have resolved the issue, you can redeploy.</p>
-          {jobId && <RetryDeploymentButton repoName={repoName} jobId={jobId} reconnect={reconnect} />}
+          {data?.jobId && (
+            <div className="flex flex-col gap-2">
+              {state.error && <Paragraph variant="error">{state.error}</Paragraph>}
+              <form>
+                <input type="hidden" name="repoName" defaultValue={repoName} />
+                <input type="hidden" name="jobId" defaultValue={data.jobId} />
+                <Button
+                  variant="outline"
+                  className="w-fit"
+                  formAction={formAction}
+                >
+                  {isPending
+                    ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Redeployment...
+                        </>
+                      )
+                    : (
+                        <>
+                          <RotateCcw />
+                          Retry
+                        </>
+                      )}
+                </Button>
+              </form>
+            </div>
+          )}
         </div>
       )}
       <Ripple />
     </div>
-  );
-}
-
-function RetryDeploymentButton({ jobId, repoName, reconnect }: { jobId: string; repoName: string; reconnect: () => void }) {
-  const [state, formAction, isPending] = useActionState<ActionState, FormData>(
-    retryDeploy,
-    { error: "", success: "", inputs: { repoName, jobId } },
-  );
-
-  useEffect(() => {
-    if (state.success)
-      reconnect();
-  }, [state, reconnect]);
-
-  return (
-    <div className="flex flex-col gap-2">
-      {state.error && <p className="text-xs text-destructive">{state.error}</p>}
-      <form>
-        <input type="hidden" name="repoName" defaultValue={state.inputs.repoName} />
-        <input type="hidden" name="jobId" defaultValue={state.inputs.jobId ?? ""} />
-        <Button
-          variant="outline"
-          className="w-fit"
-          formAction={formAction}
-        >
-          {isPending
-            ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Redeployment...
-                </>
-              )
-            : (
-                <>
-                  <RotateCcw />
-                  Retry
-                </>
-              )}
-        </Button>
-      </form>
-    </div>
-
   );
 }
 

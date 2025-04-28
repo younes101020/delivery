@@ -5,7 +5,12 @@ import { getGithubRepositoriesByGithubAppId } from "@/app/_lib/github/repositori
 import { DeploymentForm } from "./deployment-form";
 
 interface DeploymentProps {
-  sp: Promise<{ page: string; githubapp?: string; step?: string }> | undefined;
+  sp: Promise<{
+    page: string;
+    githubapp?: string;
+    step?: string;
+    query?: string;
+  }> | undefined;
   onboarding?: boolean;
 }
 
@@ -21,8 +26,9 @@ export async function Deployment({ sp, onboarding = false }: DeploymentProps) {
 
   const repositoryPage = searchParams?.page ? Number.parseInt(searchParams.page) : 1;
   const githubAppId = searchParams?.githubapp ? Number.parseInt(searchParams.githubapp) : undefined;
+  const queryRepository = searchParams?.query || "";
 
-  const installationWithRepos = await getGithubRepositoriesByGithubAppId(repositoryPage, githubAppId);
+  const installationWithRepos = await getGithubRepositoriesByGithubAppId(repositoryPage, githubAppId, queryRepository);
 
   if (!installationWithRepos) {
     if (onboarding)

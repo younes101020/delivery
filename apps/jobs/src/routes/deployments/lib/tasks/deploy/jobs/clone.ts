@@ -5,10 +5,9 @@ import { APPLICATIONS_PATH } from "@/lib/constants";
 import { DeploymentError } from "@/lib/error";
 import { ssh } from "@/lib/ssh";
 import { decryptSecret } from "@/lib/utils";
+import { convertGitToAuthenticatedUrl } from "@/routes/deployments/lib/tasks/deploy/utils";
 
 import type { QueueDeploymentJob } from "../types";
-
-import { convertGitToAuthenticatedUrl } from "./utils";
 
 export async function clone(job: QueueDeploymentJob<"clone">) {
   const { secret, appId, clientId, clientSecret, installationId, repoUrl, repoName } = job.data;
@@ -36,19 +35,18 @@ export async function clone(job: QueueDeploymentJob<"clone">) {
 
   const authenticatedUrl = convertGitToAuthenticatedUrl(repoUrl, installationAuthentication.token);
 
-  try {
-    await ssh(`git clone ${authenticatedUrl} ${repoName}`, {
-      cwd: APPLICATIONS_PATH,
-      onStdout: ({ chunk, chunks, isCriticalError }) => {
-        job.updateProgress({ logs: chunk, isCriticalError, jobId: job.id });
-        job.updateData({ ...job.data, logs: chunks?.join(), isCriticalError });
-      },
-    });
-  }
-  catch (error) {
+  await ssh(`git clone ${authenticatedUrl} ${repoName}`, {
+    cwd: APPLICATIONS_PATH,
+    onStdout: async ({ chunk, chunks, isCriticalError }) => {
+      await Promise.all([
+        job.updateProgress({ logs: chunk, isCriticalError, jobId: job.id }),
+        job.updateData({ ...job.data, logs: chunks?.join(), isCriticalError }),
+      ]);
+    },
+  }).catch((error) => {
     throw new DeploymentError({
       name: "CLONE_APP_ERROR",
       message: error instanceof Error ? error.message : "Unexpected error",
     });
-  }
+  });
 }

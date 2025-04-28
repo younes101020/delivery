@@ -61,8 +61,12 @@ export function getFormChangesAction<S extends z.ZodType<any, any>>(
   prevState: ActionState,
 ) {
   const changes = new Set(Object.keys(data));
+
   const result = Array.from(changes)
-    .filter(key => Object.prototype.hasOwnProperty.call(prevState.inputs, key) && prevState.inputs[key] !== data[key])
+    .filter(key =>
+      !Object.prototype.hasOwnProperty.call(prevState.inputs, key)
+      || prevState.inputs[key] !== data[key],
+    )
     .reduce<z.infer<S>>((diff, key) => {
       diff[key] = data[key];
       return diff;

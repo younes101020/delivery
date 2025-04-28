@@ -1,15 +1,19 @@
 import { z } from "@hono/zod-openapi";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { IdParamsSchema } from "stoker/openapi/schemas";
 
 import { applications, environmentVariables } from "../schema";
 import { insertEnvironmentVariablesSchema } from "./envvars.dto";
+import { servicesDto } from "./services.dto";
 
 export const selectApplicationsSchemaWithSharedEnv = createSelectSchema(applications).extend({
-  environmentVariable: z.array(createSelectSchema(environmentVariables)).optional(),
+  environmentVariables: z.array(createSelectSchema(environmentVariables)).optional(),
+  serviceId: z.string(),
 });
-export const selectApplicationsSchema = createSelectSchema(applications);
 
-const insertApplicationsSchema = createInsertSchema(applications).omit({ name: true });
+export const selectApplicationsSchema = servicesDto;
+
+const insertApplicationsSchema = createInsertSchema(applications);
 export const insertApplicationWithSharedEnv = z.object({
   applicationData: insertApplicationsSchema,
   envVars: z.array(insertEnvironmentVariablesSchema).optional(),
@@ -29,6 +33,12 @@ export const patchApplicationsSchema = z.object({
     ]),
   ).optional(),
 });
+
+export const ApplicationParamsSchema = z.object({
+  name: z.string(),
+});
+
+export const ApplicationServiceParamsSchema = IdParamsSchema.extend({ id: z.string() }).describe("The application swarm service id.");
 
 export type InsertApplicationSchemaWithSharedEnv = z.infer<typeof insertApplicationWithSharedEnv>;
 export type PatchApplicationSchema = z.infer<typeof patchApplicationsSchema>;

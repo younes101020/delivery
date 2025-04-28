@@ -3,7 +3,7 @@ import { unstable_cacheTag as cacheTag } from "next/cache";
 
 import { client } from "../client-http";
 
-export async function getAllGithubApp() {
+export async function getAllGithubAppCreds() {
   "use cache";
   cacheTag("github-app-installations-creds");
   const response = await client.githubapps.$get();

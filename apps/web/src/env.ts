@@ -10,19 +10,14 @@ if (process.env.CI !== "true") {
 export const env = createEnv({
   server: {
     AUTH_SECRET: z.string(),
+    JOBS_BEARER_TOKEN: z.string(),
+    JOBS_API_BASEURL: z.string(),
   },
   client: {
     NEXT_PUBLIC_BASEURL: z.string(),
   },
-  shared: {
-    JOBS_BEARER_TOKEN: z.string(),
-    JOBS_API_BASEURL: z.string(),
-  },
-  runtimeEnv: {
+  experimental__runtimeEnv: {
     NEXT_PUBLIC_BASEURL: process.env.NEXT_PUBLIC_BASEURL,
-    AUTH_SECRET: process.env.AUTH_SECRET,
-    JOBS_BEARER_TOKEN: process.env.JOBS_BEARER_TOKEN,
-    JOBS_API_BASEURL: process.env.JOBS_API_BASEURL,
   },
   skipValidation: process.env.CI === "true",
 });

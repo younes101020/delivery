@@ -5,11 +5,8 @@ the main guidelines for contributing.
 
 ## Prerequisites
 
-- Docker
-- Docker Compose
 - NodeJS LTS
 - Yarn
-- Unix-like operating system (macOS, Linux)
 
 ## Getting Started
 
@@ -29,33 +26,14 @@ yarn dev
 
 - Make sure your changes respect the code standards
 - Test your changes locally
-- Commit your changes: git commit -m "Description of the change"
+- Commit your changes: git commit -m "fix: no more..." make sure to follow [this commit specs](https://www.conventionalcommits.org/en/v1.0.0/#specification)
 - Push to your fork: git push origin your-branch-name
 - Open a Pull Request
 
 ## Testing
 
 ```bash
-yarn ut:test
-```
-
-## Development experience script
-
-These commands could be useful when you want to simulate a staging environment
-
-```bash
-# Deploy all services
-yarn deploy
-# Redeploy all services including the rebuild
-yarn redeploy
-# Or just redeploy a specific service (jobs, web)
-yarn redeploy <service>
-# Stop all services
-yarn stop
-# Restart all services
-yarn restart
-# Start postgres db
-yarn start db
+yarn test
 ```
 
 **Important note**: If you are using _WSL2_ for staging simulation, you need to
