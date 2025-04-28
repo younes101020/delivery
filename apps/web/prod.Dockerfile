@@ -1,4 +1,4 @@
-FROM node:20-alpine AS base
+FROM node:23-alpine AS base
 
 FROM base AS builder
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
@@ -23,15 +23,6 @@ RUN yarn install
 # Build the project
 COPY --from=builder /app/out/full/ .
 
-# Uncomment and use build args to enable remote caching
-# ARG TURBO_TEAM
-# ARG TURBO_TOKEN
-# ENV TURBO_TOKEN=$TURBO_TOKEN
-ENV AUTH_SECRET=${AUTH_SECRET}
-ENV JOBS_BEARER_TOKEN=${JOBS_BEARER_TOKEN}
-ENV JOBS_API_BASEURL=${JOBS_API_BASEURL}
-ENV NEXT_PUBLIC_BASEURL=${NEXT_PUBLIC_BASEURL}
-
 RUN yarn turbo build
 
 FROM base AS runner
@@ -48,4 +39,4 @@ COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
 COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
 COPY --from=installer --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
 
-CMD node apps/web/server.js
+CMD ["node", "apps/web/server.js"]
