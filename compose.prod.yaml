@@ -60,7 +60,7 @@ services:
     networks:
       - proxy
     volumes:
-      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql:rw
       - ${PWD}/db-data/:/var/lib/postgresql@16/data:rw
     restart: always
   
