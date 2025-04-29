@@ -23,6 +23,11 @@ RUN yarn install
 # Build the project
 COPY --from=builder /app/out/full/ .
 
+ENV AUTH_SECRET=${AUTH_SECRET}
+ENV JOBS_BEARER_TOKEN=${JOBS_BEARER_TOKEN}
+ENV JOBS_API_BASEURL=${JOBS_API_BASEURL}
+ENV NEXT_PUBLIC_BASEURL=${NEXT_PUBLIC_BASEURL}
+
 RUN yarn turbo build
 
 FROM base AS runner
