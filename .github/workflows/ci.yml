@@ -114,6 +114,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push images
+        if: env.docker_publish == 'true'
         run: |
           docker compose -f compose.prod.yaml build
           docker compose -f compose.prod.yaml push
