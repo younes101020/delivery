@@ -8,8 +8,10 @@ const nextConfig = {
   output: "standalone",
   transpilePackages: ["@t3-oss/env-nextjs", "@t3-oss/env-core"],
   experimental: {
+    nodeMiddleware: true,
     dynamicIO: true,
     reactCompiler: true,
+    ppr: true,
   },
   images: {
     remotePatterns: [

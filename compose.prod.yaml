@@ -17,6 +17,12 @@ services:
       - proxy
     depends_on:
       - jobs
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.web.rule=Host(`web.localhost`)
+     # - traefik.http.routers.web.entrypoints=web,websecure
+     # - traefik.http.routers.web.tls.certresolver=myresolver
+      - traefik.http.services.web.loadbalancer.server.port=3000
 
   jobs:
     image: younes60/jobs:${DOCKER_TAGS}
@@ -98,34 +104,22 @@ services:
     container_name: "traefik"
     command:
       - --api.dashboard=true
-      - "--providers.docker=true"
-      - "--providers.swarm.endpoint=tcp://127.0.0.1:2377"
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.swarm.endpoint=tcp://127.0.0.1:2377
       - --log.level=INFO
       #- --log.filepath=/var/log/traefik.log
       - --accesslog=true
       #- --accesslog.filepath=/var/log/traefik-access.log
       - --entrypoints.web.address=:80
-      - --entrypoints.web.http.redirections.entrypoint.to=websecure
-      - --entryPoints.web.http.redirections.entrypoint.scheme=https
-      - --entrypoints.websecure.address=:443
-      - --entrypoints.websecure.asDefault=true 
-      - --entrypoints.websecure.http.tls.certresolver=myresolver
-      - --certificatesresolvers.myresolver.acme.email=younesfakallah60@gmail.com
-      - --certificatesresolvers.myresolver.acme.tlschallenge=true
-      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
     labels:
       - traefik.enable=true
-      - traefik.http.routers.mydashboard.rule=Host(`traefik.example.com`)
-      - traefik.http.routers.mydashboard.service=api@internal
-      - traefik.http.routers.mydashboard.middlewares=myauth
-      - traefik.http.middlewares.myauth.basicauth.users=test:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/
+      - traefik.http.routers.mydashboard.rule=Host(`traefik.localhost`)
     ports:
       - "80:80"
-      - "443:443"
+      - "8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./letsencrypt:/letsencrypt"
-      - "./config:/etc/traefik/config"
     networks:
       - proxy
     restart: always
