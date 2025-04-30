@@ -23,6 +23,9 @@ export function createApplicationServiceSpec({ applicationName, image, fqdn, por
         {
           Target: networkId,
         },
+        {
+          Target: "proxy",
+        },
       ],
       RestartPolicy: {
         Condition: "on-failure",
@@ -38,6 +41,10 @@ export function createApplicationServiceSpec({ applicationName, image, fqdn, por
     Labels: {
       "resource": "application",
       "traefik.enable": "true",
+      [`traefik.http.routers.${applicationName}.entrypoints`]: "web-secure",
+      [`traefik.http.routers.${applicationName}.tls`]: "true",
+      [`traefik.http.routers.${applicationName}.tls.certresolver`]: "tlschallenge",
+      [`traefik.http.routers.${applicationName}.middlewares`]: "secHeaders@file",
       [`traefik.http.routers.${applicationName}.rule`]: `Host(\`${fqdn}\`)`,
       [`traefik.http.services.${applicationName}.loadbalancer.server.port`]: port.toString(),
     },
