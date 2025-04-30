@@ -5,10 +5,10 @@ import { NextResponse } from "next/server";
 import { signToken, verifyToken } from "@/app/_lib/session";
 import { parseSetCookie } from "@/app/_lib/utils";
 
+import { env } from "./env";
+
 const protectedRoutes = "/dashboard";
 const onboardingRoute = "/onboarding";
-
-export const runtime = "nodejs";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -77,10 +77,7 @@ export const config = {
  * and forwards it to the client as a cookie
  */
 async function forwardOnboardingStatus(res: NextResponse) {
-  // TODO: wait for nextjs middleware to be nodejs compatible (https://github.com/vercel/next.js/discussions/71727) to use `serverEnv.AUTH_SECRET`
-  // + replace fetch by trpc implementation
-  // eslint-disable-next-line node/no-process-env
-  const response = await fetch(process.env.JOBS_API_BASEURL!);
+  const response = await fetch(env.JOBS_API_BASEURL!);
   const headers = Object.fromEntries(response.headers);
   const cookie = parseSetCookie(headers["set-cookie"]);
   res.cookies.set({
