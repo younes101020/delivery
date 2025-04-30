@@ -27,6 +27,12 @@ application.
 
   ![db_hub_page_dialog](https://github.com/user-attachments/assets/db0f0cdd-8a1d-4912-9d22-0b91ea2c9631)
 
+
+## Inspiration
+
+- [Codebase](https://kentcdodds.com/blog/colocation)
+- [Coolify](https://www.coolify.io/)
+
 ## Contributor installation
 
 First of all, you need to fork and clone the repository:
