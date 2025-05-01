@@ -1,4 +1,4 @@
-/* eslint-disable node/no-process-env */
+/* eslint-disable node/no-process-env*/
 import { createEnv } from "@t3-oss/env-nextjs";
 import { config } from "dotenv";
 import { z } from "zod";
