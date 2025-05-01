@@ -30,5 +30,8 @@
     "semantic-release": "^24.2.0",
     "turbo": "^2.3.3",
     "typescript": "^5.4.3"
+  },
+  "dependencies": {
+    "next-runtime-env": "^3.3.0"
   }
 }

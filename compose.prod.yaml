@@ -4,12 +4,11 @@ services:
     build:
       context: .
       dockerfile: ./apps/web/prod.Dockerfile
-      args:
-        NEXT_PUBLIC_BASEURL: ${NEXT_PUBLIC_BASEURL}
     environment:
       - AUTH_SECRET=${AUTH_SECRET}
       - JOBS_BEARER_TOKEN=${JOBS_BEARER_TOKEN}
       - JOBS_API_BASEURL=${JOBS_API_BASEURL}
+      - NEXT_PUBLIC_BASEURL=${NEXT_PUBLIC_BASEURL}
     volumes:
       - ./apps/web/src:/app/src
     ports:

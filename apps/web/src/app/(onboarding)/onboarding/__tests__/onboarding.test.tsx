@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeAll, describe, expect, vi } from "vitest";
 
 import { Login } from "@/app/_components/login-form";
-import { env } from "@/env";
 
 import { GithubAppForm } from "../_components/github-app-form";
 import { onBoardingTest } from "./fixtures";
@@ -53,7 +52,7 @@ describe("onboarding process", () => {
   );
 
   onBoardingTest("github form include initial object to create a github app from manifest", () => {
-    setup(<GithubAppForm baseUrl={env.NEXT_PUBLIC_BASEURL} />);
+    setup(<GithubAppForm />);
 
     const form = within(screen.getByRole("form"));
 
