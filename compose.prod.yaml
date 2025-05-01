@@ -50,7 +50,8 @@ services:
     networks:
       - proxy
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   db:
     image: postgres:latest
@@ -58,12 +59,19 @@ services:
       - 5432:5432
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+      - PGUSER=postgres
     networks:
       - proxy
     volumes:
       - ./infrastructure/database:/docker-entrypoint-initdb.d/
       - ${PWD}/db-data/:/var/lib/postgresql@16/data
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   
   screenshots-storage:
     image: bitnami/minio:latest
