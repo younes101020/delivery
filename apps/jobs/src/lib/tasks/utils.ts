@@ -7,8 +7,6 @@ import type { RedisType } from "./types";
 
 export const connection = new IORedis({
   maxRetriesPerRequest: null,
-  host: "host.docker.internal",
-  port: 6379,
 });
 
 let worker: Worker | null = null;

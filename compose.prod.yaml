@@ -53,6 +53,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      bull_queue:
+        condition: service_healthy
 
   db:
     image: postgres:latest
@@ -96,6 +98,11 @@ services:
       - 6379:6379
     networks:
       - proxy
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   adminer:
     image: adminer
