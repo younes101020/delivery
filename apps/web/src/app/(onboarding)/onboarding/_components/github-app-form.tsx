@@ -80,7 +80,7 @@ export function GithubAppForm() {
       </div>
       <div>
         <Label htmlFor="events" className="block text-sm font-medium">
-          Redeploy when
+          Redeploy my applications and website when
         </Label>
         <ScrollArea className="my-2 w-full h-40">
           <div className="flex flex-col gap-2">
