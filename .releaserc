@@ -15,7 +15,7 @@
     [
       "@semantic-release/exec",
       {
-        "prepareCmd": "DELIVERY_VERSION=1.1.32 sh -c \"if [ ${branch.name} = 'next' ]; then echo 'DOCKER_TAGS=next'; else echo 'DOCKER_TAGS=1.1.32-latest'; fi\" >> \"$GITHUB_ENV\"",
+        "prepareCmd": "DELIVERY_VERSION=${nextRelease.version} sh -c \"if [ ${branch.name} = 'next' ]; then echo 'DOCKER_TAGS=next'; else echo 'DOCKER_TAGS=${nextRelease.version}-latest'; fi\" >> \"$GITHUB_ENV\"",
         "publishCmd": "echo \"docker_publish=true\" >> \"$GITHUB_ENV\""
       }
     ],
