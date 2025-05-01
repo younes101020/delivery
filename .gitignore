@@ -6,3 +6,4 @@ db-data
 config.yml
 letsencrypt
 config
+/infrastructure/traefik-config/acme.json
