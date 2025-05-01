@@ -5,7 +5,11 @@ import IORedis from "ioredis";
 import type { Resources } from "../constants";
 import type { RedisType } from "./types";
 
-export const connection = new IORedis({ maxRetriesPerRequest: null });
+export const connection = new IORedis({
+  maxRetriesPerRequest: null,
+  host: "host.docker.internal",
+  port: 6379,
+});
 
 let worker: Worker | null = null;
 
