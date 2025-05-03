@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { useActionState } from "react";
 
 import type { ActionState } from "@/app/_lib/form-middleware";
@@ -64,8 +64,8 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
 
       {state?.error && <Paragraph variant="error">{state.error}</Paragraph>}
 
-      <CardFooter className="flex px-0 pt-8 justify-end">
-        <Button type="submit" disabled={pending} aria-label="submit">
+      <CardFooter className="flex px-0 pt-8">
+        <Button type="submit" disabled={pending} aria-label="submit" className="w-full">
           {pending
             ? (
                 <>
@@ -75,10 +75,17 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
               )
             : mode === "signin"
               ? (
-                  "Sign in"
+                  <>
+                    Sign in
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </>
+
                 )
               : (
-                  "Sign up"
+                  <>
+                    Sign up
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </>
                 )}
         </Button>
       </CardFooter>
