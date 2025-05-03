@@ -15,10 +15,19 @@ export async function signOut() {
 const signInSchema = z.object({
   email: z.string().email().min(3).max(255),
   password: z.string().min(8).max(100),
+  redirectTo: z.string()
+    .refine((pathname) => {
+      const isValidSuccessSignInPathnameRedirect = pathname === "/dashboard/applications" || pathname.startsWith("/onboarding");
+      if (isValidSuccessSignInPathnameRedirect) {
+        return true;
+      }
+    }, {
+      message: "Invalid redirect URL",
+    }),
 });
 
 export const signIn = validatedAction(signInSchema, async (data) => {
-  const { email, password } = data;
+  const { email, password, redirectTo } = data;
 
   const response = await client.auth.verify.$post({
     json: {
@@ -32,5 +41,5 @@ export const signIn = validatedAction(signInSchema, async (data) => {
   }
   const user = await response.json();
   await setSession(user);
-  redirect("/dashboard/applications");
+  redirect(redirectTo);
 });

@@ -42,6 +42,15 @@ export async function middleware(request: NextRequest) {
 
       return NextResponse.redirect(onboardingUrl);
     }
+
+    if (!sessionCookie && !isOnboardingAuthStepRoute && isOnboardingRoute) {
+      const urlSearchParams = new URLSearchParams(request.nextUrl.search);
+      const params = Object.fromEntries(urlSearchParams.entries());
+      const urlParams = `?${new URLSearchParams(params)}`;
+      const redirectTo = request.nextUrl.pathname + urlParams;
+
+      return NextResponse.redirect(new URL(`${onboardingRoute}/verify?redirectTo=${redirectTo}`, request.url));
+    }
   }
 
   if (isProtectedRoute && !sessionCookie) {

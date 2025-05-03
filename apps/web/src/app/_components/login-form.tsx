@@ -14,7 +14,7 @@ import { signUp } from "@/app/actions";
 import { signIn } from "../(login)/actions";
 import { Paragraph } from "./ui/paragraph";
 
-export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
+export function Login({ mode = "signup", redirectTo = "/dashboard/applications" }: { mode?: "signin" | "signup"; redirectTo?: string }) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
     mode === "signin" ? signIn : signUp,
     { error: "", inputs: {} },
@@ -61,6 +61,7 @@ export function Login({ mode = "signup" }: { mode?: "signin" | "signup" }) {
           />
         </div>
       </div>
+      <input type="hidden" name="redirectTo" defaultValue={redirectTo} />
 
       {state?.error && <Paragraph variant="error">{state.error}</Paragraph>}
 
