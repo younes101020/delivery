@@ -20,7 +20,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.web.entrypoints=web-secure"
-      - "traefik.http.routers.web.rule=HostRegexp(`{host:.+}`)"
+      - "traefik.http.routers.web.rule=Host(`${PUBLIC_IP}.sslip.io`)"
       - "traefik.http.routers.web.tls=true"
       - "traefik.http.routers.web.tls.certresolver=tlschallenge"
       - "traefik.http.services.web.loadbalancer.server.port=3000"
@@ -120,7 +120,7 @@ services:
       - "traefik.enable=true"
 
       # define traefik dashboard router and service
-      - "traefik.http.routers.web.rule=HostRegexp(`{host:.+}`)"
+      - "traefik.http.routers.web.rule=Host(`traefik.${PUBLIC_IP}.sslip.io`)"
       - "traefik.http.routers.traefik.service=api@internal"
       - "traefik.http.routers.traefik.tls.certresolver=tlschallenge"
       - "traefik.http.routers.traefik.entrypoints=web-secure"
