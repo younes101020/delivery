@@ -26,10 +26,8 @@ jobs:
         volumes:
           - ${{ github.workspace }}/data:/data
         options: --name=minio --health-cmd "curl http://localhost:9000/minio/health/live"
-      redis:
+      bull_queue:
         image: redis
-        options: >-
-          --name bull_queue
         ports:
           - 6379:6379
       db:
