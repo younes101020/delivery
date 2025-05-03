@@ -10,9 +10,10 @@ import { useGetRepoName } from "../_hooks/use-get-repo-name";
 
 interface SubscribeToSSEProps {
   children: ReactNode;
+  baseUrl: string;
 }
 
-export function SubscribeToSSE({ children }: SubscribeToSSEProps) {
+export function SubscribeToSSE({ children, baseUrl }: SubscribeToSSEProps) {
   const repoName = useGetRepoName();
 
   const stateCallback = (data: DeploymentLogState, prevData: DeploymentLogState) => {
@@ -20,6 +21,6 @@ export function SubscribeToSSE({ children }: SubscribeToSSEProps) {
     return shouldMergeLogs ? { ...data, logs: prevData.logs ? `${prevData.logs}${data.logs}` : data.logs } : data;
   };
 
-  useQuerySubscription<DeploymentLogState>(`/deployments-proxy/logs/${repoName}`, stateCallback);
+  useQuerySubscription<DeploymentLogState>(`/deployments-proxy/logs/${repoName}`, baseUrl, stateCallback);
   return <>{children}</>;
 }

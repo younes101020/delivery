@@ -10,6 +10,7 @@ import { PageTitle } from "@/app/_components/ui/page-title";
 import { Separator } from "@/app/_components/ui/separator";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { SubscribeToSSE } from "@/app/(dashboard)/dashboard/deployments/_components/subscribe-to-sse";
+import { env } from "@/env";
 
 import { DeploymentPreviewCard } from "./_components/deployment-preview-card";
 import { PreviousDeploymentPreviewCard } from "./_components/previous-deployment-card";
@@ -43,12 +44,13 @@ export default async function DeploymentsPage() {
 
 async function OngoingDeploymentPreview() {
   const deployments = await getCurrentDeploymentsState();
+  const baseUrl = env.BASE_URL;
 
   if (deployments.length < 1)
     return <NoDeployments title="No ongoing deployment" description="You can preview all your ongoing deployments here." Icon={Truck} />;
 
   return deployments.map(deployment => (
-    <SubscribeToSSE key={deployment.id} repoName={deployment.repoName}>
+    <SubscribeToSSE key={deployment.id} baseUrl={baseUrl} repoName={deployment.repoName}>
       <DeploymentPreviewCard {...deployment} />
     </SubscribeToSSE>
   ));

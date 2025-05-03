@@ -9,9 +9,10 @@ import type { DeploymentPreviewState } from "../types";
 interface SubscribeToSSEProps {
   children: ReactNode;
   repoName: string;
+  baseUrl: string;
 }
 
-export function SubscribeToSSE({ children, repoName }: SubscribeToSSEProps) {
-  useQuerySubscription<DeploymentPreviewState>(`/deployments-proxy/preview/${repoName}`);
+export function SubscribeToSSE({ children, repoName, baseUrl }: SubscribeToSSEProps) {
+  useQuerySubscription<DeploymentPreviewState>(`/deployments-proxy/preview/${repoName}`, baseUrl);
   return <>{children}</>;
 }

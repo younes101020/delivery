@@ -46,7 +46,7 @@ jobs:
       PORT: ${{ vars.PORT }}
       LOG_LEVEL: ${{ vars.LOG_LEVEL }}
       JOBS_API_BASEURL: ${{ vars.JOBS_API_BASEURL }}
-      NEXT_PUBLIC_BASEURL: ${{ vars.NEXT_PUBLIC_BASEURL }}
+      BASE_URL: ${{ vars.BASE_URL }}
       TEST_USERS_PASSWORD: ${{ secrets.TEST_USERS_PASSWORD }}
       MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
       MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
@@ -90,7 +90,7 @@ jobs:
       JOBS_BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
       PORT: ${{ vars.PORT }}
       LOG_LEVEL: ${{ vars.LOG_LEVEL }}
-      NEXT_PUBLIC_BASEURL: ${{ vars.NEXT_PUBLIC_BASEURL }}
+      BASE_URL: ${{ vars.BASE_URL }}
 
     steps:
       - name: Checkout code

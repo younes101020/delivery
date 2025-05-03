@@ -12,12 +12,8 @@ export const env = createEnv({
     AUTH_SECRET: z.string(),
     JOBS_BEARER_TOKEN: z.string(),
     JOBS_API_BASEURL: z.string(),
+    BASE_URL: z.string(),
   },
-  client: {
-    NEXT_PUBLIC_BASEURL: z.string(),
-  },
-  experimental__runtimeEnv: {
-    NEXT_PUBLIC_BASEURL: process.env.NEXT_PUBLIC_BASEURL,
-  },
+  experimental__runtimeEnv: {},
   skipValidation: process.env.CI === "true",
 });

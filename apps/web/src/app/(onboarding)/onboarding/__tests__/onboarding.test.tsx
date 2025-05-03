@@ -52,7 +52,8 @@ describe("onboarding process", () => {
   );
 
   onBoardingTest("github form include initial object to create a github app from manifest", () => {
-    setup(<GithubAppForm />);
+    const baseUrl = "https://example.com";
+    setup(<GithubAppForm baseUrl={baseUrl} />);
 
     const form = within(screen.getByRole("form"));
 

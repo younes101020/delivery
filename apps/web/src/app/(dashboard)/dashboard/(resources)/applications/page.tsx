@@ -9,6 +9,7 @@ import { PageTitle } from "@/app/_components/ui/page-title";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { formatDate } from "@/app/_lib/utils";
 import { getActiveDatabaseServices } from "@/app/(dashboard)/dashboard/(resources)/databases/_lib/queries";
+import { env } from "@/env";
 
 import { AppCard } from "./_components/app-card";
 import { NewAppCard } from "./_components/new-app-card";
@@ -16,6 +17,7 @@ import { SubscribeToSSE } from "./_components/subscribe-to-sse";
 import { getApplications } from "./_lib/queries";
 
 export default async function ApplicationsPage() {
+  const baseUrl = env.BASE_URL;
   return (
     <section className="p-5 bg-background/50 border h-[90%]">
       <div className="flex justify-between gap-2">
@@ -31,7 +33,7 @@ export default async function ApplicationsPage() {
       </div>
 
       <div className="mt-8 h-full">
-        <SubscribeToSSE>
+        <SubscribeToSSE baseUrl={baseUrl}>
           <Suspense fallback={<Skeleton className="h-32 w-full" />}>
             <ApplicationList />
           </Suspense>

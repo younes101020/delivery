@@ -1,7 +1,6 @@
 "use client";
 
 import { Info } from "lucide-react";
-import { env } from "next-runtime-env";
 import { useMemo, useState } from "react";
 
 import { Button } from "@/app/_components/ui/button";
@@ -16,12 +15,15 @@ import { WEBHOOK_EVENTS } from "@/app/_lib/github/config";
 
 const GITHUB_APP_REGISTRATION_URL = "https://github.com/settings/apps/new";
 
-export function GithubAppForm() {
+interface GithubAppFormProps {
+  baseUrl: string;
+}
+
+export function GithubAppForm({ baseUrl }: GithubAppFormProps) {
   const [url, setUrl] = useState(GITHUB_APP_REGISTRATION_URL);
   const [enableOrg, setEnableOrg] = useState(false);
   const [name, setName] = useState("");
   const [selectedEvents, setSelectedEvents] = useState(["pull_request", "push"]);
-  const baseUrl = env("NEXT_PUBLIC_BASEURL");
 
   const data = useMemo(
     () => ({

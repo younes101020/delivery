@@ -6,9 +6,10 @@ import { useQuerySubscription } from "@/app/_hooks/use-query-subscription";
 
 interface SubscribeToSSEProps {
   children: ReactNode;
+  baseUrl: string;
 }
 
-export function SubscribeToSSE({ children }: SubscribeToSSEProps) {
-  useQuerySubscription("/applications-proxy/ongoing");
+export function SubscribeToSSE({ children, baseUrl }: SubscribeToSSEProps) {
+  useQuerySubscription("/applications-proxy/ongoing", baseUrl);
   return <>{children}</>;
 }
