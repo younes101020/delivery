@@ -15,7 +15,9 @@ export async function middleware(request: NextRequest) {
   const sessionCookie = request.cookies.get("session");
   const onboardingCookie = request.cookies.get("skiponboarding");
   const isProtectedRoute = pathname.startsWith(protectedRoutes);
+
   const isOnboardingRoute = pathname.startsWith(onboardingRoute);
+  const isOnboardingAuthStepRoute = isOnboardingRoute && !request.nextUrl.searchParams.get("step");
 
   const res = NextResponse.next();
 
@@ -27,11 +29,18 @@ export async function middleware(request: NextRequest) {
   if (onboardingCookie || forwardedOnboardingCookie) {
     const skiponboarding
       = onboardingCookie?.value === "true" || forwardedOnboardingCookie?.value === "true";
-    if (isOnboardingRoute && skiponboarding) {
+
+    if (isOnboardingRoute && skiponboarding)
       return NextResponse.redirect(new URL("/", request.url));
-    }
-    else if (!skiponboarding && !isOnboardingRoute) {
+
+    if (!skiponboarding && !isOnboardingRoute)
       return NextResponse.redirect(new URL(onboardingRoute, request.url));
+
+    if (sessionCookie && isOnboardingAuthStepRoute) {
+      const onboardingUrl = new URL(onboardingRoute, request.url);
+      onboardingUrl.searchParams.set("step", "2");
+
+      return NextResponse.redirect(onboardingUrl);
     }
   }
 
