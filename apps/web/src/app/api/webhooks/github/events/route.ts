@@ -4,7 +4,13 @@ import { client } from "@/app/_lib/client-http";
 import { getApplications } from "@/app/(dashboard)/dashboard/(resources)/applications/_lib/queries";
 
 export async function POST(req: Request) {
-  const { repository } = await req.json();
+  const githubData = await req.json();
+
+  if (githubData.action === "created")
+    return Response.json({ message: "Webhook received" });
+
+  const { repository } = githubData;
+
   const queueName = basename(repository.url).toLowerCase();
   const applications = await getApplications();
   if (!applications) {
