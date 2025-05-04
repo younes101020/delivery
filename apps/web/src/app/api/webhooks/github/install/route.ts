@@ -23,5 +23,5 @@ export async function GET(req: NextRequest) {
     redirect("/onboarding/?step=3");
   }
   revalidateTag("github-app-installations-creds");
-  redirect("/onboarding/?state=4");
+  redirect("/onboarding/?step=4");
 }
