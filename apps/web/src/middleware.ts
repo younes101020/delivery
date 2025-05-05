@@ -36,13 +36,6 @@ export async function middleware(request: NextRequest) {
     if (!skiponboarding && !isOnboardingRoute)
       return NextResponse.redirect(new URL(onboardingRoute, request.url));
 
-    if (sessionCookie && isOnboardingAuthStepRoute) {
-      const onboardingUrl = new URL(onboardingRoute, request.url);
-      onboardingUrl.searchParams.set("step", "2");
-
-      return NextResponse.redirect(onboardingUrl);
-    }
-
     if (!sessionCookie && !isOnboardingAuthStepRoute && isOnboardingRoute) {
       const urlSearchParams = new URLSearchParams(request.nextUrl.search);
       const params = Object.fromEntries(urlSearchParams.entries());
@@ -73,6 +66,13 @@ export async function middleware(request: NextRequest) {
         sameSite: "lax",
         expires: expiresInOneDay,
       });
+
+      if (isOnboardingAuthStepRoute) {
+        const onboardingUrl = new URL(onboardingRoute, request.url);
+        onboardingUrl.searchParams.set("step", "2");
+
+        return NextResponse.redirect(onboardingUrl);
+      }
     }
     catch (error) {
       console.error("Error updating session:", error);
