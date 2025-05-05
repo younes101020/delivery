@@ -7,6 +7,7 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import type { DeploymentReferenceAndDataSchema } from "@/db/dto";
 
 import { getApplicationIdByName, getEnvironmentVariablesForApplication, getGithubAppByAppId, getSystemDomainName } from "@/db/queries/queries";
+import env from "@/env";
 import { connection, getBullConnection, subscribeWorkerTo } from "@/lib/tasks/utils";
 import { fromGitUrlToQueueName, parseAppHost, persistedEnvVarsToCmdEnvVars, transformEnvVars, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
 
@@ -22,7 +23,7 @@ export const JOBS = {
   build: "build",
 };
 
-const processorFile = join(dirname(fileURLToPath(import.meta.url)), "../worker.ts");
+const processorFile = join(dirname(fileURLToPath(import.meta.url)), env.NODE_ENV === "production" ? "../worker.js" : "../worker.ts");
 
 function runDeployment(
   getDeploymentData: (payload: QueueName | DeploymentReferenceAndDataSchema) => Promise<QueueDeploymentJobData>,
