@@ -23,7 +23,6 @@ export async function Deployment({ sp, onboarding = false }: DeploymentProps) {
       return null;
     }
   }
-
   const repositoryPage = searchParams?.page ? Number.parseInt(searchParams.page) : 1;
   const githubAppId = searchParams?.githubapp ? Number.parseInt(searchParams.githubapp) : undefined;
   const queryRepository = searchParams?.query || "";
