@@ -6,8 +6,8 @@ import { getApplications } from "@/app/(dashboard)/dashboard/(resources)/applica
 export async function POST(req: Request) {
   const githubData = await req.json();
 
-  if (githubData.action === "created")
-    return Response.json({ message: "Webhook received" });
+  if (githubData.action === "created" || !githubData.repository)
+    return Response.json({ message: "Event github webhook received, this event is not related to repository" });
 
   const { repository } = githubData;
 
