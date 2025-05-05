@@ -2,13 +2,15 @@ import { Job, Queue, Worker } from "bullmq";
 import Redis, { type RedisOptions } from "ioredis";
 import IORedis from "ioredis";
 
+import env from "@/env";
+
 import type { Resources } from "../constants";
 import type { RedisType } from "./types";
 
 export const connection = new IORedis({
   maxRetriesPerRequest: null,
-  host: "bull_queue",
   port: 6379,
+  host: env.CI === "true" ? "localhost" : "bull_queue",
 });
 
 let worker: Worker | null = null;

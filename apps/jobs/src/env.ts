@@ -21,6 +21,7 @@ const EnvSchema = z.object({
   TEST_ENTITY_COUNT: z.coerce.number().default(10),
   SSH_HOST: z.string().default("host.docker.internal"),
   BEARER_TOKEN: z.string(),
+  CI: z.string().default("false"),
 });
 
 export type env = z.infer<typeof EnvSchema>;
