@@ -10,6 +10,7 @@ const nextConfig = {
   experimental: {
     nodeMiddleware: true,
     dynamicIO: true,
+    useCache: true,
     reactCompiler: true,
     ppr: true,
   },

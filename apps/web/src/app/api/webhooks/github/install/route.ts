@@ -4,6 +4,7 @@ import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { setInstallationIdOnGithubApp } from "@/app/_lib/github/queries";
+import { env } from "@/env";
 
 export async function GET(req: NextRequest) {
   const installationId = req.nextUrl.searchParams.get("installation_id");
@@ -22,6 +23,7 @@ export async function GET(req: NextRequest) {
     console.error(error);
     redirect("/onboarding/?step=3");
   }
+
   revalidateTag("github-app-installations-creds");
-  redirect("/onboarding/?step=4");
+  return Response.redirect(new URL("/onboarding/?step=4", env.BASE_URL));
 }
