@@ -9,6 +9,10 @@ application.
 
 ## Screenshots
 
+* Deployment page
+
+  ![deployment-page](https://github.com/user-attachments/assets/93bc3e2c-66a9-4f03-8ede-6dc484eb8909)
+
 * Signin
   
   ![signin_page](https://github.com/user-attachments/assets/13ae3ba5-de42-46e0-86d5-5619d894e599)
