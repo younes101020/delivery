@@ -17,6 +17,7 @@ services:
       - proxy
     depends_on:
       - jobs
+    restart: unless-stopped
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.web.entrypoints=web-secure"
@@ -49,6 +50,7 @@ services:
       - 3090:3090
     networks:
       - proxy
+    restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
@@ -61,14 +63,13 @@ services:
       - 5432:5432
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-
       - PGUSER=postgres
     networks:
       - proxy
     volumes:
       - ./infrastructure/database:/docker-entrypoint-initdb.d/
       - ${PWD}/db-data/:/var/lib/postgresql@16/data
-    restart: always
+    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 5s
@@ -80,35 +81,35 @@ services:
     ports:
       - 9000:9000
       - 9001:9001
+    restart: unless-stopped
     environment:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
       - MINIO_DEFAULT_BUCKETS=${MINIO_DEFAULT_BUCKETS}
     networks:
       - proxy
-    restart: always
   
   bull_queue:
     image: redis
     command: redis-server --save 60 1 --loglevel warning --maxmemory-policy noeviction --maxmemory 2gb
-    restart: always
     ports:
       - 6379:6379
     networks:
       - proxy
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 3050:8080
-    networks:
-      - proxy
+  #adminer:
+  #  image: adminer
+  #  restart: always
+  #  ports:
+  #    - 3050:8080
+  #  networks:
+  #    - proxy
   
   traefik:
     image: "traefik:v3.3.6"
@@ -136,7 +137,7 @@ services:
       - ./infrastructure/traefik-config/acme.json:/etc/traefik/acme.json           # TLS certificate storage
     networks:
       - proxy
-    restart: always
+    restart: unless-stopped
 
 networks:
   proxy:
