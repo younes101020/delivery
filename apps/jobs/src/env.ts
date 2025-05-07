@@ -12,6 +12,7 @@ const EnvSchema = z.object({
   MINIO_PORT: z.coerce.number().default(9000),
   PORT: z.coerce.number().default(9999),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]),
+  REDIS_PASSWORD: z.string(),
   DATABASE_URL: z.string(),
   MINIO_PUBLIC_DOMAIN: z.string(),
   MINIO_ROOT_USER: z.string(),

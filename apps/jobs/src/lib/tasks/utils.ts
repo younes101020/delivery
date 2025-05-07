@@ -11,6 +11,7 @@ export const connection = new IORedis({
   maxRetriesPerRequest: null,
   port: 6379,
   host: env.CI === "true" ? "localhost" : "bull_queue",
+  password: env.REDIS_PASSWORD,
 });
 
 let worker: Worker | null = null;

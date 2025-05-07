@@ -43,6 +43,7 @@ jobs:
           - 5432:5432
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
       BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
       AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
       JOBS_BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
@@ -91,6 +92,7 @@ jobs:
       AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
       JOBS_API_BASEURL: ${{ vars.JOBS_API_BASEURL }}
       JOBS_BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
+      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
       PORT: ${{ vars.PORT }}
       LOG_LEVEL: ${{ vars.LOG_LEVEL }}
       BASE_URL: ${{ vars.BASE_URL }}
