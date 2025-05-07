@@ -1,4 +1,4 @@
-FROM node:20.19.1 AS base
+FROM node:20-alpine AS base
 
 FROM base AS builder
 RUN apk update
