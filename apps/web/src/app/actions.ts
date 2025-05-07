@@ -80,7 +80,7 @@ const deploySchema = z.object({
 
 export const deploy = validatedActionWithUser(
   deploySchema,
-  async (data, _, user) => {
+  async (data, _, prev, user) => {
     const deploymentResponse = await client.deployments.$post({
       json: data,
     });

@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1738769944862,
-      "tag": "0000_strong_loa",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1739212728904,
-      "tag": "0001_tearful_manta",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1743367338991,
-      "tag": "0002_lonely_bloodstorm",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1743367775442,
-      "tag": "0003_pretty_banshee",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1745181247147,
-      "tag": "0004_wooden_skin",
+      "when": 1746652153566,
+      "tag": "0000_military_madame_masque",
       "breakpoints": true
     }
   ]

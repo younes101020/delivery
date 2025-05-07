@@ -1,14 +1,17 @@
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import path from "node:path";
 
+import env from "@/env";
 import { databases as databasesConst } from "@/routes/databases/lib/remote-docker/const";
 
 import { db } from ".";
 import { databases } from "./schema";
 
 async function main() {
+  const migrationsFolder = path.join(process.cwd(), env.NODE_ENV === "production" ? "/apps/jobs/src/db/migrations" : "/src/db/migrations");
+
   await migrate(db, {
-    migrationsFolder: path.join(process.cwd(), "/apps/jobs/src/db/migrations"),
+    migrationsFolder,
   });
 
   await seedWithDatabaseConstants();

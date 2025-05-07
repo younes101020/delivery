@@ -5,15 +5,25 @@ CREATE TABLE IF NOT EXISTS "application_environment_variables" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "applications" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"name" text GENERATED ALWAYS AS (split_part("applications"."fqdn", '.', 1)) STORED NOT NULL,
+	"name" text NOT NULL,
 	"fqdn" text NOT NULL,
 	"logs" text,
-	"port" text NOT NULL,
+	"port" integer NOT NULL,
 	"github_app_id" integer NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now(),
 	"deleted_at" timestamp,
 	CONSTRAINT "applications_fqdn_unique" UNIQUE("fqdn")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "databases" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"image" text NOT NULL,
+	"port" integer NOT NULL,
+	"credentialsEnvVar" json NOT NULL,
+	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp DEFAULT now(),
+	"deleted_at" timestamp
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "environment_variables" (
