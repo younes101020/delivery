@@ -1,4 +1,4 @@
-import type { StatusCode } from "hono/utils/http-status";
+import type { ContentfulStatusCode } from "hono/utils/http-status";
 import type { Buffer } from "node:buffer";
 
 import { HTTPException } from "hono/http-exception";
@@ -251,7 +251,7 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
       if (error instanceof Error) {
         const errorResponse = error instanceof HTTPException && error.getResponse();
         if (!errorResponse || HttpStatusCodes.NOT_FOUND !== errorResponse.status) {
-          const errorCode = (errorResponse ? errorResponse.status : HttpStatusCodes.INTERNAL_SERVER_ERROR) as StatusCode;
+          const errorCode = (errorResponse ? errorResponse.status : HttpStatusCodes.INTERNAL_SERVER_ERROR) as ContentfulStatusCode;
           throw new HTTPException(errorCode, { message: error.message });
         }
       }
