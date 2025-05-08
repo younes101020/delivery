@@ -1,3 +1,4 @@
+import configureBullBoard from "@/lib/configure-bull-board";
 import configureOpenAPI from "@/lib/configure-open-api";
 import createApp from "@/lib/create-app";
 import applications from "@/routes/applications/applications.index";
@@ -13,6 +14,7 @@ import users from "@/routes/users/users.index";
 const app = createApp();
 
 configureOpenAPI(app);
+configureBullBoard(app);
 
 const routes = [
   index,

@@ -27,6 +27,7 @@
     "db:temp:fix": "npx tsx src/db/temp-drizzle-seed-fix.ts"
   },
   "dependencies": {
+    "@bull-board/hono": "^6.9.6",
     "@electric-sql/pglite": "^0.2.13",
     "@hono/node-server": "^1.13.2",
     "@hono/zod-openapi": "^0.16.4",
@@ -39,7 +40,7 @@
     "drizzle-orm": "0.36.4",
     "drizzle-seed": "^0.3.1",
     "drizzle-zod": "^0.5.1",
-    "hono": "^4.6.6",
+    "hono": "^4.7.8",
     "hono-pino": "^0.4.0",
     "ioredis": "^5.4.1",
     "pg": "^8.13.1",
