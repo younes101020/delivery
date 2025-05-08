@@ -44,7 +44,7 @@ export async function build(job: QueueDeploymentJob<"build">) {
 
   // DEPLOY APP SERVICE FROM BUILD IMAGE
 
-  defineApplicationServiceTask({
+  await defineApplicationServiceTask({
     isRedeploy,
     name: repoName,
     fqdn,

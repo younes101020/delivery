@@ -23,9 +23,6 @@ export function createApplicationServiceSpec({ applicationName, image, fqdn, por
         {
           Target: networkId,
         },
-        {
-          Target: "proxy",
-        },
       ],
       RestartPolicy: {
         Condition: "on-failure",
