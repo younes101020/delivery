@@ -13,6 +13,10 @@ That’s where ***Delivery*** comes in. We combine data integrity, affordability
 
 ## Screenshots
 
+* Onboarding page
+
+  ![deliver_onboarding](https://github.com/user-attachments/assets/70440c22-650e-413b-8424-11f23cbe9e12)
+
 * Deployment page
 
   ![deployment-page](https://github.com/user-attachments/assets/93bc3e2c-66a9-4f03-8ede-6dc484eb8909)
