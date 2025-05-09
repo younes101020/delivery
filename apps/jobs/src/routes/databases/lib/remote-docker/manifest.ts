@@ -18,11 +18,6 @@ export function createDatabaseServiceSpec({ database, name, port, initialEnvCred
         Image: database,
         Env: initialEnvCreds,
       },
-      Networks: [
-        {
-          Target: "proxy",
-        },
-      ],
       RestartPolicy: {
         Condition: "on-failure",
         Delay: 5,
