@@ -24,32 +24,35 @@ export async function build(job: QueueDeploymentJob<"build">) {
 
   const buildCmd = staticdeploy ? `${extractStaticArtefactCmd} ${buildImageFromSourceCmd}` : buildImageFromSourceCmd;
 
-  await ssh(
-    buildCmd,
-    {
-      cwd: `${APPLICATIONS_PATH}/${repoName}`,
-      onStdout: async ({ chunk, chunks, isCriticalError }) => {
-        await Promise.all([
-          job.updateProgress({ logs: chunk, isCriticalError, jobId: job.id }),
-          job.updateData({ ...job.data, logs: chunks?.join(), isCriticalError }),
-        ]);
+  try {
+    await ssh(
+      buildCmd,
+      {
+        cwd: `${APPLICATIONS_PATH}/${repoName}`,
+        onStdout: async ({ chunk, chunks, isCriticalError }) => {
+          await Promise.all([
+            job.updateProgress({ logs: chunk, isCriticalError, jobId: job.id }),
+            job.updateData({ ...job.data, logs: chunks?.join(), isCriticalError }),
+          ]);
+        },
       },
-    },
-  ).catch((error) => {
+    );
+
+    // DEPLOY APP SERVICE FROM BUILD IMAGE
+
+    await defineApplicationServiceTask({
+      isRedeploy,
+      name: repoName,
+      fqdn,
+      port,
+    });
+
+    await job.updateProgress({ logs: "Your application is now online! 🚀" });
+  }
+  catch (error) {
     throw new DeploymentError({
       name: "DEPLOYMENT_APP_ERROR",
       message: error instanceof Error ? error.message : "Unexpected error occurred while building the application.",
     });
-  });
-
-  // DEPLOY APP SERVICE FROM BUILD IMAGE
-
-  await defineApplicationServiceTask({
-    isRedeploy,
-    name: repoName,
-    fqdn,
-    port,
-  });
-
-  await job.updateProgress({ logs: "Your application is now online! 🚀" });
+  }
 }
