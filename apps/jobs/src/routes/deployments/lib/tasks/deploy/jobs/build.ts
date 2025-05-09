@@ -51,8 +51,7 @@ export async function build(job: QueueDeploymentJob<"build">) {
   }
   catch (error) {
     throw new DeploymentError({
-      name: "DEPLOYMENT_APP_ERROR",
-      message: error instanceof Error ? error.message : "Unexpected error occurred while building the application.",
+      name: error instanceof Error ? error.message : "Unexpected error occurred while building the application.",
     });
   }
 }
