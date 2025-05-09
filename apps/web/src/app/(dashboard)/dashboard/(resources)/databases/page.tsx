@@ -16,7 +16,7 @@ import { getDatabaseService } from "./_lib/queries";
 export default function DatabasesPage() {
   const baseUrl = env.BASE_URL;
   return (
-    <section className="p-5 bg-background/50 border">
+    <section className="h-[90%] p-5 bg-background/50 border">
       <div className="flex justify-between gap-2">
         <div>
           <PageTitle>My databases</PageTitle>
