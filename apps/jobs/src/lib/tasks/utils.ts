@@ -9,10 +9,9 @@ import type { RedisType } from "./types";
 
 export const connection = new IORedis({
   maxRetriesPerRequest: null,
-  host: "localhost",
   port: 6379,
+  host: env.CI === "true" ? "localhost" : "bull_queue",
   password: env.REDIS_PASSWORD,
-  // port: 6379,
 });
 
 let worker: Worker | null = null;
