@@ -1,3 +1,4 @@
+import configureBullBoard from "@/lib/configure-bull-board";
 import configureOpenAPI from "@/lib/configure-open-api";
 import createApp from "@/lib/create-app";
 import applications from "@/routes/applications/applications.index";
@@ -15,11 +16,8 @@ import env from "./env";
 const app = createApp();
 
 configureOpenAPI(app);
-
-if (env.NODE_ENV !== "production") {
-  const { default: configureBullBoard } = await import("@/lib/configure-bull-board");
+if (env.ENABLE_DEPLOYMENT_QUEUE_MONITORING === "true")
   configureBullBoard(app);
-}
 
 const routes = [
   index,

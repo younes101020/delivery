@@ -23,6 +23,7 @@ const EnvSchema = z.object({
   SSH_HOST: z.string().default("host.docker.internal"),
   BEARER_TOKEN: z.string(),
   CI: z.string().default("false"),
+  ENABLE_DEPLOYMENT_QUEUE_MONITORING: z.string().default("false"),
 });
 
 export type env = z.infer<typeof EnvSchema>;
