@@ -21,7 +21,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.web.entrypoints=web-secure"
-      - "traefik.http.routers.web.rule=Host(`${PUBLIC_IP}.sslip.io`)"
+      - "traefik.http.routers.web.rule=Host(`web.localhost`)"
       - "traefik.http.routers.web.tls=true"
       - "traefik.http.routers.web.tls.certresolver=tlschallenge"
       - "traefik.http.services.web.loadbalancer.server.port=3000"
@@ -57,6 +57,8 @@ services:
         condition: service_healthy
       bull_queue:
         condition: service_healthy
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
 
   db:
     image: postgres:latest
@@ -103,6 +105,14 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 3050:8080
+    networks:
+      - proxy
   
   traefik:
     image: "traefik:v3.3.6"
@@ -114,7 +124,7 @@ services:
       - "traefik.enable=true"
 
       # define traefik dashboard router and service
-      - "traefik.http.routers.traefik.rule=Host(`traefik.${PUBLIC_IP}.sslip.io`)"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.localhost`)"
       - "traefik.http.routers.traefik.service=api@internal"
       - "traefik.http.routers.traefik.tls.certresolver=tlschallenge"
       - "traefik.http.routers.traefik.entrypoints=web-secure"
