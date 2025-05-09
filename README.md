@@ -1,9 +1,13 @@
-Self-hostable Coolify, Vercel, Heroku alternative focusing on one single thing:
-deploying your applications as simply as possible, without any vendor lock-in.
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/8d0858db-f1ae-423b-965d-4bba7efba098" alt="logo">
+</p>
 
-Delivery act as tiny wrapper around [Nixpacks](https://nixpacks.com/docs)
-allowing you to transform your github repository into a production-ready
-application.
+Self-hostable Netlify, Vercel, Heroku alternative
+
+Coolify and Dockploy are great options for those seeking full control over their data at a reduced cost.
+However, their setup can be complex—especially when your main goal is simply to deploy applications or website from a GitHub repository.
+
+That’s where ***Delivery*** comes in. We combine data integrity, affordability, and a seamless user experience through an intuitive interface designed to simplify your deployment process.
 
 ---
 
