@@ -4,8 +4,6 @@ import { HonoAdapter } from "@bull-board/hono";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { Queue } from "bullmq";
 
-import env from "@/env";
-
 import type { AppOpenAPI } from "./types";
 
 import { connection, getBullConnection } from "./tasks/utils";
@@ -14,8 +12,6 @@ const BASE_PATH = "/bull-board-ui";
 const MONITORED_QUEUE = "cuteblogreact";
 
 export default function configureBullBoard(app: AppOpenAPI) {
-  if (env.NODE_ENV === "production")
-    return;
   const serverAdapter = new HonoAdapter(serveStatic);
   const monitoredQueue = getPredefinedDeploymentQueue();
   createBullBoard({
