@@ -24,34 +24,39 @@ export async function build(job: QueueDeploymentJob<"build">) {
 
   const buildCmd = staticdeploy ? `${extractStaticArtefactCmd} ${buildImageFromSourceCmd}` : buildImageFromSourceCmd;
 
-  try {
-    await ssh(
-      buildCmd,
-      {
-        cwd: `${APPLICATIONS_PATH}/${repoName}`,
-        onStdout: async ({ chunk, chunks, isCriticalError }) => {
-          await Promise.all([
-            job.updateProgress({ logs: chunk, isCriticalError, jobId: job.id }),
-            job.updateData({ ...job.data, logs: chunks?.join(), isCriticalError }),
-          ]);
-        },
+  // try {
+  await ssh(
+    buildCmd,
+    {
+      cwd: `${APPLICATIONS_PATH}/${repoName}`,
+      onStdout: async ({ chunk, chunks, isCriticalError }) => {
+        await Promise.all([
+          job.updateProgress({ logs: chunk, isCriticalError, jobId: job.id }),
+          job.updateData({ ...job.data, logs: chunks?.join(), isCriticalError }),
+        ]);
       },
-    );
+    },
+  );
 
-    // DEPLOY APP SERVICE FROM BUILD IMAGE
+  // DEPLOY APP SERVICE FROM BUILD IMAGE
 
-    await defineApplicationServiceTask({
-      isRedeploy,
-      name: repoName,
-      fqdn,
-      port,
+  await defineApplicationServiceTask({
+    isRedeploy,
+    name: repoName,
+    fqdn,
+    port,
+  }).catch(() => {
+    throw new DeploymentError({
+      name: "defineApplicationServiceTask",
+      message: "caused by defineApplicationServiceTask",
     });
+  });
 
-    await job.updateProgress({ logs: "Your application is now online! 🚀" });
-  }
+  await job.updateProgress({ logs: "Your application is now online! 🚀" });
+  /* }
   catch (error) {
     throw new DeploymentError({
       name: error instanceof Error ? error.message : "Unexpected error occurred while building the application.",
     });
-  }
+  } */
 }
