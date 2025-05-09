@@ -5,7 +5,7 @@
 Self-hostable Netlify, Vercel, Heroku alternative
 
 Coolify and Dockploy are solid choices for those seeking full control over their data and looking to avoid high costs.
-However, their setup can be complex—especially when your main goal is simply to deploy applications or website from a GitHub repository.
+However, their setup can be complex, especially when your main goal is simply to deploy applications or website from a GitHub repository.
 
 That’s where ***Delivery*** comes in. We combine data integrity, affordability, and a seamless user experience through an intuitive interface designed to simplify your deployment process.
 
