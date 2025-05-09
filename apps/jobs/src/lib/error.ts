@@ -32,8 +32,8 @@ export class DeploymentError extends UnrecoverableError {
     message,
     cause,
   }: {
-    name: string;
-    message?: string;
+    name: DeploymentErrorNameType;
+    message: string;
     cause?: unknown;
   }) {
     super(message);
