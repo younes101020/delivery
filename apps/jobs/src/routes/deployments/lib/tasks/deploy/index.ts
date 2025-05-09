@@ -44,13 +44,13 @@ function runDeployment(
           name: JOBS.build,
           data: data.build,
           queueName: repoName,
-          opts: { attempts: 3, failParentOnFailure: true },
+          opts: { failParentOnFailure: true },
           children: [
             {
               name: JOBS.clone,
               data: data.clone,
               queueName: repoName,
-              opts: { attempts: 3, failParentOnFailure: true },
+              opts: { failParentOnFailure: true },
             },
           ],
         },
