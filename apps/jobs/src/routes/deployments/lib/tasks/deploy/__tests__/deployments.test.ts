@@ -127,13 +127,13 @@ describe("deployments tests", () => {
             name: JOBS.build,
             data: { env: env.cmdEnvVars, cache, ...(staticdeploy && { publishdir }), port, staticdeploy, fqdn, repoName: queueName, isRedeploy: false },
             queueName,
-            opts: { attempts: 3, failParentOnFailure: true },
+            opts: { failParentOnFailure: true },
             children: [
               {
                 name: JOBS.clone,
                 data: { ...githubApp, repoUrl, secret: githubApp.secret, repoName: queueName },
                 queueName,
-                opts: { attempts: 3, failParentOnFailure: true },
+                opts: { failParentOnFailure: true },
               },
             ],
           },
@@ -194,13 +194,13 @@ describe("deployments tests", () => {
             name: JOBS.build,
             data: { ...jobMap.get("build"), env: `--env ${env.key}=${env.value}`, isRedeploy: true, ...overrideNonInitialQueueData },
             queueName,
-            opts: { attempts: 3, failParentOnFailure: true },
+            opts: { failParentOnFailure: true },
             children: [
               {
                 name: JOBS.clone,
                 data: { ...jobMap.get("clone"), ...overrideNonInitialQueueData },
                 queueName,
-                opts: { attempts: 3, failParentOnFailure: true },
+                opts: { failParentOnFailure: true },
               },
             ],
           },
