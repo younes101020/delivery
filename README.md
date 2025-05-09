@@ -53,3 +53,7 @@ First of all, you need to fork and clone the repository:
 yarn install
 yarn dev
 ```
+
+## Repository analytics
+
+![Alt](https://repobeats.axiom.co/api/embed/a9956e02475a95ab0f789927d9080b6b4974d728.svg "Repobeats analytics image")
