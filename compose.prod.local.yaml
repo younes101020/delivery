@@ -27,7 +27,7 @@ services:
       - "traefik.http.services.web.loadbalancer.server.port=3000"
 
   jobs:
-    image: younes60/jobs:${DOCKER_TAGS}
+    #image: younes60/jobs:${DOCKER_TAGS}
     build:
       context: .
       dockerfile: ./apps/jobs/prod.Dockerfile
@@ -44,9 +44,11 @@ services:
       - MINIO_PUBLIC_DOMAIN=${MINIO_PUBLIC_DOMAIN}
       - TEST_USERS_PASSWORD=${TEST_USERS_PASSWORD}
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - ENABLE_DEPLOYMENT_QUEUE_MONITORING=${ENABLE_DEPLOYMENT_QUEUE_MONITORING}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
     volumes:
       - /data/delivery/ssh/keys:/var/ssh/keys
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 3090:3090
     networks:
