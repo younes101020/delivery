@@ -1,14 +1,11 @@
 import Docker from "dockerode";
 
-import { loadConfig } from "@/lib/ssh/utils";
-
 import type { Resources } from "../constants";
 
 import { withDocker } from "./middleware";
 
 export async function getDocker() {
-  const sshConfig = await loadConfig();
-  return new Docker({ protocol: "ssh", username: sshConfig.username, sshOptions: sshConfig });
+  return new Docker();
 }
 
 export const getDockerResourceEvents = withDocker<NodeJS.ReadableStream, Resources>(
