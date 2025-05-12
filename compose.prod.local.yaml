@@ -27,7 +27,9 @@ services:
       - "traefik.http.services.web.loadbalancer.server.port=3000"
 
   jobs:
-    #image: younes60/jobs:${DOCKER_TAGS}
+    image: younes60/jobs:${DOCKER_TAGS}
+    group_add:
+      - ${DOCKER_GID:-999}
     build:
       context: .
       dockerfile: ./apps/jobs/prod.Dockerfile

@@ -29,16 +29,16 @@ RUN yarn turbo run build
 FROM base AS runner
 WORKDIR /app
 
-RUN addgroup --system --gid 1001 docker
+RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 hono
-RUN adduser hono docker
-RUN chown -R hono:docker /app
+RUN adduser hono nodejs
+RUN chown -R hono:nodejs /app
 
-COPY --from=installer --chown=hono:docker /app/node_modules ./node_modules
-COPY --from=installer --chown=hono:docker /app/apps/jobs/dist ./apps/jobs/dist
-COPY --from=installer --chown=hono:docker /app/apps/jobs/package.json ./apps/jobs/package.json
-COPY --from=installer --chown=hono:docker /app/apps/jobs/drizzle.config.ts ./apps/jobs/drizzle.config.ts
-COPY --from=installer --chown=hono:docker /app/apps/jobs/src/db/migrations ./apps/jobs/src/db/migrations
+COPY --from=installer --chown=hono:nodejs /app/node_modules ./node_modules
+COPY --from=installer --chown=hono:nodejs /app/apps/jobs/dist ./apps/jobs/dist
+COPY --from=installer --chown=hono:nodejs /app/apps/jobs/package.json ./apps/jobs/package.json
+COPY --from=installer --chown=hono:nodejs /app/apps/jobs/drizzle.config.ts ./apps/jobs/drizzle.config.ts
+COPY --from=installer --chown=hono:nodejsnodejs /app/apps/jobs/src/db/migrations ./apps/jobs/src/db/migrations
 
 
 USER hono
