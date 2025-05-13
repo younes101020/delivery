@@ -7,10 +7,14 @@ import env from "@/env";
 import type { Resources } from "../constants";
 import type { RedisType } from "./types";
 
+import { checkIsContainerized } from "../ssh/utils";
+
+const shouldUseServiceNameAsHostname = await checkIsContainerized() && env.CI !== "true";
+
 export const connection = new IORedis({
   maxRetriesPerRequest: null,
   port: 6379,
-  host: env.CI === "true" ? "localhost" : "bull_queue",
+  host: shouldUseServiceNameAsHostname ? "bull_queue" : "localhost",
   password: env.REDIS_PASSWORD,
 });
 

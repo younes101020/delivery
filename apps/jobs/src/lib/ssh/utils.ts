@@ -62,6 +62,6 @@ function getUserFromKeyPath(keyPath: string) {
   return match[1];
 }
 
-async function checkIsContainerized() {
+export async function checkIsContainerized() {
   return existsSync("/.dockerenv");
 }
