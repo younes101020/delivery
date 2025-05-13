@@ -2,7 +2,7 @@
 
 import type { CheckedState } from "@radix-ui/react-checkbox";
 
-import { Loader2, Rocket } from "lucide-react";
+import { ChevronLast, Loader2, Rocket } from "lucide-react";
 import { useActionState, useState } from "react";
 
 import type { GithubApp, GithubRepositories } from "@/app/_lib/github/types";
@@ -36,6 +36,7 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
       env: "",
       cache: true,
       staticdeploy: initialStaticChoice,
+      action: "deploy",
     },
   });
   const [selected, setSelected] = useState<SelectedRepositoryProps>({
@@ -45,6 +46,7 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
     gitUrl: null,
   });
   const [isStaticDeployment, setIsTaticDeployment] = useState<CheckedState>(initialStaticChoice);
+  const [shouldSkipDeployment, setShouldSkipDeployment] = useState(false);
 
   return (
     <>
@@ -61,7 +63,7 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
                     id="publishdir"
                     name="publishdir"
                     type="text"
-                    required={isStaticDeployment === "indeterminate" ? false : isStaticDeployment}
+                    required={isStaticDeployment !== "indeterminate" || !shouldSkipDeployment}
                     defaultValue={state.inputs.publishdir}
                     className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
                     placeholder="ex: /dist"
@@ -82,7 +84,7 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
                     id="port"
                     name="port"
                     type="text"
-                    required={!isStaticDeployment}
+                    required={!isStaticDeployment && !shouldSkipDeployment}
                     defaultValue={state.inputs.port}
                     className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
                     placeholder="ex: 3000"
@@ -186,22 +188,48 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
               {state.error}
             </Paragraph>
           )}
-          <Button type="submit" disabled={!selected.name || pending} aria-label="submit">
-            {pending
-              ? (
-                  <>
-                    <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                    Loading...
-                  </>
-                )
-              : (
-                  <>
-                    <Rocket />
-                    {" "}
-                    | Deploy
-                  </>
-                )}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              type="submit"
+              name="action"
+              value="skip"
+              variant="outline"
+              disabled={pending}
+              onClick={() => setShouldSkipDeployment(true)}
+            >
+              {pending
+                ? (
+                    <>
+                      <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                      Loading...
+                    </>
+                  )
+                : (
+                    <>
+                      <ChevronLast />
+                      {" "}
+                      | Skip
+                    </>
+                  )}
+            </Button>
+            <Button type="submit" name="action" value="deploy" disabled={!selected.name || pending} aria-label="submit">
+              {pending
+                ? (
+                    <>
+                      <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                      Loading...
+                    </>
+                  )
+                : (
+                    <>
+                      <Rocket />
+                      {" "}
+                      | Deploy
+                    </>
+                  )}
+            </Button>
+          </div>
+
         </div>
       </form>
     </>

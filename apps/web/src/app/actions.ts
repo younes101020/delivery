@@ -36,7 +36,13 @@ export async function signOut() {
   (await cookies()).delete("session");
 }
 
-const deploySchema = z.object({
+const skipDeploySchema = z.object({
+  action: z.literal("skip"),
+  isOnboarding: z.coerce.boolean(),
+});
+
+const fullDeploySchema = z.object({
+  action: z.literal("deploy"),
   repoUrl: z.string(),
   githubAppId: z.coerce.number(),
   isOnboarding: z.coerce.boolean(),
@@ -78,17 +84,28 @@ const deploySchema = z.object({
   }
 });
 
+const deploySchema = z.union([
+  skipDeploySchema,
+  fullDeploySchema,
+]);
+
 export const deploy = validatedActionWithUser(
   deploySchema,
   async (data, _, prev, user) => {
-    const deploymentResponse = await client.deployments.$post({
-      json: data,
-    });
-    if (deploymentResponse.status !== 202) {
-      return { error: "Impossible to start the deployment.", inputs: data };
+    const { action, isOnboarding } = data;
+
+    let deploymentResponse;
+
+    if (action === "deploy") {
+      deploymentResponse = await client.deployments.$post({
+        json: data,
+      });
+      if (deploymentResponse.status !== 202) {
+        return { error: "Impossible to start the deployment.", inputs: data };
+      }
     }
 
-    if (data.isOnboarding) {
+    if (isOnboarding) {
       const response = await client.serverconfig.$patch({
         json: {
           completedByUserId: user.id.toString(),
@@ -104,8 +121,12 @@ export const deploy = validatedActionWithUser(
       });
     }
 
-    const result = await deploymentResponse.json();
-    redirect(`/dashboard/deployments/${result.queueName}`);
+    if (action === "deploy") {
+      const result = await deploymentResponse!.json();
+      redirect(`/dashboard/deployments/${result.queueName}`);
+    }
+
+    redirect(`/dashboard/applications`);
   },
 );
 
