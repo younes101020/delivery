@@ -115,6 +115,7 @@ services:
           - node.role == manager
     labels:
       - "traefik.enable=true"
+      - "resource=reverse-proxy:delivery"
 
       # define traefik dashboard router and service
       - "traefik.http.routers.traefik.rule=Host(`traefik.${PUBLIC_IP}.sslip.io`)"
