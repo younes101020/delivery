@@ -43,21 +43,6 @@ That’s where ***Delivery*** comes in. We combine data integrity, affordability
 - [Codebase](https://kentcdodds.com/blog/colocation)
 - [Coolify](https://www.coolify.io/)
 
-## Contributor installation
-
-First of all, you need to fork and clone the repository:
-
-1. Fork the repository by clicking the "Fork" button at the top right of the [GitHub repository](https://github.com/younes101020/delivery)
-
-2. Clone your forked repository
-
-### Launch development environment
-
-```bash
-yarn install
-yarn dev
-```
-
 ## Repository analytics
 
 ![Alt](https://repobeats.axiom.co/api/embed/a9956e02475a95ab0f789927d9080b6b4974d728.svg "Repobeats analytics image")

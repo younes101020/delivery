@@ -22,6 +22,12 @@ describe("onboarding process", () => {
       return { signUp };
     });
 
+    vi.mock("@/app/(login)/actions", () => {
+      const signIn = vi.fn();
+      signIn.mockResolvedValue({ error: "Impossible to sign in", inputs: { email: "", password: "" } });
+      return { signIn };
+    });
+
     globalThis.ResizeObserver = vi.fn().mockImplementation(() => ({
       observe: vi.fn(),
       unobserve: vi.fn(),

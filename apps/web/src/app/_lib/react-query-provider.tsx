@@ -12,6 +12,7 @@ function makeQueryClient() {
     defaultOptions: {
       queries: {
         staleTime: Infinity,
+        queryFn: () => null,
       },
     },
   });

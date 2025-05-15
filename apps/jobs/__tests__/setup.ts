@@ -9,9 +9,10 @@ export function setup() {
     throw new Error("NODE_ENV must be 'test' and bearer token too");
   }
   applyMigration();
+  resetDatabase();
   seedDatabaseWithFakeData();
   // This is a temporary patch for: https://github.com/drizzle-team/drizzle-orm/issues/3915
-  execSync("yarn db:temp:fix");
+  execSync("pnpm db:temp:fix");
 }
 
 export function teardown() {
@@ -23,13 +24,13 @@ export function teardown() {
 }
 
 function applyMigration() {
-  execSync("yarn drizzle-kit push");
+  execSync("pnpm drizzle-kit push");
 }
 
 function seedDatabaseWithFakeData() {
-  execSync("yarn db:seed");
+  execSync("pnpm db:seed");
 }
 
 function resetDatabase() {
-  execSync("yarn db:reset");
+  execSync("pnpm db:reset");
 }

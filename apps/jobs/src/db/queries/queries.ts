@@ -91,6 +91,15 @@ export async function getSystemConfig() {
   return await db.query.systemConfig.findFirst();
 }
 
+export async function getSystemConfigFqdn() {
+  const systemConfig = await db.query.systemConfig.findFirst({
+    columns: {
+      domainName: true,
+    },
+  });
+  return systemConfig?.domainName;
+}
+
 export async function setUser(user: Omit<AuthRegisterSchema, "password">, passwordHash: string) {
   const [inserted] = await db
     .insert(users)

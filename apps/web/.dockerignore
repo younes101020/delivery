@@ -1,2 +1,3 @@
 ../../db-data
 .env.development
+node_modules

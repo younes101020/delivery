@@ -14,27 +14,32 @@ export const deploymentTest = it.extend<DeploymentFixtures>({
       repositories: [{
         id: 1,
         full_name: "octocat/Hello-World",
+        name: "Hello-World",
         git_url: "git://github.com/octocat/Hello-World.git",
         description: "This is a sample repository",
       }, {
         id: 2,
         full_name: "facebook/react",
+        name: "react",
         git_url: "git://github.com/facebook/react.git",
         description: "A JavaScript library for building user interfaces",
       }, {
         id: 3,
         full_name: "vercel/next.js",
         git_url: "git://github.com/vercel/next.js.git",
+        name: "next.js",
         description: "The React Framework for Production",
       }, {
         id: 4,
         full_name: "microsoft/typescript",
         git_url: "git://github.com/microsoft/typescript.git",
+        name: "typescript",
         description: "TypeScript is a superset of JavaScript",
       }, {
         id: 5,
         full_name: "denoland/deno",
         git_url: "git://github.com/denoland/deno.git",
+        name: "deno",
         description: "A modern runtime for JavaScript and TypeScript",
       }],
       githubApp: { appId: 4578, name: "mygithubaap" },

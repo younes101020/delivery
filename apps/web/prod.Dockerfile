@@ -1,12 +1,17 @@
 FROM node:23-alpine AS base
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
 FROM base AS builder
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apk update
 RUN apk add --no-cache libc6-compat
 # Set working directory
 WORKDIR /app
-RUN yarn global add turbo@^2.3.3
+
+RUN pnpm install --global turbo@^2.3.3
 COPY . .
 RUN turbo prune @delivery/web --docker
 
@@ -18,7 +23,7 @@ WORKDIR /app
 
 # First install the dependencies (as they change less often)
 COPY --from=builder /app/out/json/ .
-RUN yarn install
+RUN pnpm install --prod --frozen-lockfile
 
 # Build the project
 COPY --from=builder /app/out/full/ .
@@ -32,7 +37,7 @@ ENV JOBS_API_BASEURL=${JOBS_API_BASEURL}
 ARG BASE_URL
 ENV BASE_URL=${BASE_URL}
 
-RUN yarn turbo build
+RUN pnpm turbo build
 
 FROM base AS runner
 WORKDIR /app
