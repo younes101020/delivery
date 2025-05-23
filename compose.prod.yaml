@@ -1,14 +1,14 @@
 services:
   web:
-    image: younes60/web:${DOCKER_TAGS}
+    image: younes60/web:${DOCKER_TAGS:-latest}
     build:
       context: .
       dockerfile: ./apps/web/prod.Dockerfile
-    environment:
-      - AUTH_SECRET=${AUTH_SECRET}
-      - JOBS_BEARER_TOKEN=${JOBS_BEARER_TOKEN}
-      - JOBS_API_BASEURL=${JOBS_API_BASEURL}
-      - BASE_URL=${BASE_URL}
+      args:
+        - AUTH_SECRET=${AUTH_SECRET}
+        - JOBS_BEARER_TOKEN=${JOBS_BEARER_TOKEN}
+        - JOBS_API_BASEURL=${JOBS_API_BASEURL}
+        - BASE_URL=${BASE_URL}
     volumes:
       - ./apps/web/src:/app/src
     ports:
@@ -25,9 +25,10 @@ services:
       - "traefik.http.routers.web.tls=true"
       - "traefik.http.routers.web.tls.certresolver=tlschallenge"
       - "traefik.http.services.web.loadbalancer.server.port=3000"
+      - "resource=delivery-web-instance"
 
   jobs:
-    image: younes60/jobs:${DOCKER_TAGS}
+    image: younes60/jobs:${DOCKER_TAGS:-latest}
     group_add:
       - ${DOCKER_GID:-999}
     build:
@@ -62,7 +63,7 @@ services:
         condition: service_healthy
 
   db:
-    image: postgres:latest
+    image: postgres:13.21-alpine3.20
     ports:
       - 5432:5432
     environment:
@@ -81,7 +82,7 @@ services:
       retries: 5
   
   screenshots-storage:
-    image: bitnami/minio:latest
+    image: bitnami/minio:2025.3.12
     ports:
       - 9000:9000
       - 9001:9001
@@ -94,7 +95,7 @@ services:
       - proxy
   
   bull_queue:
-    image: redis
+    image: redis:8.0.1
     command: redis-server --requirepass ${REDIS_PASSWORD} --save 60 1 --loglevel warning --maxmemory-policy noeviction --maxmemory 2gb
     ports:
       - 6379:6379
@@ -115,6 +116,7 @@ services:
           - node.role == manager
     labels:
       - "traefik.enable=true"
+      - "resource=reverse-proxy:delivery"
 
       # define traefik dashboard router and service
       - "traefik.http.routers.traefik.rule=Host(`traefik.${PUBLIC_IP}.sslip.io`)"

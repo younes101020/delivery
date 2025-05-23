@@ -1,3 +1,5 @@
+import type { JobProgress } from "bullmq";
+
 import { Job, Queue, QueueEvents } from "bullmq";
 import { streamSSE } from "hono/streaming";
 import { dirname, join } from "node:path";
@@ -118,7 +120,7 @@ export const streamLog: AppRouteHandler<StreamLogsRoute> = async (c) => {
       });
     }
 
-    async function progressHandler({ data, jobId }: { data: number | object; jobId: string }) {
+    async function progressHandler({ data, jobId }: { data: JobProgress; jobId: string }) {
       const jobState = await Job.fromId(queue, jobId);
       const sseData = JSON.stringify({
         jobName: jobState?.name,

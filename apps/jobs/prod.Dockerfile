@@ -1,12 +1,16 @@
 FROM node:20-alpine AS base
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
 FROM base AS builder
 RUN apk update
 RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 
-RUN yarn global add turbo@^2.3.3
+RUN pnpm install --global turbo@^2.3.3
 COPY . .
 
 # Generate a partial monorepo with a pruned lockfile for a target workspace.
@@ -20,11 +24,11 @@ WORKDIR /app
 
 # First install the dependencies (as they change less often)
 COPY --from=builder /app/out/json/ .
-RUN yarn install
+RUN pnpm install --prod --frozen-lockfile
 
 # Build the project
 COPY --from=builder /app/out/full/ .
-RUN yarn turbo run build
+RUN pnpm turbo run build
 
 FROM base AS runner
 WORKDIR /app

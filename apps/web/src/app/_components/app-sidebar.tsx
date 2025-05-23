@@ -54,13 +54,14 @@ const data = {
       icon: Settings2,
       items: [
         {
+          title: "General",
+          url: "/dashboard/settings/general",
+        },
+        {
           title: "Account",
           url: "/dashboard/settings/account",
         },
-        {
-          title: "Team",
-          url: "#",
-        },
+
       ],
     },
   ],

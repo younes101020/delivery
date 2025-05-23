@@ -31,6 +31,12 @@ describe("onboarding process", () => {
         useUser: vi.fn(),
       };
     });
+
+    vi.mock("@/app/actions", () => {
+      const deploy = vi.fn();
+      deploy.mockResolvedValue({ error: "Impossible to create deployment" });
+      return { deploy };
+    });
   });
 
   globalThis.ResizeObserver = vi.fn().mockImplementation(() => ({

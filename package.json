@@ -2,16 +2,10 @@
   "name": "delivery",
   "version": "0.0.1",
   "private": true,
-  "packageManager": "yarn@4.5.3",
   "description": "minimalist applications deployment system",
   "author": "younes101020 <senyoupl@icloud.com>",
   "license": "MIT",
   "repository": "https://github.com/younes101020/delivery",
-  "main": "index.js",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
     "deploy": "sh ./scripts/delivery.sh deploy",
     "stop": "sh ./scripts/delivery.sh stop",
@@ -31,7 +25,11 @@
     "turbo": "^2.3.3",
     "typescript": "^5.4.3"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": ["puppeteer"]
+  },
   "dependencies": {
     "next-runtime-env": "^3.3.0"
-  }
+  },
+  "packageManager": "pnpm@10.11.0+sha512.6540583f41cc5f628eb3d9773ecee802f4f9ef9923cc45b69890fb47991d4b092964694ec3a4f738a420c918a333062c8b925d312f42e4f0c263eb603551f977"
 }
