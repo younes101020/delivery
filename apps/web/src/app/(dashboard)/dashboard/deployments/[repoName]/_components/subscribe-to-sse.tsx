@@ -21,6 +21,6 @@ export function SubscribeToSSE({ children, baseUrl }: SubscribeToSSEProps) {
     return shouldMergeLogs ? { ...data, logs: prevData.logs ? `${prevData.logs}${data.logs}` : data.logs } : data;
   };
 
-  useQuerySubscription<DeploymentLogState>(`/deployments-proxy/logs/${repoName}`, baseUrl, stateCallback);
+  useQuerySubscription<DeploymentLogState>(`/sse-proxy/deployments/logs/${repoName}`, baseUrl, stateCallback);
   return <>{children}</>;
 }

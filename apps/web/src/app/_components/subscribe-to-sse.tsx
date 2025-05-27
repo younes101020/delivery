@@ -10,6 +10,6 @@ interface SubscribeToSSEProps {
 }
 
 export function SubscribeToSSE({ children, baseUrl }: SubscribeToSSEProps) {
-  useQuerySubscription("/deployments-proxy/count", baseUrl);
+  useQuerySubscription("/sse-proxy/deployments/count", baseUrl);
   return <>{children}</>;
 }

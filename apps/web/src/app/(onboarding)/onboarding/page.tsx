@@ -17,7 +17,7 @@ interface SearchParams {
   searchParams?: Promise<{ step: string; page: string }>;
 }
 
-export default async function OnboardingPage({ searchParams }: SearchParams) {
+export default function OnboardingPage({ searchParams }: SearchParams) {
   return (
     <div className="flex justify-center items-center h-full *:lg:w-[70%] *:w-[90%]">
       <StepProvider>

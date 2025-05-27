@@ -3,6 +3,7 @@
 import { BadgeCheck, ChevronsUpDown, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Suspense } from "react";
 
 import {
   DropdownMenu,
@@ -19,20 +20,18 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/app/_components/ui/sidebar";
-import { useUser } from "@/app/_lib/user-provider";
+import { useUser } from "@/app/_hooks/use-user";
 import { signOut } from "@/app/(login)/actions";
+
+import { Skeleton } from "./ui/skeleton";
 
 export function NavUser() {
   const router = useRouter();
   const { isMobile } = useSidebar();
-  const session = useUser();
-  if (!session.user)
-    return null;
-  const { setUser, user } = session;
 
   async function handleSignOut() {
-    setUser(null);
     await signOut();
+    router.refresh();
     router.push("/");
   }
 
@@ -45,10 +44,10 @@ export function NavUser() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
-              </div>
+              <Suspense fallback={<PendingUserInfo />}>
+                <UserInfo />
+              </Suspense>
+
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
@@ -60,10 +59,9 @@ export function NavUser() {
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center px-1 py-1.5 text-left text-sm">
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
-                </div>
+                <Suspense fallback={<PendingUserInfo />}>
+                  <UserInfo />
+                </Suspense>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
@@ -85,5 +83,28 @@ export function NavUser() {
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
+  );
+}
+
+function UserInfo() {
+  const session = useUser();
+  if (!session.user)
+    return null;
+  const { user } = session;
+
+  return (
+    <div className="grid flex-1 text-left text-sm leading-tight">
+      <span className="truncate font-semibold">{user.name}</span>
+      <span className="truncate text-xs">{user.email}</span>
+    </div>
+  );
+}
+
+function PendingUserInfo() {
+  return (
+    <div className="grid flex-1 gap-1">
+      <Skeleton className="h-12 w-full" />
+      <Skeleton className="h-12 w-full" />
+    </div>
   );
 }

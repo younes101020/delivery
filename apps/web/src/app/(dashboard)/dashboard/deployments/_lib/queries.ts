@@ -17,3 +17,6 @@ export async function getPreviousDeploymentsState() {
   }
   return await response.json();
 }
+
+export type OngoingDeployments = Awaited<ReturnType<typeof getCurrentDeploymentsState>>;
+export type PreviousDeployments = Awaited<ReturnType<typeof getPreviousDeploymentsState>>;
