@@ -1,7 +1,7 @@
 "use client";
 
 import { Loader2, UserPen } from "lucide-react";
-import { useActionState } from "react";
+import { Suspense, useActionState } from "react";
 
 import type { ActionState } from "@/app/_lib/form-middleware";
 
@@ -9,11 +9,23 @@ import { Button } from "@/app/_components/ui/button";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
 import { Paragraph } from "@/app/_components/ui/paragraph";
-import { useUser } from "@/app/_lib/user-provider";
+import { Skeleton } from "@/app/_components/ui/skeleton";
+import { useUser } from "@/app/_hooks/use-user";
 
 import { updateAccount } from "../actions";
 
 export function AccountForm() {
+  return (
+    <div>
+      <h2 className="text-2xl py-2">Update account</h2>
+      <Suspense fallback={<PendingForm />}>
+        <Form />
+      </Suspense>
+    </div>
+  );
+}
+
+function Form() {
   const { user } = useUser();
   const [state, formAction, isPending] = useActionState<ActionState, FormData>(
     updateAccount,
@@ -21,7 +33,6 @@ export function AccountForm() {
   );
 
   return (
-
     <form className="space-y-4" action={formAction}>
       <div>
         <Label htmlFor="name">Name</Label>
@@ -71,5 +82,21 @@ export function AccountForm() {
             )}
       </Button>
     </form>
+  );
+}
+
+function PendingForm() {
+  return (
+    <div className="space-y-4">
+      <div className="space-y-1">
+        <Skeleton className="h-4 w-[5%]" />
+        <Skeleton className="h-9" />
+      </div>
+      <div className="space-y-1">
+        <Skeleton className="h-4 w-[5%]" />
+        <Skeleton className="h-9" />
+      </div>
+      <Skeleton className="h-9 w-[10%]" />
+    </div>
   );
 }

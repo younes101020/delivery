@@ -13,6 +13,6 @@ interface SubscribeToSSEProps {
 }
 
 export function SubscribeToSSE({ children, repoName, baseUrl }: SubscribeToSSEProps) {
-  useQuerySubscription<DeploymentPreviewState>(`/deployments-proxy/preview/${repoName}`, baseUrl);
+  useQuerySubscription<DeploymentPreviewState>(`/sse-proxy/deployments/preview/${repoName}`, baseUrl);
   return <>{children}</>;
 }

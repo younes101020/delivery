@@ -18,3 +18,5 @@ export async function getActiveDatabaseServices() {
   const data = await response.json();
   return data.filter(service => service.isActive);
 }
+
+export type Databases = Awaited<ReturnType<typeof getDatabaseService>>;

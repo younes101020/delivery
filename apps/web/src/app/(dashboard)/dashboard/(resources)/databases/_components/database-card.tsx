@@ -18,7 +18,7 @@ interface DatabaseCardProps {
 export function DatabaseCard({ name, id, createdAt, image, isActive }: DatabaseCardProps) {
   const state = isActive ? "running" : "stop";
   return (
-    <Card className="relative">
+    <Card className="h-fit">
       <CardHeader className="flex flex-row items-center justify-between">
         <div className="flex gap-2 truncate items-center">
           <PostgresIcon size={25} />

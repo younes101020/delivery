@@ -1,12 +1,12 @@
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { Boxes, PackagePlus } from "lucide-react";
 import Link from "next/link";
-import { Suspense } from "react";
 
 import { buttonVariants } from "@/app/_components/ui/button";
 import { EmptyState } from "@/app/_components/ui/empty-state";
 import { PageDescription } from "@/app/_components/ui/page-description";
 import { PageTitle } from "@/app/_components/ui/page-title";
-import { Skeleton } from "@/app/_components/ui/skeleton";
+import { getQueryClient } from "@/app/_lib/get-query-client";
 import { env } from "@/env";
 
 import { DatabaseCard } from "./_components/database-card";
@@ -15,6 +15,14 @@ import { getDatabaseService } from "./_lib/queries";
 
 export default function DatabasesPage() {
   const baseUrl = env.BASE_URL;
+
+  const queryClient = getQueryClient();
+
+  queryClient.prefetchQuery({
+    queryKey: ["databases"],
+    queryFn: () => getDatabaseService(),
+  });
+
   return (
     <section className="h-[90%] p-5 bg-background/50 border">
       <div className="flex justify-between gap-2">
@@ -30,11 +38,11 @@ export default function DatabasesPage() {
       </div>
 
       <div className="h-full mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <SubscribeToSSE baseUrl={baseUrl}>
-          <Suspense fallback={<Skeleton className="h-32 w-full" />}>
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <SubscribeToSSE baseUrl={baseUrl}>
             <DatabaseList />
-          </Suspense>
-        </SubscribeToSSE>
+          </SubscribeToSSE>
+        </HydrationBoundary>
       </div>
     </section>
   );
@@ -47,9 +55,13 @@ async function DatabaseList() {
     return <NoDatabases />;
   }
 
-  return dbContainers.map(dbContainer => (
-    <DatabaseCard key={dbContainer.name} {...dbContainer} />
-  ));
+  return (
+    <>
+      {dbContainers.map(dbContainer => (
+        <DatabaseCard key={dbContainer.name} {...dbContainer} />
+      ))}
+    </>
+  );
 }
 
 function NoDatabases() {

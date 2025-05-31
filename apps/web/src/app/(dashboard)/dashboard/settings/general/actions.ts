@@ -1,6 +1,5 @@
 "use server";
 
-import { revalidateTag } from "next/cache";
 import { z } from "zod";
 
 import { client } from "@/app/_lib/client-http";
@@ -19,6 +18,5 @@ export const deliveryInstanceForm = validatedAction(deliveryInstanceFormSchema, 
   if (response.status !== 200)
     return { error: "Can't update delivery instance configuration. Please try again.", inputs: data };
 
-  revalidateTag("delivery-instance-configuration");
   return { success: "Delivery instance configuration updated", inputs: data };
 });
