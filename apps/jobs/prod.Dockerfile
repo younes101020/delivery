@@ -23,7 +23,7 @@ RUN yarn global add turbo
 
 # First install the dependencies (as they change less often)
 COPY --from=builder /app/out/json/ .
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --prod --frozen-lockfile
 
 # Build the project
 COPY --from=builder /app/out/full/ .
