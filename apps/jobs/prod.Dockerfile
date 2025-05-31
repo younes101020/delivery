@@ -28,7 +28,7 @@ RUN pnpm install --prod --frozen-lockfile
 
 # Build the project
 COPY --from=builder /app/out/full/ .
-RUN yarn turbo run build
+RUN pnpm turbo build
 
 FROM base AS runner
 WORKDIR /app
