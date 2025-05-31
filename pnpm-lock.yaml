@@ -75,9 +75,6 @@ importers:
       ioredis:
         specifier: ^5.4.1
         version: 5.6.1
-      minio:
-        specifier: ^8.0.5
-        version: 8.0.5
       pg:
         specifier: ^8.13.1
         version: 8.16.0
@@ -102,9 +99,6 @@ importers:
       stoker:
         specifier: ^1.2.7
         version: 1.4.2(@asteasolutions/zod-to-openapi@7.3.0(zod@3.25.6))(@hono/zod-openapi@0.16.4(hono@4.7.10)(zod@3.25.6))(hono@4.7.10)(openapi3-ts@4.4.0)
-      typescript:
-        specifier: ^5.8.3
-        version: 5.8.3
       uuid:
         specifier: ^11.0.3
         version: 11.1.0
@@ -139,12 +133,18 @@ importers:
       eslint:
         specifier: ^9.18.0
         version: 9.27.0(jiti@2.4.2)
+      minio:
+        specifier: ^8.0.5
+        version: 8.0.5
       tsc-alias:
         specifier: ^1.8.10
         version: 1.8.16
       tsx:
         specifier: ^4.19.1
         version: 4.19.4
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
       vitest:
         specifier: ^3.1.4
         version: 3.1.4(@types/debug@4.1.12)(@types/node@22.15.19)(jiti@2.4.2)(jsdom@26.1.0)(tsx@4.19.4)(yaml@2.8.0)
