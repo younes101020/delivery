@@ -37,7 +37,7 @@ ENV JOBS_API_BASEURL=${JOBS_API_BASEURL}
 ARG BASE_URL
 ENV BASE_URL=${BASE_URL}
 
-RUN pnpm turbo build
+RUN yarn turbo build
 
 FROM base AS runner
 WORKDIR /app
