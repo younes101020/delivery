@@ -10,7 +10,7 @@ RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 
-RUN pnpm install --global turbo@^2.3.3
+RUN pnpm install --force --global turbo@^2.3.3
 COPY . .
 
 # Generate a partial monorepo with a pruned lockfile for a target workspace.

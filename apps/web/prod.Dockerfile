@@ -11,7 +11,7 @@ RUN apk add --no-cache libc6-compat
 # Set working directory
 WORKDIR /app
 
-RUN pnpm install --global turbo@^2.3.3
+RUN pnpm install --force --global turbo@^2.3.3
 COPY . .
 RUN turbo prune @delivery/web --docker
 
