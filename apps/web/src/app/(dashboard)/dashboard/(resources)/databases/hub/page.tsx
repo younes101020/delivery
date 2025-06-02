@@ -1,5 +1,3 @@
-"use cache";
-
 import { PageDescription } from "@/app/_components/ui/page-description";
 import { PageTitle } from "@/app/_components/ui/page-title";
 import { database } from "@/app/(dashboard)/dashboard/(resources)/databases/const";
@@ -7,7 +5,9 @@ import { database } from "@/app/(dashboard)/dashboard/(resources)/databases/cons
 import { DatabaseCreateDialog } from "./_components/create-database-dialog";
 import { DatabaseCard } from "./_components/database-card";
 
-export default async function DatabasesPage() {
+export const dynamic = "force-dynamic";
+
+export default function DatabasesPage() {
   return (
     <section className="h-[90%] p-5 bg-background/50 border">
       <PageTitle>Databases Hub</PageTitle>

@@ -8,6 +8,7 @@ import { Bounce } from "@/app/_components/ui/bounce";
 import { buttonVariants } from "@/app/_components/ui/button";
 import { Card, CardContent, CardFooter } from "@/app/_components/ui/card";
 import { Skeleton } from "@/app/_components/ui/skeleton";
+import { getQueryClient } from "@/app/_lib/react-query-provider";
 import { cn, formatDate } from "@/app/_lib/utils";
 
 import type { DeploymentPreviewState } from "../types";
@@ -24,7 +25,7 @@ export function DeploymentPreviewCard({
   repoName,
 }: DeploymentPreviewCardProps) {
   const date = formatDate(timestamp);
-  const { data } = useQuery<DeploymentPreviewState>({ queryKey: [repoName] });
+  const { data } = useQuery<DeploymentPreviewState>({ queryKey: [repoName] }, getQueryClient(true));
 
   const previousStep = data?.step === "build" ? "clone" : data?.step === "configure" ? "build" : null;
   const nextStep = data?.step === "clone" ? "build" : data?.step === "build" ? "configure" : null;

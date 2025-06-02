@@ -1,17 +1,47 @@
 "use client";
 
 import {
+  isServer,
+  QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
-import { getQueryClient } from "./get-query-client";
+function makeQueryClient(forSSE: boolean) {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        // With SSR, we usually want to set some default staleTime
+        // above 0 to avoid refetching immediately on the client
+        staleTime: forSSE ? Infinity : 60 * 1000,
+        queryFn: () => null,
+      },
+    },
+  });
+}
 
-export default function ReactQueryProviders({ children }: { children: React.ReactNode }) {
-  // NOTE: Avoid useState when initializing the query client if you don't
-  //       have a suspense boundary between this and the code that may
-  //       suspend because React will throw away the client on the initial
-  //       render if it suspends and there is no boundary
+let browserQueryClient: QueryClient | undefined;
+let browserSSEQueryClient: QueryClient | undefined;
+
+export function getQueryClient(forSSE = false) {
+  if (isServer) {
+    return makeQueryClient(forSSE);
+  }
+  else {
+    if (forSSE) {
+      if (!browserSSEQueryClient)
+        browserSSEQueryClient = makeQueryClient(true);
+      return browserSSEQueryClient;
+    }
+    else {
+      if (!browserQueryClient)
+        browserQueryClient = makeQueryClient(false);
+      return browserQueryClient;
+    }
+  }
+}
+
+export default function ReactQueryProvider({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
 
   return (

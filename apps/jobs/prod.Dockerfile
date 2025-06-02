@@ -1,5 +1,9 @@
 FROM node:20-alpine AS base
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
 FROM base AS builder
 RUN apk update
 RUN apk add --no-cache libc6-compat
@@ -23,11 +27,13 @@ RUN yarn global add turbo
 
 # First install the dependencies (as they change less often)
 COPY --from=builder /app/out/json/ .
+COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+RUN corepack enable
 RUN pnpm install --frozen-lockfile
 
 # Build the project
 COPY --from=builder /app/out/full/ .
-RUN pnpm turbo build
+RUN pnpm turbo build --filter=@delivery/jobs
 
 FROM installer AS migration
 WORKDIR /app

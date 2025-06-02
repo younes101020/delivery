@@ -1,5 +1,7 @@
 import { env } from "@/env";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const { body } = await fetch(`${env.JOBS_API_BASEURL}/databases/ongoing`);
   return new Response(body, {

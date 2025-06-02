@@ -1,6 +1,5 @@
 "use server";
 
-import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -52,7 +51,6 @@ export const editApplication = validatedAction(
         inputs: data,
       };
     }
-    revalidateTag(`application-${name}`);
     return { success: "Application updated successfully.", inputs: data };
   },
 );
@@ -66,7 +64,6 @@ export async function removeApplication(name: string, redirectToList: boolean) {
       success: false,
     };
   }
-  revalidateTag(`application-${name}`);
   if (redirectToList)
     redirect("/dashboard/applications");
   return {

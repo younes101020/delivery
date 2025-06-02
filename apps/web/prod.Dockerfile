@@ -22,7 +22,7 @@ RUN yarn global add turbo
 
 # First install the dependencies (as they change less often)
 COPY --from=builder /app/out/json/ .
-RUN pnpm install --prod --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 # Build the project
 COPY --from=builder /app/out/full/ .
@@ -36,7 +36,9 @@ ENV JOBS_API_BASEURL=${JOBS_API_BASEURL}
 ARG BASE_URL
 ENV BASE_URL=${BASE_URL}
 
-RUN pnpm turbo build
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN pnpm turbo build --filter=@delivery/web
 
 FROM base AS runner
 WORKDIR /app

@@ -5,8 +5,6 @@ import { NextResponse } from "next/server";
 import { signToken, verifyToken } from "@/app/_lib/session";
 import { parseSetCookie } from "@/app/_lib/utils";
 
-import { env } from "./env";
-
 const protectedRoutes = "/dashboard";
 const onboardingRoute = "/onboarding";
 
@@ -96,7 +94,8 @@ export const config = {
  * and forwards it to the client as a cookie
  */
 async function forwardOnboardingStatus(res: NextResponse) {
-  const response = await fetch(env.JOBS_API_BASEURL!);
+  // eslint-disable-next-line node/no-process-env
+  const response = await fetch(process.env.JOBS_API_BASEURL!);
   const headers = Object.fromEntries(response.headers);
   const cookie = parseSetCookie(headers["set-cookie"]);
   res.cookies.set({

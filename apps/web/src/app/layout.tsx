@@ -9,7 +9,7 @@ import ReactQueryProviders from "@/app/_lib/react-query-provider";
 import { env } from "@/env";
 
 import { FetcherProvider } from "./_lib/fetch-provider";
-import { getQueryClient } from "./_lib/get-query-client";
+import { getQueryClient } from "./_lib/get-rsc-query-client";
 import { getUser } from "./_lib/user-session";
 
 const geistSans = localFont({
@@ -41,6 +41,7 @@ export default function RootLayout({
     queryKey: ["user"],
     queryFn: getUser,
   });
+
   return (
     <html lang="en">
       <body

@@ -1,11 +1,15 @@
 import "server-only";
-import { unstable_cacheTag } from "next/cache";
 
 import { client } from "@/app/_lib/client-http";
 
-export async function getApplicationByName(name: string) {
-  "use cache";
-  unstable_cacheTag(`application-${name}`);
+type GetApplicationByNameParams = Promise<{ name: string }>;
+
+export async function getApplicationByName(searchParams: GetApplicationByNameParams) {
+  const { name } = await searchParams;
+  return getCachedApplicationByName(name);
+}
+
+async function getCachedApplicationByName(name: string) {
   const response = await client.applications[":name"].$get({
     param: {
       name,
@@ -17,13 +21,19 @@ export async function getApplicationByName(name: string) {
   return await response.json();
 }
 
-export async function getApplicationSreenshotUrl(
-  applicationName: string,
-  applicationUrl: string = "https://facebook.com",
-) {
+interface GetApplicationScreenshotParams {
+  searchParams: Promise<{ name: string }>;
+  applicationUrl?: string;
+}
+
+export async function getApplicationSreenshotUrl({
+  searchParams,
+  applicationUrl = "https://facebook.com",
+}: GetApplicationScreenshotParams) {
+  const { name } = await searchParams;
   const response = await client.screenshots.$post({
     json: {
-      applicationName,
+      applicationName: name,
       url: applicationUrl,
     },
   });
@@ -41,3 +51,6 @@ export async function getApplications() {
   }
   return await response.json();
 }
+
+export type Application = Awaited<ReturnType<typeof getApplicationByName>>;
+export type ApplicationScreenshotImageSource = Awaited<ReturnType<typeof getApplicationSreenshotUrl>>;

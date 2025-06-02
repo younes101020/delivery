@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-import { getQueryClient } from "@/app/_lib/get-query-client";
+import { getQueryClient } from "../_lib/react-query-provider";
 
 export function useQuerySubscription<T = Record<string, unknown>>(endpoints: `/${string}`, baseUrl: string, stateCallback?: (data: T, prevData: T) => void) {
   const queryClient = getQueryClient(true);

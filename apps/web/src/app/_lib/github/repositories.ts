@@ -94,7 +94,6 @@ async function listGithubRepositoriesByPagination({
   repoPerPage?: number;
   repoPage?: number;
 }) {
-  "use cache";
   const githubApp = await getGithubApp({ appId, privateKey, installationId, authType: "installation" });
 
   const reposPromises = Array.from({ length: repoPage }, (_, pageIndex) =>

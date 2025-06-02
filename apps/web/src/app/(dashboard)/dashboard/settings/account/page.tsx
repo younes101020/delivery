@@ -4,6 +4,8 @@ import { PageTitle } from "@/app/_components/ui/page-title";
 import { AccountForm } from "./_components/account-form";
 import { SecurityForm } from "./_components/security-form";
 
+export const dynamic = "force-dynamic";
+
 export default function AccountPage() {
   return (
     <section className="p-5 bg-background/50 border">

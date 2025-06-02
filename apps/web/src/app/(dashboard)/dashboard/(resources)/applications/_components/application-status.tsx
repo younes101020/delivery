@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { Badge } from "@/app/_components/ui/badge";
 import { Bounce } from "@/app/_components/ui/bounce";
+import { getQueryClient } from "@/app/_lib/react-query-provider";
 
 import type { ContainerStatusProps } from "../../types";
 import type { ApplicationStatusData } from "./types";
@@ -17,7 +18,7 @@ const statusComponents = {
 };
 
 export function ApplicationStatus({ initialState, id }: ContainerStatusProps) {
-  const { data } = useQuery<ApplicationStatusData>({ queryKey: [id] });
+  const { data } = useQuery<ApplicationStatusData>({ queryKey: [id] }, getQueryClient(true));
 
   if (!data) {
     return (

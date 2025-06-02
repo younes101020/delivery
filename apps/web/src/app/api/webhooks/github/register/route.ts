@@ -6,6 +6,8 @@ import { client } from "@/app/_lib/client-http";
 
 import type { GithubAppResponse } from "../types";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const code = searchParams.get("code");
