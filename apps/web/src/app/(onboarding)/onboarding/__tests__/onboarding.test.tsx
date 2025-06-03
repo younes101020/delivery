@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeAll, describe, expect, vi } from "vitest";
 
 import { Login } from "@/app/_components/login-form";
+import { FetcherProvider } from "@/app/_lib/fetch-provider";
 
 import { GithubAppForm } from "../_components/github-app-form";
 import { onBoardingTest } from "./fixtures";
@@ -10,7 +11,7 @@ import { onBoardingTest } from "./fixtures";
 function setup(jsx: React.ReactElement) {
   return {
     userAction: userEvent.setup(),
-    ...render(jsx),
+    ...render(jsx, { wrapper: () => <FetcherProvider baseUrl="http://test.com">{jsx}</FetcherProvider> }),
   };
 }
 
