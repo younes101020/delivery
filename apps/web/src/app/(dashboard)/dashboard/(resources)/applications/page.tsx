@@ -1,12 +1,10 @@
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { PackagePlus } from "lucide-react";
 import Link from "next/link";
-import { Suspense } from "react";
 
 import { buttonVariants } from "@/app/_components/ui/button";
 import { PageDescription } from "@/app/_components/ui/page-description";
 import { PageTitle } from "@/app/_components/ui/page-title";
-import { Skeleton } from "@/app/_components/ui/skeleton";
 import { getQueryClient } from "@/app/_lib/get-rsc-query-client";
 import { env } from "@/env";
 
@@ -33,20 +31,18 @@ export default function ApplicationsPage() {
       </div>
 
       <div className="mt-8 h-full">
-        <Suspense fallback={<PendingApplications />}>
-          <Applications />
-        </Suspense>
+        <Applications />
       </div>
     </section>
   );
 }
 
-async function Applications() {
+function Applications() {
   const baseUrl = env.BASE_URL;
 
   const queryClient = getQueryClient();
 
-  await queryClient.prefetchQuery({
+  queryClient.prefetchQuery({
     queryKey: ["applications"],
     queryFn: () => Promise.all([
       getApplications(),
@@ -61,8 +57,4 @@ async function Applications() {
       </SubscribeToSSE>
     </HydrationBoundary>
   );
-}
-
-function PendingApplications() {
-  return <Skeleton className="h-full w-full" />;
 }
