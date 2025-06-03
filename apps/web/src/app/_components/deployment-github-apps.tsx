@@ -5,6 +5,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/app/_components/
 
 import type { GithubApp } from "../_lib/github/types";
 
+import { AddNewGithubApp } from "./deployment-add-github-app";
 import { ScrollArea } from "./ui/scroll-area";
 import { Separator } from "./ui/separator";
 
@@ -28,6 +29,7 @@ export function DeploymentGithubAppList({ githubApps, initialGithubAppId }: Depl
   return (
     <ScrollArea>
       <div className="col-span-1 flex flex-col gap-2 max-h-52">
+        <AddNewGithubApp />
         <Separator />
         {githubApps.map(
           ghApp => (
