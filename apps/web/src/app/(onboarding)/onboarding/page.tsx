@@ -48,7 +48,7 @@ async function GithubAppStep(props: SearchParams) {
   const allGithubInstallations = await getAllGithubAppCreds();
   if (allGithubInstallations && allGithubInstallations.length > 0)
     redirect("/onboarding/?step=4");
-  return <GithubAppForm baseUrl={baseUrl} />;
+  return <GithubAppForm isOnboarding={true} />;
 }
 
 async function DomainNameStep(props: SearchParams) {

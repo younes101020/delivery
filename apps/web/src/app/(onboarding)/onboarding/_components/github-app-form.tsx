@@ -9,17 +9,23 @@ import { Checkbox } from "@/app/_components/ui/checkbox";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
 import { ScrollArea } from "@/app/_components/ui/scroll-area";
+import { Separator } from "@/app/_components/ui/separator";
 import { Switch } from "@/app/_components/ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/app/_components/ui/tooltip";
+import { useFetch as getBaseUrl } from "@/app/_lib/fetch-provider";
 import { WEBHOOK_EVENTS } from "@/app/_lib/github/config";
 
-const GITHUB_APP_REGISTRATION_URL = "https://github.com/settings/apps/new";
-
-interface GithubAppFormProps {
-  baseUrl: string;
+interface GitHubAppFormProps {
+  isOnboarding?: boolean;
 }
 
-export function GithubAppForm({ baseUrl }: GithubAppFormProps) {
+export function GithubAppForm({ isOnboarding = false }: GitHubAppFormProps) {
+  const { baseUrl } = getBaseUrl();
+
+  // `ghState` data will be returned by github after gh app creation to webhook endpoint
+  const ghState = isOnboarding;
+  const GITHUB_APP_REGISTRATION_URL = `https://github.com/settings/apps/new?state=${ghState}`;
+
   const [url, setUrl] = useState(GITHUB_APP_REGISTRATION_URL);
   const [enableOrg, setEnableOrg] = useState(false);
   const [name, setName] = useState("");

@@ -11,6 +11,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const code = searchParams.get("code");
+  const isOnboarding = searchParams.get("state");
 
   if (!code) {
     return new Response("Missing code parameter", { status: 400 });
@@ -39,11 +40,13 @@ export async function GET(request: NextRequest) {
     },
   });
   if (appResponse.status !== 200) {
-    redirect("/onboarding/?step=3");
+    const fallbackErrorUrl = isOnboarding === "true" ? "/onboarding/?step=3" : "/dashboard";
+    redirect(fallbackErrorUrl);
   }
   const app = await appResponse.json();
   const metadata = {
     appId: app.appId,
+    isOnboarding: isOnboarding === "true",
   };
   const stateObj = encodeURIComponent(JSON.stringify(metadata));
   return Response.redirect(
