@@ -67,7 +67,7 @@ export function GithubAppForm({ isOnboarding = false }: GitHubAppFormProps) {
   return (
     <form action={url} method="POST" className="space-y-8" aria-label="form">
       <div>
-        <Label htmlFor="name" className="block text-sm font-medium">
+        <Label htmlFor="name" className="block text-sm">
           Github App name
         </Label>
         <div className="mt-1">
@@ -87,9 +87,10 @@ export function GithubAppForm({ isOnboarding = false }: GitHubAppFormProps) {
         <p className="text-muted-foreground text-xs pt-1">Enter a name for your Github App</p>
       </div>
       <div>
-        <Label htmlFor="events" className="block text-sm font-medium">
-          Redeploy my applications and website when
+        <Label htmlFor="events" className="block text-sm mb-2">
+          Redeploy my web applications/site when
         </Label>
+        <Separator />
         <ScrollArea className="my-2 w-full h-40">
           <div className="flex flex-col gap-2">
             {WEBHOOK_EVENTS.map(option => (
@@ -101,7 +102,7 @@ export function GithubAppForm({ isOnboarding = false }: GitHubAppFormProps) {
                 />
                 <Label
                   htmlFor={option.id}
-                  className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="text-xs leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   {option.label}
                 </Label>
@@ -114,7 +115,7 @@ export function GithubAppForm({ isOnboarding = false }: GitHubAppFormProps) {
         <p className="text-muted-foreground text-xs pt-1">What events should trigger a redeployment?</p>
       </div>
       <div className={enableOrg ? "" : "opacity-25"}>
-        <Label htmlFor="organization" className="block text-sm font-medium">
+        <Label htmlFor="organization" className="block text-sm">
           Organization name
         </Label>
         <div className="mt-1">
@@ -145,7 +146,7 @@ export function GithubAppForm({ isOnboarding = false }: GitHubAppFormProps) {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Info size={15} className="mb-2" />
+              <Info size={13} className="mb-2" />
             </TooltipTrigger>
             <TooltipContent>
               <p>Are your repositories in a Github organization account?</p>
