@@ -6,7 +6,6 @@ const getQueryClient = cache(() => new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 60 * 1000,
-      queryFn: () => null,
     },
     dehydrate: {
       // include pending queries in dehydration
