@@ -5,7 +5,6 @@ import { Deployment } from "@/app/_components/deployment";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { getAllGithubAppCreds } from "@/app/_lib/github/queries";
 import { getUser } from "@/app/_lib/user-session";
-import { env } from "@/env";
 
 import { Login } from "../../_components/login-form";
 import { DomainNameForm } from "./_components/domain-name-form";
@@ -40,7 +39,6 @@ export default function OnboardingPage({ searchParams }: SearchParams) {
 
 async function GithubAppStep(props: SearchParams) {
   const searchParams = await props.searchParams;
-  const baseUrl = env.BASE_URL;
   const onboardingStep = searchParams ? Number.parseInt(searchParams.step) : null;
   if (onboardingStep !== 3) {
     return null;

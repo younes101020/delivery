@@ -8,6 +8,7 @@ type Fetcher = (endpoint: string) => Promise<any>;
 
 interface FetcherContextType {
   fetcher: Fetcher;
+  baseUrl: string;
 }
 
 const FetcherContext = createContext<FetcherContextType | null>(null);
@@ -30,6 +31,7 @@ export function FetcherProvider({
   return (
     <FetcherContext.Provider value={{
       fetcher: (endpoint: string) => fetch(`${baseUrl}${endpoint}`).then(res => res.json()),
+      baseUrl,
     }}
     >
       {children}
