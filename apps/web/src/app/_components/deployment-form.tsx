@@ -189,29 +189,32 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
             </Paragraph>
           )}
           <div className="flex gap-2">
-            <Button
-              type="submit"
-              name="action"
-              value="skip"
-              variant="outline"
-              disabled={pending}
-              onClick={() => setShouldSkipDeployment(true)}
-            >
-              {pending
-                ? (
-                    <>
-                      <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                      Loading...
-                    </>
-                  )
-                : (
-                    <>
-                      <ChevronLast />
-                      {" "}
-                      | Skip
-                    </>
-                  )}
-            </Button>
+            {isOnboarding && (
+              <Button
+                type="submit"
+                name="action"
+                value="skip"
+                variant="outline"
+                disabled={pending}
+                onClick={() => setShouldSkipDeployment(true)}
+              >
+                {pending
+                  ? (
+                      <>
+                        <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                        Loading...
+                      </>
+                    )
+                  : (
+                      <>
+                        <ChevronLast />
+                        {" "}
+                        | Skip
+                      </>
+                    )}
+              </Button>
+            )}
+
             <Button type="submit" name="action" value="deploy" disabled={!selected.name || pending} aria-label="submit">
               {pending
                 ? (
