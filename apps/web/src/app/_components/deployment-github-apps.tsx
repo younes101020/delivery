@@ -1,27 +1,57 @@
+"use client";
+
+import { Loader2 } from "lucide-react";
 import { motion } from "motion/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { startTransition, useOptimistic } from "react";
 
 import { Card, CardDescription, CardHeader, CardTitle } from "@/app/_components/ui/card";
 
 import type { GithubApp } from "../_lib/github/types";
 
+import { useDeploymentApplicationList } from "../_ctx/deployment-application-list";
 import { AddNewGithubApp } from "./deployment-add-github-app";
 import { ScrollArea } from "./ui/scroll-area";
 import { Separator } from "./ui/separator";
 
-interface DeploymentGithubAppsProps {
-  githubApps: GithubApp[];
-  initialGithubAppId: number;
+interface SelectedGithubApp {
+  githubAppId: number;
+  isPending: boolean;
 }
 
-export function DeploymentGithubAppList({ githubApps, initialGithubAppId }: DeploymentGithubAppsProps) {
+export function DeploymentGithubAppList() {
+  const { applicationsWithGithubApps } = useDeploymentApplicationList();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
   const params = new URLSearchParams(searchParams);
-  const githubAppSearchParam = params.get("githubapp") ? Number.parseInt(params.get("githubapp") as string) : initialGithubAppId;
+
+  const githubAppSearchParam = params.get("githubapp") ? Number.parseInt(params.get("githubapp") as string) : applicationsWithGithubApps.repositories.githubApp.appId;
+
+  const [optimisticSelectedGHApp, addOptimisticSelectedGHApp] = useOptimistic(
+    {
+      githubAppId: githubAppSearchParam,
+      isPending: false,
+    },
+    (_, newSelectedGithubApp: SelectedGithubApp) => newSelectedGithubApp,
+  );
+
+  if (!applicationsWithGithubApps) {
+    return (
+      <p className="text-sm text-muted-foreground px-4 py-8 text-center">
+        Unable to get github app.
+      </p>
+    );
+  }
 
   const handleGithubAppClick = (appId: number) => {
+    startTransition(() => {
+      addOptimisticSelectedGHApp({
+        githubAppId: appId,
+        isPending: true,
+      });
+    });
+
     params.set("githubapp", `${appId}`);
     replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
@@ -31,13 +61,14 @@ export function DeploymentGithubAppList({ githubApps, initialGithubAppId }: Depl
       <div className="col-span-1 flex flex-col gap-2 max-h-52">
         <AddNewGithubApp />
         <Separator />
-        {githubApps.map(
+        {applicationsWithGithubApps.githubApps.map(
           ghApp => (
-            <DeploymentGithubApp
+            <GithubAppCard
               key={ghApp.appId}
               githubApp={ghApp}
               handleGithubAppClick={handleGithubAppClick}
-              isSelected={githubAppSearchParam === ghApp.appId}
+              isSelected={optimisticSelectedGHApp.githubAppId === ghApp.appId}
+              isPending={optimisticSelectedGHApp.isPending && optimisticSelectedGHApp.githubAppId === ghApp.appId}
             />
           ),
         )}
@@ -50,10 +81,11 @@ export function DeploymentGithubAppList({ githubApps, initialGithubAppId }: Depl
 interface DeploymentGithubAppProps {
   githubApp: GithubApp;
   isSelected: boolean;
+  isPending: boolean;
   handleGithubAppClick: (githubAppId: number) => void;
 }
 
-function DeploymentGithubApp({ githubApp, isSelected, handleGithubAppClick }: DeploymentGithubAppProps) {
+function GithubAppCard({ githubApp, isSelected, isPending, handleGithubAppClick }: DeploymentGithubAppProps) {
   return (
     <motion.section
       whileHover={{ scale: 1 }}
@@ -65,7 +97,7 @@ function DeploymentGithubApp({ githubApp, isSelected, handleGithubAppClick }: De
       <Card className={`overflow-hidden relative ${isSelected && "border-primary"}`}>
         <CardHeader>
           <div className="absolute p-1 top-0 left-0 bg-primary">
-            <GithubSVG />
+            {isPending ? <Loader2 className="animate-spin h-3 w-3 stroke-secondary" /> : <GithubSVG />}
           </div>
           <div>
             <CardTitle>

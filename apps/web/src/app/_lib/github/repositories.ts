@@ -22,10 +22,13 @@ export async function getGithubRepositoriesByGithubAppId(repoPage: number, githu
   });
 
   return {
-    repositories: { ...repositories, githubApp },
+    repositories: { ...repositories, githubApp, isPending: false },
     githubApps: githubApps.map(ghApp => ({ appId: ghApp.appId, name: ghApp.name })),
   };
 }
+
+export type RepositoriesWithGithubAppPromise = ReturnType<typeof getGithubRepositoriesByGithubAppId>;
+export type RepositoriesWithGithubApp = Awaited<ReturnType<typeof getGithubRepositoriesByGithubAppId>>;
 
 interface GetGithubRepositories {
   appId: string;

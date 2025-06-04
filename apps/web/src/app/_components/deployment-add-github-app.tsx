@@ -39,15 +39,15 @@ interface AddGithubAppButtonProps {
 
 function AddGithubAppButton({ handleClick }: AddGithubAppButtonProps) {
   return (
-    <div className="text-xs flex">
-      <p className="self-center italic">Not yet sync?</p>
+    <div className="text-xs flex flex-col lg:flex-row lg:gap-2">
+      <p className="italic text-nowrap lg:self-center">Not yet sync?</p>
       <Button
         onClick={(e) => {
           e.preventDefault();
           handleClick(true);
         }}
         variant="link"
-        className="text-xs italic"
+        className="text-xs italic flex justify-start pl-0 py-0"
       >
         add new github app.
       </Button>
