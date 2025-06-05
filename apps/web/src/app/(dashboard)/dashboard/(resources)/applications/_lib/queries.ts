@@ -1,6 +1,6 @@
 import "server-only";
 
-import { client } from "@/app/_lib/client-http";
+import { getProtectedClient } from "@/app/_lib/client-http";
 
 type GetApplicationByNameParams = Promise<{ name: string }>;
 
@@ -10,6 +10,7 @@ export async function getApplicationByName(searchParams: GetApplicationByNamePar
 }
 
 async function getCachedApplicationByName(name: string) {
+  const client = await getProtectedClient();
   const response = await client.applications[":name"].$get({
     param: {
       name,
@@ -31,6 +32,7 @@ export async function getApplicationSreenshotUrl({
   applicationUrl = "https://facebook.com",
 }: GetApplicationScreenshotParams) {
   const { name } = await searchParams;
+  const client = await getProtectedClient();
   const response = await client.screenshots.$post({
     json: {
       applicationName: name,
@@ -45,6 +47,7 @@ export async function getApplicationSreenshotUrl({
 }
 
 export async function getApplications() {
+  const client = await getProtectedClient();
   const response = await client.applications.$get();
   if (response.status !== 200) {
     return null;

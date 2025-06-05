@@ -1,8 +1,9 @@
 import "server-only";
 
-import { client } from "@/app/_lib/client-http";
+import { getProtectedClient } from "@/app/_lib/client-http";
 
 export async function getCurrentDeploymentsState() {
+  const client = await getProtectedClient();
   const response = await client.deployments.jobs.ongoing.$get();
   if (!response.ok) {
     return [];
@@ -11,6 +12,7 @@ export async function getCurrentDeploymentsState() {
 }
 
 export async function getPreviousDeploymentsState() {
+  const client = await getProtectedClient();
   const response = await client.deployments.jobs.previous.$get();
   if (!response.ok) {
     return [];

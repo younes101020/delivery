@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-import { client } from "@/app/_lib/client-http";
+import { getProtectedClient } from "@/app/_lib/client-http";
 import { getFormChangesAction, validatedActionWithUser } from "@/app/_lib/form-middleware";
 
 const updateAccountSchema = z.object({
@@ -14,6 +14,7 @@ export const updateAccount = validatedActionWithUser(
   updateAccountSchema,
   async (data, _, prevState, user) => {
     const changes = getFormChangesAction(data, prevState);
+    const client = await getProtectedClient();
     const response = await client.users[":id"].$patch({
       param: { id: user.id.toString() },
       json: changes,
@@ -41,6 +42,7 @@ const updateSecuritySettingsSchema = z.object({
 export const updateSecuritySettings = validatedActionWithUser(
   updateSecuritySettingsSchema,
   async (data, _, prevState, user) => {
+    const client = await getProtectedClient();
     const response = await client.users[":id"].$patch({
       param: { id: user.id.toString() },
       json: { password: data.password },

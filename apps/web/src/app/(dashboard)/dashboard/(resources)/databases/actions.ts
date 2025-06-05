@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-import { client } from "@/app/_lib/client-http";
+import { getProtectedClient } from "@/app/_lib/client-http";
 import { validatedAction } from "@/app/_lib/form-middleware";
 
 const updateContainerStatusSchema = z.object({
@@ -11,7 +11,7 @@ const updateContainerStatusSchema = z.object({
 
 export const stopDatabaseService = validatedAction(updateContainerStatusSchema, async (inputs) => {
   const { serviceId } = inputs;
-
+  const client = await getProtectedClient();
   const response = await client.databases[":id"].stop.$post({
     param: { id: serviceId },
   });
@@ -26,6 +26,7 @@ export const stopDatabaseService = validatedAction(updateContainerStatusSchema, 
 export const startDatabaseService = validatedAction(updateContainerStatusSchema, async (inputs) => {
   const { serviceId } = inputs;
 
+  const client = await getProtectedClient();
   const response = await client.databases[":id"].start.$post({
     param: { id: serviceId },
   });
@@ -38,6 +39,7 @@ export const startDatabaseService = validatedAction(updateContainerStatusSchema,
 });
 
 export async function removeDatabaseService(serviceId: string) {
+  const client = await getProtectedClient();
   const response = await client.databases[":id"].$delete({
     param: { id: serviceId },
   });

@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { client } from "@/app/_lib/client-http";
+import { getProtectedClient } from "@/app/_lib/client-http";
 import { getFormChangesAction, validatedAction } from "@/app/_lib/form-middleware";
 
 import { plainEnvVarsToStructured } from "./_lib/utils";
@@ -38,6 +38,7 @@ export const editApplication = validatedAction(
     const { environmentVariables, ...applicationData } = changes;
     const environmentVariable = environmentVariables ? plainEnvVarsToStructured(environmentVariables) : typeof environmentVariables === "string" ? [] : undefined;
 
+    const client = await getProtectedClient();
     const response = await client.applications[":name"].$patch({
       param: { name },
       json: {
@@ -56,6 +57,7 @@ export const editApplication = validatedAction(
 );
 
 export async function removeApplication(name: string, redirectToList: boolean) {
+  const client = await getProtectedClient();
   const response = await client.applications[":name"].$delete({
     param: { name },
   });
@@ -78,6 +80,7 @@ const updateApplicationStateSchema = z.object({
 export const stopApplication = validatedAction(updateApplicationStateSchema, async (inputs) => {
   const { serviceId } = inputs;
 
+  const client = await getProtectedClient();
   const response = await client.applications[":id"].stop.$post({
     param: { id: serviceId },
   });
@@ -92,6 +95,7 @@ export const stopApplication = validatedAction(updateApplicationStateSchema, asy
 export const startApplication = validatedAction(updateApplicationStateSchema, async (inputs) => {
   const { serviceId } = inputs;
 
+  const client = await getProtectedClient();
   const response = await client.applications[":id"].start.$post({
     param: { id: serviceId },
   });
@@ -104,6 +108,7 @@ export const startApplication = validatedAction(updateApplicationStateSchema, as
 });
 
 export async function redeploy(applicationName: string) {
+  const client = await getProtectedClient();
   const response = await client.deployments.redeploy[":queueName"].$post({
     param: { queueName: applicationName },
   });
@@ -122,6 +127,7 @@ const injectEnvSchema = z.object({
 export const injectEnv = validatedAction(injectEnvSchema, async (inputs) => {
   const { env, dbId, applicationName } = inputs;
 
+  const client = await getProtectedClient();
   const envResponse = await client.databases[":id"].link.$post({
     param: { id: dbId },
     json: {

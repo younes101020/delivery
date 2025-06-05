@@ -1,8 +1,9 @@
 import "server-only";
 
-import { client } from "@/app/_lib/client-http";
+import { getProtectedClient } from "@/app/_lib/client-http";
 
 export async function getDeliveryWebInstanceConfiguration() {
+  const client = await getProtectedClient();
   const response = await client.serverconfig.instance.$get();
 
   if (response.status !== 200)

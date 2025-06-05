@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-import { client } from "@/app/_lib/client-http";
+import { getProtectedClient } from "@/app/_lib/client-http";
 import { validatedAction } from "@/app/_lib/form-middleware";
 
 const createDatabaseSchema = z.object({
@@ -20,6 +20,7 @@ const createDatabaseSchema = z.object({
 export const createContainer = validatedAction(createDatabaseSchema, async (inputs) => {
   const { type, name } = inputs;
 
+  const client = await getProtectedClient();
   const response = await client.databases.$post({
     json: {
       type,

@@ -1,8 +1,9 @@
 import "server-only";
 
-import { client } from "@/app/_lib/client-http";
+import { getProtectedClient } from "@/app/_lib/client-http";
 
 export async function getDatabaseService() {
+  const client = await getProtectedClient();
   const response = await client.databases.$get();
   if (response.status !== 200) {
     return null;
@@ -11,6 +12,7 @@ export async function getDatabaseService() {
 }
 
 export async function getActiveDatabaseServices() {
+  const client = await getProtectedClient();
   const response = await client.databases.$get();
   if (response.status !== 200) {
     return null;

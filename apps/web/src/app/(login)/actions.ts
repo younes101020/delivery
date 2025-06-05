@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { client } from "@/app/_lib/client-http";
+import { getClient } from "@/app/_lib/client-http";
 import { validatedAction } from "@/app/_lib/form-middleware";
 import { setSession } from "@/app/_lib/session";
 
@@ -28,7 +28,7 @@ const signInSchema = z.object({
 
 export const signIn = validatedAction(signInSchema, async (data) => {
   const { email, password, redirectTo } = data;
-
+  const client = getClient();
   const response = await client.auth.verify.$post({
     json: {
       email,
