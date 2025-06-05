@@ -1,7 +1,5 @@
-import { redirect } from "next/navigation";
-
-import { getGithubRepositoriesByGithubAppId } from "@/app/_lib/github/repositories";
-
+import { DeploymentSelectedApplicationProvider } from "../_ctx/deployment-selected-application";
+import { ApplicationSource } from "./deployment-applications-source";
 import { DeploymentForm } from "./deployment-form";
 
 interface DeploymentProps {
@@ -10,7 +8,7 @@ interface DeploymentProps {
     githubapp?: string;
     step?: string;
     query?: string;
-  }> | undefined;
+  } | undefined>;
   onboarding?: boolean;
 }
 
@@ -23,20 +21,12 @@ export async function Deployment({ sp, onboarding = false }: DeploymentProps) {
       return null;
     }
   }
-  const repositoryPage = searchParams?.page ? Number.parseInt(searchParams.page) : 1;
-  const githubAppId = searchParams?.githubapp ? Number.parseInt(searchParams.githubapp) : undefined;
-  const queryRepository = searchParams?.query || "";
 
-  const installationWithRepos = await getGithubRepositoriesByGithubAppId(repositoryPage, githubAppId, queryRepository);
-
-  if (!installationWithRepos) {
-    if (onboarding)
-      redirect("/onboarding/?step=3");
-
-    return <p className="mt-5">No Github repository found</p>;
-  }
-
-  const { repositories, githubApps } = installationWithRepos;
-
-  return <DeploymentForm repositories={repositories} githubApps={githubApps} isOnboarding={onboarding} />;
+  return (
+    <DeploymentSelectedApplicationProvider>
+      <DeploymentForm isOnboarding={onboarding}>
+        <ApplicationSource sp={sp} />
+      </DeploymentForm>
+    </DeploymentSelectedApplicationProvider>
+  );
 }

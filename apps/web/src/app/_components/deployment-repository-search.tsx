@@ -2,16 +2,23 @@
 
 import { SearchIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { startTransition } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
+import { useDeploymentApplicationList } from "../_ctx/deployment-application-list";
 import { Input } from "./ui/input";
 
 export function RepositorySearch() {
+  const { triggerPending } = useDeploymentApplicationList();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
 
   const handleRepositorySearch = useDebouncedCallback((term) => {
+    startTransition(() => {
+      triggerPending();
+    });
+
     const params = new URLSearchParams(searchParams);
     if (term) {
       params.set("query", term);

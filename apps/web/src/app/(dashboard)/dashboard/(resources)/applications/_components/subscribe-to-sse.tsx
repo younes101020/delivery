@@ -10,6 +10,6 @@ interface SubscribeToSSEProps {
 }
 
 export function SubscribeToSSE({ children, baseUrl }: SubscribeToSSEProps) {
-  useQuerySubscription("/applications-proxy/ongoing", baseUrl);
+  useQuerySubscription("/sse-proxy/applications", baseUrl);
   return <>{children}</>;
 }

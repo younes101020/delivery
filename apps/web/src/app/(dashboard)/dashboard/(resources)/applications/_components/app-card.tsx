@@ -1,9 +1,12 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { buttonVariants } from "@/app/_components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/app/_components/ui/card";
+import { Skeleton } from "@/app/_components/ui/skeleton";
 
 import type { ContainerStatusProps } from "../../types";
 
@@ -11,6 +14,8 @@ import { AppOptions } from "./app-options";
 import { ApplicationActions } from "./application-actions";
 import { ApplicationStatus } from "./application-status";
 import { InjectEnvCard } from "./link-to-database";
+// to avoid hydration mismatch
+const AppDeploymentDate = dynamic(() => import("./app-deployment-date"), { ssr: false });
 
 interface AppCardProps {
   name: string;
@@ -49,7 +54,9 @@ export function AppCard({ name, firstDeploymentAt, id, initialState, databases }
         </dl>
         <dl className="text-xs pt-2">
           <dt className="text-muted-foreground">First deployment at</dt>
-          <dd className="text-xs">{firstDeploymentAt}</dd>
+          <Suspense fallback={<Skeleton className="h-12 w-full bg-red-500" />}>
+            <AppDeploymentDate deployedAt={firstDeploymentAt} />
+          </Suspense>
         </dl>
       </CardContent>
       <CardFooter className="flex flex-wrap gap-2">

@@ -1,7 +1,8 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { type ReactNode, Suspense } from "react";
 
+import { Skeleton } from "@/app/_components/ui/skeleton";
 import { useQuerySubscription } from "@/app/_hooks/use-query-subscription";
 
 import type { DeploymentLogState } from "../types";
@@ -14,6 +15,19 @@ interface SubscribeToSSEProps {
 }
 
 export function SubscribeToSSE({ children, baseUrl }: SubscribeToSSEProps) {
+  return (
+    <Suspense fallback={<PendingStepper />}>
+      <SuspendedSubscribeToSSE baseUrl={baseUrl}>
+        {children}
+      </SuspendedSubscribeToSSE>
+    </Suspense>
+  );
+}
+
+function SuspendedSubscribeToSSE({
+  children,
+  baseUrl,
+}: SubscribeToSSEProps) {
   const repoName = useGetRepoName();
 
   const stateCallback = (data: DeploymentLogState, prevData: DeploymentLogState) => {
@@ -21,6 +35,10 @@ export function SubscribeToSSE({ children, baseUrl }: SubscribeToSSEProps) {
     return shouldMergeLogs ? { ...data, logs: prevData.logs ? `${prevData.logs}${data.logs}` : data.logs } : data;
   };
 
-  useQuerySubscription<DeploymentLogState>(`/deployments-proxy/logs/${repoName}`, baseUrl, stateCallback);
+  useQuerySubscription<DeploymentLogState>(`/sse-proxy/deployments/logs/${repoName}`, baseUrl, stateCallback);
   return <>{children}</>;
+}
+
+function PendingStepper() {
+  return <Skeleton className="h-60 rounded-full w-full" />;
 }

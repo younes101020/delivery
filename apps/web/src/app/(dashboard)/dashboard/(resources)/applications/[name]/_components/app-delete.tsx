@@ -1,7 +1,8 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useParams } from "next/navigation";
+import { Suspense, useState } from "react";
 
 import { Button } from "@/app/_components/ui/button";
 import {
@@ -13,14 +14,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/app/_components/ui/dialog";
+import { Skeleton } from "@/app/_components/ui/skeleton";
 
 import { removeApplication } from "../../actions";
 
-interface DeleteAppProps {
-  name: string;
+export function ApplicationDelete() {
+  return (
+    <Suspense fallback={<PendingApplicationConfigurationButton />}>
+      <ApplicationDeleteForm />
+    </Suspense>
+  );
 }
 
-export default function DeleteAppForm({ name }: DeleteAppProps) {
+function ApplicationDeleteForm() {
+  const { name } = useParams<{ name: string }>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -64,4 +71,8 @@ export default function DeleteAppForm({ name }: DeleteAppProps) {
       </DialogContent>
     </Dialog>
   );
+}
+
+function PendingApplicationConfigurationButton() {
+  return <Skeleton className="h-10 w-32" />;
 }

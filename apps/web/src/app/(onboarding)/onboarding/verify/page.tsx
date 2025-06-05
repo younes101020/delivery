@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { Login } from "@/app/_components/login-form";
 import { Card, CardContent, CardFooter, CardHeader } from "@/app/_components/ui/card";
 import { PageDescription } from "@/app/_components/ui/page-description";
 import { PageTitle } from "@/app/_components/ui/page-title";
+import { Skeleton } from "@/app/_components/ui/skeleton";
 
 export const metadata: Metadata = {
   title: "Wait a moment",
@@ -16,12 +18,11 @@ interface VerifyProps {
   redirectTo: string;
 }
 
-export default async function Verify({
+export default function Verify({
   searchParams,
 }: {
   searchParams: Promise<VerifyProps>;
 }) {
-  const redirectTo = (await searchParams).redirectTo;
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-lg">
@@ -30,7 +31,9 @@ export default async function Verify({
           <PageDescription className="text-sm">Enter your credentials to continue process</PageDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Login mode="signin" redirectTo={redirectTo} />
+          <Suspense fallback={<PendingForm />}>
+            <Form searchParams={searchParams} />
+          </Suspense>
         </CardContent>
         <CardFooter className="flex justify-center border-t p-6">
           <p className="text-xs">
@@ -45,6 +48,25 @@ export default async function Verify({
           </p>
         </CardFooter>
       </Card>
+    </div>
+  );
+}
+
+interface FormProps {
+  searchParams: Promise<VerifyProps>;
+}
+
+async function Form({ searchParams }: FormProps) {
+  const redirectTo = (await searchParams).redirectTo;
+
+  return <Login mode="signin" redirectTo={redirectTo} />;
+}
+
+function PendingForm() {
+  return (
+    <div className="space-y-3">
+      <Skeleton className="h-10 w-full" />
+      <Skeleton className="h-10 w-full" />
     </div>
   );
 }

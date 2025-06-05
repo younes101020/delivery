@@ -1,30 +1,28 @@
+"use client";
+
 import { Check } from "lucide-react";
 import { motion } from "motion/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-
-import type { Nullable } from "@/app/_lib/utils";
 
 import { Card, CardDescription, CardHeader, CardTitle } from "@/app/_components/ui/card";
 import { ScrollArea } from "@/app/_components/ui/scroll-area";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { useIntersectionObserver } from "@/app/_hooks/use-intersection-observer";
 
-import type { GithubApp, GithubRepositories, Repository } from "../_lib/github/types";
+import type { GithubApp, Repository } from "../_lib/github/types";
 
-interface DeploymentReposProps {
-  repositories: GithubRepositories;
-  githubApp: GithubApp;
-  selected: SelectedRepositoryProps;
-  setSelected: (repository: SelectedRepositoryProps) => void;
-}
+import { useDeploymentApplicationList } from "../_ctx/deployment-application-list";
+import { useDeploymentSelectedApplication } from "../_ctx/deployment-selected-application";
 
-export function DeploymentRepositories({ repositories, githubApp, selected, setSelected }: DeploymentReposProps) {
+export function DeploymentRepositories() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
   const [hasTriggered, setHasTriggered] = useState(false);
   const { isIntersecting, ref } = useIntersectionObserver({ threshold: 0.5 });
+
+  const { applicationsWithGithubApps } = useDeploymentApplicationList();
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
@@ -46,22 +44,34 @@ export function DeploymentRepositories({ repositories, githubApp, selected, setS
     }
   }, [isIntersecting, pathname, replace, hasTriggered, searchParams]);
 
+  if (!applicationsWithGithubApps) {
+    return (
+      <p className="text-sm text-muted-foreground px-4 py-8 text-center">
+        Unable to get your github repositories.
+      </p>
+    );
+  }
+
+  if (applicationsWithGithubApps.repositories.isPending) {
+    return (
+      <Skeleton className="h-48" />
+    );
+  }
+
   return (
     <ScrollArea>
       <div className="max-h-52 grid grid-cols-1 md:grid-cols-2 gap-2">
-        {repositories.repositories.map(repo => (
+        {applicationsWithGithubApps.repositories.repositories.map(repo => (
           <RepositorySection
             repo={repo}
-            githubAppId={githubApp.appId}
+            githubAppId={applicationsWithGithubApps.repositories.githubApp.appId}
             key={repo.id}
-            setSelected={setSelected}
-            selected={selected}
           />
         ))}
 
-        {repositories.hasMore && (
+        {applicationsWithGithubApps.repositories.hasMore && (
           <div ref={ref}>
-            <Skeleton className="w-full h-40" />
+            <Skeleton className="w-full h-36" />
           </div>
         )}
       </div>
@@ -69,29 +79,21 @@ export function DeploymentRepositories({ repositories, githubApp, selected, setS
   );
 }
 
-export type SelectedRepositoryProps = Nullable<{
-  name: string;
-  gitUrl: string;
-  githubAppId: number;
-  id: number;
-}>;
-
 interface RepositorySectionProps {
   repo: Repository;
   githubAppId: GithubApp["appId"];
-  selected: SelectedRepositoryProps;
-  setSelected: (repository: SelectedRepositoryProps) => void;
 }
 
-function RepositorySection({ repo, setSelected, selected, githubAppId }: RepositorySectionProps) {
-  const isSelected = selected.name === repo.full_name;
+function RepositorySection({ repo, githubAppId }: RepositorySectionProps) {
+  const { selectedApplication, setSelectedApplication } = useDeploymentSelectedApplication();
+  const isSelected = selectedApplication.name === repo.full_name;
   return (
     <motion.section
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.9 }}
       className="cursor-pointer"
       onClick={() => {
-        setSelected({
+        setSelectedApplication({
           name: repo.full_name,
           id: repo.id,
           githubAppId,

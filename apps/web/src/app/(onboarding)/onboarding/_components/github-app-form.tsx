@@ -9,17 +9,23 @@ import { Checkbox } from "@/app/_components/ui/checkbox";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
 import { ScrollArea } from "@/app/_components/ui/scroll-area";
+import { Separator } from "@/app/_components/ui/separator";
 import { Switch } from "@/app/_components/ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/app/_components/ui/tooltip";
+import { useFetch as getBaseUrl } from "@/app/_lib/fetch-provider";
 import { WEBHOOK_EVENTS } from "@/app/_lib/github/config";
 
-const GITHUB_APP_REGISTRATION_URL = "https://github.com/settings/apps/new";
-
-interface GithubAppFormProps {
-  baseUrl: string;
+interface GitHubAppFormProps {
+  isOnboarding?: boolean;
 }
 
-export function GithubAppForm({ baseUrl }: GithubAppFormProps) {
+export function GithubAppForm({ isOnboarding = false }: GitHubAppFormProps) {
+  const { baseUrl } = getBaseUrl();
+
+  // `ghState` data will be returned by github after gh app creation to webhook endpoint
+  const ghState = isOnboarding;
+  const GITHUB_APP_REGISTRATION_URL = `https://github.com/settings/apps/new?state=${ghState}`;
+
   const [url, setUrl] = useState(GITHUB_APP_REGISTRATION_URL);
   const [enableOrg, setEnableOrg] = useState(false);
   const [name, setName] = useState("");
@@ -61,7 +67,7 @@ export function GithubAppForm({ baseUrl }: GithubAppFormProps) {
   return (
     <form action={url} method="POST" className="space-y-8" aria-label="form">
       <div>
-        <Label htmlFor="name" className="block text-sm font-medium">
+        <Label htmlFor="name" className="block text-sm">
           Github App name
         </Label>
         <div className="mt-1">
@@ -81,9 +87,10 @@ export function GithubAppForm({ baseUrl }: GithubAppFormProps) {
         <p className="text-muted-foreground text-xs pt-1">Enter a name for your Github App</p>
       </div>
       <div>
-        <Label htmlFor="events" className="block text-sm font-medium">
-          Redeploy my applications and website when
+        <Label htmlFor="events" className="block text-sm mb-2">
+          Redeploy my web applications/site when
         </Label>
+        <Separator />
         <ScrollArea className="my-2 w-full h-40">
           <div className="flex flex-col gap-2">
             {WEBHOOK_EVENTS.map(option => (
@@ -95,7 +102,7 @@ export function GithubAppForm({ baseUrl }: GithubAppFormProps) {
                 />
                 <Label
                   htmlFor={option.id}
-                  className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="text-xs leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   {option.label}
                 </Label>
@@ -108,7 +115,7 @@ export function GithubAppForm({ baseUrl }: GithubAppFormProps) {
         <p className="text-muted-foreground text-xs pt-1">What events should trigger a redeployment?</p>
       </div>
       <div className={enableOrg ? "" : "opacity-25"}>
-        <Label htmlFor="organization" className="block text-sm font-medium">
+        <Label htmlFor="organization" className="block text-sm">
           Organization name
         </Label>
         <div className="mt-1">
@@ -139,7 +146,7 @@ export function GithubAppForm({ baseUrl }: GithubAppFormProps) {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Info size={15} className="mb-2" />
+              <Info size={13} className="mb-2" />
             </TooltipTrigger>
             <TooltipContent>
               <p>Are your repositories in a Github organization account?</p>

@@ -3,6 +3,8 @@ import { basename } from "node:path";
 import { client } from "@/app/_lib/client-http";
 import { getApplications } from "@/app/(dashboard)/dashboard/(resources)/applications/_lib/queries";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
   const githubData = await req.json();
 

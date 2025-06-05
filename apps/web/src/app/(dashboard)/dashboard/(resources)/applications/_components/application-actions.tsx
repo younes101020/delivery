@@ -7,6 +7,7 @@ import { useActionState } from "react";
 import type { ActionState } from "@/app/_lib/form-middleware";
 
 import { Button } from "@/app/_components/ui/button";
+import { getQueryClient } from "@/app/_lib/react-query-provider";
 import { cn } from "@/app/_lib/utils";
 
 import type { ApplicationStatusData } from "./types";
@@ -20,8 +21,7 @@ interface DatabaseActionsProps {
 }
 
 export function ApplicationActions({ initialState, serviceId }: DatabaseActionsProps) {
-  const { data } = useQuery<ApplicationStatusData>({ queryKey: [serviceId] });
-
+  const { data } = useQuery<ApplicationStatusData>({ queryKey: [serviceId] }, getQueryClient(true));
   if (data?.status === "completed" || !data || data.processName) {
     const isProcessingCompleted = data?.status === "completed";
     const canStopContainer = isProcessingCompleted ? state[data.queueName] === "running" : data?.processName ? state[data.processName] === "start" : initialState === "running";

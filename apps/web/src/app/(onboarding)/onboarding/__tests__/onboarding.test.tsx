@@ -1,18 +1,11 @@
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { cleanup, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, vi } from "vitest";
 
 import { Login } from "@/app/_components/login-form";
 
 import { GithubAppForm } from "../_components/github-app-form";
 import { onBoardingTest } from "./fixtures";
-
-function setup(jsx: React.ReactElement) {
-  return {
-    userAction: userEvent.setup(),
-    ...render(jsx),
-  };
-}
+import { setup } from "./utils";
 
 describe("onboarding process", () => {
   beforeAll(() => {
@@ -58,8 +51,7 @@ describe("onboarding process", () => {
   );
 
   onBoardingTest("github form include initial object to create a github app from manifest", () => {
-    const baseUrl = "https://example.com";
-    setup(<GithubAppForm baseUrl={baseUrl} />);
+    setup(<GithubAppForm isOnboarding={true} />);
 
     const form = within(screen.getByRole("form"));
 

@@ -2,10 +2,10 @@
 
 import { useEffect } from "react";
 
-import { getQueryClient } from "@/app/_lib/react-query-provider";
+import { getQueryClient } from "../_lib/react-query-provider";
 
-export function useQuerySubscription<T = {}>(endpoints: `/${string}`, baseUrl: string, stateCallback?: (data: T, prevData: T) => void) {
-  const queryClient = getQueryClient();
+export function useQuerySubscription<T = Record<string, unknown>>(endpoints: `/${string}`, baseUrl: string, stateCallback?: (data: T, prevData: T) => void) {
+  const queryClient = getQueryClient(true);
   useEffect(() => {
     const eventSource = new EventSource(`${baseUrl}/api${endpoints}`);
     eventSource.onmessage = (event) => {

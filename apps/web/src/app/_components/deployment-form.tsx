@@ -5,29 +5,23 @@ import type { CheckedState } from "@radix-ui/react-checkbox";
 import { ChevronLast, Loader2, Rocket } from "lucide-react";
 import { useActionState, useState } from "react";
 
-import type { GithubApp, GithubRepositories } from "@/app/_lib/github/types";
-
 import { Button } from "@/app/_components/ui/button";
 import { Checkbox } from "@/app/_components/ui/checkbox";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
 
 import type { ActionState } from "../_lib/form-middleware";
-import type { SelectedRepositoryProps } from "./deployment-repositories";
 
+import { useDeploymentSelectedApplication } from "../_ctx/deployment-selected-application";
 import { deploy } from "../actions";
-import { DeploymentGithubAppList } from "./deployment-github-apps";
-import { DeploymentRepositories } from "./deployment-repositories";
-import { RepositorySearch } from "./deployment-repository-search";
 import { Paragraph } from "./ui/paragraph";
 
 interface DeploymentProps {
-  repositories: GithubRepositories;
-  githubApps: GithubApp[];
   isOnboarding?: boolean;
+  children?: React.ReactNode;
 }
 
-export function DeploymentForm({ repositories, githubApps, isOnboarding = false }: DeploymentProps) {
+export function DeploymentForm({ isOnboarding = false, children }: DeploymentProps) {
   const initialStaticChoice = false;
   const [state, formAction, pending] = useActionState<ActionState, FormData>(deploy, {
     error: "",
@@ -39,13 +33,8 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
       action: "deploy",
     },
   });
-  const [selected, setSelected] = useState<SelectedRepositoryProps>({
-    name: null,
-    id: null,
-    githubAppId: null,
-    gitUrl: null,
-  });
-  const [isStaticDeployment, setIsTaticDeployment] = useState<CheckedState>(initialStaticChoice);
+  const { selectedApplication } = useDeploymentSelectedApplication();
+  const [isStaticDeployment, setIsStaticDeployment] = useState<CheckedState>(initialStaticChoice);
   const [shouldSkipDeployment, setShouldSkipDeployment] = useState(false);
 
   return (
@@ -118,14 +107,7 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
           <p className="block text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 pb-2">
             Application source
           </p>
-          <div className="grid grid-cols-4 gap-4">
-            <DeploymentGithubAppList githubApps={githubApps} initialGithubAppId={repositories.githubApp.appId} />
-            <div className="col-span-3">
-              <RepositorySearch />
-              <DeploymentRepositories githubApp={repositories.githubApp} repositories={repositories} selected={selected} setSelected={setSelected} />
-            </div>
-          </div>
-
+          {children}
         </div>
         <p className="text-muted-foreground text-xs">
           This GitHub repository will be the source of your application.
@@ -137,7 +119,7 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
               name="staticdeploy"
               defaultChecked={!!(state.inputs.staticdeploy === "on" || state.inputs.staticdeploy)}
               key={state.inputs.staticdeploy}
-              onCheckedChange={isChecked => setIsTaticDeployment(isChecked)}
+              onCheckedChange={isChecked => setIsStaticDeployment(isChecked)}
             />
             <div className="flex flex-col">
               <label
@@ -173,12 +155,12 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
         </div>
 
         <div className={`flex ${state.error ? "justify-between" : "justify-end"}`}>
-          <input type="hidden" name="repoUrl" id="repoUrl" value={selected.gitUrl ?? "no-url"} />
+          <input type="hidden" name="repoUrl" id="repoUrl" value={selectedApplication.gitUrl ?? "no-url"} />
           <input
             type="hidden"
             name="githubAppId"
             id="githubAppId"
-            value={selected.githubAppId ?? "no-github-app-id"}
+            value={selectedApplication.githubAppId ?? "no-github-app-id"}
           />
           {isOnboarding && (
             <input type="hidden" name="isOnboarding" id="isOnboarding" value="true" />
@@ -189,30 +171,33 @@ export function DeploymentForm({ repositories, githubApps, isOnboarding = false 
             </Paragraph>
           )}
           <div className="flex gap-2">
-            <Button
-              type="submit"
-              name="action"
-              value="skip"
-              variant="outline"
-              disabled={pending}
-              onClick={() => setShouldSkipDeployment(true)}
-            >
-              {pending
-                ? (
-                    <>
-                      <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                      Loading...
-                    </>
-                  )
-                : (
-                    <>
-                      <ChevronLast />
-                      {" "}
-                      | Skip
-                    </>
-                  )}
-            </Button>
-            <Button type="submit" name="action" value="deploy" disabled={!selected.name || pending} aria-label="submit">
+            {isOnboarding && (
+              <Button
+                type="submit"
+                name="action"
+                value="skip"
+                variant="outline"
+                disabled={pending}
+                onClick={() => setShouldSkipDeployment(true)}
+              >
+                {pending
+                  ? (
+                      <>
+                        <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                        Loading...
+                      </>
+                    )
+                  : (
+                      <>
+                        <ChevronLast />
+                        {" "}
+                        | Skip
+                      </>
+                    )}
+              </Button>
+            )}
+
+            <Button type="submit" name="action" value="deploy" disabled={!selectedApplication.name || pending} aria-label="submit">
               {pending
                 ? (
                     <>

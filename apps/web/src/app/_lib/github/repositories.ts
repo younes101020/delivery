@@ -22,10 +22,13 @@ export async function getGithubRepositoriesByGithubAppId(repoPage: number, githu
   });
 
   return {
-    repositories: { ...repositories, githubApp },
+    repositories: { ...repositories, githubApp, isPending: false },
     githubApps: githubApps.map(ghApp => ({ appId: ghApp.appId, name: ghApp.name })),
   };
 }
+
+export type RepositoriesWithGithubAppPromise = ReturnType<typeof getGithubRepositoriesByGithubAppId>;
+export type RepositoriesWithGithubApp = Awaited<ReturnType<typeof getGithubRepositoriesByGithubAppId>>;
 
 interface GetGithubRepositories {
   appId: string;
@@ -94,7 +97,6 @@ async function listGithubRepositoriesByPagination({
   repoPerPage?: number;
   repoPage?: number;
 }) {
-  "use cache";
   const githubApp = await getGithubApp({ appId, privateKey, installationId, authType: "installation" });
 
   const reposPromises = Array.from({ length: repoPage }, (_, pageIndex) =>
