@@ -23,7 +23,7 @@ const DeploymentSelectedApplicationContext = createContext<DeploymentSelectedApp
 export function useDeploymentSelectedApplication(): DeploymentSelectedApplicationContextType {
   const context = useContext(DeploymentSelectedApplicationContext);
   if (context === null) {
-    throw new Error("useDeploymentSource must be used within a DeploymentSelectedApplicationProvider");
+    throw new Error("useDeploymentSelectedApplication must be used within a DeploymentSelectedApplicationProvider");
   }
   return context;
 }
