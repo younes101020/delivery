@@ -8,7 +8,7 @@ interface DeploymentProps {
     githubapp?: string;
     step?: string;
     query?: string;
-  }> | undefined;
+  } | undefined>;
   onboarding?: boolean;
 }
 

@@ -10,7 +10,7 @@ interface ApplicationSourceProps {
     githubapp?: string;
     step?: string;
     query?: string;
-  }> | undefined;
+  } | undefined>;
 }
 
 export async function ApplicationSource({ sp }: ApplicationSourceProps) {
