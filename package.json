@@ -7,11 +7,6 @@
   "license": "MIT",
   "repository": "https://github.com/younes101020/delivery",
   "scripts": {
-    "deploy": "sh ./scripts/delivery.sh deploy",
-    "stop": "sh ./scripts/delivery.sh stop",
-    "restart": "sh ./scripts/delivery.sh restart",
-    "redeploy": "sh ./scripts/delivery.sh redeploy",
-    "start": "sh ./scripts/delivery.sh start",
     "check-types": "tsc --noEmit",
     "dev": "turbo dev",
     "test": "turbo run test",
