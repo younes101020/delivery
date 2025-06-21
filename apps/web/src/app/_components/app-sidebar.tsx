@@ -61,7 +61,7 @@ const data = {
           title: "Account",
           url: "/dashboard/settings/account",
         },
-
+        { title: "Team", url: "/dashboard/settings/team" },
       ],
     },
   ],
