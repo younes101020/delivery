@@ -21,6 +21,7 @@ import {
   githubApp,
   githubAppSecret,
   systemConfig,
+  teamMembers,
   users,
 } from "../schema";
 
@@ -177,21 +178,20 @@ export async function createUser(user: InsertUserSchema, passwordHash: string) {
   return inserted;
 }
 
-export async function getUserById(id: number) {
-  const user = await db.query.users
-    .findFirst({
-      where(fields, operators) {
-        return operators.eq(fields.id, id);
-      },
+export async function getUserById(userId: number) {
+  const result = await db
+    .select({
+      user: users,
+      teamId: teamMembers.teamId,
     })
-    .then((user) => {
-      if (user) {
-        const { passwordHash, ...rest } = user;
-        return rest;
-      }
-      return null;
-    });
-  return user;
+    .from(users)
+    .leftJoin(teamMembers, eq(users.id, teamMembers.userId))
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  const { passwordHash, ...userWithoutPassword } = result[0].user;
+
+  return { ...userWithoutPassword, teamId: result[0].teamId };
 }
 
 export async function updateUser(id: number, updates: Partial<InsertUserSchema>) {
