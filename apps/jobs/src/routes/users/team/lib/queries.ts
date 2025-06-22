@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { teamMembers, users } from "@/db/schema";
+import { teamMembers } from "@/db/schema";
 
 export async function getTeamForUserByUserId(userId: number) {
   const result = await db.query.teamMembers.findFirst({
