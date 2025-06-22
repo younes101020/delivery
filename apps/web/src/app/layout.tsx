@@ -11,6 +11,7 @@ import { env } from "@/env";
 import { FetcherProvider } from "./_lib/fetch-provider";
 import { getQueryClient } from "./_lib/get-rsc-query-client";
 import { getUser } from "./_lib/user-session";
+import { getTeamForUser } from "./api/team/queries";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -40,6 +41,11 @@ export default function RootLayout({
   queryClient.prefetchQuery({
     queryKey: ["user"],
     queryFn: getUser,
+  });
+
+  queryClient.prefetchQuery({
+    queryKey: ["team"],
+    queryFn: getTeamForUser,
   });
 
   return (
