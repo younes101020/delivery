@@ -11,7 +11,9 @@ const inviteTeamMemberSchema = z.object({
 });
 
 export const inviteTeamMember = validatedActionWithUser(inviteTeamMemberSchema, async (inputs, _, user) => {
-  const { email, role } = inputs;
+  const { email,
+    // role
+  } = inputs;
   const response = await client.users[":id"].team.$get({
     param: { id: user.id },
   });
@@ -19,12 +21,12 @@ export const inviteTeamMember = validatedActionWithUser(inviteTeamMemberSchema, 
   if (response.status !== 200) {
     return { error: "Unable to get your team detail", inputs };
   }
-  
+
   const userWithTeam = await response.json();
 
   const isAlreadyMember = userWithTeam.teamMembers.some(teamMember => teamMember.user.email === email);
 
-  if(isAlreadyMember) {
+  if (isAlreadyMember) {
     return { error: "This user is already member of your team", inputs };
   }
 });

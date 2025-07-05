@@ -1,7 +1,4 @@
-import { faker } from "@faker-js/faker";
 import { it as base } from "vitest";
-
-import type { InsertUserSchema, SelectUserSchema } from "@/db/dto";
 
 import { db } from "@/db";
 import { teams } from "@/db/schema";
