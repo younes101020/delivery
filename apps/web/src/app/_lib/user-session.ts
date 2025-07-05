@@ -1,6 +1,6 @@
 import "server-only";
 
-import { getClient } from "./client-http";
+import { client } from "./client-http";
 import { getSession } from "./session";
 
 export async function getUser() {
@@ -8,7 +8,6 @@ export async function getUser() {
   if (!sessionData || new Date(sessionData.expires) < new Date()) {
     return null;
   }
-  const client = getClient();
   const response = await client.users[":id"].$get({
     param: {
       id: sessionData.user.id.toString(),

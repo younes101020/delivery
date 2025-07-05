@@ -1,9 +1,8 @@
 import "server-only";
 
-import { getProtectedClient, getWebhookClient } from "../client-http";
+import { client } from "../client-http";
 
 export async function getAllGithubAppCreds() {
-  const client = await getProtectedClient();
   const response = await client.githubapps.$get();
   if (response.status !== 200) {
     return null;
@@ -13,7 +12,6 @@ export async function getAllGithubAppCreds() {
 }
 
 export async function setInstallationIdOnGithubApp({ githubAppId, installationId }: { githubAppId: string; installationId: number }) {
-  const client = getWebhookClient();
   await client.githubapps[":id"].$patch({
     param: {
       id: githubAppId,

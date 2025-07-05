@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { redirect } from "next/navigation";
 
 import type { GithubAppResponse } from "../types";
+import { client } from "@/app/_lib/client-http";
 
 export const dynamic = "force-dynamic";
 
@@ -26,8 +27,6 @@ export async function GET(request: NextRequest) {
     return new Response("Failed to convert app manifest", { status: response.status });
   }
   const result = (await response.json()) as GithubAppResponse;
-
-  const client = getWebhookClient();
 
   const appResponse = await client.githubapps.$post({
     json: {

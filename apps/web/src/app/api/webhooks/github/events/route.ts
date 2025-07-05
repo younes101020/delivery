@@ -1,6 +1,6 @@
 import { basename } from "node:path";
 
-import { getWebhookClient } from "@/app/_lib/client-http";
+import { client } from "@/app/_lib/client-http";
 import { getApplications } from "@/app/(dashboard)/dashboard/(resources)/applications/_lib/queries";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +18,6 @@ export async function POST(req: Request) {
   if (!applications) {
     return Response.json({ message: "No applications found" }, { status: 404 });
   }
-  const client = getWebhookClient();
   const isApplicationRegistered = applications.some(app => app.name === queueName);
   if (isApplicationRegistered) {
     await client.deployments.redeploy[":queueName"].$post({

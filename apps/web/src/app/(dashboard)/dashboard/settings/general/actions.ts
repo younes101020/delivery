@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-import { getProtectedClient } from "@/app/_lib/client-http";
+import { client } from "@/app/_lib/client-http";
 import { validatedAction } from "@/app/_lib/form-middleware";
 
 const deliveryInstanceFormSchema = z.object({
@@ -11,7 +11,6 @@ const deliveryInstanceFormSchema = z.object({
 });
 
 export const deliveryInstanceForm = validatedAction(deliveryInstanceFormSchema, async (data) => {
-  const client = await getProtectedClient();
   const response = await client.serverconfig.instance.$patch({
     json: data,
   });

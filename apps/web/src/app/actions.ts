@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { getClient, getProtectedClient } from "./_lib/client-http";
+import { client } from "./_lib/client-http";
 import { validatedAction, validatedActionWithUser } from "./_lib/form-middleware";
 import { setSession } from "./_lib/session";
 
@@ -15,8 +15,6 @@ const signUpSchema = z.object({
 
 export const signUp = validatedAction(signUpSchema, async (data) => {
   const { email, password } = data;
-
-  const client = await getClient();
   const response = await client.auth.register.$post({
     json: {
       email,
@@ -96,7 +94,6 @@ export const deploy = validatedActionWithUser(
     const { action, isOnboarding } = data;
 
     let deploymentResponse;
-    const client = await getProtectedClient();
     if (action === "deploy") {
       deploymentResponse = await client.deployments.$post({
         json: data,
@@ -138,7 +135,6 @@ const retryDeploySchema = z.object({
 
 export const retryDeploy = validatedAction(retryDeploySchema, async (data) => {
   const { jobId, repoName } = data;
-  const client = await getProtectedClient();
   const response = await client.deployments.jobs.retry[":jobId"].$post({
     param: {
       jobId,
@@ -158,7 +154,6 @@ const domainNameSchema = z.object({
 });
 
 export const domainName = validatedAction(domainNameSchema, async (data) => {
-  const client = await getProtectedClient();
   const response = await client.serverconfig.$patch({
     json: {
       domainName: data.domainName,
