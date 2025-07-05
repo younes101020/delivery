@@ -14,6 +14,7 @@ export default antfu({
   rules: {
     "no-console": ["warn"],
     "antfu/no-top-level-await": ["off"],
+    "no-empty-pattern": ["off"],
     "node/prefer-global/process": ["off"],
     "ts/no-empty-object-type": ["error", { allowObjectTypes: "always" }],
     "node/no-process-env": ["error"],

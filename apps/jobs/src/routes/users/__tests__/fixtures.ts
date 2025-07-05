@@ -17,11 +17,9 @@ const userPayload = {
 };
 
 export const it = base.extend<Fixtures>({
-  // eslint-disable-next-line no-empty-pattern
   userPayload: async ({}, use) => {
     await use(userPayload);
   },
-  // eslint-disable-next-line no-empty-pattern
   registeredUser: async ({}, use) => {
     const registeredUser = await getRandomRegisteredUser();
     await use(registeredUser);

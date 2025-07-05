@@ -10,7 +10,6 @@ interface Fixtures {
 const registeredApplicationName = await getRandomRegisteredApplicationName();
 
 export const it = base.extend<Fixtures>({
-  // eslint-disable-next-line no-empty-pattern
   registeredApplicationName: async ({}, use) => {
     await use(registeredApplicationName);
   },

@@ -23,11 +23,9 @@ const githubAppPayload = {
 };
 
 export const it = base.extend<Fixtures>({
-  // eslint-disable-next-line no-empty-pattern
   githubAppPayload: async ({}, use) => {
     await use(githubAppPayload);
   },
-  // eslint-disable-next-line no-empty-pattern
   registeredGithubAppId: async ({}, use) => {
     const registeredGithubAppId = await getRandomRegisteredGithubAppId();
     await use(registeredGithubAppId);

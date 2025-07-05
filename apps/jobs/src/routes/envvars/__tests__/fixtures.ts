@@ -16,7 +16,6 @@ const envVarAppPayload = {
 };
 
 export const it = base.extend<Fixtures>({
-  // eslint-disable-next-line no-empty-pattern
   envVarAppPayload: async ({}, use) => {
     await use(envVarAppPayload);
   },
