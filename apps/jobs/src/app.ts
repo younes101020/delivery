@@ -9,6 +9,7 @@ import githubApps from "@/routes/githubapps/githubapps.index";
 import index from "@/routes/index.route";
 import screenshots from "@/routes/screenshots/screenshots.index";
 import serverConfig from "@/routes/server-config/server-config.index";
+import invitation from "@/routes/users/team/invitation/invitation.index";
 import team from "@/routes/users/team/team.index";
 import users from "@/routes/users/users.index";
 
@@ -25,6 +26,7 @@ const routes = [
   deployments,
   users,
   team,
+  invitation,
   githubApps,
   serverConfig,
   auth,
