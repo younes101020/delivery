@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { seed } from "drizzle-seed";
 
@@ -40,6 +41,9 @@ async function main() {
       count: 0,
     },
   }));
+  await db.execute(
+    sql`SELECT setval(pg_get_serial_sequence('users', 'id'), coalesce(max(id), 0) + 1, false) FROM users`,
+  );
   process.exit(0);
 }
 
