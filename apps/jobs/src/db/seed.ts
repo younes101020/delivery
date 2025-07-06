@@ -24,6 +24,11 @@ async function main() {
         passwordHash: f.default({ defaultValue: passwordHash }),
       },
     },
+    invitations: {
+      columns: {
+        status: f.default({ defaultValue: "pending" }),
+      },
+    },
     githubApp: {
       with: {
         applications: 10,

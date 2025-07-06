@@ -14,4 +14,9 @@ export const selectInvitationsSchema = selectInvitationSchema.array();
 
 export const createInvitationsSchema = createInsertSchema(invitations).omit({ teamId: true });
 
+export const approvedInvitationSchema = z.object({
+  invitedUserEmail: z.string().email(),
+});
+
 export type CreateInvitation = z.infer<typeof createInvitationsSchema>;
+export type SelectInvitation = z.infer<typeof selectInvitationSchema>;

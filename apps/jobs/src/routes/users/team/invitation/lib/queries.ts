@@ -1,4 +1,5 @@
 import { and, eq } from "drizzle-orm";
+import { HTTPException } from "hono/http-exception";
 
 import { db } from "@/db";
 import { invitations } from "@/db/schema";
@@ -34,4 +35,34 @@ export async function createInvitationIntoTeam({ teamId, invitation }: CreateTea
     ...invitation,
     teamId,
   }).returning();
+}
+
+interface ApproveTeamInvitation {
+  invitationId: number;
+  invitedUserEmail: string;
+}
+
+export async function approveInvitation({ invitationId, invitedUserEmail }: ApproveTeamInvitation) {
+  const invitation = await db.query.invitations.findFirst({
+    where: and(
+      eq(invitations.id, invitationId),
+      eq(invitations.status, "pending"),
+      eq(invitations.email, invitedUserEmail),
+    ),
+  });
+
+  if (!invitation) {
+    throw new HTTPException(404, { message: "Invitation not found." });
+  }
+
+  const [updatedInvitation] = await db.update(invitations)
+    .set({
+      status: "accepted",
+    })
+    .where(
+      eq(invitations.id, invitationId),
+    )
+    .returning();
+
+  return updatedInvitation;
 }

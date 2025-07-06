@@ -2,13 +2,14 @@ import { faker } from "@faker-js/faker";
 import { it as base } from "vitest";
 
 import { db } from "@/db";
-import { teams, users } from "@/db/schema";
+import { invitations, teams, users } from "@/db/schema";
 
-import type { CreateInvitation } from "../lib/dto";
+import type { CreateInvitation, SelectInvitation } from "../lib/dto";
 
 interface Fixtures {
   randomRegisteredTeamId: string;
   invitationPayload: CreateInvitation;
+  randomRegisteredInvitation: SelectInvitation;
 }
 
 const invitationPayload = {
@@ -27,11 +28,20 @@ export const it = base.extend<Fixtures>({
     const registeredUser = await getRandomRegisteredUser();
     await use({ ...invitationPayload, invitedBy: registeredUser.id });
   },
+  randomRegisteredInvitation: async ({}, use) => {
+    const randomRegisteredInvitation = await getRandomRegisteredInvitation();
+    await use(randomRegisteredInvitation);
+  },
 });
 
 async function getRandomRegisteredTeamId() {
   const [registeredUser] = await db.select().from(teams).limit(1);
   return registeredUser.id.toString();
+}
+
+async function getRandomRegisteredInvitation() {
+  const [registeredUser] = await db.select().from(invitations).limit(1);
+  return registeredUser;
 }
 
 async function getRandomRegisteredUser() {

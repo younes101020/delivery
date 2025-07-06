@@ -11,6 +11,7 @@ import { setSession } from "./_lib/session";
 const signUpSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8, "Password must be at least 8 characters"),
+  inviteId: z.string().optional(),
 });
 
 export const signUp = validatedAction(signUpSchema, async (data) => {

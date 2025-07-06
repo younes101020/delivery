@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, Loader2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useActionState } from "react";
 
 import type { ActionState } from "@/app/_lib/form-middleware";
@@ -15,6 +16,8 @@ import { signIn } from "../(login)/actions";
 import { Paragraph } from "./ui/paragraph";
 
 export function Login({ mode = "signup", redirectTo = "/dashboard/applications" }: { mode?: "signin" | "signup"; redirectTo?: string }) {
+  const searchParams = useSearchParams();
+  const inviteId = searchParams.get("inviteId");
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
     mode === "signin" ? signIn : signUp,
     { error: "", inputs: {} },
@@ -62,6 +65,7 @@ export function Login({ mode = "signup", redirectTo = "/dashboard/applications" 
         </div>
       </div>
       <input type="hidden" name="redirectTo" defaultValue={redirectTo} />
+      <input type="hidden" name="inviteId" value={inviteId || ""} />
 
       {state?.error && <Paragraph variant="error">{state.error}</Paragraph>}
 

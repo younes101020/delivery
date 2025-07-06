@@ -3,7 +3,9 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 
-import { createInvitationsSchema, InvitationSearchParam, selectInvitationSchema, selectInvitationsSchema } from "./lib/dto";
+import { notFoundSchema } from "@/lib/constants";
+
+import { approvedInvitationSchema, createInvitationsSchema, InvitationSearchParam, selectInvitationSchema, selectInvitationsSchema } from "./lib/dto";
 
 const tags = ["Users", "Team", "Invitation"];
 
@@ -43,5 +45,26 @@ export const createTeamInvitation = createRoute({
   },
 });
 
+export const approveTeamInvitation = createRoute({
+  path: "/users/team/invitation/{id}",
+  method: "patch",
+  description: "Approve an invitation to join a team.",
+  request: {
+    params: IdParamsSchema,
+    body: jsonContentRequired(approvedInvitationSchema, "The email of the invited user"),
+  },
+  tags,
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(selectInvitationSchema, "The approved invitation"),
+    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
+      createErrorSchema(approvedInvitationSchema).or(createErrorSchema(IdParamsSchema)),
+      "The validation error(s)",
+    ),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Invitation not found or already approved."),
+
+  },
+});
+
 export type GetTeamInvitation = typeof getTeamInvitation;
 export type CreateTeamInvitation = typeof createTeamInvitation;
+export type ApproveTeamInvitation = typeof approveTeamInvitation;

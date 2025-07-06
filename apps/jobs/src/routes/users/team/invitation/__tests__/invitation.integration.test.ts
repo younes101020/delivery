@@ -94,4 +94,22 @@ describe("invitation routes / integration test", () => {
       }>();
     }
   });
+
+  it("patch /users/team/invitation/{id} return approved team invitations", async ({ randomRegisteredInvitation }) => {
+    const response = await client.users.team.invitation[":id"].$patch(
+      {
+        param: {
+          id: randomRegisteredInvitation.id.toString(),
+        },
+        json: {
+          invitedUserEmail: randomRegisteredInvitation.email,
+        },
+      },
+    );
+    expect(response.status).toBe(200);
+    if (response.status === 200) {
+      const json = await response.json();
+      expect(json).toHaveProperty("status", "accepted");
+    }
+  });
 });
