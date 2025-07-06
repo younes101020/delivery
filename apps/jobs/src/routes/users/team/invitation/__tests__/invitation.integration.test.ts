@@ -45,4 +45,53 @@ describe("invitation routes / integration test", () => {
       >();
     }
   });
+
+  it("post /users/team/{id}/invitation return 422 when team id params is missing", async ({ invitationPayload }) => {
+    const response = await client.users.team[":id"].invitation.$post(
+      {
+        // @ts-expect-error testing purpose
+        param: {},
+        json: invitationPayload,
+      },
+    );
+    expect(response.status).toBe(422);
+  });
+
+  it("post /users/team/{id}/invitation return 422 when invitation payload is missing", async ({ randomRegisteredTeamId }) => {
+    const response = await client.users.team[":id"].invitation.$post(
+      {
+        param: {
+          id: randomRegisteredTeamId,
+        },
+        // @ts-expect-error testing purpose
+        json: undefined,
+      },
+    );
+    expect(response.status).toBe(422);
+  });
+
+  it("post /users/team/{id}/invitation return created team invitations", async ({ randomRegisteredTeamId, invitationPayload }) => {
+    const response = await client.users.team[":id"].invitation.$post(
+      {
+        param: {
+          id: randomRegisteredTeamId,
+        },
+        json: invitationPayload,
+      },
+    );
+    expect(response.status).toBe(200);
+    if (response.status === 200) {
+      const json = await response.json();
+      expectTypeOf(json)
+        .toEqualTypeOf<{
+        status: string;
+        id: number;
+        teamId: number;
+        email: string;
+        role: string;
+        invitedBy: number;
+        invitedAt: string;
+      }>();
+    }
+  });
 });

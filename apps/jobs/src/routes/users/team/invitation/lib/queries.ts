@@ -3,7 +3,7 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { invitations } from "@/db/schema";
 
-import type { invitationStatus } from "./dto";
+import type { CreateInvitation, invitationStatus } from "./dto";
 
 interface GetTeamInvitationByTeamId {
   status?: typeof invitationStatus[number];
@@ -18,5 +18,20 @@ export async function getTeamInvitationByTeamId({ teamId, status }: GetTeamInvit
           eq(invitations.status, status),
         )
       : eq(invitations.teamId, teamId),
+    with: {
+      team: true,
+    },
   });
+}
+
+interface CreateTeamInvitation {
+  teamId: number;
+  invitation: CreateInvitation;
+}
+
+export async function createInvitationIntoTeam({ teamId, invitation }: CreateTeamInvitation) {
+  return db.insert(invitations).values({
+    ...invitation,
+    teamId,
+  }).returning();
 }
