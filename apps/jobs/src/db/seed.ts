@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker";
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { seed } from "drizzle-seed";
@@ -18,15 +19,24 @@ const SECRET = await encryptSecret(GITHUB_APP_PRIVATE_KEY);
 async function main() {
   const db = drizzle(env.DATABASE_URL);
   const passwordHash = await hashPassword(env.TEST_USERS_PASSWORD!);
+
+  const randomEmails = Array.from({ length: env.TEST_ENTITY_COUNT }, () => faker.internet.email());
+
   await seed(db, schema, { count: env.TEST_ENTITY_COUNT }).refine(f => ({
     users: {
       columns: {
         passwordHash: f.default({ defaultValue: passwordHash }),
+        email: f.valuesFromArray({
+          values: randomEmails,
+        }),
       },
     },
     invitations: {
       columns: {
         status: f.default({ defaultValue: "pending" }),
+        email: f.valuesFromArray({
+          values: randomEmails,
+        }),
       },
     },
     githubApp: {
