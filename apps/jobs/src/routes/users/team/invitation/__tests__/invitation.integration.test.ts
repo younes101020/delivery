@@ -2,9 +2,9 @@ import { testClient } from "hono/testing";
 import { describe, expect, expectTypeOf } from "vitest";
 
 import createApp from "@/lib/create-app";
+import { it } from "@/routes/users/__tests__/fixtures";
 
 import router from "../invitation.index";
-import { it } from "./fixtures";
 
 const client = testClient(createApp().route("/", router));
 

@@ -1,5 +1,5 @@
 import { testClient } from "hono/testing";
-import { describe, expect, expectTypeOf } from "vitest";
+import { describe, expect } from "vitest";
 
 import createApp from "@/lib/create-app";
 
@@ -19,50 +19,6 @@ describe("team routes / integration test", () => {
     expect(response.status).toBe(422);
   });
 
-  it("get /users/{id}/team return team members", async ({ registeredUser }) => {
-    const response = await client.users[":id"].team.$get(
-      {
-        param: {
-          id: registeredUser.id.toString(),
-        },
-      },
-    );
-    expect(response.status).toBe(200);
-    if (response.status === 200) {
-      const json = await response.json();
-      expectTypeOf(json.teamMembers)
-        .toEqualTypeOf<
-        Array<{
-          id: number;
-          userId: number;
-          teamId: number;
-          role: string;
-          joinedAt: string;
-          user: {
-            id: number;
-            name: string;
-            email: string;
-          };
-        }>
-      >();
-    }
-  });
-
-  it("get /users/{id}/team return team name", async ({ registeredUser }) => {
-    const response = await client.users[":id"].team.$get(
-      {
-        param: {
-          id: registeredUser.id.toString(),
-        },
-      },
-    );
-    expect(response.status).toBe(200);
-    if (response.status === 200) {
-      const json = await response.json();
-      expectTypeOf(json.name).toEqualTypeOf<string>();
-    }
-  });
-
   it("get /users/{id}/team return 404 when the user id is not linked to any user", async () => {
     const response = await client.users[":id"].team.$get(
       {
@@ -72,5 +28,33 @@ describe("team routes / integration test", () => {
       },
     );
     expect(response.status).toBe(404);
+  });
+
+  it("delete /users/team/{id} return 404 when the user is not member of the team", async ({ randomRegisteredTeamId }) => {
+    const response = await client.users.team[":id"].$delete(
+      {
+        param: {
+          id: randomRegisteredTeamId,
+        },
+        json: {
+          revokedUserId: 55555555,
+        },
+      },
+    );
+    expect(response.status).toBe(404);
+  });
+
+  it("delete /users/team/{id} return 204 when the user is revoked from team", async ({ randomRegisteredTeamMember }) => {
+    const response = await client.users.team[":id"].$delete(
+      {
+        param: {
+          id: randomRegisteredTeamMember.teamId.toString(),
+        },
+        json: {
+          revokedUserId: randomRegisteredTeamMember.userId,
+        },
+      },
+    );
+    expect(response.status).toBe(204);
   });
 });

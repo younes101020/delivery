@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 import { db } from "@/db";
-import { invitations } from "@/db/schema";
+import { invitations, teamMembers, users } from "@/db/schema";
 
 import type { CreateInvitation, invitationStatus } from "./dto";
 
@@ -43,26 +43,42 @@ interface ApproveTeamInvitation {
 }
 
 export async function approveInvitation({ invitationId, invitedUserEmail }: ApproveTeamInvitation) {
-  const invitation = await db.query.invitations.findFirst({
-    where: and(
-      eq(invitations.id, invitationId),
-      eq(invitations.status, "pending"),
-      eq(invitations.email, invitedUserEmail),
-    ),
+  return db.transaction(async (tx) => {
+    const invitation = await tx.query.invitations.findFirst({
+      where: and(
+        eq(invitations.id, invitationId),
+        eq(invitations.status, "pending"),
+        eq(invitations.email, invitedUserEmail),
+      ),
+    });
+
+    if (!invitation) {
+      throw new HTTPException(404, { message: "Invitation not found." });
+    }
+
+    const [updatedInvitation] = await tx.update(invitations)
+      .set({
+        status: "accepted",
+      })
+      .where(
+        eq(invitations.id, invitationId),
+      )
+      .returning();
+
+    const [invitedUser] = await tx.select().from(users).where(eq(users.email, invitedUserEmail));
+
+    if (!invitedUser) {
+      throw new HTTPException(404, { message: "Invited user not found." });
+    }
+
+    const newTeamMember = {
+      teamId: updatedInvitation.teamId,
+      userId: invitedUser.id,
+      role: updatedInvitation.role,
+    };
+
+    await tx.insert(teamMembers).values(newTeamMember);
+
+    return updatedInvitation;
   });
-
-  if (!invitation) {
-    throw new HTTPException(404, { message: "Invitation not found." });
-  }
-
-  const [updatedInvitation] = await db.update(invitations)
-    .set({
-      status: "accepted",
-    })
-    .where(
-      eq(invitations.id, invitationId),
-    )
-    .returning();
-
-  return updatedInvitation;
-}
+};

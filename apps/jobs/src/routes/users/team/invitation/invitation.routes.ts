@@ -60,7 +60,7 @@ export const approveTeamInvitation = createRoute({
       createErrorSchema(approvedInvitationSchema).or(createErrorSchema(IdParamsSchema)),
       "The validation error(s)",
     ),
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Invitation not found or already approved."),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Invitation or invited user not found."),
 
   },
 });

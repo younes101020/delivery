@@ -3,9 +3,9 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import type { GetUserTeamRoute } from "./team.routes";
+import type { GetUserTeamRoute, RevokeUserTeamRoute } from "./team.routes";
 
-import { getTeamForUserByUserId } from "./lib/queries";
+import { getTeamForUserByUserId, revokeUserFromTeam } from "./lib/queries";
 
 export const getUserTeam: AppRouteHandler<GetUserTeamRoute> = async (c) => {
   const { id } = c.req.valid("param");
@@ -22,4 +22,13 @@ export const getUserTeam: AppRouteHandler<GetUserTeamRoute> = async (c) => {
   }
 
   return c.json(teamWithMembers, HttpStatusCodes.OK);
+};
+
+export const revokeUserTeam: AppRouteHandler<RevokeUserTeamRoute> = async (c) => {
+  const { id: teamId } = c.req.valid("param");
+  const { revokedUserId } = c.req.valid("json");
+
+  await revokeUserFromTeam({ teamId, userId: revokedUserId });
+
+  return c.body(null, HttpStatusCodes.NO_CONTENT);
 };

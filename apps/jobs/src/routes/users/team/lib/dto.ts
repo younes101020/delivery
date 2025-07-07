@@ -1,4 +1,7 @@
 import { z } from "@hono/zod-openapi";
+import { createSelectSchema } from "drizzle-zod";
+
+import { teamMembers } from "@/db/schema";
 
 export const selectUserTeamWithMembersSchema = z.object({
   id: z.number(),
@@ -20,3 +23,11 @@ export const selectUserTeamWithMembersSchema = z.object({
     }),
   ),
 });
+
+export const revokedUserTeamSchema = z.object({
+  revokedUserId: z.number(),
+});
+
+export const teamMember = createSelectSchema(teamMembers);
+
+export type TeamMember = z.infer<typeof teamMember>;
