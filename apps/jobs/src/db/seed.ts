@@ -23,7 +23,7 @@ async function main() {
   const randomEmails = Array.from({ length: env.TEST_ENTITY_COUNT }, () => faker.internet.email());
   const primaryIds = Array.from({ length: env.TEST_ENTITY_COUNT }, (_, i) => i + 1);
   // Add an extra ID for the existing user
-  const userPrimaryIds = Array.from({ length: env.TEST_ENTITY_COUNT + 1 }, (_, i) => i + 1);
+  const userPrimaryIds = env.CI === "true" ? primaryIds : Array.from({ length: env.TEST_ENTITY_COUNT + 1 }, (_, i) => i + 1);
 
   await seed(db, schema, { count: env.TEST_ENTITY_COUNT }).refine(f => ({
     users: {
