@@ -19,7 +19,7 @@ const EnvSchema = z.object({
   MINIO_ROOT_PASSWORD: z.string(),
   MINIO_BUCKETS: z.string().default("screenshots"),
   TEST_USERS_PASSWORD: z.string().min(8).default("azerty-azerty"),
-  TEST_ENTITY_COUNT: z.coerce.number().default(10),
+  TEST_ENTITY_COUNT: z.coerce.number().default(11),
   SSH_HOST: z.string().default("host.docker.internal"),
   BEARER_TOKEN: z.string(),
   CI: z.string().default("false"),

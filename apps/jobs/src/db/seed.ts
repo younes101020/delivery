@@ -21,9 +21,15 @@ async function main() {
   const passwordHash = await hashPassword(env.TEST_USERS_PASSWORD!);
 
   const randomEmails = Array.from({ length: env.TEST_ENTITY_COUNT }, () => faker.internet.email());
+  const primaryIds = Array.from({ length: env.TEST_ENTITY_COUNT }, (_, i) => i + 1);
+  // Add an extra ID for the existing user
+  const userPrimaryIds = Array.from({ length: env.TEST_ENTITY_COUNT + 1 }, (_, i) => i + 1);
 
   await seed(db, schema, { count: env.TEST_ENTITY_COUNT }).refine(f => ({
     users: {
+      with: {
+        teamMembers: 1,
+      },
       columns: {
         passwordHash: f.default({ defaultValue: passwordHash }),
         email: f.valuesFromArray({
@@ -33,9 +39,32 @@ async function main() {
     },
     invitations: {
       columns: {
-        status: f.default({ defaultValue: "pending" }),
+        status: f.valuesFromArray({
+          values: ["pending", "accepted"],
+        }),
+        role: f.valuesFromArray({
+          values: ["owner", "member"],
+        }),
         email: f.valuesFromArray({
           values: randomEmails,
+        }),
+      },
+    },
+    teams: {
+      with: {
+        teamMembers: 5,
+      },
+    },
+    teamMembers: {
+      columns: {
+        role: f.valuesFromArray({
+          values: ["owner", "member"],
+        }),
+        userId: f.valuesFromArray({
+          values: userPrimaryIds,
+        }),
+        teamId: f.valuesFromArray({
+          values: primaryIds,
         }),
       },
     },
