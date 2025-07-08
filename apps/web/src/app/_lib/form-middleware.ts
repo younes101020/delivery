@@ -3,7 +3,9 @@ import type { z } from "zod";
 
 import { getUser } from "./user-session";
 
-export interface ActionState<PrevState extends object = Record<string, any>> {
+type ActionFields = Record<string, any> | undefined;
+
+export interface ActionState<PrevState extends ActionFields = Record<string, any>> {
   error?: string;
   success?: string;
   inputs: PrevState;

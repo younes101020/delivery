@@ -7,17 +7,19 @@ import { Suspense, useActionState } from "react";
 import type { ActionState } from "@/app/_lib/form-middleware";
 import type { TeamForUser } from "@/app/api/team/queries";
 
+import { AlertDialog, AlertDialogTrigger } from "@/app/_components/ui/alert-dialog";
 import { Button } from "@/app/_components/ui/button";
 import { CardFooter } from "@/app/_components/ui/card";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
 import { Paragraph } from "@/app/_components/ui/paragraph";
+import { RadioGroup, RadioGroupItem } from "@/app/_components/ui/radio-group";
 import { ScrollArea } from "@/app/_components/ui/scroll-area";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { useFetch } from "@/app/_lib/fetch-provider";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 import { inviteTeamMember } from "../actions";
+import { RevokeTeamMemberForm } from "./revoke-team-member-form";
 
 export function TeamList() {
   return (
@@ -41,12 +43,29 @@ function TeamMemberList() {
   return (
     <ScrollArea className="my-2 w-full">
       <ul className="flex flex-col gap-4 h-full mt-4 text-sm max-h-80">
-        {team.teamMembers.map(member => (
-          <li key={member.user.id} className="flex flex-col p-4">
-            <span>{member.user.email}</span>
-            <span className="text-muted-foreground text-xs">{member.role}</span>
-          </li>
-        ))}
+        {team.teamMembers
+          .sort((a, b) => a.role === "owner" ? -1 : b.role === "owner" ? 1 : 0)
+          .map(member => (
+            <li key={member.user.id} className="flex justify-between p-4">
+              <div>
+                <div>{member.user.email}</div>
+                <div className="text-muted-foreground text-xs">{member.role}</div>
+              </div>
+              {member.role !== "owner" && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                    >
+                      Revoke
+                    </Button>
+                  </AlertDialogTrigger>
+                  <RevokeTeamMemberForm memberId={member.id} />
+                </AlertDialog>
+              )}
+            </li>
+          ))}
       </ul>
     </ScrollArea>
   );

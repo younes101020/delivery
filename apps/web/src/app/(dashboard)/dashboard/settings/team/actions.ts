@@ -11,7 +11,7 @@ const inviteTeamMemberSchema = z.object({
   role: z.enum(["member", "owner"]),
 });
 
-export const inviteTeamMember = validatedActionWithUser(inviteTeamMemberSchema, async (inputs, _, user) => {
+export const inviteTeamMember = validatedActionWithUser(inviteTeamMemberSchema, async (inputs, _, __, user) => {
   const { email, role } = inputs;
   const response = await client.users[":id"].team.$get({
     param: { id: user.id },
@@ -71,4 +71,36 @@ export const inviteTeamMember = validatedActionWithUser(inviteTeamMemberSchema, 
     ...inputs,
     inviteUrl: `${env.BASE_URL}?inviteId=${inviteId}`,
   } };
+});
+
+const revokeTeamMemberSchema = z.object({
+  memberId: z.coerce.number(),
+});
+
+export const revokeTeamMember = validatedActionWithUser(revokeTeamMemberSchema, async (inputs, _, __, user) => {
+  const { memberId } = inputs;
+  const response = await client.users[":id"].team.$get({
+    param: { id: user.id.toString() },
+  });
+
+  if (response.status !== 200) {
+    return { error: "Unable to get your team detail.", inputs };
+  }
+
+  const userWithTeam = await response.json();
+
+  const revokeResponse = await client.users.team[":id"].$delete({
+    param: {
+      id: userWithTeam.id.toString(),
+    },
+    json: {
+      revokedUserId: memberId,
+    },
+  });
+
+  if (revokeResponse.status !== 204) {
+    return { error: "Unable to delete this member.", inputs };
+  }
+
+  return { success: "User revoked from your team.", inputs };
 });
