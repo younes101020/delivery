@@ -40,7 +40,7 @@ async function main() {
     invitations: {
       columns: {
         status: f.valuesFromArray({
-          values: ["pending", "accepted"],
+          values: ["pending"],
         }),
         role: f.valuesFromArray({
           values: ["owner", "member"],
