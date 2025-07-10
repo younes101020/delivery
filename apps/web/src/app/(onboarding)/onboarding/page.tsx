@@ -30,7 +30,7 @@ export default function OnboardingPage({ searchParams }: SearchParams) {
           <GithubAppStep searchParams={searchParams} />
         </Suspense>
         <Suspense fallback={<CheckStepStatusLoadingScreen />}>
-          <Deployment sp={searchParams} onboarding={true} />
+          <Deployment sp={searchParams!} onboarding={true} />
         </Suspense>
       </StepProvider>
     </div>
