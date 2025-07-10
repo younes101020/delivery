@@ -14,7 +14,7 @@ const inviteTeamMemberSchema = z.object({
 export const inviteTeamMember = validatedActionWithUser(inviteTeamMemberSchema, async (inputs, _, __, user) => {
   const { email, role } = inputs;
   const response = await client.users[":id"].team.$get({
-    param: { id: user.id },
+    param: { id: user.id.toString() },
   });
 
   if (response.status !== 200) {
