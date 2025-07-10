@@ -4,7 +4,7 @@ import { ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 // import { useSearchParams } from "next/navigation";
-import { useActionState } from "react";
+import { Suspense, useActionState } from "react";
 
 import type { ActionState } from "@/app/_lib/form-middleware";
 
@@ -18,7 +18,7 @@ import { signIn } from "../(login)/actions";
 import { Paragraph } from "./ui/paragraph";
 import { Separator } from "./ui/separator";
 
-export function Login({ mode = "signup", redirectTo = "/dashboard/applications" }: { mode?: "signin" | "signup"; redirectTo?: string }) {
+function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications" }: { mode?: "signin" | "signup"; redirectTo?: string }) {
   const searchParams = useSearchParams();
   const inviteId = searchParams.get("inviteId");
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
@@ -154,5 +154,13 @@ export function Login({ mode = "signup", redirectTo = "/dashboard/applications" 
         </Button>
       </CardFooter>
     </form>
+  );
+}
+
+export function Login({ mode = "signup", redirectTo = "/dashboard/applications" }: { mode?: "signin" | "signup"; redirectTo?: string }) {
+  return (
+    <Suspense>
+      <LoginForm mode={mode} redirectTo={redirectTo} />
+    </Suspense>
   );
 }
