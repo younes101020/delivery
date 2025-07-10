@@ -13,7 +13,7 @@ export default function NewApplicationPage(props: {
       <PageTitle>New application</PageTitle>
       <PageDescription>Start deploying your new application from here.</PageDescription>
       <Suspense fallback={<PendingDeployment />}>
-        <Deployment sp={props.searchParams} />
+        <Deployment sp={props.searchParams!} />
       </Suspense>
     </section>
   );
