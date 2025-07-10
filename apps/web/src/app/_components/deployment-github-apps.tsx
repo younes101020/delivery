@@ -26,7 +26,7 @@ export function DeploymentGithubAppList() {
   const { replace } = useRouter();
   const params = new URLSearchParams(searchParams);
 
-  const githubAppSearchParam = params.get("githubapp") ? Number.parseInt(params.get("githubapp") as string) : applicationsWithGithubApps.repositories.githubApp.appId;
+  const githubAppSearchParam = params.get("githubapp") ? Number.parseInt(params.get("githubapp") as string) : applicationsWithGithubApps?.repositories.githubApp.appId;
 
   const [optimisticSelectedGHApp, addOptimisticSelectedGHApp] = useOptimistic(
     {
