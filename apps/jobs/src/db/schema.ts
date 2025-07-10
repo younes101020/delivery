@@ -38,6 +38,13 @@ export const githubApp = pgTable("github_app", {
   appId: integer("app_id").notNull(),
 });
 
+export const teams = pgTable("teams", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 export const githubAppSecret = pgTable("github_app_secret", {
   id: serial("id").primaryKey(),
   encryptedData: text("encrypted_data").notNull(),
@@ -76,6 +83,32 @@ export const databases = pgTable("databases", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   deletedAt: timestamp("deleted_at"),
+});
+
+export const invitations = pgTable("invitations", {
+  id: serial("id").primaryKey(),
+  teamId: integer("team_id")
+    .notNull()
+    .references(() => teams.id),
+  email: text("email").notNull(),
+  role: text("role").notNull(),
+  invitedBy: integer("invited_by")
+    .notNull()
+    .references(() => users.id),
+  invitedAt: timestamp("invited_at").notNull().defaultNow(),
+  status: text("status").notNull().default("pending"),
+});
+
+export const teamMembers = pgTable("team_members", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id),
+  teamId: integer("team_id")
+    .notNull()
+    .references(() => teams.id),
+  role: text("role").notNull(),
+  joinedAt: timestamp("joined_at").notNull().defaultNow(),
 });
 
 export const applicationEnvironmentVariables = pgTable("application_environment_variables", {
@@ -120,6 +153,38 @@ export const githubAppRelations = relations(githubApp, ({ one, many }) => ({
 
 export const githubAppSecretRelations = relations(githubAppSecret, ({ one }) => ({
   githubApp: one(githubApp, { fields: [githubAppSecret.githubAppId], references: [githubApp.id] }),
+}));
+
+export const teamsRelations = relations(teams, ({ many }) => ({
+  teamMembers: many(teamMembers),
+  invitations: many(invitations),
+}));
+
+export const usersRelations = relations(users, ({ many }) => ({
+  teamMembers: many(teamMembers),
+  invitationsSent: many(invitations),
+}));
+
+export const invitationsRelations = relations(invitations, ({ one }) => ({
+  team: one(teams, {
+    fields: [invitations.teamId],
+    references: [teams.id],
+  }),
+  invitedBy: one(users, {
+    fields: [invitations.invitedBy],
+    references: [users.id],
+  }),
+}));
+
+export const teamMembersRelations = relations(teamMembers, ({ one }) => ({
+  user: one(users, {
+    fields: [teamMembers.userId],
+    references: [users.id],
+  }),
+  team: one(teams, {
+    fields: [teamMembers.teamId],
+    references: [teams.id],
+  }),
 }));
 
 // Shared types

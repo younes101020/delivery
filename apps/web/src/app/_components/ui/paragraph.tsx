@@ -15,7 +15,7 @@ export function Paragraph({ children, variant }: ParagraphProps) {
   return (
     <p className={cn("p-2 text-xs border inline-flex gap-2 items-center", variantClasses)}>
       <Ban size={12} />
-      <span>/</span>
+      <span>|</span>
       {children}
     </p>
   );

@@ -24,14 +24,12 @@ const authUnregisteredUser = {
 };
 
 export const it = base.extend<Fixtures>({
-  // eslint-disable-next-line no-empty-pattern
   authRegisteredUser: async ({}, use) => {
     //  For each test, use a different email
     const [user] = await getRandomUserEmail(authRegisteredUser.email);
     authRegisteredUser.email = user.email;
     await use(authRegisteredUser);
   },
-  // eslint-disable-next-line no-empty-pattern
   authUnregisteredUser: async ({}, use) => {
     await use(authUnregisteredUser);
   },

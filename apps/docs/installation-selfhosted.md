@@ -21,7 +21,7 @@ You need a server with SSH access. This can be:
 A VPS
 A Dedicated Server
 A VM in Proxmox
-A Raspberry Pi (for all compatible models read the Raspberry Pi OS Setup Guide prerequisites)
+A Raspberry Pi 5, you can try it on other models and let us know whether it works or not.
 Any other server with SSH access
 
 ### Supported languages and frameworks

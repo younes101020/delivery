@@ -1,6 +1,9 @@
 "use client";
 
 import { ArrowRight, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+// import { useSearchParams } from "next/navigation";
 import { useActionState } from "react";
 
 import type { ActionState } from "@/app/_lib/form-middleware";
@@ -13,8 +16,11 @@ import { signUp } from "@/app/actions";
 
 import { signIn } from "../(login)/actions";
 import { Paragraph } from "./ui/paragraph";
+import { Separator } from "./ui/separator";
 
 export function Login({ mode = "signup", redirectTo = "/dashboard/applications" }: { mode?: "signin" | "signup"; redirectTo?: string }) {
+  const searchParams = useSearchParams();
+  const inviteId = searchParams.get("inviteId");
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
     mode === "signin" ? signIn : signUp,
     { error: "", inputs: {} },
@@ -41,7 +47,7 @@ export function Login({ mode = "signup", redirectTo = "/dashboard/applications" 
           />
         </div>
       </div>
-
+      <Separator />
       <div>
         <Label htmlFor="password" className="block text-sm font-medium">
           Password
@@ -57,15 +63,72 @@ export function Login({ mode = "signup", redirectTo = "/dashboard/applications" 
             minLength={8}
             className="appearance-none relative block w-full px-3 py-2 border focus:outline-none focus:z-10 sm:text-sm"
             placeholder="Enter your password"
-            defaultValue={state.inputs.passwordHash ?? ""}
+            defaultValue={state.inputs.password ?? ""}
           />
         </div>
       </div>
+      {mode === "signup" && (
+        <div>
+          <Label htmlFor="repeatPassword" className="block text-sm font-medium">
+            Repeat password
+          </Label>
+          <div className="mt-1">
+            <Input
+              id="repeatPassword"
+              name="repeatPassword"
+              type="password"
+              aria-label="repeatPassword"
+              autoComplete="new-password"
+              required
+              minLength={8}
+              className="appearance-none relative block w-full px-3 py-2 border focus:outline-none focus:z-10 sm:text-sm"
+              placeholder="Repeat your password"
+              defaultValue={state.inputs.repeatPassword ?? ""}
+            />
+          </div>
+        </div>
+      )}
+
       <input type="hidden" name="redirectTo" defaultValue={redirectTo} />
+      <input type="hidden" name="inviteId" value={inviteId || ""} />
 
       {state?.error && <Paragraph variant="error">{state.error}</Paragraph>}
 
-      <CardFooter className="flex px-0 pt-8">
+      <div className="text-xs text-muted-foreground">
+        {mode === "signin"
+          ? (
+              <>
+                You dont have any account ?
+                {" "}
+                <Link
+                  href={{
+                    pathname: "/signup",
+                    query: { inviteId },
+                  }}
+                  className="underline underline-offset-4"
+                >
+                  register here.
+                </Link>
+              </>
+            )
+          : (
+              <>
+                Already have an account ?
+                {" "}
+                <Link
+                  href={{
+                    pathname: "/",
+                    query: { inviteId },
+                  }}
+                  className="underline underline-offset-4"
+                >
+                  sign in here.
+                </Link>
+              </>
+            )}
+
+      </div>
+      <CardFooter className="flex px-0">
         <Button type="submit" disabled={pending} aria-label="submit" className="w-full">
           {pending
             ? (

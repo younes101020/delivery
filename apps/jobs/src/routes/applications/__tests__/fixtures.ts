@@ -8,7 +8,6 @@ interface ITFixtures {
 }
 
 export const it = base.extend<ITFixtures>({
-  // eslint-disable-next-line no-empty-pattern
   applicationName: async ({}, use) => {
     const applicationName = await getApplicationName();
     await use(applicationName);

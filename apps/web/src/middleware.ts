@@ -48,6 +48,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
+  if (!isProtectedRoute && sessionCookie) {
+    return NextResponse.redirect(new URL(`${protectedRoutes}/applications`, request.url));
+  }
+
   if (sessionCookie) {
     try {
       const parsed = await verifyToken(sessionCookie.value);
@@ -86,7 +90,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\.svg).*)"],
-  runtime: "nodejs",
 };
 
 /**

@@ -77,7 +77,6 @@ const updateApplicationStateSchema = z.object({
 
 export const stopApplication = validatedAction(updateApplicationStateSchema, async (inputs) => {
   const { serviceId } = inputs;
-
   const response = await client.applications[":id"].stop.$post({
     param: { id: serviceId },
   });
@@ -91,7 +90,6 @@ export const stopApplication = validatedAction(updateApplicationStateSchema, asy
 
 export const startApplication = validatedAction(updateApplicationStateSchema, async (inputs) => {
   const { serviceId } = inputs;
-
   const response = await client.applications[":id"].start.$post({
     param: { id: serviceId },
   });

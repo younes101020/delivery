@@ -13,7 +13,6 @@ interface OnBoardingFixtures {
 }
 
 export const onBoardingTest = it.extend<OnBoardingFixtures>({
-  // eslint-disable-next-line no-empty-pattern
   users: async ({}, inject) => {
     users.push(
       {

@@ -1,4 +1,3 @@
-/* eslint-disable no-empty-pattern */
 import type { ContainerInspectInfo } from "dockerode";
 
 import { faker } from "@faker-js/faker";

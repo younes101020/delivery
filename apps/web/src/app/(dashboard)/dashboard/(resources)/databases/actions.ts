@@ -11,7 +11,6 @@ const updateContainerStatusSchema = z.object({
 
 export const stopDatabaseService = validatedAction(updateContainerStatusSchema, async (inputs) => {
   const { serviceId } = inputs;
-
   const response = await client.databases[":id"].stop.$post({
     param: { id: serviceId },
   });
@@ -25,7 +24,6 @@ export const stopDatabaseService = validatedAction(updateContainerStatusSchema, 
 
 export const startDatabaseService = validatedAction(updateContainerStatusSchema, async (inputs) => {
   const { serviceId } = inputs;
-
   const response = await client.databases[":id"].start.$post({
     param: { id: serviceId },
   });

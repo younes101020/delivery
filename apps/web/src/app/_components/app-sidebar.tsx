@@ -30,6 +30,7 @@ const data = {
       title: "Applications",
       url: "/dashboard/applications",
       icon: Package,
+      isActive: true,
       items: [
         {
           title: "New",
@@ -40,6 +41,7 @@ const data = {
     {
       title: "Databases",
       url: "/dashboard/databases",
+      isActive: true,
       icon: Cuboid,
       items: [
         {
@@ -52,6 +54,8 @@ const data = {
       title: "Settings",
       url: "#",
       icon: Settings2,
+      open: true,
+      isActive: true,
       items: [
         {
           title: "General",
@@ -61,7 +65,7 @@ const data = {
           title: "Account",
           url: "/dashboard/settings/account",
         },
-
+        { title: "Team", url: "/dashboard/settings/team" },
       ],
     },
   ],

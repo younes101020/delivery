@@ -11,8 +11,6 @@ export function setup() {
   applyMigration();
   resetDatabase();
   seedDatabaseWithFakeData();
-  // This is a temporary patch for: https://github.com/drizzle-team/drizzle-orm/issues/3915
-  execSync("pnpm db:temp:fix");
 }
 
 export function teardown() {

@@ -14,7 +14,7 @@
 -   Server-sent-event
 -   Dockerode
 -   NextJS 15 as BFF & SSR
--   Hono as REST API
+-   Hono as REST API + RPC
 -   Drizzle as ORM
 -   SSH2
 -   Zod

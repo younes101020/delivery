@@ -1,4 +1,3 @@
-/* eslint-disable no-empty-pattern */
 import { faker } from "@faker-js/faker";
 import { it as base } from "vitest";
 

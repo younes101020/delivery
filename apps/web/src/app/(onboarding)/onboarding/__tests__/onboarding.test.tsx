@@ -9,6 +9,12 @@ import { setup } from "./utils";
 
 describe("onboarding process", () => {
   beforeAll(() => {
+    vi.mock("next/navigation", () => ({
+      useSearchParams: () => ({
+        get: vi.fn().mockReturnValue(""),
+      }),
+    }));
+
     vi.mock("@/app/actions", () => {
       const signUp = vi.fn();
       signUp.mockResolvedValue({ error: "Impossible to sign up", inputs: { email: "", password: "" } });
@@ -42,6 +48,7 @@ describe("onboarding process", () => {
 
       await userAction.type(form.getByRole("textbox", { name: "email" }), registeredUser!.email);
       await userAction.type(form.getByLabelText("password"), registeredUser!.password);
+      await userAction.type(form.getByLabelText("Repeat password"), registeredUser!.password);
       await userAction.click(form.getByRole("button"));
 
       await waitFor(() => {
