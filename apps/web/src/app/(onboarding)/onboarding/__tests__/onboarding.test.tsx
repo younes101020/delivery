@@ -48,6 +48,7 @@ describe("onboarding process", () => {
 
       await userAction.type(form.getByRole("textbox", { name: "email" }), registeredUser!.email);
       await userAction.type(form.getByLabelText("password"), registeredUser!.password);
+      await userAction.type(form.getByLabelText("Repeat password"), registeredUser!.password);
       await userAction.click(form.getByRole("button"));
 
       await waitFor(() => {
