@@ -86,7 +86,19 @@ async function main() {
     },
   }));
   await db.execute(
-    sql`SELECT setval(pg_get_serial_sequence('users', 'id'), coalesce(max(id), 0) + 1, false) FROM users`,
+    sql`DO $$
+DECLARE
+    seq_record record;
+BEGIN
+    FOR seq_record IN 
+        SELECT schemaname, sequencename 
+        FROM pg_sequences 
+        WHERE schemaname = 'public'
+    LOOP
+        EXECUTE format('SELECT setval(%L, ${sql.raw((env.TEST_ENTITY_COUNT + 1).toString())})', 
+            seq_record.schemaname || '.' || seq_record.sequencename);
+    END LOOP;
+END $$;`,
   );
   process.exit(0);
 }
