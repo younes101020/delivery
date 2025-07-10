@@ -4,6 +4,10 @@ services:
     build:
       context: .
       dockerfile: ./apps/web/prod.Dockerfile
+      x-bake:
+        platforms:
+          - linux/amd64
+          - linux/arm64
       args:
         - AUTH_SECRET=${AUTH_SECRET}
         - JOBS_BEARER_TOKEN=${JOBS_BEARER_TOKEN}
@@ -34,6 +38,10 @@ services:
     build:
       context: .
       dockerfile: ./apps/jobs/prod.Dockerfile
+      x-bake:
+        platforms:
+          - linux/amd64
+          - linux/arm64
     environment:
       - PORT=${PORT}
       - DATABASE_URL=${DATABASE_URL}
