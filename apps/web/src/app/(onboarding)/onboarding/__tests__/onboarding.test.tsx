@@ -9,6 +9,12 @@ import { setup } from "./utils";
 
 describe("onboarding process", () => {
   beforeAll(() => {
+    vi.mock("next/navigation", () => ({
+      useSearchParams: () => ({
+        get: vi.fn().mockReturnValue(""),
+      }),
+    }));
+
     vi.mock("@/app/actions", () => {
       const signUp = vi.fn();
       signUp.mockResolvedValue({ error: "Impossible to sign up", inputs: { email: "", password: "" } });
