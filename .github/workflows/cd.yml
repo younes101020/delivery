@@ -56,3 +56,4 @@ jobs:
         if: env.docker_publish == 'true'
         with:
           push: true
+          files: ./compose.prod.yaml
