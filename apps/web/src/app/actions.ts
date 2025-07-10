@@ -6,16 +6,30 @@ import { z } from "zod";
 
 import { client } from "./_lib/client-http";
 import { validatedAction, validatedActionWithUser } from "./_lib/form-middleware";
+import { approveTeamMemberInvite } from "./_lib/server-utils";
 import { setSession } from "./_lib/session";
 
 const signUpSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8, "Password must be at least 8 characters"),
+  repeatPassword: z.string().min(8, "Password must be at least 8 characters"),
   inviteId: z.string().optional(),
+}).refine(data => data.password === data.repeatPassword, {
+  message: "Passwords do not match",
 });
 
 export const signUp = validatedAction(signUpSchema, async (data) => {
-  const { email, password } = data;
+  const { email, password, inviteId } = data;
+
+  const approveResp = await approveTeamMemberInvite({
+    invitationId: inviteId,
+    invitedUserEmail: email,
+  });
+
+  if (approveResp?.error) {
+    return { error: approveResp.error, inputs: data };
+  }
+
   const response = await client.auth.register.$post({
     json: {
       email,
@@ -26,6 +40,7 @@ export const signUp = validatedAction(signUpSchema, async (data) => {
   // Non explicit error message to end-user to prevent from enumeration attack
   if (!response.ok)
     return { error: "Impossible to sign up", inputs: data };
+
   const createdUser = await response.json();
   await setSession(createdUser);
 

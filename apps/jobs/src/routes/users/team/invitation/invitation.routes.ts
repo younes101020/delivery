@@ -45,7 +45,7 @@ export const createTeamInvitation = createRoute({
   },
 });
 
-export const approveTeamInvitation = createRoute({
+export const approveInvitation = createRoute({
   path: "/users/team/invitation/{id}",
   method: "patch",
   description: "Approve an invitation to join a team.",
@@ -67,4 +67,4 @@ export const approveTeamInvitation = createRoute({
 
 export type GetTeamInvitation = typeof getTeamInvitation;
 export type CreateTeamInvitation = typeof createTeamInvitation;
-export type ApproveTeamInvitation = typeof approveTeamInvitation;
+export type ApproveInvitation = typeof approveInvitation;

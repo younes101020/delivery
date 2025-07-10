@@ -6,6 +6,6 @@ import * as teamInvitationroutes from "./invitation.routes";
 const router = createRouter()
   .openapi(teamInvitationroutes.getTeamInvitation, teamInvitationhandlers.getTeamInvitation)
   .openapi(teamInvitationroutes.createTeamInvitation, teamInvitationhandlers.createTeamInvitation)
-  .openapi(teamInvitationroutes.approveTeamInvitation, teamInvitationhandlers.approveTeamInvitation);
+  .openapi(teamInvitationroutes.approveInvitation, teamInvitationhandlers.approveInvitation);
 
 export default router;

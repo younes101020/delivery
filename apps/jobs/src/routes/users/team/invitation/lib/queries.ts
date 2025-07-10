@@ -42,7 +42,7 @@ interface ApproveTeamInvitation {
   invitedUserEmail: string;
 }
 
-export async function approveInvitation({ invitationId, invitedUserEmail }: ApproveTeamInvitation) {
+export async function approveTeamMember({ invitationId, invitedUserEmail }: ApproveTeamInvitation) {
   return db.transaction(async (tx) => {
     const invitation = await tx.query.invitations.findFirst({
       where: and(

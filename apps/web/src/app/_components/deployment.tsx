@@ -8,7 +8,7 @@ interface DeploymentProps {
     githubapp?: string;
     step?: string;
     query?: string;
-  } | undefined>;
+  }> | undefined;
   onboarding?: boolean;
 }
 
@@ -25,7 +25,7 @@ export async function Deployment({ sp, onboarding = false }: DeploymentProps) {
   return (
     <DeploymentSelectedApplicationProvider>
       <DeploymentForm isOnboarding={onboarding}>
-        <ApplicationSource sp={sp} />
+        <ApplicationSource sp={sp!} />
       </DeploymentForm>
     </DeploymentSelectedApplicationProvider>
   );
