@@ -65,7 +65,7 @@ export async function approveInvitation({ invitationId, invitedUserEmail }: Appr
       )
       .returning();
 
-    const [invitedUser] = await tx.select().from(users).where(eq(users.email, invitedUserEmail));
+    const [invitedUser] = await tx.select().from(users).where(eq(users.email, invitedUserEmail)).limit(1);
 
     if (!invitedUser) {
       throw new HTTPException(404, { message: "Invited user not found." });
@@ -77,7 +77,7 @@ export async function approveInvitation({ invitationId, invitedUserEmail }: Appr
       role: updatedInvitation.role,
     };
 
-    await tx.insert(teamMembers).values(newTeamMember);
+    await tx.insert(teamMembers).values(newTeamMember).onConflictDoNothing();
 
     return updatedInvitation;
   });

@@ -23,8 +23,7 @@
     "build": "tsc -p tsconfig.build.json && tsc-alias",
     "db:migrate": "npx tsx src/db/migrate.ts",
     "db:reset": "npx tsx src/db/reset.ts",
-    "db:seed": "npx tsx src/db/seed.ts",
-    "db:temp:fix": "npx tsx src/db/temp-drizzle-seed-fix.ts"
+    "db:seed": "npx tsx src/db/seed.ts"
   },
   "dependencies": {
     "@bull-board/api": "^6.9.6",
