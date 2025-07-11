@@ -38,11 +38,18 @@ RUN pnpm turbo build --filter=@delivery/jobs
 FROM installer AS migration
 WORKDIR /app
 
-COPY --from=installer /app/apps/jobs/dist ./apps/jobs/dist
+COPY --from=installer /app/node_modules ./node_modules
+COPY --from=installer /app/apps/jobs/node_modules ./apps/jobs/node_modules
+
+COPY --from=installer /app/package.json ./package.json
+COPY --from=installer /app/apps/jobs/package.json ./apps/jobs/package.json
+
+COPY --from=installer /app/apps/jobs/tsconfig.build.json ./apps/jobs/tsconfig.build.json
 COPY --from=installer /app/apps/jobs/drizzle.config.ts ./apps/jobs/drizzle.config.ts
 COPY --from=installer /app/apps/jobs/src/db/migrations ./apps/jobs/src/db/migrations
+COPY --from=installer /app/apps/jobs/src/db/schema.ts ./apps/jobs/src/db/schema.ts
 
-RUN node apps/jobs/dist/src/db/migrate.js
+RUN pnpm db:migrate
 
 FROM base AS runner
 WORKDIR /app

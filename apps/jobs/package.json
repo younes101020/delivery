@@ -21,7 +21,7 @@
     "lint:fix": "pnpm lint --fix",
     "test": "vitest",
     "build": "tsc -p tsconfig.build.json && tsc-alias",
-    "db:migrate": "npx tsx src/db/migrate.ts",
+    "db:migrate": "drizzle-kit migrate",
     "db:reset": "npx tsx src/db/reset.ts",
     "db:seed": "npx tsx src/db/seed.ts"
   },

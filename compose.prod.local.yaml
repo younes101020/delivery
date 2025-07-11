@@ -57,20 +57,21 @@ services:
       - proxy
     restart: unless-stopped
     depends_on:
-      db:
+      database:
         condition: service_healthy
       bull_queue:
         condition: service_healthy
     extra_hosts:
     - "host.docker.internal:host-gateway"
 
-  db:
+  database:
     image: postgres:17.5
     ports:
       - 5432:5432
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - PGUSER=postgres
+      - POSTGRES_USER=productiondb
+      - POSTGRES_DB=productiondb
     networks:
       - proxy
     volumes:
