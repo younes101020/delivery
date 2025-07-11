@@ -34,14 +34,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
       
       - name: Release
         run: npx -p @semantic-release/exec semantic-release
