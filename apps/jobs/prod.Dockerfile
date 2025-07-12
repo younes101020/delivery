@@ -49,7 +49,22 @@ COPY --from=installer /app/apps/jobs/drizzle.config.ts ./apps/jobs/drizzle.confi
 COPY --from=installer /app/apps/jobs/src/db/migrations ./apps/jobs/src/db/migrations
 COPY --from=installer /app/apps/jobs/src/db/schema.ts ./apps/jobs/src/db/schema.ts
 
-RUN pnpm db:migrate
+ARG DATABASE_URL
+ARG LOG_LEVEL
+ARG BEARER_TOKEN
+ARG REDIS_PASSWORD
+ARG MINIO_PUBLIC_DOMAIN
+ARG MINIO_ROOT_USER
+ARG MINIO_ROOT_PASSWORD
+ENV DATABASE_URL=${DATABASE_URL}
+ENV LOG_LEVEL=${LOG_LEVEL}
+ENV BEARER_TOKEN=${BEARER_TOKEN}
+ENV REDIS_PASSWORD=${REDIS_PASSWORD}
+ENV MINIO_PUBLIC_DOMAIN=${MINIO_PUBLIC_DOMAIN}
+ENV MINIO_ROOT_USER=${MINIO_ROOT_USER}
+ENV MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+
+RUN pnpm turbo run db:migrate --filter=@delivery/jobs
 
 FROM base AS runner
 WORKDIR /app
