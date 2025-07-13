@@ -4,6 +4,11 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const selectUserSchema = createSelectSchema(users).omit({
   passwordHash: true,
+}).extend({
+  createdAt: z.string().nullable(),
+  updatedAt: z.string().nullable(),
+  deletedAt: z.string().nullable(),
+  emailVerificationTokenExpiresAt: z.string().nullable(),
 });
 export const insertUserSchema = createInsertSchema(users)
   .omit({
