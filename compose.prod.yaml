@@ -71,6 +71,7 @@ services:
         condition: service_healthy
 
   migrations:
+    image: younes60/migrations:${DOCKER_TAGS:-latest}
     build:
       context: .
       dockerfile: ./packages/drizzle/prod.Dockerfile
