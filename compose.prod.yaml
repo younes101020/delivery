@@ -65,9 +65,29 @@ services:
       - proxy
     restart: unless-stopped
     depends_on:
-      database:
+      migrations:
         condition: service_healthy
       bull_queue:
+        condition: service_healthy
+
+  migrations:
+    build:
+      context: .
+      dockerfile: ./packages/drizzle/prod.Dockerfile
+      x-bake:
+        platforms:
+          - linux/amd64
+          - linux/arm64
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - NODE_ENV=${NODE_ENV}
+      - TEST_USERS_PASSWORD=${TEST_USERS_PASSWORD}
+      - TEST_ENTITY_COUNT=${TEST_ENTITY_COUNT}
+    networks:
+      - proxy
+    restart: no
+    depends_on:
+      database:
         condition: service_healthy
 
   database:
