@@ -41,7 +41,7 @@ describe("deployments tests", () => {
     return { ...actual, FlowProducer, Queue };
   });
 
-  vi.mock("@/db/queries/queries", () => {
+  vi.mock("@/lib/queries/queries", () => {
     const env = { key: "VAR", value: "VAL" };
     return {
       getGithubAppByAppId: mocks.getGithubAppByAppId,

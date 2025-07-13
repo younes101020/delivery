@@ -1,5 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalEnv": ["DATABASE_URL", "LOG_LEVEL", "BEARER_TOKEN"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -16,6 +17,18 @@
     "lint:fix": {},
     "migrate": {
       "env": ["DATABASE_URL", "LOG_LEVEL", "BEARER_TOKEN", "REDIS_PASSWORD", "MINIO_PUBLIC_DOMAIN", "MINIO_ROOT_USER", "MINIO_ROOT_PASSWORD"]
+    },
+
+    "db:push": {
+      "env": ["DATABASE_URL"]
+    },
+    "db:reset": {
+      "dependsOn": ["^db:push"],
+      "env": ["DATABASE_URL"]
+    },
+    "db:seed": {
+      "dependsOn": ["^db:push"],
+      "env": ["DATABASE_URL", "MINIO_ROOT_USER", "MINIO_ROOT_PASSWORD", "MINIO_ENDPOINT", "MINIO_PORT", "MINIO_BUCKETS", "SSH_HOST", "PORT", "LOG_LEVEL", "BEARER_TOKEN", "TEST_USERS_PASSWORD", "TEST_ENTITY_COUNT", "MINIO_PUBLIC_DOMAIN"]
     },
     "test": {
       "dependsOn": ["^build"],

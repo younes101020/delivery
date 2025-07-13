@@ -7,16 +7,16 @@ import { seed } from "drizzle-seed";
 import env from "../env";
 import * as schema from "../schema";
 
-const GITHUB_APP_PRIVATE_KEY
+async function main() {
+  const db = drizzle(env.DATABASE_URL);
+  const passwordHash = await hashPassword(env.TEST_USERS_PASSWORD!);
+
+  const GITHUB_APP_PRIVATE_KEY
 = `
   mL+IHQ/AH6tF0KMlJGQn+IrPIbdkfGJz4I3qVo7yp7JFN3lLfZ/ndndcE+kHGc3R
   rNntHJbXa1rDMDDpP4lmCtmMaX2hYcSsqhN4iQIDAQABAoIBAHfZe0e4zYpR3mGW
   xvd6rCX9Jf3dIJ8nVzzSEk3ZOhtUEZYG+PcZLh6jwwFH1wO7K+LwFlBNr/RMaBOU`;
-const SECRET = await encryptSecret(GITHUB_APP_PRIVATE_KEY);
-
-async function main() {
-  const db = drizzle(env.DATABASE_URL);
-  const passwordHash = await hashPassword(env.TEST_USERS_PASSWORD!);
+  const SECRET = await encryptSecret(GITHUB_APP_PRIVATE_KEY);
 
   const randomEmails = Array.from({ length: env.TEST_ENTITY_COUNT }, () => faker.internet.email());
   const primaryIds = Array.from({ length: env.TEST_ENTITY_COUNT }, (_, i) => i + 1);

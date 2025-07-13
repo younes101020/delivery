@@ -8,9 +8,7 @@ export function setup() {
   if (env.NODE_ENV !== "test" || !env.BEARER_TOKEN) {
     throw new Error("NODE_ENV must be 'test' and bearer token too");
   }
-  applyMigration();
-  resetDatabase();
-  seedDatabaseWithFakeData();
+  setupTestDB();
 }
 
 export function teardown() {
@@ -21,14 +19,10 @@ export function teardown() {
   resetDatabase();
 }
 
-function applyMigration() {
-  execSync("pnpm drizzle-kit push");
-}
-
-function seedDatabaseWithFakeData() {
-  execSync("pnpm db:seed");
+function setupTestDB() {
+  execSync("turbo run db:push db:reset db:seed --filter=@delivery/drizzle");
 }
 
 function resetDatabase() {
-  execSync("pnpm db:reset");
+  execSync("turbo run db:reset --filter=@delivery/drizzle");
 }

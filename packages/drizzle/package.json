@@ -13,7 +13,10 @@
   "scripts": {
     "migrate": "drizzle-kit migrate",
     "lint": "eslint .",
-    "lint:fix": "pnpm lint --fix"
+    "lint:fix": "pnpm lint --fix",
+    "db:push": "NODE_ENV=test drizzle-kit push",
+    "db:reset": "NODE_ENV=test npx tsx src/utils/reset.ts",
+    "db:seed": "NODE_ENV=test npx tsx src/utils/seed.ts"
   },
   "dependencies": {
     "@delivery/utils": "workspace:*",

@@ -12,8 +12,7 @@
     "test": "turbo run test",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
-    "build": "turbo run build",
-    "migrate": "turbo run migrate --filter=@delivery/drizzle"
+    "build": "turbo run build"
   },
   "devDependencies": {
     "@types/node": "^20.11.30",

@@ -47,4 +47,4 @@ COPY --from=installer /app/packages/drizzle/drizzle.config.ts ./packages/drizzle
 COPY --from=installer /app/turbo.json ./turbo.json
 COPY --from=installer /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
-CMD ["pnpm", "migrate"]
+CMD ["turbo", "migrate"]
