@@ -1,7 +1,6 @@
+import { systemConfig } from "@delivery/drizzle/schema";
 import { z } from "@hono/zod-openapi";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-
-import { systemConfig } from "../schema";
 
 export const selectServerConfigSchema = createSelectSchema(systemConfig);
 export const insertServerConfigSchema = createInsertSchema(systemConfig);

@@ -4,7 +4,7 @@ import { Job, Queue, QueueEvents } from "bullmq";
 import { HTTPException } from "hono/http-exception";
 import { basename } from "node:path";
 
-import type { CurrentJobSchema, DeploymentReferenceAndDataSchema, InsertEnvironmentVariablesSchema, PreviousJobSchema } from "@/db/dto";
+import type { CurrentJobSchema, DeploymentReferenceAndDataSchema, InsertEnvironmentVariablesSchema, PreviousJobSchema } from "@/lib/dto";
 
 import { DeploymentError } from "@/lib/error";
 import { connection, fetchQueueTitles, getBullConnection } from "@/lib/tasks/utils";

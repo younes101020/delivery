@@ -1,7 +1,7 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import type { CreateDatabaseSchema } from "@/db/dto";
+import type { CreateDatabaseSchema } from "@/lib/dto";
 
 import env from "@/env";
 import { subscribeWorkerTo } from "@/lib/tasks/utils";

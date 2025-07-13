@@ -4,7 +4,7 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { afterEach, beforeEach, describe, expect, vi } from "vitest";
 import { ZodError } from "zod";
 
-import { insertDeploymentSchema } from "@/db/dto";
+import { insertDeploymentSchema } from "@/lib/dto";
 import { DeploymentError } from "@/lib/error";
 import { it } from "@/routes/deployments/__tests__/fixtures";
 import { convertGitToAuthenticatedUrl, parseAppHost, persistedEnvVarsToCmdEnvVars, plainEnvVarsToCmdEnvVars, plainEnvVarsToPersistedEnvVars, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";

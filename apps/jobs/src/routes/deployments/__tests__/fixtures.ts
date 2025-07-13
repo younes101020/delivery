@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { it as base } from "vitest";
 
-import type { DeploymentReferenceAndDataSchema } from "@/db/dto";
+import type { DeploymentReferenceAndDataSchema } from "@/lib/dto";
 
 interface UTFixtures {
   repoUrl: string;

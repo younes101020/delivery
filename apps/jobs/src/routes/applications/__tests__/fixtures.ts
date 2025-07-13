@@ -1,7 +1,6 @@
+import { db } from "@delivery/drizzle";
+import { applications } from "@delivery/drizzle/schema";
 import { it as base } from "vitest";
-
-import { db } from "@/db";
-import { applications } from "@/db/schema";
 
 interface ITFixtures {
   applicationName: string;

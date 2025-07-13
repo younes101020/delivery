@@ -3,7 +3,7 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema } from "stoker/openapi/schemas";
 
-import { selectScreenshotSchema, selectUrlScreenshotSchema } from "@/db/dto/screenshots.dto";
+import { selectScreenshotSchema, selectUrlScreenshotSchema } from "@/lib/dto/screenshots.dto";
 
 const tags = ["Website screenshot"];
 

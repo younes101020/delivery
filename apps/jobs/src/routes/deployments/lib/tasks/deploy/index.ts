@@ -4,10 +4,10 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
-import type { DeploymentReferenceAndDataSchema } from "@/db/dto";
+import type { DeploymentReferenceAndDataSchema } from "@/lib/dto";
 
-import { getApplicationIdByName, getEnvironmentVariablesForApplication, getGithubAppByAppId, getSystemDomainName } from "@/db/queries/queries";
 import env from "@/env";
+import { getApplicationIdByName, getEnvironmentVariablesForApplication, getGithubAppByAppId, getSystemDomainName } from "@/lib/queries/queries";
 import { connection, getBullConnection, subscribeWorkerTo } from "@/lib/tasks/utils";
 import { fromGitUrlToQueueName, parseAppHost, persistedEnvVarsToCmdEnvVars, transformEnvVars, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
 

@@ -33,14 +33,6 @@ services:
     build:
       context: .
       dockerfile: ./apps/jobs/prod.Dockerfile
-      args:
-      - DATABASE_URL=${DATABASE_URL}
-      - LOG_LEVEL=${LOG_LEVEL}
-      - BEARER_TOKEN=${BEARER_TOKEN}
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - MINIO_PUBLIC_DOMAIN=${MINIO_PUBLIC_DOMAIN}
-      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
-      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
     environment:
       - PORT=${PORT}
       - DATABASE_URL=${DATABASE_URL}
@@ -52,6 +44,7 @@ services:
       - MINIO_SERVER_ACCESS_KEY=${MINIO_SERVER_ACCESS_KEY}
       - MINIO_SERVER_SECRET_KEY=${MINIO_SERVER_SECRET_KEY}
       - MINIO_PUBLIC_DOMAIN=${MINIO_PUBLIC_DOMAIN}
+      - MINIO_PORT=${MINIO_PORT}
       - TEST_USERS_PASSWORD=${TEST_USERS_PASSWORD}
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - ENABLE_DEPLOYMENT_QUEUE_MONITORING=${ENABLE_DEPLOYMENT_QUEUE_MONITORING}
@@ -65,12 +58,28 @@ services:
       - proxy
     restart: unless-stopped
     depends_on:
-      database:
+      migrations:
         condition: service_healthy
       bull_queue:
         condition: service_healthy
     extra_hosts:
     - "host.docker.internal:host-gateway"
+
+  migrations:
+    build:
+      context: .
+      dockerfile: ./packages/drizzle/prod.Dockerfile
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - NODE_ENV=${NODE_ENV}
+      - TEST_USERS_PASSWORD=${TEST_USERS_PASSWORD}
+      - TEST_ENTITY_COUNT=${TEST_ENTITY_COUNT}
+    networks:
+      - proxy
+    restart: no
+    depends_on:
+      database:
+        condition: service_healthy
 
   database:
     image: postgres:17.5

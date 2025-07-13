@@ -1,8 +1,7 @@
+import { db } from "@delivery/drizzle";
+import { invitations, teamMembers, users } from "@delivery/drizzle/schema";
 import { and, eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
-
-import { db } from "@/db";
-import { invitations, teamMembers, users } from "@/db/schema";
 
 import type { CreateInvitation, invitationStatus } from "./dto";
 

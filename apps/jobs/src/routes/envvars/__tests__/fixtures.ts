@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { it as base } from "vitest";
 
-import type { InsertEnvironmentVariablesSchema } from "@/db/dto/envvars.dto";
+import type { InsertEnvironmentVariablesSchema } from "@/lib/dto/envvars.dto";
 
 interface Fixtures {
   envVarAppPayload: InsertEnvironmentVariablesSchema;

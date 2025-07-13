@@ -1,17 +1,18 @@
+import { encryptSecret } from "@delivery/utils";
 import { Buffer } from "node:buffer";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
+import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
 import {
   createGithubAppWithSecret,
   getGithubAppById,
   getGithubApps,
   updateGithubApp,
-} from "@/db/queries/queries";
-import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
-import { decryptSecret, encryptSecret } from "@/lib/utils";
+} from "@/lib/queries/queries";
+import { decryptSecret } from "@/lib/utils";
 
 import type { CreateRoute, GetOneRoute, ListRoute, PatchRoute } from "./githubapps.routes";
 

@@ -8,12 +8,12 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
+import { APPLICATIONS_PATH, ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
 import {
   deleteApplicationByName,
   getApplicationWithEnvVarsByName,
   patchApplication,
-} from "@/db/queries/queries";
-import { APPLICATIONS_PATH, ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
+} from "@/lib/queries/queries";
 import { getDockerResourceEvents } from "@/lib/remote-docker";
 import { getSwarmServiceByName } from "@/lib/remote-docker/utils";
 import { ssh } from "@/lib/ssh";

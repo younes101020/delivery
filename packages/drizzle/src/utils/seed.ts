@@ -1,13 +1,11 @@
+import { encryptSecret, hashPassword } from "@delivery/utils";
 import { faker } from "@faker-js/faker";
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { seed } from "drizzle-seed";
 
-import env from "@/env";
-import { hashPassword } from "@/lib/auth";
-import { encryptSecret } from "@/lib/utils";
-
-import * as schema from "./schema";
+import env from "../env";
+import * as schema from "../schema";
 
 const GITHUB_APP_PRIVATE_KEY
 = `

@@ -1,7 +1,7 @@
 import type Dockerode from "dockerode";
 
-import type { PatchEnvironmentVariablesSchema } from "@/db/dto";
-import type { ServicesDto } from "@/db/dto/services.dto";
+import type { PatchEnvironmentVariablesSchema } from "@/lib/dto";
+import type { ServicesDto } from "@/lib/dto/services.dto";
 
 import { withDocker } from "@/lib/remote-docker/middleware";
 import { getSwarmServiceByName, toServiceSpec } from "@/lib/remote-docker/utils";

@@ -1,6 +1,6 @@
 import type { Job } from "bullmq";
 
-import type { InsertApplicationSchemaWithSharedEnv, InsertEnvironmentVariablesSchema, SelectedGithubAppSecretSchema, SelectedGithubAppsSchema } from "@/db/dto";
+import type { InsertApplicationSchemaWithSharedEnv, InsertEnvironmentVariablesSchema, SelectedGithubAppSecretSchema, SelectedGithubAppsSchema } from "@/lib/dto";
 import type { MergeSubJobs } from "@/lib/tasks/types";
 
 type Application = InsertApplicationSchemaWithSharedEnv["applicationData"];

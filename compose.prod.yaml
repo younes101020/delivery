@@ -38,14 +38,6 @@ services:
     build:
       context: .
       dockerfile: ./apps/jobs/prod.Dockerfile
-      args:
-      - DATABASE_URL=${DATABASE_URL}
-      - LOG_LEVEL=${LOG_LEVEL}
-      - BEARER_TOKEN=${BEARER_TOKEN}
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - MINIO_PUBLIC_DOMAIN=${MINIO_PUBLIC_DOMAIN}
-      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
-      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
       x-bake:
         platforms:
           - linux/amd64

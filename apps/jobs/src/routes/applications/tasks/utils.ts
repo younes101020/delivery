@@ -1,6 +1,6 @@
 import { Queue, QueueEvents } from "bullmq";
 
-import { getApplicationsNames } from "@/db/queries/queries";
+import { getApplicationsNames } from "@/lib/queries/queries";
 import { connection, getBullConnection } from "@/lib/tasks/utils";
 
 import { PREFIX, queueNames } from "./const";

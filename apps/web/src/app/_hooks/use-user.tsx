@@ -1,6 +1,6 @@
 "use client";
 
-import type { NewUser as User } from "@delivery/jobs/types";
+import type { SelectUserSchema } from "@delivery/jobs/types";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 
@@ -8,7 +8,7 @@ import { useFetch } from "../_lib/fetch-provider";
 
 export function useUser() {
   const { fetcher } = useFetch();
-  const user = useSuspenseQuery<User>({
+  const user = useSuspenseQuery<SelectUserSchema>({
     queryKey: ["user"],
     queryFn: () => fetcher("/api/user"),
   });

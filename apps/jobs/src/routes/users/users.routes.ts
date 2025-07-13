@@ -3,8 +3,8 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 
-import { patchUserSchema, selectUserSchema } from "@/db/dto/users.dto";
 import { notFoundSchema } from "@/lib/constants";
+import { patchUserSchema, selectUserSchema } from "@/lib/dto/users.dto";
 
 const tags = ["Users"];
 

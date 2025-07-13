@@ -5,7 +5,7 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import { patchApplication } from "@/db/queries/queries";
+import { patchApplication } from "@/lib/queries/queries";
 import { getDockerResourceEvents } from "@/lib/remote-docker";
 import { queueNames } from "@/lib/tasks/const";
 import { getJobAndQueueNameByJobId } from "@/lib/tasks/utils";

@@ -1,7 +1,6 @@
+import { invitations } from "@delivery/drizzle/schema";
 import { z } from "@hono/zod-openapi";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-
-import { invitations } from "@/db/schema";
 
 export const invitationStatus = ["pending", "accepted"] as const;
 

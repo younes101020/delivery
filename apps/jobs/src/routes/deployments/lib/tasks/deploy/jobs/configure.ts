@@ -1,5 +1,5 @@
-import { createApplication } from "@/db/queries/queries";
 import { DeploymentError } from "@/lib/error";
+import { createApplication } from "@/lib/queries/queries";
 
 import type { QueueDeploymentJob } from "../types";
 

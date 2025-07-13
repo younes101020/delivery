@@ -1,8 +1,8 @@
+import { applications, environmentVariables } from "@delivery/drizzle/schema";
 import { z } from "@hono/zod-openapi";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { IdParamsSchema } from "stoker/openapi/schemas";
 
-import { applications, environmentVariables } from "../schema";
 import { insertEnvironmentVariablesSchema } from "./envvars.dto";
 import { servicesDto } from "./services.dto";
 

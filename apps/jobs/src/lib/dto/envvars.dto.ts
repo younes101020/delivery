@@ -1,8 +1,7 @@
 import type { z } from "@hono/zod-openapi";
 
+import { environmentVariables } from "@delivery/drizzle/schema";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-
-import { environmentVariables } from "../schema";
 
 export const selectEnvironmentVariablesSchema = createSelectSchema(environmentVariables);
 export const insertEnvironmentVariablesSchema = createInsertSchema(environmentVariables);

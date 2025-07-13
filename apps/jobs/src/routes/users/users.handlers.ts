@@ -1,11 +1,11 @@
+import { hashPassword } from "@delivery/utils";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import { getUserById, updateUser } from "@/db/queries/queries";
-import { hashPassword } from "@/lib/auth";
 import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
+import { getUserById, updateUser } from "@/lib/queries/queries";
 
 import type { GetOneRoute, PatchRoute } from "./users.routes";
 

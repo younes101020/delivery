@@ -14,7 +14,7 @@ RUN yarn global add turbo@^2.3.3
 COPY . .
 
 # Generate a partial monorepo with a pruned lockfile for a target workspace.
-RUN turbo prune @delivery/jobs --docker
+RUN turbo prune @delivery/drizzle --docker
 
 # First install the dependencies (as they change less often)
 FROM base AS installer
@@ -33,21 +33,18 @@ RUN pnpm install --frozen-lockfile
 
 # Build the project
 COPY --from=builder /app/out/full/ .
-RUN pnpm turbo build --filter=@delivery/jobs
+RUN pnpm turbo build --filter=@delivery/drizzle
 
 FROM base AS runner
 WORKDIR /app
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 hono
-RUN adduser hono nodejs
-RUN chown -R hono:nodejs /app
+COPY --from=installer /app/node_modules ./node_modules
+COPY --from=installer /app/packages/drizzle/node_modules ./packages/drizzle/node_modules
+COPY --from=installer /app/packages/drizzle/src ./packages/drizzle/src
+COPY --from=installer /app/package.json ./package.json
+COPY --from=installer /app/packages/drizzle/package.json ./packages/drizzle/package.json
+COPY --from=installer /app/packages/drizzle/drizzle.config.ts ./packages/drizzle/drizzle.config.ts
+COPY --from=installer /app/turbo.json ./turbo.json
+COPY --from=installer /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
-COPY --from=installer --chown=hono:nodejs /app/node_modules ./node_modules
-COPY --from=installer --chown=hono:nodejs /app/apps/jobs/node_modules ./apps/jobs/node_modules
-COPY --from=installer --chown=hono:nodejs /app/apps/jobs/dist ./apps/jobs/dist
-
-USER hono
-EXPOSE 3090
-
-CMD ["node", "apps/jobs/dist/src/index.js"]
+CMD ["pnpm", "migrate"]

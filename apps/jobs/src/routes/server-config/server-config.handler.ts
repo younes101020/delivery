@@ -3,8 +3,8 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import { getSystemConfig, getSystemConfigFqdn, updateSystemConfig } from "@/db/queries/queries";
 import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
+import { getSystemConfig, getSystemConfigFqdn, updateSystemConfig } from "@/lib/queries/queries";
 
 import type { GetFirstRoute, GetInstanceRoute, PatchInstanceRoute, PatchRoute } from "./server-config.route";
 

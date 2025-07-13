@@ -1,7 +1,6 @@
+import { users } from "@delivery/drizzle/schema";
 import { z } from "@hono/zod-openapi";
 import { createInsertSchema } from "drizzle-zod";
-
-import { users } from "../schema";
 
 export const authRegisterSchema = createInsertSchema(users)
   .omit({ passwordHash: true })

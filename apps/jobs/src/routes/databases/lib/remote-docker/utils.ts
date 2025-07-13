@@ -3,8 +3,8 @@ import type Dockerode from "dockerode";
 import { HTTPException } from "hono/http-exception";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
-import type { Database } from "@/db/dto";
-import type { ServicesDto } from "@/db/dto/services.dto";
+import type { Database } from "@/lib/dto";
+import type { ServicesDto } from "@/lib/dto/services.dto";
 
 import { getDocker } from "@/lib/remote-docker";
 import { withDocker, withSwarmService } from "@/lib/remote-docker/middleware";

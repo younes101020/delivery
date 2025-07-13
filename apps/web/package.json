@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "LINT=true next lint",
+    "lint:fix": "LINT=true next lint --fix",
     "test": "vitest"
   },
   "dependencies": {

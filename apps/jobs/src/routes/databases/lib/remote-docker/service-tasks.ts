@@ -1,6 +1,6 @@
 import type Dockerode from "dockerode";
 
-import type { Database } from "@/db/dto";
+import type { Database } from "@/lib/dto";
 
 import { withDocker, withSwarmService } from "@/lib/remote-docker/middleware";
 

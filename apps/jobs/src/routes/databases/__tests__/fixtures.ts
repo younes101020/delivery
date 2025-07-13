@@ -1,6 +1,6 @@
 import { it as base } from "vitest";
 
-import type { CreateDatabaseSchema } from "@/db/dto/databases.dto";
+import type { CreateDatabaseSchema } from "@/lib/dto/databases.dto";
 
 interface ITFixtures {
   database: CreateDatabaseSchema;

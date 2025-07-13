@@ -3,8 +3,8 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema } from "stoker/openapi/schemas";
 
-import { patchServerConfigSchema, patchServerInstanceConfigSchema, selectServerConfigSchema, selectServerInstanceConfigSchema } from "@/db/dto/server-config.dto";
 import { notFoundSchema } from "@/lib/constants";
+import { patchServerConfigSchema, patchServerInstanceConfigSchema, selectServerConfigSchema, selectServerInstanceConfigSchema } from "@/lib/dto/server-config.dto";
 
 const tags = ["Server configuration"];
 

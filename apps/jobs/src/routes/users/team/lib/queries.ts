@@ -1,8 +1,7 @@
+import { db } from "@delivery/drizzle";
+import { teamMembers, teams } from "@delivery/drizzle/schema";
 import { and, eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
-
-import { db } from "@/db";
-import { teamMembers, teams } from "@/db/schema";
 
 export async function getTeamForUserByUserId(userId: number) {
   const result = await db.query.teamMembers.findFirst({

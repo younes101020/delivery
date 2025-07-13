@@ -1,7 +1,6 @@
+import { teamMembers } from "@delivery/drizzle/schema";
 import { z } from "@hono/zod-openapi";
 import { createSelectSchema } from "drizzle-zod";
-
-import { teamMembers } from "@/db/schema";
 
 export const selectUserTeamWithMembersSchema = z.object({
   id: z.number(),

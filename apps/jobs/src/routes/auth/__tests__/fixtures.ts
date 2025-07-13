@@ -1,11 +1,11 @@
+import { db } from "@delivery/drizzle";
+import { users } from "@delivery/drizzle/schema";
 import { faker } from "@faker-js/faker";
 import { eq, not } from "drizzle-orm";
 import { it as base } from "vitest";
 
-import type { AuthRegisterSchema, AuthVerifySchema } from "@/db/dto";
+import type { AuthRegisterSchema, AuthVerifySchema } from "@/lib/dto";
 
-import { db } from "@/db";
-import { users } from "@/db/schema";
 import env from "@/env";
 
 interface Fixtures {

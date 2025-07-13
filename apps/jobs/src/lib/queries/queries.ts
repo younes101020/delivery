@@ -1,3 +1,14 @@
+import { db } from "@delivery/drizzle";
+import {
+  applicationEnvironmentVariables,
+  applications,
+  environmentVariables,
+  githubApp,
+  githubAppSecret,
+  systemConfig,
+  teamMembers,
+  users,
+} from "@delivery/drizzle/schema";
 import { eq } from "drizzle-orm";
 
 import type {
@@ -12,18 +23,6 @@ import type {
   PatchApplicationSchema,
 } from "../dto/applications.dto";
 import type { InsertEnvironmentVariablesSchema } from "../dto/envvars.dto";
-
-import { db } from "..";
-import {
-  applicationEnvironmentVariables,
-  applications,
-  environmentVariables,
-  githubApp,
-  githubAppSecret,
-  systemConfig,
-  teamMembers,
-  users,
-} from "../schema";
 
 export async function createApplication(application: InsertApplicationSchemaWithSharedEnv) {
   const { applicationData, envVars } = application;

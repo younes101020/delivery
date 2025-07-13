@@ -1,4 +1,4 @@
-import type { NewUser } from "@delivery/jobs/types";
+import type { SelectUserSchema } from "@delivery/jobs/types";
 
 import { jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
@@ -33,7 +33,7 @@ export async function getSession() {
   return await verifyToken(session);
 }
 
-export async function setSession(user: NewUser) {
+export async function setSession(user: SelectUserSchema) {
   const expiresInOneDay = new Date(Date.now() + 24 * 60 * 60 * 1000);
   const session: SessionData = {
     user: { id: user.id },

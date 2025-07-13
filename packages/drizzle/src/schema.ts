@@ -1,10 +1,5 @@
-import type { z } from "zod";
-
 import { relations } from "drizzle-orm";
 import { boolean, integer, json, pgTable, primaryKey, serial, text, timestamp } from "drizzle-orm/pg-core";
-
-import type { selectUserSchema } from "./dto";
-import type { selectGithubAppsSchema } from "./dto/githubapps.dto";
 
 export const systemConfig = pgTable("system_config", {
   id: serial("id").primaryKey(),
@@ -186,17 +181,3 @@ export const teamMembersRelations = relations(teamMembers, ({ one }) => ({
     references: [teams.id],
   }),
 }));
-
-// Shared types
-// workaround to https://github.com/honojs/hono/issues/1800
-type NewUserWithoutDateTypes = Omit<
-  z.infer<typeof selectUserSchema>,
-  "createdAt" | "updatedAt" | "deletedAt" | "emailVerificationTokenExpiresAt"
->;
-export type NewUser = NewUserWithoutDateTypes & {
-  createdAt: string | null;
-  updatedAt: string | null;
-  deletedAt: string | null;
-  emailVerificationTokenExpiresAt: string | null;
-};
-export type GithubInstallation = z.infer<typeof selectGithubAppsSchema>;

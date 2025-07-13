@@ -1,4 +1,4 @@
-import type { NewUser as User } from "@delivery/jobs/types";
+import type { SelectUserSchema } from "@delivery/jobs/types";
 import type { z } from "zod";
 
 import { getUser } from "./user-session";
@@ -36,7 +36,7 @@ type ValidatedActionWithUserFunction<S extends z.ZodType<any, any>, T> = (
   data: z.infer<S>,
   formData: FormData,
   prevState: ActionState,
-  user: User
+  user: SelectUserSchema
 ) => Promise<T>;
 
 export function validatedActionWithUser<S extends z.ZodType<any, any>, T>(

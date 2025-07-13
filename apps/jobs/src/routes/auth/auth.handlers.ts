@@ -1,10 +1,11 @@
+import { hashPassword } from "@delivery/utils";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import { getUserByEmail, setUser } from "@/db/queries/queries";
-import { hashPassword, verifyPassword } from "@/lib/auth";
+import { verifyPassword } from "@/lib/auth";
+import { getUserByEmail, setUser } from "@/lib/queries/queries";
 
 import type { RegisterRoute, VerifyRoute } from "./auth.routes";
 

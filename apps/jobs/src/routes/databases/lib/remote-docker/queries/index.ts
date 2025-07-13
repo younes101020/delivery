@@ -1,7 +1,6 @@
+import { db } from "@delivery/drizzle";
+import { databases } from "@delivery/drizzle/schema";
 import { eq } from "drizzle-orm";
-
-import { db } from "@/db";
-import { databases } from "@/db/schema";
 
 import { withCache } from "./middleware";
 

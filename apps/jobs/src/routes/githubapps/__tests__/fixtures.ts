@@ -1,10 +1,9 @@
+import { db } from "@delivery/drizzle";
+import { githubApp } from "@delivery/drizzle/schema";
 import { faker } from "@faker-js/faker";
 import { it as base } from "vitest";
 
-import type { InsertGithubAppSchema } from "@/db/dto";
-
-import { db } from "@/db";
-import { githubApp } from "@/db/schema";
+import type { InsertGithubAppSchema } from "@/lib/dto";
 
 interface Fixtures {
   githubAppPayload: InsertGithubAppSchema;

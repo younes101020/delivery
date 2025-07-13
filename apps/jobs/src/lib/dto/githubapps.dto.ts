@@ -1,7 +1,6 @@
+import { githubApp, githubAppSecret } from "@delivery/drizzle/schema";
 import { z } from "@hono/zod-openapi";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-
-import { githubApp, githubAppSecret } from "../schema";
 
 export const selectGithubAppsSchema = createSelectSchema(githubApp);
 export const insertGithubAppSchema = createInsertSchema(githubApp).extend({

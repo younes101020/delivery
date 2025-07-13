@@ -1,11 +1,10 @@
+import { db } from "@delivery/drizzle";
+import { invitations, teamMembers, teams, users } from "@delivery/drizzle/schema";
 import { faker } from "@faker-js/faker";
 import { sql } from "drizzle-orm";
 import { it as base } from "vitest";
 
-import type { InsertUserSchema, SelectUserSchema } from "@/db/dto";
-
-import { db } from "@/db";
-import { invitations, teamMembers, teams, users } from "@/db/schema";
+import type { InsertUserSchema, SelectUserSchema } from "@/lib/dto";
 
 import type { CreateInvitation, SelectInvitation } from "../team/invitation/lib/dto";
 import type { TeamMember } from "../team/lib/dto";

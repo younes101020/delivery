@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "exports": {
-    "./types": "./src/db/schema.ts",
+    "./types": "./src/lib/dto/index.ts",
     "./http": "./src/app.ts",
     "./hc": {
       "import": {
@@ -28,6 +28,8 @@
   "dependencies": {
     "@bull-board/api": "^6.9.6",
     "@bull-board/hono": "^6.9.6",
+    "@delivery/drizzle": "workspace:*",
+    "@delivery/utils": "workspace:*",
     "@electric-sql/pglite": "^0.2.13",
     "@hono/node-server": "^1.13.2",
     "@hono/zod-openapi": "^0.16.4",

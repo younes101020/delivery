@@ -3,14 +3,14 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, SlugParamsSchema } from "stoker/openapi/schemas";
 
+import { internalServerSchema, notFoundSchema } from "@/lib/constants";
 import {
   ApplicationParamsSchema,
   ApplicationServiceParamsSchema,
   patchApplicationsSchema,
   selectApplicationsSchema,
   selectApplicationsSchemaWithSharedEnv,
-} from "@/db/dto";
-import { internalServerSchema, notFoundSchema } from "@/lib/constants";
+} from "@/lib/dto";
 
 const tags = ["Applications"];
 
