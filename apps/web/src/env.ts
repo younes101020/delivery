@@ -15,5 +15,5 @@ export const env = createEnv({
     BASE_URL: z.string(),
   },
   experimental__runtimeEnv: {},
-  skipValidation: process.env.CI === "true",
+  skipValidation: process.env.CI === "true" || process.env.LINT === "true",
 });
