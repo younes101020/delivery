@@ -15,6 +15,11 @@ services:
         - BASE_URL=${BASE_URL}
     volumes:
       - ./apps/web/src:/app/src
+    environment:
+      - AUTH_SECRET=${AUTH_SECRET}
+      - JOBS_BEARER_TOKEN=${JOBS_BEARER_TOKEN}
+      - JOBS_API_BASEURL=${JOBS_API_BASEURL}
+      - BASE_URL=${BASE_URL}
     ports:
       - 3000:3000
     networks:
