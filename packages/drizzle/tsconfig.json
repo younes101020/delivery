@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+
+    "lib": ["es2022"],
+    "moduleDetection": "force",
+    "baseUrl": ".",
+    "rootDir": "src",
+    "module": "esnext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "strict": true,
+    "noImplicitOverride": true,
+    "noUncheckedIndexedAccess": true,
+    "declaration": false,
+    "declarationMap": false,
+    "outDir": "dist",
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true
+  },
+  "include": ["src", "./package.json"],
+  "exclude": ["./dist", "./node_modules"]
+}

@@ -1,5 +1,6 @@
 {
   "name": "@delivery/drizzle",
+  "type": "module",
   "version": "1.0.0",
   "packageManager": "pnpm@10.11.0",
   "description": "",
@@ -7,10 +8,17 @@
   "license": "ISC",
   "keywords": [],
   "exports": {
-    ".": "./src/index.ts",
-    "./schema": "./src/schema.ts"
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./schema": {
+      "types": "./src/schema.ts",
+      "default": "./dist/schema.js"
+    }
   },
   "scripts": {
+    "build": "tsc",
     "migrate": "drizzle-kit migrate",
     "lint": "eslint .",
     "lint:fix": "pnpm lint --fix",
@@ -32,6 +40,7 @@
     "drizzle-kit": "^0.28.1",
     "drizzle-seed": "^0.3.1",
     "eslint": "catalog:",
-    "tsx": "^4.19.4"
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
   }
 }

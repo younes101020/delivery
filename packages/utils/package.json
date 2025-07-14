@@ -1,15 +1,23 @@
 {
   "name": "@delivery/utils",
+  "type": "module",
   "version": "1.0.0",
   "packageManager": "pnpm@10.11.0",
-  "main": "index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
   "scripts": {
+    "build": "tsc",
     "lint": "eslint .",
     "lint:fix": "pnpm lint --fix"
   },
   "devDependencies": {
     "@delivery/eslint-config": "workspace:*",
     "@types/node": "^20.11.30",
-    "eslint": "catalog:"
+    "eslint": "catalog:",
+    "typescript": "^5.8.3"
   }
 }

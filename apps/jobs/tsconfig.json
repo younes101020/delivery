@@ -19,6 +19,11 @@
   "tsc-alias": {
     "resolveFullPaths": true
   },
+  "references": [
+    {
+      "path": "../../packages/utils"
+    }
+  ],
   "include": ["./src/**/*.ts", "./package.json", "./__tests__/**/*.ts"],
   "exclude": ["./dist", "./node_modules"]
 }

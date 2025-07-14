@@ -29,11 +29,11 @@ RUN yarn global add turbo
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 RUN corepack enable
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 
 # Build the project
 COPY --from=builder /app/out/full/ .
-RUN pnpm turbo build --filter=@delivery/jobs
+RUN pnpm turbo build
 
 FROM base AS runner
 WORKDIR /app
@@ -43,9 +43,9 @@ RUN adduser --system --uid 1001 hono
 RUN adduser hono nodejs
 RUN chown -R hono:nodejs /app
 
-COPY --from=installer --chown=hono:nodejs /app/node_modules ./node_modules
-COPY --from=installer --chown=hono:nodejs /app/apps/jobs/node_modules ./apps/jobs/node_modules
-COPY --from=installer --chown=hono:nodejs /app/apps/jobs/dist ./apps/jobs/dist
+#COPY --from=installer --chown=hono:nodejs /app/node_modules ./node_modules
+#COPY --from=installer --chown=hono:nodejs /app/apps/jobs/node_modules ./apps/jobs/node_modules
+COPY --from=installer --chown=hono:nodejs /app .
 
 USER hono
 EXPOSE 3090
