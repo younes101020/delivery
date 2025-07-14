@@ -51,4 +51,3 @@ USER hono
 EXPOSE 3090
 
 ENTRYPOINT ["/app/apps/jobs/scripts/migrate.sh"]
-CMD ["node", "apps/jobs/dist/src/index.js"]
