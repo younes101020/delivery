@@ -38,13 +38,6 @@ RUN pnpm turbo build --filter=@delivery/drizzle
 FROM base AS runner
 WORKDIR /app
 
-COPY --from=installer /app/node_modules ./node_modules
-COPY --from=installer /app/packages/drizzle/node_modules ./packages/drizzle/node_modules
-COPY --from=installer /app/packages/drizzle/src ./packages/drizzle/src
-COPY --from=installer /app/package.json ./package.json
-COPY --from=installer /app/packages/drizzle/package.json ./packages/drizzle/package.json
-COPY --from=installer /app/packages/drizzle/drizzle.config.ts ./packages/drizzle/drizzle.config.ts
-COPY --from=installer /app/turbo.json ./turbo.json
-COPY --from=installer /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
+COPY --from=installer /app .
 
 CMD ["turbo", "migrate"]

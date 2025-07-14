@@ -43,8 +43,6 @@ RUN adduser --system --uid 1001 hono
 RUN adduser hono nodejs
 RUN chown -R hono:nodejs /app
 
-#COPY --from=installer --chown=hono:nodejs /app/node_modules ./node_modules
-#COPY --from=installer --chown=hono:nodejs /app/apps/jobs/node_modules ./apps/jobs/node_modules
 COPY --from=installer --chown=hono:nodejs /app .
 
 USER hono
