@@ -45,7 +45,10 @@ RUN chown -R hono:nodejs /app
 
 COPY --from=installer --chown=hono:nodejs /app .
 
+RUN chmod +x /app/apps/jobs/scripts/migrate.sh
+
 USER hono
 EXPOSE 3090
 
+ENTRYPOINT ["/app/apps/jobs/scripts/migrate.sh"]
 CMD ["node", "apps/jobs/dist/src/index.js"]

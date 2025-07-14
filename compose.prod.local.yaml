@@ -58,28 +58,10 @@ services:
       - proxy
     restart: unless-stopped
     depends_on:
-      migrations:
-        condition: service_completed_successfully
       bull_queue:
         condition: service_healthy
     extra_hosts:
     - "host.docker.internal:host-gateway"
-
-  migrations:
-    build:
-      context: .
-      dockerfile: ./packages/drizzle/prod.Dockerfile
-    environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - NODE_ENV=${NODE_ENV}
-      - TEST_USERS_PASSWORD=${TEST_USERS_PASSWORD}
-      - TEST_ENTITY_COUNT=${TEST_ENTITY_COUNT}
-    networks:
-      - proxy
-    restart: no
-    depends_on:
-      database:
-        condition: service_healthy
 
   database:
     image: postgres:17.5
