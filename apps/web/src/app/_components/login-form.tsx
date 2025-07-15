@@ -18,7 +18,7 @@ import { signIn } from "../(login)/actions";
 import { Paragraph } from "./ui/paragraph";
 import { Separator } from "./ui/separator";
 
-function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications" }: { mode?: "signin" | "signup"; redirectTo?: string }) {
+function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", isOnboarding }: { mode?: "signin" | "signup"; redirectTo?: string; isOnboarding?: boolean }) {
   const searchParams = useSearchParams();
   const inviteId = searchParams.get("inviteId");
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
@@ -111,7 +111,7 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications" }: 
                 </Link>
               </>
             )
-          : (
+          : !isOnboarding && (
               <>
                 Already have an account ?
                 {" "}
@@ -157,10 +157,10 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications" }: 
   );
 }
 
-export function Login({ mode = "signup", redirectTo = "/dashboard/applications" }: { mode?: "signin" | "signup"; redirectTo?: string }) {
+export function Login({ mode = "signup", redirectTo = "/dashboard/applications", isOnboarding = false }: { mode?: "signin" | "signup"; redirectTo?: string; isOnboarding?: boolean }) {
   return (
     <Suspense>
-      <LoginForm mode={mode} redirectTo={redirectTo} />
+      <LoginForm mode={mode} redirectTo={redirectTo} isOnboarding={isOnboarding} />
     </Suspense>
   );
 }

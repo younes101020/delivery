@@ -42,7 +42,7 @@ describe("onboarding process", () => {
   onBoardingTest(
     "should display error message related to registering",
     async ({ users }) => {
-      const { userAction } = setup(<Login />);
+      const { userAction } = setup(<Login isOnboarding={true} />);
       const registeredUser = users.find(user => user.registered);
       const form = within(screen.getByRole("form"));
 

@@ -71,7 +71,7 @@ async function LoginStep(props: SearchParams) {
   if (user) {
     redirect("/onboarding/?step=2");
   }
-  return <Login />;
+  return <Login isOnboarding={true} />;
 }
 
 function CheckStepStatusLoadingScreen() {
