@@ -55,7 +55,7 @@ describe("deployments utils unit tests", () => {
   });
 
   it("append application name as hostname", () => {
-    expect(parseAppHost("weatherapp", "https://younes.fr")).toBe("weatherapp.younes.fr");
+    expect(parseAppHost("weatherapp", "https://younes.fr")).toBe("younes.fr/weatherapp");
   });
 
   it("throw DEPLOYMENT_APP_ERROR error for invalid host name URL", () => {

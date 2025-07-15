@@ -24,7 +24,7 @@ describe("deployments tests", () => {
       getSystemDomainName: vi.fn().mockResolvedValue("https://domain.com"),
       fromGitUrlToQueueName: vi.fn().mockReturnValue("my-app"),
       waitForDeploymentToComplete: vi.fn(),
-      parseAppHost: vi.fn().mockReturnValue("https://my-app.domain.com"),
+      parseAppHost: vi.fn().mockReturnValue("https://domain.com/my-app"),
       transformEnvVars: vi.fn().mockReturnValue({ cmdEnvVars: `--env ${env.key}=${env.value}`, persistedEnvVars: [env] }),
     };
   });

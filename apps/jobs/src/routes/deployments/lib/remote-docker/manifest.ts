@@ -5,13 +5,12 @@ import { APPLICATION_INSTANCE_REPLICAS } from "@/routes/applications/lib/remote-
 interface ApplicationServiceSpec {
   applicationName: string;
   image: string;
-  fqdn: string;
   port: number;
   plainEnv?: string[];
   networkId: string;
 }
 
-export function createApplicationServiceSpec({ applicationName, image, fqdn, port, plainEnv, networkId }: ApplicationServiceSpec) {
+export function createApplicationServiceSpec({ applicationName, image, port, plainEnv, networkId }: ApplicationServiceSpec) {
   const manifest: Dockerode.ServiceSpec = {
     Name: applicationName,
     TaskTemplate: {
@@ -42,7 +41,7 @@ export function createApplicationServiceSpec({ applicationName, image, fqdn, por
       [`traefik.http.routers.${applicationName}.tls`]: "true",
       [`traefik.http.routers.${applicationName}.tls.certresolver`]: "tlschallenge",
       [`traefik.http.routers.${applicationName}.middlewares`]: "secHeaders@file",
-      [`traefik.http.routers.${applicationName}.rule`]: `Host(\`${fqdn}\`)`,
+      [`traefik.http.routers.${applicationName}.rule`]: `PathPrefix(\`${applicationName}\`)`,
       [`traefik.http.services.${applicationName}.loadbalancer.server.port`]: port.toString(),
     },
     UpdateConfig: {

@@ -216,8 +216,8 @@ export function parseAppHost(appName: string, hostName: string) {
       cause: error,
     });
   }
-  url.hostname = `${appName}.${url.hostname}`;
-  return url.host;
+  url.pathname = appName;
+  return `${url.host}${url.pathname}`;
 }
 
 export function convertGitToAuthenticatedUrl(gitUrl: string, token: string) {
