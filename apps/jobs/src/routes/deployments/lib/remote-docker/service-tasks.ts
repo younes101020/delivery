@@ -11,6 +11,7 @@ import { synchroniseApplicationServiceWithLocalImage } from "./utils";
 interface DefineApplicationServiceTask {
   isRedeploy: boolean;
   name: string;
+  fqdn: string;
   port: number;
 }
 
@@ -22,7 +23,7 @@ export const defineApplicationServiceTask = withDocker<void | Dockerode.Service 
         message: MISSING_DEPLOYMENT_DATA_ERROR_MESSAGE,
       });
     }
-    const { name, isRedeploy, port } = input;
+    const { name, isRedeploy, port, fqdn } = input;
     const networkId = await getApplicationNetworkID(name);
 
     if (isRedeploy)
@@ -31,6 +32,7 @@ export const defineApplicationServiceTask = withDocker<void | Dockerode.Service 
     const appServiceSpec = createApplicationServiceSpec({
       applicationName: name,
       image: name,
+      fqdn,
       port,
       networkId,
     });

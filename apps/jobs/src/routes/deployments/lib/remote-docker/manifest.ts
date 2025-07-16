@@ -6,11 +6,12 @@ interface ApplicationServiceSpec {
   applicationName: string;
   image: string;
   port: number;
+  fqdn: string;
   plainEnv?: string[];
   networkId: string;
 }
 
-export function createApplicationServiceSpec({ applicationName, image, port, plainEnv, networkId }: ApplicationServiceSpec) {
+export function createApplicationServiceSpec({ applicationName, image, port, plainEnv, networkId, fqdn }: ApplicationServiceSpec) {
   const manifest: Dockerode.ServiceSpec = {
     Name: applicationName,
     TaskTemplate: {
@@ -38,10 +39,8 @@ export function createApplicationServiceSpec({ applicationName, image, port, pla
       "resource": "application",
       "traefik.enable": "true",
       [`traefik.http.routers.${applicationName}.entrypoints`]: "web-secure",
-      [`traefik.http.routers.${applicationName}.tls`]: "true",
       [`traefik.http.routers.${applicationName}.tls.certresolver`]: "tlschallenge",
-      [`traefik.http.routers.${applicationName}.middlewares`]: "secHeaders@file",
-      [`traefik.http.routers.${applicationName}.rule`]: `PathPrefix(\`${applicationName}\`)`,
+      [`traefik.http.routers.${applicationName}.rule`]: `Host(\`${fqdn.split("/")[0]}\`) && PathPrefix(\`/${applicationName}\`)`,
       [`traefik.http.services.${applicationName}.loadbalancer.server.port`]: port.toString(),
     },
     UpdateConfig: {
