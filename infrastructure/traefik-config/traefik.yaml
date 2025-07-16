@@ -19,11 +19,11 @@ api:
 entryPoints:
   web:
     address: ':80' # http
-    http:
-      redirections:
-        entryPoint:
-          to: web-secure
-          scheme: https      
+    #http:
+    #  redirections:
+    #    entryPoint:
+    #      to: web-secure
+    #      scheme: https
   web-secure:
     address: ':443' # https
 certificatesResolvers:
