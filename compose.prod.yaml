@@ -133,7 +133,7 @@ services:
       # define traefik dashboard router and service
       - "traefik.http.routers.traefik.rule=Host(`traefik.${PUBLIC_IP}.sslip.io`)"
       - "traefik.http.routers.traefik.service=api@internal"
-      - "traefik.http.routers.traefik.tls.certresolver)=deliveryresolver"
+      - "traefik.http.routers.traefik.tls.certresolver=deliveryresolver"
       - "traefik.http.routers.traefik.entrypoints=web-secure"
       - "traefik.http.routers.traefik.middlewares=autodetectContenttype@file"
       - "traefik.http.services.traefik.loadbalancer.server.port=8080"
