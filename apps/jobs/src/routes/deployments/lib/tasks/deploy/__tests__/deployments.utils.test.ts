@@ -7,7 +7,7 @@ import { ZodError } from "zod";
 import { insertDeploymentSchema } from "@/lib/dto";
 import { DeploymentError } from "@/lib/error";
 import { it } from "@/routes/deployments/__tests__/fixtures";
-import { convertGitToAuthenticatedUrl, parseAppHost, persistedEnvVarsToCmdEnvVars, plainEnvVarsToCmdEnvVars, plainEnvVarsToPersistedEnvVars, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
+import { convertGitToAuthenticatedUrl, parseAppHost, persistedEnvVarsToCmdEnvVars, plainEnvVarsToCmdEnvVars, plainEnvVarsToPersistedEnvVars, shouldEnableTls, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
 
 const eventHandlers: Record<string, ({ jobId }: { jobId: string }) => void> = {};
 
@@ -56,6 +56,14 @@ describe("deployments utils unit tests", () => {
 
   it("append application name as hostname", () => {
     expect(parseAppHost("weatherapp", "https://younes.fr")).toBe("younes.fr/weatherapp");
+  });
+
+  it("return false for ip based url", () => {
+    expect(shouldEnableTls("https://109.152.12.3")).toBe(false);
+  });
+
+  it("return false for domain", () => {
+    expect(shouldEnableTls("https://younes.fr")).toBe(true);
   });
 
   it("throw DEPLOYMENT_APP_ERROR error for invalid host name URL", () => {

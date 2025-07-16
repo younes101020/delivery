@@ -9,7 +9,7 @@ import type { DeploymentReferenceAndDataSchema } from "@/lib/dto";
 import env from "@/env";
 import { getApplicationIdByName, getEnvironmentVariablesForApplication, getGithubAppByAppId, getSystemDomainName } from "@/lib/queries/queries";
 import { connection, getBullConnection, subscribeWorkerTo } from "@/lib/tasks/utils";
-import { fromGitUrlToQueueName, parseAppHost, persistedEnvVarsToCmdEnvVars, transformEnvVars, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
+import { fromGitUrlToQueueName, parseAppHost, persistedEnvVarsToCmdEnvVars, shouldEnableTls, transformEnvVars, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
 
 import type { QueueDeploymentJobData } from "./types";
 
@@ -78,6 +78,7 @@ export const deployApp = runDeployment(async (payload) => {
     const repoName = fromGitUrlToQueueName(repoUrl);
     const port = staticdeploy ? 80 : exposedPort!;
     const fqdn = parseAppHost(repoName, hostName);
+    const enableTls = shouldEnableTls(hostName);
     const environmentVariables = transformEnvVars(env);
 
     return {
@@ -90,6 +91,7 @@ export const deployApp = runDeployment(async (payload) => {
         cache,
         fqdn,
         repoName,
+        enableTls,
         ...(staticdeploy && { publishdir }),
       },
       configure: {

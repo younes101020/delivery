@@ -3,6 +3,7 @@ import type { Job as TJob } from "bullmq";
 import { Job, Queue, QueueEvents } from "bullmq";
 import { HTTPException } from "hono/http-exception";
 import { basename } from "node:path";
+import z from "zod/v4";
 
 import type { CurrentJobSchema, DeploymentReferenceAndDataSchema, InsertEnvironmentVariablesSchema, PreviousJobSchema } from "@/lib/dto";
 
@@ -218,6 +219,11 @@ export function parseAppHost(appName: string, hostName: string) {
   }
   url.pathname = appName;
   return `${url.host}${url.pathname}`;
+}
+
+// Return false for ip addresses and true for domain names (check tld too)
+export function shouldEnableTls(hostName: string) {
+  return z.url({ hostname: /^\D.*\.[a-z]+$/i }).safeParse(hostName).success;
 }
 
 export function convertGitToAuthenticatedUrl(gitUrl: string, token: string) {

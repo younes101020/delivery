@@ -25,6 +25,7 @@ describe("deployments tests", () => {
       fromGitUrlToQueueName: vi.fn().mockReturnValue("my-app"),
       waitForDeploymentToComplete: vi.fn(),
       parseAppHost: vi.fn().mockReturnValue("https://domain.com/my-app"),
+      shouldEnableTls: vi.fn().mockReturnValue(true),
       transformEnvVars: vi.fn().mockReturnValue({ cmdEnvVars: `--env ${env.key}=${env.value}`, persistedEnvVars: [env] }),
     };
   });
@@ -62,6 +63,7 @@ describe("deployments tests", () => {
         },
       ),
       parseAppHost: mocks.parseAppHost,
+      shouldEnableTls: mocks.shouldEnableTls,
       waitForDeploymentToComplete: mocks.waitForDeploymentToComplete,
       persistedEnvVarsToCmdEnvVars: vi.fn().mockReturnValue(`--env ${env.key}=${env.value}`),
     };
@@ -103,6 +105,7 @@ describe("deployments tests", () => {
       const queueName = mocks.fromGitUrlToQueueName();
       const env = mocks.transformEnvVars();
       const fqdn = mocks.parseAppHost();
+      const enableTls = mocks.shouldEnableTls();
       const port = staticdeploy ? 80 : exposedPort;
       mocks.getGithubAppByAppId.mockResolvedValueOnce(githubApp);
       const spy = vi.spyOn(FlowProducer.prototype, "add");
@@ -125,7 +128,7 @@ describe("deployments tests", () => {
         children: [
           {
             name: JOBS.build,
-            data: { env: env.cmdEnvVars, cache, ...(staticdeploy && { publishdir }), port, staticdeploy, fqdn, repoName: queueName, isRedeploy: false },
+            data: { env: env.cmdEnvVars, enableTls, cache, ...(staticdeploy && { publishdir }), port, staticdeploy, fqdn, repoName: queueName, isRedeploy: false },
             queueName,
             opts: { failParentOnFailure: true },
             children: [
