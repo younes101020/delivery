@@ -34,8 +34,6 @@ certificatesResolvers:
       storage: /etc/traefik/acme.json
       httpChallenge:
         entryPoint: web
-      certificatesDuration: 160
-      profile: shortlived
 global:
   checkNewVersion: true
   sendAnonymousUsage: true # disable this if you don't want to send anonymous usage data to traefik
