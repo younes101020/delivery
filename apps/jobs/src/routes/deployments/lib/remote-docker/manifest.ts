@@ -9,10 +9,9 @@ interface ApplicationServiceSpec {
   fqdn: string;
   plainEnv?: string[];
   networkId: string;
-  enableTls: boolean;
 }
 
-export function createApplicationServiceSpec({ applicationName, image, port, plainEnv, networkId, fqdn, enableTls }: ApplicationServiceSpec) {
+export function createApplicationServiceSpec({ applicationName, image, port, plainEnv, networkId, fqdn }: ApplicationServiceSpec) {
   const manifest: Dockerode.ServiceSpec = {
     Name: applicationName,
     TaskTemplate: {
@@ -39,12 +38,8 @@ export function createApplicationServiceSpec({ applicationName, image, port, pla
     Labels: {
       "resource": "application",
       "traefik.enable": "true",
-      [`traefik.http.routers.${applicationName}.entrypoints`]: enableTls ? "web-secure" : "web",
-      [`traefik.http.routers.${applicationName}.tls`]: enableTls ? "true" : "false",
-      ...(enableTls && {
-        [`traefik.http.routers.${applicationName}.tls.certresolver`]: "deliveryresolver",
-      }),
-      [`traefik.http.routers.${applicationName}.rule`]: `Host(\`${fqdn.split("/")[0]}\`) && PathPrefix(\`/${applicationName}\`)`,
+      [`traefik.http.routers.${applicationName}.entrypoints`]: "web",
+      [`traefik.http.routers.${applicationName}.rule`]: `Host(\`${fqdn}\`)`,
       [`traefik.http.services.${applicationName}.loadbalancer.server.port`]: port.toString(),
     },
     UpdateConfig: {

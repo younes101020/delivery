@@ -205,10 +205,10 @@ export function plainEnvVarsToCmdEnvVars(envs: string) {
     .join(" ");
 }
 
-export function parseAppHost(appName: string, hostName: string) {
+export function parseAppHost(appName: string, publicIpURL: string) {
   let url: URL;
   try {
-    url = new URL(hostName);
+    url = new URL(publicIpURL);
   }
   catch (error) {
     throw new DeploymentError({
@@ -217,8 +217,8 @@ export function parseAppHost(appName: string, hostName: string) {
       cause: error,
     });
   }
-  url.pathname = appName;
-  return `${url.host}${url.pathname}`;
+  url.hostname = `${appName}.${url.hostname}.sslip.io`;
+  return url.hostname;
 }
 
 // Return false for ip addresses and true for domain names (check tld too)

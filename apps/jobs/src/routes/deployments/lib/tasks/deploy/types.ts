@@ -22,7 +22,6 @@ export interface QueueDeploymentJobData {
     logs?: string;
     isCriticalError?: boolean;
     repoName: string;
-    enableTls: boolean;
   };
   configure: {
     application: Pick<Application, "port" | "githubAppId" | "name">;

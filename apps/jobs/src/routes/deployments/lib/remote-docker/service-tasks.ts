@@ -13,7 +13,6 @@ interface DefineApplicationServiceTask {
   name: string;
   fqdn: string;
   port: number;
-  enableTls: boolean;
 }
 
 export const defineApplicationServiceTask = withDocker<void | Dockerode.Service | DeploymentError, DefineApplicationServiceTask>(
@@ -24,7 +23,7 @@ export const defineApplicationServiceTask = withDocker<void | Dockerode.Service 
         message: MISSING_DEPLOYMENT_DATA_ERROR_MESSAGE,
       });
     }
-    const { name, isRedeploy, port, fqdn, enableTls } = input;
+    const { name, isRedeploy, port, fqdn } = input;
     const networkId = await getApplicationNetworkID(name);
 
     if (isRedeploy)
@@ -33,7 +32,6 @@ export const defineApplicationServiceTask = withDocker<void | Dockerode.Service 
     const appServiceSpec = createApplicationServiceSpec({
       applicationName: name,
       image: name,
-      enableTls,
       fqdn,
       port,
       networkId,

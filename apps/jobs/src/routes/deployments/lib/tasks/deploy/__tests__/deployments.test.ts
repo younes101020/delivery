@@ -24,8 +24,7 @@ describe("deployments tests", () => {
       getSystemDomainName: vi.fn().mockResolvedValue("https://domain.com"),
       fromGitUrlToQueueName: vi.fn().mockReturnValue("my-app"),
       waitForDeploymentToComplete: vi.fn(),
-      parseAppHost: vi.fn().mockReturnValue("https://domain.com/my-app"),
-      shouldEnableTls: vi.fn().mockReturnValue(true),
+      parseAppHost: vi.fn().mockReturnValue("https:///my-app.209-123-214-1.slip.io"),
       transformEnvVars: vi.fn().mockReturnValue({ cmdEnvVars: `--env ${env.key}=${env.value}`, persistedEnvVars: [env] }),
     };
   });
@@ -63,7 +62,6 @@ describe("deployments tests", () => {
         },
       ),
       parseAppHost: mocks.parseAppHost,
-      shouldEnableTls: mocks.shouldEnableTls,
       waitForDeploymentToComplete: mocks.waitForDeploymentToComplete,
       persistedEnvVarsToCmdEnvVars: vi.fn().mockReturnValue(`--env ${env.key}=${env.value}`),
     };
@@ -78,12 +76,6 @@ describe("deployments tests", () => {
       mocks.getGithubAppByAppId.mockResolvedValueOnce(null);
 
       await expect(deployApp(deployAppPayload)).rejects.toThrow(new HTTPException(HttpStatusCodes.NOT_FOUND, { message: "Github app not found" }));
-    });
-
-    it("throw error if server domain name is not found when attempting to deploy", async ({ deployAppPayload }) => {
-      mocks.getSystemDomainName.mockResolvedValueOnce(null);
-
-      await expect(deployApp(deployAppPayload)).rejects.toThrow(new HTTPException(HttpStatusCodes.NOT_FOUND, { message: "Domain name of the server not found" }));
     });
 
     it("throw error if the github app secret is not found when attempting to deploy", async ({ deployAppPayload }) => {
@@ -105,7 +97,6 @@ describe("deployments tests", () => {
       const queueName = mocks.fromGitUrlToQueueName();
       const env = mocks.transformEnvVars();
       const fqdn = mocks.parseAppHost();
-      const enableTls = mocks.shouldEnableTls();
       const port = staticdeploy ? 80 : exposedPort;
       mocks.getGithubAppByAppId.mockResolvedValueOnce(githubApp);
       const spy = vi.spyOn(FlowProducer.prototype, "add");
@@ -128,7 +119,7 @@ describe("deployments tests", () => {
         children: [
           {
             name: JOBS.build,
-            data: { env: env.cmdEnvVars, enableTls, cache, ...(staticdeploy && { publishdir }), port, staticdeploy, fqdn, repoName: queueName, isRedeploy: false },
+            data: { env: env.cmdEnvVars, cache, ...(staticdeploy && { publishdir }), port, staticdeploy, fqdn, repoName: queueName, isRedeploy: false },
             queueName,
             opts: { failParentOnFailure: true },
             children: [

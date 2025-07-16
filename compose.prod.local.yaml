@@ -34,6 +34,7 @@ services:
       context: .
       dockerfile: ./apps/jobs/prod.Dockerfile
     environment:
+      - PUBLIC_IP=${PUBLIC_IP}
       - PORT=${PORT}
       - DATABASE_URL=${DATABASE_URL}
       - LOG_LEVEL=${LOG_LEVEL}

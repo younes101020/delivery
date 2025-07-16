@@ -51,6 +51,7 @@ jobs:
         run: pnpm run test
 
     env:
+      PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
       BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}

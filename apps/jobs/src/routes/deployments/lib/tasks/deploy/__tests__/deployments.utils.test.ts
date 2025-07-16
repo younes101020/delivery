@@ -55,7 +55,7 @@ describe("deployments utils unit tests", () => {
   });
 
   it("append application name as hostname", () => {
-    expect(parseAppHost("weatherapp", "https://younes.fr")).toBe("younes.fr/weatherapp");
+    expect(parseAppHost("weatherapp", "http://209-123-212-1")).toBe("weatherapp.209-123-212-1.sslip.io");
   });
 
   it("return false for ip based url", () => {

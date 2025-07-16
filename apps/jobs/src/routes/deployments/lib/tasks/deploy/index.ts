@@ -6,10 +6,10 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { DeploymentReferenceAndDataSchema } from "@/lib/dto";
 
-import env from "@/env";
-import { getApplicationIdByName, getEnvironmentVariablesForApplication, getGithubAppByAppId, getSystemDomainName } from "@/lib/queries/queries";
+import serverEnv from "@/env";
+import { getApplicationIdByName, getEnvironmentVariablesForApplication, getGithubAppByAppId } from "@/lib/queries/queries";
 import { connection, getBullConnection, subscribeWorkerTo } from "@/lib/tasks/utils";
-import { fromGitUrlToQueueName, parseAppHost, persistedEnvVarsToCmdEnvVars, shouldEnableTls, transformEnvVars, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
+import { fromGitUrlToQueueName, parseAppHost, persistedEnvVarsToCmdEnvVars, transformEnvVars, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
 
 import type { QueueDeploymentJobData } from "./types";
 
@@ -23,7 +23,7 @@ export const JOBS = {
   build: "build",
 };
 
-const processorFile = join(dirname(fileURLToPath(import.meta.url)), env.NODE_ENV === "production" ? "../worker.js" : "../worker.ts");
+const processorFile = join(dirname(fileURLToPath(import.meta.url)), serverEnv.NODE_ENV === "production" ? "../worker.js" : "../worker.ts");
 
 function runDeployment(
   getDeploymentData: (payload: QueueName | DeploymentReferenceAndDataSchema) => Promise<QueueDeploymentJobData>,
@@ -64,21 +64,17 @@ function runDeployment(
 export const deployApp = runDeployment(async (payload) => {
   if (typeof payload === "object") {
     const { githubAppId, repoUrl, staticdeploy, env, port: exposedPort, publishdir, cache } = payload;
-    const [githubApp, hostName] = await Promise.all([getGithubAppByAppId(githubAppId), getSystemDomainName()]);
+    const githubApp = await getGithubAppByAppId(githubAppId);
 
     if (!githubApp)
       throw new HTTPException(HttpStatusCodes.NOT_FOUND, { message: "Github app not found" });
-
-    if (!hostName)
-      throw new HTTPException(HttpStatusCodes.NOT_FOUND, { message: "Domain name of the server not found" });
 
     if (!githubApp?.secret)
       throw new HTTPException(HttpStatusCodes.UNAUTHORIZED, { message: "Invalid github app secret" });
 
     const repoName = fromGitUrlToQueueName(repoUrl);
     const port = staticdeploy ? 80 : exposedPort!;
-    const fqdn = parseAppHost(repoName, hostName);
-    const enableTls = shouldEnableTls(hostName);
+    const fqdn = parseAppHost(repoName, `http://${serverEnv.PUBLIC_IP}`);
     const environmentVariables = transformEnvVars(env);
 
     return {
@@ -91,7 +87,6 @@ export const deployApp = runDeployment(async (payload) => {
         cache,
         fqdn,
         repoName,
-        enableTls,
         ...(staticdeploy && { publishdir }),
       },
       configure: {
