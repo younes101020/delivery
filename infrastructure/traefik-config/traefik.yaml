@@ -27,12 +27,11 @@ entryPoints:
   web-secure:
     address: ':443' # https
 certificatesResolvers:
-  tlschallenge:
+  deliveryresolver:
     acme:
       caServer: https://acme-staging-v02.api.letsencrypt.org/directory # IMPORTANT: comment out this line to get production ready certificates. After this, clear acme.json file.
       email: pedoy59842@nutrv.com
       storage: /etc/traefik/acme.json
-      tlsChallenge: {}
       httpChallenge:
         entryPoint: web
       certificatesDuration: 160
