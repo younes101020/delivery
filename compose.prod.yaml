@@ -130,6 +130,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "resource=reverse-proxy:delivery"
+      - "traefik.docker.network=proxy"
 
       # define traefik dashboard router and service
       - "traefik.http.routers.traefik.rule=Host(`traefik.${PUBLIC_IP}.sslip.io`)"
@@ -152,7 +153,7 @@ services:
 
 networks:
   proxy:
-    name: proxy
+    external: true
 
 volumes:
   postgres_data:

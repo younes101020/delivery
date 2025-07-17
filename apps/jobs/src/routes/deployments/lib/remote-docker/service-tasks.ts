@@ -2,7 +2,7 @@ import type Dockerode from "dockerode";
 
 import { DeploymentError } from "@/lib/error";
 import { withDocker } from "@/lib/remote-docker/middleware";
-import { getApplicationNetworkID } from "@/routes/applications/lib/remote-docker/utils";
+// import { getApplicationNetworkID } from "@/routes/applications/lib/remote-docker/utils";
 
 import { MISSING_DEPLOYMENT_DATA_ERROR_MESSAGE } from "./const";
 import { createApplicationServiceSpec } from "./manifest";
@@ -24,7 +24,7 @@ export const defineApplicationServiceTask = withDocker<void | Dockerode.Service 
       });
     }
     const { name, isRedeploy, port, fqdn } = input;
-    const networkId = await getApplicationNetworkID(name);
+    // const networkId = await getApplicationNetworkID(name);
 
     if (isRedeploy)
       return await synchroniseApplicationServiceWithLocalImage(name);
@@ -34,7 +34,7 @@ export const defineApplicationServiceTask = withDocker<void | Dockerode.Service 
       image: name,
       fqdn,
       port,
-      networkId,
+      // networkId,
     });
 
     return await docker.createService(appServiceSpec).catch((error) => {

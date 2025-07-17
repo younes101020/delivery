@@ -8,10 +8,10 @@ interface ApplicationServiceSpec {
   port: number;
   fqdn: string;
   plainEnv?: string[];
-  networkId: string;
+  // networkId: string;
 }
 
-export function createApplicationServiceSpec({ applicationName, image, port, plainEnv, networkId, fqdn }: ApplicationServiceSpec) {
+export function createApplicationServiceSpec({ applicationName, image, port, plainEnv, fqdn }: ApplicationServiceSpec) {
   const manifest: Dockerode.ServiceSpec = {
     Name: applicationName,
     TaskTemplate: {
@@ -19,11 +19,11 @@ export function createApplicationServiceSpec({ applicationName, image, port, pla
         Image: image,
         Env: plainEnv ? ["CI=false", ...plainEnv] : ["CI=false"],
       },
-      Networks: [
+      /* Networks: [
         {
           Target: networkId,
         },
-      ],
+      ], */
       RestartPolicy: {
         Condition: "on-failure",
         Delay: 5,
