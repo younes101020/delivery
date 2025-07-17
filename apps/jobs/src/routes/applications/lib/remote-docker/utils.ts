@@ -29,6 +29,7 @@ export const getApplicationNetworkID = withDocker<string, string>(async (docker,
     IPAM: {
       Driver: "default",
     },
+    Attachable: true,
   });
 
   return network.id;
