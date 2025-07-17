@@ -13,8 +13,16 @@ services:
         - JOBS_BEARER_TOKEN=${JOBS_BEARER_TOKEN}
         - JOBS_API_BASEURL=${JOBS_API_BASEURL}
         - BASE_URL=${BASE_URL}
-    volumes:
-      - ./apps/web/src:/app/src
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.web.entrypoints=web-secure"
+        - "traefik.http.routers.web.rule=Host(`${PUBLIC_IP}.sslip.io`)"
+        - "traefik.http.routers.web.tls=true"
+        - "traefik.http.routers.web.tls.certresolver=deliveryresolver"
+        - "traefik.http.services.web.loadbalancer.server.port=3000"
+        - "resource=delivery-web-instance"
+        - "traefik.docker.network=proxy"
     environment:
       - AUTH_SECRET=${AUTH_SECRET}
       - JOBS_BEARER_TOKEN=${JOBS_BEARER_TOKEN}
@@ -24,17 +32,6 @@ services:
       - 3000:3000
     networks:
       - proxy
-    depends_on:
-      - jobs
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.web.entrypoints=web-secure"
-      - "traefik.http.routers.web.rule=Host(`${PUBLIC_IP}.sslip.io`)"
-      - "traefik.http.routers.web.tls=true"
-      - "traefik.http.routers.web.tls.certresolver=deliveryresolver"
-      - "traefik.http.services.web.loadbalancer.server.port=3000"
-      - "resource=delivery-web-instance"
 
   jobs:
     image: younes60/jobs:${DOCKER_TAGS:-latest}
@@ -69,10 +66,6 @@ services:
       - 3090:3090
     networks:
       - proxy
-    restart: unless-stopped
-    depends_on:
-      bull_queue:
-        condition: service_healthy
 
   database:
     image: postgres:17.5
@@ -87,7 +80,6 @@ services:
     volumes:
       - ./infrastructure/database:/docker-entrypoint-initdb.d/
       - ${PWD}/db-data/:/var/lib/postgresql@16/data
-    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 5s
@@ -99,7 +91,6 @@ services:
     ports:
       - 9000:9000
       - 9001:9001
-    restart: unless-stopped
     environment:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
@@ -114,7 +105,6 @@ services:
       - 6379:6379
     networks:
       - proxy
-    restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -127,18 +117,18 @@ services:
       placement:
         constraints:
           - node.role == manager
-    labels:
-      - "traefik.enable=true"
-      - "resource=reverse-proxy:delivery"
-      - "traefik.docker.network=proxy"
+      labels:
+        - "traefik.enable=true"
+        - "resource=reverse-proxy:delivery"
+        - "traefik.docker.network=proxy"
 
-      # define traefik dashboard router and service
-      - "traefik.http.routers.traefik.rule=Host(`traefik.${PUBLIC_IP}.sslip.io`)"
-      - "traefik.http.routers.traefik.service=api@internal"
-      - "traefik.http.routers.traefik.tls.certresolver=deliveryresolver"
-      - "traefik.http.routers.traefik.entrypoints=web-secure"
-      - "traefik.http.routers.traefik.middlewares=autodetectContenttype@file"
-      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+        # define traefik dashboard router and service
+        - "traefik.http.routers.traefik.rule=Host(`traefik.${PUBLIC_IP}.sslip.io`)"
+        - "traefik.http.routers.traefik.service=api@internal"
+        - "traefik.http.routers.traefik.tls.certresolver=deliveryresolver"
+        - "traefik.http.routers.traefik.entrypoints=web-secure"
+        - "traefik.http.routers.traefik.middlewares=autodetectContenttype@file"
+        - "traefik.http.services.traefik.loadbalancer.server.port=8080"
     ports:
       - "80:80"
       - "443:443"
@@ -149,7 +139,6 @@ services:
       - ./infrastructure/traefik-config/acme.json:/etc/traefik/acme.json           # TLS certificate storage
     networks:
       - proxy
-    restart: unless-stopped
 
 networks:
   proxy:
