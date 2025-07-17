@@ -6,11 +6,11 @@ providers:
   docker:
     exposedByDefault: false
     endpoint: 'unix:///var/run/docker.sock'
-    network: proxy
+    network: astro-tech-blog
   swarm:
     exposedByDefault: false
     endpoint: "unix:///var/run/docker.sock"
-    network: proxy
+    network: astro-tech-blog
   file:
     filename: /etc/traefik/dynamic.yaml
     watch: true
