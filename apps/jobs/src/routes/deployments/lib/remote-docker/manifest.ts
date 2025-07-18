@@ -11,6 +11,8 @@ interface ApplicationServiceSpec {
   // networkId: string;
 }
 
+const CLUSTER_NETWORK_NAME = "proxy";
+
 export function createApplicationServiceSpec({ applicationName, image, port, plainEnv, fqdn }: ApplicationServiceSpec) {
   const manifest: Dockerode.ServiceSpec = {
     Name: applicationName,
@@ -19,11 +21,11 @@ export function createApplicationServiceSpec({ applicationName, image, port, pla
         Image: image,
         Env: plainEnv ? ["CI=false", ...plainEnv] : ["CI=false"],
       },
-      /* Networks: [
+      Networks: [
         {
-          Target: networkId,
+          Target: CLUSTER_NETWORK_NAME,
         },
-      ], */
+      ],
       RestartPolicy: {
         Condition: "on-failure",
         Delay: 5,
