@@ -6,7 +6,7 @@ RUN corepack enable
 
 FROM base AS builder
 RUN apk update
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache su-exec libc6-compat
 
 WORKDIR /app
 
@@ -47,7 +47,6 @@ COPY --from=installer --chown=hono:nodejs /app .
 
 RUN chmod +x /app/apps/jobs/scripts/migrate.sh
 
-USER hono
 EXPOSE 3090
 
 ENTRYPOINT ["/app/apps/jobs/scripts/migrate.sh"]
