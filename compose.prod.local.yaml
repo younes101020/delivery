@@ -26,8 +26,6 @@ services:
 
   jobs:
     image: younes60/jobs:${DOCKER_TAGS}
-    group_add:
-      - ${DOCKER_GID:-999}
     build:
       context: .
       dockerfile: ./apps/jobs/prod.Dockerfile
@@ -48,6 +46,7 @@ services:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - ENABLE_DEPLOYMENT_QUEUE_MONITORING=${ENABLE_DEPLOYMENT_QUEUE_MONITORING}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - DOCKER_GID=${DOCKER_GID}
     volumes:
       - /data/delivery/ssh/keys:/var/ssh/keys
       - /var/run/docker.sock:/var/run/docker.sock
