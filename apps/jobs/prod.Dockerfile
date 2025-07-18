@@ -6,7 +6,7 @@ RUN corepack enable
 
 FROM base AS builder
 RUN apk update
-RUN apk add --no-cache su-exec libc6-compat
+RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 
@@ -37,6 +37,8 @@ RUN pnpm turbo build
 
 FROM base AS runner
 WORKDIR /app
+
+RUN apk add --no-cache su-exec
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 hono
