@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --turbopack",
     "start": "next start",
     "lint": "LINT=true next lint",
     "lint:fix": "LINT=true next lint --fix",
