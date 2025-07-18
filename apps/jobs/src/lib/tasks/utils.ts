@@ -14,7 +14,7 @@ const shouldUseServiceNameAsHostname = await checkIsContainerized() && env.CI !=
 export const connection = new IORedis({
   maxRetriesPerRequest: null,
   port: 6379,
-  host: shouldUseServiceNameAsHostname ? "bull_queue" : "localhost",
+  host: shouldUseServiceNameAsHostname ? "delivery_bull_queue" : "localhost",
   password: env.REDIS_PASSWORD,
 });
 
