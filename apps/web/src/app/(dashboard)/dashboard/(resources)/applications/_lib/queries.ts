@@ -20,18 +20,17 @@ export async function getApplicationByName(params: GetApplicationByNameParams) {
 
 interface GetApplicationScreenshotParams {
   params: Promise<{ name: string }>;
-  applicationUrl?: string;
 }
 
 export async function getApplicationSreenshotUrl({
   params,
-  applicationUrl = "https://facebook.com",
 }: GetApplicationScreenshotParams) {
   const { name } = await params;
+  const appDetails = await getApplicationByName(params);
   const response = await client.screenshots.$post({
     json: {
       applicationName: name,
-      url: applicationUrl,
+      url: appDetails?.fqdn || "",
     },
   });
   if (response.status !== 200) {
