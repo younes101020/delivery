@@ -9,6 +9,6 @@ interface Params {
 }
 
 export async function GET(_: Request, { params }: Params) {
-  const appPreviewImg = await getApplicationSreenshotUrl({ searchParams: params });
+  const appPreviewImg = await getApplicationSreenshotUrl({ params });
   return Response.json(appPreviewImg);
 }
