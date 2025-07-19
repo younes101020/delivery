@@ -14,10 +14,10 @@ import { ApplicationDetails } from "./_components/app-details";
 import { ApplicationScreenshot } from "./_components/app-screenshot";
 
 interface ApplicationPageProps {
-  searchParams: Promise<{ name: string }>;
+  params: Promise<{ name: string }>;
 }
 
-export default function ApplicationPage({ searchParams }: ApplicationPageProps) {
+export default function ApplicationPage({ params }: ApplicationPageProps) {
   return (
     <section className="p-5 bg-background/50 border">
       <PageTitle>Application configuration</PageTitle>
@@ -26,24 +26,24 @@ export default function ApplicationPage({ searchParams }: ApplicationPageProps) 
       </PageDescription>
       <div className="mt-8 grid grid-cols-4 gap-4">
         <Suspense fallback={<PendingApplication />}>
-          <Application searchParams={searchParams} />
+          <Application params={params} />
         </Suspense>
       </div>
     </section>
   );
 }
 
-async function Application({ searchParams }: ApplicationPageProps) {
+async function Application({ params }: ApplicationPageProps) {
   const queryClient = getQueryClient();
 
   await Promise.all([
     queryClient.prefetchQuery({
       queryKey: ["applications", "details"],
-      queryFn: () => getApplicationByName(searchParams),
+      queryFn: () => getApplicationByName(params),
     }),
     queryClient.prefetchQuery({
       queryKey: ["applications", "screenshot"],
-      queryFn: () => getApplicationSreenshotUrl({ searchParams }),
+      queryFn: () => getApplicationSreenshotUrl({ params }),
     }),
   ]);
 

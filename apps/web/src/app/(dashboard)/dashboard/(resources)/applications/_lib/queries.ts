@@ -4,12 +4,9 @@ import { client } from "@/app/_lib/client-http";
 
 type GetApplicationByNameParams = Promise<{ name: string }>;
 
-export async function getApplicationByName(searchParams: GetApplicationByNameParams) {
-  const { name } = await searchParams;
-  return getCachedApplicationByName(name);
-}
+export async function getApplicationByName(params: GetApplicationByNameParams) {
+  const { name } = await params;
 
-async function getCachedApplicationByName(name: string) {
   const response = await client.applications[":name"].$get({
     param: {
       name,
@@ -22,15 +19,15 @@ async function getCachedApplicationByName(name: string) {
 }
 
 interface GetApplicationScreenshotParams {
-  searchParams: Promise<{ name: string }>;
+  params: Promise<{ name: string }>;
   applicationUrl?: string;
 }
 
 export async function getApplicationSreenshotUrl({
-  searchParams,
+  params,
   applicationUrl = "https://facebook.com",
 }: GetApplicationScreenshotParams) {
-  const { name } = await searchParams;
+  const { name } = await params;
   const response = await client.screenshots.$post({
     json: {
       applicationName: name,
