@@ -8,7 +8,7 @@ if (process.env.CI !== "true") {
 
 const EnvSchema = z.object({
   NODE_ENV: z.string().default("development"),
-  PUBLIC_IP: z.string(),
+  PUBLIC_IP: process.env.NODE_ENV === "production" ? z.string() : z.string().default("localhost"),
   MINIO_ENDPOINT: z.string().default("localhost"),
   MINIO_PORT: z.coerce.number().default(9000),
   PORT: z.coerce.number().default(9999),
