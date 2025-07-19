@@ -11,7 +11,7 @@ import type { AppOpenAPI } from "./types";
 import { connection, getBullConnection } from "./tasks/utils";
 
 const BASE_PATH = "/bull-board-ui";
-const DEPLOYED_APP_NAME = "example-nextjs-15";
+const DEPLOYED_APP_NAME = "portfolio";
 
 export default function configureBullBoard(app: AppOpenAPI) {
   const serverAdapter = new HonoAdapter(serveStatic);
