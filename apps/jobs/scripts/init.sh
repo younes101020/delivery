@@ -11,8 +11,5 @@ addgroup hono docker || true
 # run sql migrations
 pnpm -C /app/packages/drizzle run migrate
 
-# install browsers for screenshots service
-pnpm -C /app/apps/jobs dlx puppeteer browsers install
-
 # start the application as the runtime user
 exec su-exec hono sh -c "exec node /app/apps/jobs/dist/src/index.js"
