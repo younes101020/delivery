@@ -30,7 +30,7 @@ export async function getApplicationSreenshotUrl({
   const response = await client.screenshots.$post({
     json: {
       applicationName: name,
-      url: appDetails?.fqdn || "",
+      url: `http://${appDetails?.fqdn}` || "",
     },
   });
   if (response.status !== 200) {
