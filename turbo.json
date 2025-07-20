@@ -1,6 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalEnv": ["DATABASE_URL", "LOG_LEVEL", "BEARER_TOKEN", "PUPPETEER_CACHE_DIR"],
+  "globalEnv": ["DATABASE_URL", "LOG_LEVEL", "BEARER_TOKEN"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -36,7 +36,7 @@
     },
     "@delivery/web#build": {
       "dependsOn": ["@delivery/jobs#build"],
-      "env": ["BASE_URL", "AUTH_SECRET", "JOBS_BEARER_TOKEN", "JOBS_API_BASEURL", "DATABASE_URL", "MINIO_ROOT_USER", "MINIO_ROOT_PASSWORD", "MINIO_ENDPOINT", "MINIO_PORT", "MINIO_BUCKETS", "SSH_HOST", "PORT", "LOG_LEVEL", "BEARER_TOKEN", "TEST_USERS_PASSWORD", "TEST_ENTITY_COUNT", "MINIO_PUBLIC_DOMAIN", "PUBLIC_IP", "PUPPETEER_CACHE_DIR"]
+      "env": ["BASE_URL", "AUTH_SECRET", "JOBS_BEARER_TOKEN", "JOBS_API_BASEURL", "DATABASE_URL", "MINIO_ROOT_USER", "MINIO_ROOT_PASSWORD", "MINIO_ENDPOINT", "MINIO_PORT", "MINIO_BUCKETS", "SSH_HOST", "PORT", "LOG_LEVEL", "BEARER_TOKEN", "TEST_USERS_PASSWORD", "TEST_ENTITY_COUNT", "MINIO_PUBLIC_DOMAIN", "PUBLIC_IP"]
     },
     "@delivery/web#test": {
       "dependsOn": ["@delivery/jobs#test"],

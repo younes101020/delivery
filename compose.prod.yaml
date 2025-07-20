@@ -58,7 +58,6 @@ services:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
       - DOCKER_GID=${DOCKER_GID}
-      - PUPPETEER_CACHE_DIR=${PUPPETEER_CACHE_DIR}
     volumes:
       - /data/delivery/ssh/keys:/var/ssh/keys
       - /var/run/docker.sock:/var/run/docker.sock
