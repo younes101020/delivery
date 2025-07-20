@@ -8,8 +8,8 @@ if ! getent group docker > /dev/null 2>&1; then
 fi
 addgroup hono docker || true
 
-# run sql migrations and start the application as the runtime user
-exec su-exec hono sh -c "
-  pnpm -C /app/packages/drizzle run migrate &&
-  exec node /app/apps/jobs/dist/src/index.js
-"
+# run sql migrations
+pnpm -C /app/packages/drizzle run migrate
+
+# start the application as the runtime user
+exec su-exec hono sh -c "exec node /app/apps/jobs/dist/src/index.js"
