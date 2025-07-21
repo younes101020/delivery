@@ -63,28 +63,8 @@ jobs:
       JOBS_API_BASEURL: ${{ vars.JOBS_API_BASEURL }}
       BASE_URL: ${{ vars.BASE_URL }}
       TEST_USERS_PASSWORD: ${{ secrets.TEST_USERS_PASSWORD }}
-      MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
-      MINIO_ENDPOINT: ${{ vars.MINIO_ENDPOINT }}
-      MINIO_PORT: ${{ vars.MINIO_PORT }}
-      MINIO_PUBLIC_DOMAIN: ${{ vars.MINIO_PUBLIC_DOMAIN }}
-      MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
         
     services:
-      screenshots-storage:
-        image: bitnami/minio:2025.3.12
-        ports:
-          - 9000:9000
-          - 9001:9001
-        env:
-          MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
-          MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
-          MINIO_SERVER_ACCESS_KEY: ${{ secrets.MINIO_SERVER_ACCESS_KEY }}
-          MINIO_SERVER_SECRET_KEY: ${{ secrets.MINIO_SERVER_SECRET_KEY }}
-          MINIO_DEFAULT_BUCKETS: ${{ vars.MINIO_DEFAULT_BUCKETS }}
-          MINIO_ENDPOINT: ${{ vars.MINIO_ENDPOINT }}
-        volumes:
-          - ${{ github.workspace }}/data:/data
-        options: --name=minio --health-cmd "curl http://localhost:9000/minio/health/live"
       db:
         image: postgres:13.21-alpine3.20
         env:

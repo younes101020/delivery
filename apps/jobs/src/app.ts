@@ -7,7 +7,6 @@ import databases from "@/routes/databases/databases.index";
 import deployments from "@/routes/deployments/deployments.index";
 import githubApps from "@/routes/githubapps/githubapps.index";
 import index from "@/routes/index.route";
-import screenshots from "@/routes/screenshots/screenshots.index";
 import serverConfig from "@/routes/server-config/server-config.index";
 import invitation from "@/routes/users/team/invitation/invitation.index";
 import team from "@/routes/users/team/team.index";
@@ -31,7 +30,6 @@ const routes = [
   serverConfig,
   auth,
   applications,
-  screenshots,
   databases,
 ] as const;
 

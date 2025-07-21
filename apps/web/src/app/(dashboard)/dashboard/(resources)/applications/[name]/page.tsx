@@ -7,11 +7,10 @@ import { Separator } from "@/app/_components/ui/separator";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { getQueryClient } from "@/app/_lib/get-rsc-query-client";
 
-import { getApplicationByName, getApplicationSreenshotUrl } from "../_lib/queries";
+import { getApplicationByName } from "../_lib/queries";
 import { ApplicationConfiguration } from "./_components/app-configuration";
 import { ApplicationDelete } from "./_components/app-delete";
 import { ApplicationDetails } from "./_components/app-details";
-import { ApplicationScreenshot } from "./_components/app-screenshot";
 
 interface ApplicationPageProps {
   params: Promise<{ name: string }>;
@@ -25,9 +24,6 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
         Configure your application settings from here.
       </PageDescription>
       <div className="mt-8 grid grid-cols-4 gap-4">
-        <Suspense fallback={<PendingScreenshot />}>
-          <Screenshot params={params} />
-        </Suspense>
         <Suspense fallback={<PendingApplication />}>
           <Application params={params} />
         </Suspense>
@@ -62,27 +58,6 @@ async function Application({ params }: ApplicationPageProps) {
   );
 }
 
-async function Screenshot({ params }: ApplicationPageProps) {
-  const queryClient = getQueryClient();
-
-  await queryClient.prefetchQuery({
-    queryKey: ["applications", "screenshot"],
-    queryFn: () => getApplicationSreenshotUrl({ params }),
-  });
-
-  return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <ApplicationScreenshot />
-    </HydrationBoundary>
-  );
-}
-
 function PendingApplication() {
   return <Skeleton className="h-full w-full" />;
-}
-
-function PendingScreenshot() {
-  return (
-    <Skeleton className="w-1/2 h-full" />
-  );
 }

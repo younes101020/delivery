@@ -38,14 +38,7 @@ RUN pnpm turbo build
 FROM base AS runner
 WORKDIR /app
 
-RUN apk add --no-cache \
-  su-exec \
-  chromium \
-  nss \
-  freetype \
-  harfbuzz \
-  ca-certificates \
-  ttf-freefont
+RUN apk add --no-cache su-exec 
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 hono

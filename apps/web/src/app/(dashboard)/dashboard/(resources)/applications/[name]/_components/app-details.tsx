@@ -10,6 +10,7 @@ import { useFetch } from "@/app/_lib/fetch-provider";
 import type { Application } from "../../_lib/queries";
 
 import { AppDate } from "./app-date";
+import { AspectRatio } from "./ui/aspect-ratio";
 
 export function ApplicationDetails() {
   return (
@@ -31,7 +32,25 @@ function ApplicationDetailsWithData() {
   if (!data)
     router.push("/dashboard/applications");
 
-  return <ApplicationDetailsTemplate application={data} />;
+  return (
+    <>
+      {data?.fqdn && <ApplicationIframe fqdn={data.fqdn} />}
+      <ApplicationDetailsTemplate application={data} />
+    </>
+  );
+}
+
+function ApplicationIframe({ fqdn }: { fqdn: string }) {
+  // ignore tls for auto generated domains
+  const appURL = fqdn.includes("sslip.io") ? `http://${fqdn}` : `https://${fqdn}`;
+  return (
+    <div className="col-span-4 md:col-span-3 lg:col-span-1">
+      <AspectRatio ratio={16 / 9}>
+        <iframe allowFullScreen className="h-full w-full" src={appURL}></iframe>
+      </AspectRatio>
+    </div>
+
+  );
 }
 
 function ApplicationDetailsTemplate({ application, isPending = false }: { application?: Application; isPending?: boolean }) {

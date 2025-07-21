@@ -51,12 +51,7 @@ services:
       - SSH_HOST=${SSH_HOST}
       - BEARER_TOKEN=${BEARER_TOKEN}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - MINIO_SERVER_ACCESS_KEY=${MINIO_SERVER_ACCESS_KEY}
-      - MINIO_SERVER_SECRET_KEY=${MINIO_SERVER_SECRET_KEY}
-      - MINIO_PUBLIC_DOMAIN=${MINIO_PUBLIC_DOMAIN}
       - TEST_USERS_PASSWORD=${TEST_USERS_PASSWORD}
-      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
-      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
       - DOCKER_GID=${DOCKER_GID}
     volumes:
       - /data/delivery/ssh/keys:/var/ssh/keys
@@ -84,18 +79,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-  
-  screenshots-storage:
-    image: bitnami/minio:2025.3.12
-    ports:
-      - 9000:9000
-      - 9001:9001
-    environment:
-      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
-      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
-      - MINIO_DEFAULT_BUCKETS=${MINIO_DEFAULT_BUCKETS}
-    networks:
-      - proxy
   
   bull_queue:
     image: redis:8.0.1
