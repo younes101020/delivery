@@ -35,6 +35,7 @@ jobs:
 
       - name: Enable corepack & install global tools
         run: |
+          pnpm self-update
           corepack enable
           pnpm add -g pnpm
           pnpm add -g turbo@^2.3.3
