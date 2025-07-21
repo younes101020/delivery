@@ -9,32 +9,19 @@ jobs:
   ci:
     name: Execute lint and tests
     runs-on: ubuntu-latest
-    container:
-      image: node:20-alpine
     environment: test
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Update apk & install dependencies
-        run: |
-          apk update
-          apk add --no-cache \
-            libc6-compat \
-            su-exec \
-            chromium \
-            curl \
-            bash \
-            py3-pip \
-            git \
-            docker-cli
-
       - uses: pnpm/action-setup@v4
         name: Install pnpm
 
-      - name: Enable corepack & install global tools
-        run: pnpm add -g turbo@^2.3.3
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
         
       # Since we can't pass arguments to redis runner service, we need to run it manually (ref: https://github.com/actions/runner/pull/1152)
       - name: Start Redis
@@ -59,6 +46,9 @@ jobs:
 
       - name: Lint
         run: pnpm run lint
+
+      - name: Install Chromium Browser for screenshots related service
+        run: sudo apt-get update && sudo apt-get install -y chromium-browser
 
       - name: Integration and unit tests
         run: pnpm run test
