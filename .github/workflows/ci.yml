@@ -17,6 +17,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v4
+
       - name: Install system dependencies
         run: |
           apk update && apk add --no-cache libc6-compat su-exec chromium
