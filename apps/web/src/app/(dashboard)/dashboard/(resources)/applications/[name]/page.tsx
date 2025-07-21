@@ -25,6 +25,9 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
         Configure your application settings from here.
       </PageDescription>
       <div className="mt-8 grid grid-cols-4 gap-4">
+        <Suspense fallback={<PendingScreenshot />}>
+          <Screenshot params={params} />
+        </Suspense>
         <Suspense fallback={<PendingApplication />}>
           <Application params={params} />
         </Suspense>
@@ -36,20 +39,13 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
 async function Application({ params }: ApplicationPageProps) {
   const queryClient = getQueryClient();
 
-  await Promise.all([
-    queryClient.prefetchQuery({
-      queryKey: ["applications", "details"],
-      queryFn: () => getApplicationByName(params),
-    }),
-    queryClient.prefetchQuery({
-      queryKey: ["applications", "screenshot"],
-      queryFn: () => getApplicationSreenshotUrl({ params }),
-    }),
-  ]);
+  await queryClient.prefetchQuery({
+    queryKey: ["applications", "details"],
+    queryFn: () => getApplicationByName(params),
+  });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <ApplicationScreenshot />
       <ApplicationDetails />
       <div className="col-span-4 mt-4">
         <Separator className="mb-4" />
@@ -66,6 +62,27 @@ async function Application({ params }: ApplicationPageProps) {
   );
 }
 
+async function Screenshot({ params }: ApplicationPageProps) {
+  const queryClient = getQueryClient();
+
+  await queryClient.prefetchQuery({
+    queryKey: ["applications", "screenshot"],
+    queryFn: () => getApplicationSreenshotUrl({ params }),
+  });
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <ApplicationScreenshot />
+    </HydrationBoundary>
+  );
+}
+
 function PendingApplication() {
   return <Skeleton className="h-full w-full" />;
+}
+
+function PendingScreenshot() {
+  return (
+    <Skeleton className="w-1/2 h-full" />
+  );
 }
