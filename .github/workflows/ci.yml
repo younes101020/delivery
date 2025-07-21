@@ -36,7 +36,6 @@ jobs:
       - name: Enable corepack & install global tools
         run: |
           corepack enable
-          pnpm add -g pnpm
           pnpm add -g turbo@^2.3.3
         
       # Since we can't pass arguments to redis runner service, we need to run it manually (ref: https://github.com/actions/runner/pull/1152)
