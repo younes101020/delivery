@@ -9,7 +9,7 @@ import { toWebp } from "./utils";
 export async function screenPage(url: string) {
   const browser = await puppeteer.launch({
     executablePath: env.NODE_ENV === "production" ? "/usr/bin/chromium-browser" : undefined,
-    args: ["--no-sandbox", "--disable-setuid-sandbox", "--ignore-certificate-errors"]
+    args: ["--no-sandbox", "--disable-setuid-sandbox", "--ignore-certificate-errors"],
   });
 
   const page = await browser.newPage();
