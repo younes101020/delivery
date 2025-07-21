@@ -17,12 +17,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Docker
-        uses: docker/setup-docker-action@v4
-
-      - name: Install system dependencies
+      - name: Update apk & install dependencies
         run: |
-          apk update && apk add --no-cache libc6-compat su-exec chromium
+          apk update
+          apk add --no-cache \
+            libc6-compat \
+            su-exec \
+            chromium \
+            curl \
+            bash \
+            py3-pip \
+            git \
+            docker-cli
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
