@@ -47,9 +47,6 @@ jobs:
       - name: Lint
         run: pnpm run lint
 
-      - name: Install Chromium Browser for screenshots related service
-        run: sudo apt-get update && sudo apt-get install -y chromium-browser
-
       - name: Integration and unit tests
         run: pnpm run test
 

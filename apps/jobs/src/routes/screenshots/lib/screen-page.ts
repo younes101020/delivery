@@ -2,11 +2,13 @@ import { HTTPException } from "hono/http-exception";
 import puppeteer from "puppeteer";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
+import env from "@/env";
+
 import { toWebp } from "./utils";
 
 export async function screenPage(url: string) {
   const browser = await puppeteer.launch({
-    executablePath: "/usr/bin/chromium-browser",
+    executablePath: env.NODE_ENV === "production" ? "/usr/bin/chromium-browser" : undefined,
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
 
