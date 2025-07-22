@@ -1,10 +1,10 @@
 import { createRoute } from "@hono/zod-openapi";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
-import { createErrorSchema } from "stoker/openapi/schemas";
+import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 
 import { notFoundSchema } from "@/lib/constants";
-import { patchServerConfigSchema, patchServerInstanceConfigSchema, selectServerConfigSchema, selectServerInstanceConfigSchema } from "@/lib/dto/server-config.dto";
+import { patchServerConfigSchema, patchServerWebServiceConfigSchema, selectServerConfigSchema, selectServerWebServiceConfigSchema } from "@/routes/server-config/lib/dto/server-config.dto";
 
 const tags = ["Server configuration"];
 
@@ -37,30 +37,31 @@ export const patch = createRoute({
   },
 });
 
-export const getInstance = createRoute({
-  path: "/serverconfig/instance",
+export const getWebService = createRoute({
+  path: "/serverconfig/web-service",
   method: "get",
-  description: "Get the configuration of the delivery dashboard instance",
+  description: "Get the configuration of the delivery dashboard service",
   tags,
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(selectServerInstanceConfigSchema, "Delivery web instance configuration details"),
+    [HttpStatusCodes.OK]: jsonContent(selectServerWebServiceConfigSchema, "Delivery web service configuration details"),
   },
 });
 
-export const patchInstance = createRoute({
-  path: "/serverconfig/instance",
+export const patchWebService = createRoute({
+  path: "/serverconfig/web-service/{id}",
   method: "patch",
-  description: "Update the configuration of the delivery dashboard instance",
+  description: "Update the configuration of the delivery dashboard service",
   request: {
-    body: jsonContentRequired(patchServerInstanceConfigSchema, "The delivery web instance updates"),
+    params: IdParamsSchema,
+    body: jsonContentRequired(patchServerWebServiceConfigSchema, "The delivery web service updates"),
   },
   tags,
   responses: {
     [HttpStatusCodes.OK]: {
-      description: "Web instance configuration updated",
+      description: "Web service configuration updated",
     },
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(patchServerInstanceConfigSchema),
+      createErrorSchema(patchServerWebServiceConfigSchema),
       "The validation error(s)",
     ),
   },
@@ -68,5 +69,5 @@ export const patchInstance = createRoute({
 
 export type PatchRoute = typeof patch;
 export type GetFirstRoute = typeof getFirst;
-export type PatchInstanceRoute = typeof patchInstance;
-export type GetInstanceRoute = typeof getInstance;
+export type PatchServiceRoute = typeof patchWebService;
+export type GetServiceRoute = typeof getWebService;

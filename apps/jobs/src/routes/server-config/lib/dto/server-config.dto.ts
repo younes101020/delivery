@@ -6,10 +6,13 @@ export const selectServerConfigSchema = createSelectSchema(systemConfig);
 export const insertServerConfigSchema = createInsertSchema(systemConfig);
 export const patchServerConfigSchema = insertServerConfigSchema.partial();
 
-export const selectServerInstanceConfigSchema = z.object({
+export const selectServerWebServiceConfigSchema = z.object({
   name: z.string(),
   fqdn: z.string().optional(),
+  serviceId: z.string(),
 });
-export const patchServerInstanceConfigSchema = selectServerInstanceConfigSchema.partial();
+export const patchServerWebServiceConfigSchema = selectServerWebServiceConfigSchema.partial();
 
+export type GetServerWebServiceConfigSchema = z.infer<typeof selectServerWebServiceConfigSchema>;
 export type InsertServerConfigSchema = z.infer<typeof insertServerConfigSchema>;
+export type PatchServerWebServiceConfigSchema = z.infer<typeof patchServerWebServiceConfigSchema>;

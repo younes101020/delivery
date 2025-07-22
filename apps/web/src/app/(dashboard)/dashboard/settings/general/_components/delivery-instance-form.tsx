@@ -21,6 +21,7 @@ import { deliveryInstanceForm } from "../actions";
 interface DeliveryInstanceFormProps {
   fqdn?: string;
   name?: string;
+  serviceId: string;
   error?: string;
 }
 
@@ -41,6 +42,7 @@ function Form() {
       error: "",
       success: "",
       inputs: {
+        serviceId: "",
         fqdn: "",
         name: "",
       },
@@ -87,6 +89,7 @@ function Form() {
               The domain name of your application. This is the fully qualified domain name that will be used to access your application.
             </p>
           </div>
+          <input type="hidden" name="serviceId" id="serviceId" defaultValue={state.inputs?.serviceId || deliveryWebInstanceConfiguration.data?.serviceId} />
           {state?.error && <Paragraph variant="error">{state.error}</Paragraph>}
           <CardFooter className="flex px-0 pt-8 col-span-2">
             <Button type="submit" disabled={pending} aria-label="submit" className="w-full">

@@ -2,6 +2,7 @@ import type { ContainerCreateOptions, ContainerListOptions } from "dockerode";
 
 import { withDocker } from "@/lib/remote-docker/utils";
 
+import type { GetServerWebServiceConfigSchema, PatchServerWebServiceConfigSchema } from "../dto/server-config.dto";
 import type { CreateDeliveryWebConfigContainerWithHostnameLabelObjectOptions, UpdatedWebInstanceOptions } from "./types";
 
 export const getDeliveryWebContainerInfo = withDocker(
@@ -92,3 +93,35 @@ export async function getDeliveryWebInstanceName() {
   const instanceConfig = await getDeliveryWebContainerInfo();
   return instanceConfig.Name.slice(1); // Remove the leading slash
 }
+
+export const getWebService = withDocker<Omit<GetServerWebServiceConfigSchema, "fqdn">, void>(
+  async (docker) => {
+    const dbServices = await docker.listServices({ filters: { label: ["resource=delivery-web-instance"] } });
+    const name = dbServices[0] && dbServices[0].Spec ? dbServices[0].Spec.Name! : "Anonymous";
+    const serviceId = dbServices[0] ? dbServices[0].ID : "None";
+    return {
+      name,
+      serviceId,
+    };
+  },
+);
+
+export const patchWebService = withDocker<void, PatchServerWebServiceConfigSchema & { serviceId: string }>(
+  async (docker, ctx) => {
+    const webService = docker.getService(ctx!.serviceId);
+
+    const webServiceInspect = await webService.inspect();
+    const webServiceSpec = webServiceInspect.Spec;
+
+    if (ctx?.name)
+      webServiceSpec.Name = ctx.name;
+
+    if (ctx?.fqdn)
+      webServiceSpec.Labels[`traefik.http.routers.${webServiceSpec.Name}.rule`] = `Host(\`${ctx.fqdn}\`)`;
+
+    await webService.update({
+      ...webServiceSpec,
+      version: Number.parseInt(webServiceInspect.Version.Index),
+    });
+  },
+);

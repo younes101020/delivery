@@ -4,6 +4,5 @@ export * from "./databases.dto";
 export * from "./deployments.dto";
 export * from "./envvars.dto";
 export * from "./githubapps.dto";
-export * from "./server-config.dto";
 export * from "./services.dto";
 export * from "./users.dto";

@@ -5,7 +5,6 @@ import {
   environmentVariables,
   githubApp,
   githubAppSecret,
-  systemConfig,
   teamMembers,
   users,
 } from "@delivery/drizzle/schema";
@@ -15,7 +14,6 @@ import type {
   AuthRegisterSchema,
   InsertGithubAppSchema,
   InsertGithubAppsSecretSchema,
-  InsertServerConfigSchema,
   InsertUserSchema,
 } from "../dto";
 import type {
@@ -87,19 +85,6 @@ export async function getGithubAppByAppId(appId: number) {
   });
 }
 
-export async function getSystemConfig() {
-  return await db.query.systemConfig.findFirst();
-}
-
-export async function getSystemConfigFqdn() {
-  const systemConfig = await db.query.systemConfig.findFirst({
-    columns: {
-      domainName: true,
-    },
-  });
-  return systemConfig?.domainName;
-}
-
 export async function setUser(user: Omit<AuthRegisterSchema, "password">, passwordHash: string) {
   const [inserted] = await db
     .insert(users)
@@ -158,15 +143,6 @@ export async function createEnvironmentVariable(
 ) {
   const [inserted] = await db.insert(environmentVariables).values(environmentVariable).returning();
   return inserted;
-}
-
-export async function updateSystemConfig(updates: Partial<InsertServerConfigSchema>) {
-  const [updatedConfig] = await db
-    .update(systemConfig)
-    .set(updates)
-    .where(eq(systemConfig.id, db.select({ id: systemConfig.id }).from(systemConfig).limit(1)))
-    .returning();
-  return updatedConfig;
 }
 
 export async function createUser(user: InsertUserSchema, passwordHash: string) {

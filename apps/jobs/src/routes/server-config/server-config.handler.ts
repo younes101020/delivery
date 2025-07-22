@@ -4,11 +4,11 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 import type { AppRouteHandler } from "@/lib/types";
 
 import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
-import { getSystemConfig, getSystemConfigFqdn, updateSystemConfig } from "@/lib/queries/queries";
 
-import type { GetFirstRoute, GetInstanceRoute, PatchInstanceRoute, PatchRoute } from "./server-config.route";
+import type { GetFirstRoute, GetServiceRoute, PatchRoute, PatchServiceRoute } from "./server-config.route";
 
-import { getDeliveryWebInstanceName, updateWebInstanceContainerConfiguration } from "./lib/remote-docker/utils";
+import { getSystemConfig, getSystemConfigFqdn, updateSystemConfig } from "./lib/queries";
+import { getWebService, patchWebService } from "./lib/remote-docker/utils";
 
 export const getFirst: AppRouteHandler<GetFirstRoute> = async (c) => {
   const systemconfig = await getSystemConfig();
@@ -61,23 +61,26 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
   return c.json(systemconfig, HttpStatusCodes.OK);
 };
 
-export const getInstance: AppRouteHandler<GetInstanceRoute> = async (c) => {
-  const [fqdn, name] = await Promise.all([
+export const getWebServiceHandler: AppRouteHandler<GetServiceRoute> = async (c) => {
+  const [fqdn, webService] = await Promise.all([
     getSystemConfigFqdn(),
-    getDeliveryWebInstanceName(),
+    getWebService(),
   ]);
 
   return c.json(
     {
       fqdn: fqdn ?? undefined,
-      name,
+      name: webService.name,
+      serviceId: webService.serviceId,
     },
     HttpStatusCodes.OK,
   );
 };
 
-export const patchInstance: AppRouteHandler<PatchInstanceRoute> = async (c) => {
+export const patchWebServiceHandler: AppRouteHandler<PatchServiceRoute> = async (c) => {
   const updates = c.req.valid("json");
+  const { id } = c.req.valid("param");
+
   const logger = c.get("logger");
 
   if (Object.keys(updates).length === 0) {
@@ -100,9 +103,10 @@ export const patchInstance: AppRouteHandler<PatchInstanceRoute> = async (c) => {
   }
 
   await Promise.all([
-    updateWebInstanceContainerConfiguration({
+    patchWebService({
       name: updates.name,
-      domainName: updates.fqdn,
+      fqdn: updates.fqdn,
+      serviceId: id.toString(),
     }),
     updates.fqdn
       ? updateSystemConfig({
