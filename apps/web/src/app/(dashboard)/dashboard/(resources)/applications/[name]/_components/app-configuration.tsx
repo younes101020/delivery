@@ -70,7 +70,7 @@ export function AppForm(applicationData: AppFormProps) {
   );
 
   return (
-    <form className="w-full flex flex-col gap-4 pt-4" action={formAction} aria-label="form">
+    <form className="col-span-4 lg:col-span-3 flex flex-col gap-4 pt-4" action={formAction} aria-label="form">
       <div>
         <Label htmlFor="fqdn">Domain name</Label>
         <Input
@@ -138,7 +138,7 @@ export function AppForm(applicationData: AppFormProps) {
 
 function PendingApplicationConfiguration() {
   return (
-    <div className="flex flex-col gap-4 h-full">
+    <div className="col-span-3 flex flex-col gap-4 h-full">
       <Skeleton />
       <Skeleton />
     </div>
@@ -151,7 +151,7 @@ interface NoApplicationConfigurationProps {
 
 function NoApplicationConfiguration({ refetch }: NoApplicationConfigurationProps) {
   return (
-    <div className="flex flex-col gap-4 h-full">
+    <div className="col-span-3 flex flex-col gap-4 h-full">
       <p>No application configuration found.</p>
       <Button onClick={refetch}>
         <Loader2 className="animate-spin mr-2 h-4 w-4" />

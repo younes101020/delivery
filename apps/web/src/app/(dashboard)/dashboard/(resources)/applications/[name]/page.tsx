@@ -3,14 +3,13 @@ import { Suspense } from "react";
 
 import { PageDescription } from "@/app/_components/ui/page-description";
 import { PageTitle } from "@/app/_components/ui/page-title";
-import { Separator } from "@/app/_components/ui/separator";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { getQueryClient } from "@/app/_lib/get-rsc-query-client";
 
 import { getApplicationByName } from "../_lib/queries";
 import { ApplicationConfiguration } from "./_components/app-configuration";
-import { ApplicationDelete } from "./_components/app-delete";
 import { ApplicationDetails } from "./_components/app-details";
+import { ApplicationOptions } from "./_components/app-options";
 
 interface ApplicationPageProps {
   params: Promise<{ name: string }>;
@@ -19,10 +18,16 @@ interface ApplicationPageProps {
 export default function ApplicationPage({ params }: ApplicationPageProps) {
   return (
     <section className="p-5 bg-background/50 border">
-      <PageTitle>Application configuration</PageTitle>
-      <PageDescription>
-        Configure your application settings from here.
-      </PageDescription>
+      <div className="flex justify-between">
+        <div>
+          <PageTitle>Application configuration</PageTitle>
+          <PageDescription>
+            Configure your application settings from here.
+          </PageDescription>
+        </div>
+        <ApplicationOptions />
+      </div>
+
       <div className="mt-8 grid grid-cols-4 gap-4">
         <Suspense fallback={<PendingApplication />}>
           <Application params={params} />
@@ -42,18 +47,8 @@ async function Application({ params }: ApplicationPageProps) {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
+      <ApplicationConfiguration />
       <ApplicationDetails />
-      <div className="col-span-4 mt-4">
-        <Separator className="mb-4" />
-        <h2 className="text-xl mb-2">Update application details</h2>
-        <ApplicationConfiguration />
-        <Separator className="my-4" />
-        <div className="p-3 text-destructive">
-
-          <h3 className="text-lg font-bold mb-4">Danger zone</h3>
-          <ApplicationDelete />
-        </div>
-      </div>
     </HydrationBoundary>
   );
 }
