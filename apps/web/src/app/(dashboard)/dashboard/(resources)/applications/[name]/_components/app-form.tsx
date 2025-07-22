@@ -50,7 +50,7 @@ export function AppForm(applicationData: AppFormProps) {
           defaultValue={state.inputs?.fqdn}
         />
         <p className="text-muted-foreground text-xs pt-2">
-          The domain name of your application. This is the name that will be used to access your application.
+          The domain name of your application. This is the fully qualified domain name that will be used to access your application.
         </p>
       </div>
       <div>

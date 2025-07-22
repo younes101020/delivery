@@ -84,7 +84,7 @@ function Form() {
               defaultValue={state.inputs.fqdn || deliveryWebInstanceConfiguration.data?.fqdn}
             />
             <p className="text-muted-foreground text-xs pt-2">
-              The domain name of your application. This is the name that will be used to access your application.
+              The domain name of your application. This is the fully qualified domain name that will be used to access your application.
             </p>
           </div>
           {state?.error && <Paragraph variant="error">{state.error}</Paragraph>}
