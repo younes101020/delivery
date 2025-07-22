@@ -22,7 +22,7 @@
 
 ## DevOps & Infrastructure
 
--   Docker Compose & Docker Swarm
+-   Docker Swarm
 -   Traefik
 -   GitHub Actions (CI/CD)
 -   Vitest
