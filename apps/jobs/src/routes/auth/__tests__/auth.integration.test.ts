@@ -108,6 +108,7 @@ describe("auth routes / integration test", () => {
         },
       },
     );
+    console.log(response);
     expect(response.status).toBe(422);
     if (response.status === 422) {
       const json = await response.json();
