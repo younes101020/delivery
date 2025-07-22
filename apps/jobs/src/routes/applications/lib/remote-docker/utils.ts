@@ -54,9 +54,11 @@ export const patchApplicationService = withDocker<void, PatchApplication>(
     const appServiceInspect = await appService.inspect();
     const appServiceSpec = appServiceInspect.Spec;
 
+    const currentEnvs = appServiceSpec.TaskTemplate.ContainerSpec.Env || [];
+
     if (ctx?.envs) {
       const envs = ctx?.envs.map(env => `${env.key}=${env.value}`);
-      appServiceSpec.TaskTemplate.ContainerSpec.Env = envs;
+      appServiceSpec.TaskTemplate.ContainerSpec.Env = [...currentEnvs, ...envs];
     }
 
     let currentLabels: Record<string, string> = {};
