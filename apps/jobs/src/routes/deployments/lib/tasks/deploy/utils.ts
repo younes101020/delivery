@@ -217,7 +217,7 @@ export function parseAppHost(appName: string, publicIpURL: string) {
       cause: error,
     });
   }
-  url.hostname = `${appName}.${url.hostname}.sslip.io`;
+  url.hostname = `${appName}.${url.hostname}`;
   return url.hostname;
 }
 

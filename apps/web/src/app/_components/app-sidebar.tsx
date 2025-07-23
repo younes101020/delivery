@@ -33,6 +33,10 @@ const data = {
       isActive: true,
       items: [
         {
+          title: "Domain name",
+          url: "/dashboard/applications/domain-name",
+        },
+        {
           title: "New",
           url: "/dashboard/applications/new",
         },
