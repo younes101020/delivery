@@ -35,7 +35,8 @@ export default function createApp() {
 
   app.notFound(notFound);
   app.onError((e, c) => {
-    console.log("Error in app:", e);
+    if (env.NODE_ENV === "test")
+      console.error("Error in app:", e);
     return onError(e, c);
   });
   return app;
