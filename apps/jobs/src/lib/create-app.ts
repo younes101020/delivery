@@ -28,10 +28,11 @@ export default function createApp() {
   );
   app.use(serveEmojiFavicon("📝"));
   app.use(pinoLogger());
-  app.use(onboardingFlag);
 
-  if (env.NODE_ENV !== "test")
+  if (env.NODE_ENV !== "test") {
+    app.use(onboardingFlag);
     app.use("/", except("/auth/*", bearerAuth({ token: env.BEARER_TOKEN })));
+  }
 
   app.notFound(notFound);
   app.onError((e, c) => {
