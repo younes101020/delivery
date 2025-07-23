@@ -34,7 +34,10 @@ export default function createApp() {
     app.use("/", except("/auth/*", bearerAuth({ token: env.BEARER_TOKEN })));
 
   app.notFound(notFound);
-  app.onError(onError);
+  app.onError((e, c) => {
+    console.log("Error in app:", e);
+    return onError(e, c);
+  });
   return app;
 }
 
