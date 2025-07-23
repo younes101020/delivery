@@ -3,6 +3,7 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
+import env from "@/env";
 import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
 
 import type { GetFirstRoute, GetServiceRoute, PatchRoute, PatchServiceRoute } from "./server-config.route";
@@ -22,7 +23,10 @@ export const getFirst: AppRouteHandler<GetFirstRoute> = async (c) => {
     );
   }
 
-  return c.json(systemconfig, HttpStatusCodes.OK);
+  return c.json({
+    ...systemconfig,
+    publicIp: env.PUBLIC_IP,
+  }, HttpStatusCodes.OK);
 };
 
 export const patch: AppRouteHandler<PatchRoute> = async (c) => {
@@ -58,7 +62,10 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
     );
   }
 
-  return c.json(systemconfig, HttpStatusCodes.OK);
+  return c.json({
+    ...systemconfig,
+    publicIp: env.PUBLIC_IP,
+  }, HttpStatusCodes.OK);
 };
 
 export const getWebServiceHandler: AppRouteHandler<GetServiceRoute> = async (c) => {

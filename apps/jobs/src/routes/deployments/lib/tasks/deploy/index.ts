@@ -13,6 +13,7 @@ import { fromGitUrlToQueueName, parseAppHost, persistedEnvVarsToCmdEnvVars, tran
 
 import type { QueueDeploymentJobData } from "./types";
 
+import { getWildcardDomain } from "../../queries";
 import { PREFIX } from "../const";
 
 type QueueName = string;
@@ -64,7 +65,7 @@ function runDeployment(
 export const deployApp = runDeployment(async (payload) => {
   if (typeof payload === "object") {
     const { githubAppId, repoUrl, staticdeploy, env, port: exposedPort, publishdir, cache } = payload;
-    const githubApp = await getGithubAppByAppId(githubAppId);
+    const [githubApp, wildcardDomain] = await Promise.all([getGithubAppByAppId(githubAppId), getWildcardDomain()]);
 
     if (!githubApp)
       throw new HTTPException(HttpStatusCodes.NOT_FOUND, { message: "Github app not found" });
@@ -74,7 +75,9 @@ export const deployApp = runDeployment(async (payload) => {
 
     const repoName = fromGitUrlToQueueName(repoUrl);
     const port = staticdeploy ? 80 : exposedPort!;
-    const fqdn = parseAppHost(repoName, `http://${serverEnv.PUBLIC_IP}`);
+    // use existing wildcard domain if provided, otherwise use the server public ip with sslip.io as a wildcard fallback
+    const host = wildcardDomain ?? `http://${serverEnv.PUBLIC_IP}.sslip.io`;
+    const fqdn = parseAppHost(repoName, host);
     const environmentVariables = transformEnvVars(env);
 
     return {

@@ -7,6 +7,7 @@ export const systemConfig = pgTable("system_config", {
   onboardingCompletedAt: timestamp("onboarding_completed_at"),
   completedByUserId: text("completed_by_user_id"),
   domainName: text("domain_name"),
+  wildcardDomain: text("wildcard_domain"),
 });
 
 export const users = pgTable("users", {

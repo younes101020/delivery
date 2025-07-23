@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS system_config (
     onboarding_completed BOOLEAN DEFAULT FALSE,
     onboarding_completed_at TIMESTAMP,
     completed_by_user_id TEXT,
-    domain_name TEXT
+    domain_name TEXT,
+    wildcard_domain TEXT
 );
 
 DO $$

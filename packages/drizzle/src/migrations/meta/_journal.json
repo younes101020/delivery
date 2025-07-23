@@ -15,6 +15,13 @@
       "when": 1748288606308,
       "tag": "0001_brief_gamora",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1753271076658,
+      "tag": "0002_colossal_sunset_bain",
+      "breakpoints": true
     }
   ]
 }
