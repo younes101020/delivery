@@ -22,7 +22,7 @@ services:
         - "traefik.http.routers.web.tls.certresolver=deliveryresolver"
         - "traefik.http.services.web.loadbalancer.server.port=3000"
         - "resource=delivery-web-instance"
-        - "traefik.docker.network=proxy"
+        - "traefik.swarm.network=proxy"
     environment:
       - AUTH_SECRET=${AUTH_SECRET}
       - JOBS_BEARER_TOKEN=${JOBS_BEARER_TOKEN}
@@ -102,7 +102,7 @@ services:
       labels:
         - "traefik.enable=true"
         - "resource=reverse-proxy:delivery"
-        - "traefik.docker.network=proxy"
+        - "traefik.swarm.network=proxy"
 
         # define traefik dashboard router and service
         - "traefik.http.routers.traefik.rule=Host(`traefik.${PUBLIC_IP}.sslip.io`)"

@@ -41,7 +41,7 @@ export function createApplicationServiceSpec({ applicationName, image, port, pla
     Labels: {
       "resource": "application",
       "traefik.enable": "true",
-      "traefik.docker.network": CLUSTER_NETWORK_NAME,
+      "traefik.swarm.network": CLUSTER_NETWORK_NAME,
       [`traefik.http.routers.${applicationName}.entrypoints`]: "web",
       [`traefik.http.routers.${applicationName}.rule`]: `Host(\`${fqdn}\`)`,
       [`traefik.http.services.${applicationName}.loadbalancer.server.port`]: port.toString(),

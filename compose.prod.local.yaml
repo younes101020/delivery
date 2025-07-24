@@ -112,7 +112,7 @@ services:
           - node.role == manager
       labels:
         - "traefik.enable=true"
-        - "traefik.docker.network=proxy"
+        - "traefik.swarm.network=proxy"
 
         # define traefik dashboard router and service
         - "traefik.http.routers.traefik.rule=Host(`traefik.localhost`)"
