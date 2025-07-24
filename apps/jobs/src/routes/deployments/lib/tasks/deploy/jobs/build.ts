@@ -13,7 +13,7 @@ export interface ISSH {
 }
 
 export async function build(job: QueueDeploymentJob<"build">) {
-  const { repoName, port, env, cache, staticdeploy, publishdir, isRedeploy, fqdn } = job.data;
+  const { repoName, port, env, cache, staticdeploy, publishdir, isRedeploy, fqdn, enableTls } = job.data;
   await job.updateProgress({ logs: "\nImage will be built..." });
 
   // BUILD APP IMAGE
@@ -45,6 +45,7 @@ export async function build(job: QueueDeploymentJob<"build">) {
       name: repoName,
       fqdn,
       port,
+      enableTls,
     });
 
     await job.updateProgress({ logs: "Your application is now online! 🚀" });

@@ -119,7 +119,7 @@ describe("deployments tests", () => {
         children: [
           {
             name: JOBS.build,
-            data: { env: env.cmdEnvVars, cache, ...(staticdeploy && { publishdir }), port, staticdeploy, fqdn, repoName: queueName, isRedeploy: false },
+            data: { env: env.cmdEnvVars, cache, ...(staticdeploy && { publishdir }), port, staticdeploy, fqdn, repoName: queueName, isRedeploy: false, enableTls: false },
             queueName,
             opts: { failParentOnFailure: true },
             children: [

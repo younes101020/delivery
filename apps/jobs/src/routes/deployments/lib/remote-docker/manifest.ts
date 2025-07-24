@@ -8,12 +8,13 @@ interface ApplicationServiceSpec {
   port: number;
   fqdn: string;
   plainEnv?: string[];
+  enableTls: boolean;
   // networkId: string;
 }
 
 const CLUSTER_NETWORK_NAME = "proxy";
 
-export function createApplicationServiceSpec({ applicationName, image, port, plainEnv, fqdn }: ApplicationServiceSpec) {
+export function createApplicationServiceSpec({ applicationName, image, port, plainEnv, fqdn, enableTls }: ApplicationServiceSpec) {
   const manifest: Dockerode.ServiceSpec = {
     Name: applicationName,
     TaskTemplate: {
@@ -44,6 +45,12 @@ export function createApplicationServiceSpec({ applicationName, image, port, pla
       [`traefik.http.routers.${applicationName}.entrypoints`]: "web",
       [`traefik.http.routers.${applicationName}.rule`]: `Host(\`${fqdn}\`)`,
       [`traefik.http.services.${applicationName}.loadbalancer.server.port`]: port.toString(),
+      ...(enableTls
+        ? {
+            [`traefik.http.routers.${applicationName}.middlewares`]: "redirect-to-https",
+            "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme": "https",
+          }
+        : {}),
     },
     UpdateConfig: {
       Parallelism: 1,

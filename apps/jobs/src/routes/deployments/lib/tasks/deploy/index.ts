@@ -77,6 +77,7 @@ export const deployApp = runDeployment(async (payload) => {
     const port = staticdeploy ? 80 : exposedPort!;
     // use existing wildcard domain if provided, otherwise use the server public ip with sslip.io as a wildcard fallback
     const host = wildcardDomain ?? `http://${serverEnv.PUBLIC_IP}.sslip.io`;
+    const enableTls = Boolean(wildcardDomain);
     const fqdn = parseAppHost(repoName, host);
     const environmentVariables = transformEnvVars(env);
 
@@ -90,6 +91,7 @@ export const deployApp = runDeployment(async (payload) => {
         cache,
         fqdn,
         repoName,
+        enableTls,
         ...(staticdeploy && { publishdir }),
       },
       configure: {
