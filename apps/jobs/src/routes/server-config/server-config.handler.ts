@@ -25,7 +25,7 @@ export const getFirst: AppRouteHandler<GetFirstRoute> = async (c) => {
 
   return c.json({
     ...systemconfig,
-    publicIp: env.PUBLIC_IP,
+    publicIp: env.PUBLIC_IP.replaceAll("-", "."),
   }, HttpStatusCodes.OK);
 };
 
@@ -64,7 +64,7 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
 
   return c.json({
     ...systemconfig,
-    publicIp: env.PUBLIC_IP,
+    publicIp: env.PUBLIC_IP.replaceAll("-", "."),
   }, HttpStatusCodes.OK);
 };
 
