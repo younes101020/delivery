@@ -1,16 +1,14 @@
 import { db } from "@delivery/drizzle";
 import { systemConfig } from "@delivery/drizzle/schema";
+import { eq } from "drizzle-orm";
 
 import type { InsertServerConfigSchema } from "../dto/server-config.dto";
 
 export async function updateSystemConfig(updates: Partial<InsertServerConfigSchema>) {
   const [updatedConfig] = await db
-    .insert(systemConfig)
-    .values(updates)
-    .onConflictDoUpdate({
-      target: systemConfig.id,
-      set: updates,
-    })
+    .update(systemConfig)
+    .set(updates)
+    .where(eq(systemConfig.id, 1))
     .returning();
   return updatedConfig;
 }
