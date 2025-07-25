@@ -42,17 +42,19 @@ export function createApplicationServiceSpec({ applicationName, image, port, pla
       "resource": "application",
       "traefik.enable": "true",
       "traefik.swarm.network": CLUSTER_NETWORK_NAME,
-      [`traefik.http.routers.${applicationName}.entrypoints`]: "web",
       [`traefik.http.routers.${applicationName}.rule`]: `Host(\`${fqdn}\`)`,
       [`traefik.http.services.${applicationName}.loadbalancer.server.port`]: port.toString(),
       ...(enableTls
         ? {
+            [`traefik.http.routers.${applicationName}.entrypoints`]: "web-secure",
             [`traefik.http.routers.${applicationName}.middlewares`]: "redirect-to-https",
             "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme": "https",
             [`traefik.http.routers.${applicationName}.tls`]: "true",
             [`traefik.http.routers.${applicationName}.tls.certresolver`]: "deliveryresolver",
           }
-        : {}),
+        : {
+            [`traefik.http.routers.${applicationName}.entrypoints`]: "web",
+          }),
     },
     UpdateConfig: {
       Parallelism: 1,
