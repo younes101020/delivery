@@ -72,7 +72,6 @@ services:
     networks:
       - proxy
     volumes:
-      - ./infrastructure/database:/docker-entrypoint-initdb.d/
       - ${PWD}/db-data/:/var/lib/postgresql@16/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
