@@ -5,8 +5,12 @@ import type { InsertServerConfigSchema } from "../dto/server-config.dto";
 
 export async function updateSystemConfig(updates: Partial<InsertServerConfigSchema>) {
   const [updatedConfig] = await db
-    .update(systemConfig)
-    .set(updates)
+    .insert(systemConfig)
+    .values(updates)
+    .onConflictDoUpdate({
+      target: systemConfig.id,
+      set: updates,
+    })
     .returning();
   return updatedConfig;
 }
