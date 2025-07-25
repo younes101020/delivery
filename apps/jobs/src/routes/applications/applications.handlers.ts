@@ -225,6 +225,7 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
       serviceName: name,
       envs: updates.environmentVariable,
       port: updates.applicationData.port,
+      fqdn: updates.applicationData.fqdn,
     }),
   ]);
 
