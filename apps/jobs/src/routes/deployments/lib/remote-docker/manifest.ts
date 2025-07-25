@@ -49,6 +49,8 @@ export function createApplicationServiceSpec({ applicationName, image, port, pla
         ? {
             [`traefik.http.routers.${applicationName}.middlewares`]: "redirect-to-https",
             "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme": "https",
+            [`traefik.http.routers.${applicationName}.tls`]: "true",
+            [`traefik.http.routers.${applicationName}.tls.certresolver`]: "deliveryresolver",
           }
         : {}),
     },
