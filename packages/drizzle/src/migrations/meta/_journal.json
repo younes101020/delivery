@@ -22,6 +22,13 @@
       "when": 1753271076658,
       "tag": "0002_colossal_sunset_bain",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1753446311001,
+      "tag": "0003_seed-system-config",
+      "breakpoints": true
     }
   ]
 }
