@@ -1,5 +1,7 @@
 import type Dockerode from "dockerode";
 
+import { CLUSTER_NETWORK_NAME } from "@/lib/remote-docker/const";
+
 import { DATABASE_INSTANCE_REPLICAS } from "./const";
 
 interface DatabaseServiceSpec {
@@ -32,6 +34,7 @@ export function createDatabaseServiceSpec({ database, name, port, initialEnvCred
     Labels: {
       "resource": "database",
       "traefik.enable": "true",
+      "traefik.swarm.network": CLUSTER_NETWORK_NAME,
       [`traefik.http.routers.${name}.rule`]: "HostSNI(`*`)",
       [`traefik.tcp.routers.${name}.entrypoints`]: name,
       [`traefik.tcp.services.${name}.loadbalancer.server.port`]: port.toString(),

@@ -1,5 +1,6 @@
 import type Dockerode from "dockerode";
 
+import { CLUSTER_NETWORK_NAME } from "@/lib/remote-docker/const";
 import { APPLICATION_INSTANCE_REPLICAS } from "@/routes/applications/lib/remote-docker/const";
 
 interface ApplicationServiceSpec {
@@ -11,8 +12,6 @@ interface ApplicationServiceSpec {
   enableTls: boolean;
   // networkId: string;
 }
-
-const CLUSTER_NETWORK_NAME = "proxy";
 
 export function createApplicationServiceSpec({ applicationName, image, port, plainEnv, fqdn, enableTls }: ApplicationServiceSpec) {
   const manifest: Dockerode.ServiceSpec = {
