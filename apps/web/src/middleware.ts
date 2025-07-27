@@ -10,6 +10,7 @@ const onboardingRoute = "/onboarding";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
   const sessionCookie = request.cookies.get("session");
   const onboardingCookie = request.cookies.get("skiponboarding");
   const isProtectedRoute = pathname.startsWith(protectedRoutes);
@@ -89,7 +90,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\.svg).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\.svg|mockServiceWorker).*)"],
 };
 
 /**

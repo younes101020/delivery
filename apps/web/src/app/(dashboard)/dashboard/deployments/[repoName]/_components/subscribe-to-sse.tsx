@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, Suspense } from "react";
+import { type ReactNode, Suspense, useEffect } from "react";
 
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { useQuerySubscription } from "@/app/_hooks/use-query-subscription";
@@ -8,6 +8,7 @@ import { useQuerySubscription } from "@/app/_hooks/use-query-subscription";
 import type { DeploymentLogState } from "../types";
 
 import { useGetRepoName } from "../_hooks/use-get-repo-name";
+import { enableMocking } from "../_lib/utils";
 
 interface SubscribeToSSEProps {
   children: ReactNode;
@@ -34,6 +35,10 @@ function SuspendedSubscribeToSSE({
     const shouldMergeLogs = "logs" in data && data.logs && prevData && "logs" in prevData && prevData.logs;
     return shouldMergeLogs ? { ...data, logs: prevData.logs ? `${prevData.logs}${data.logs}` : data.logs } : data;
   };
+
+  useEffect(() => {
+    enableMocking();
+  }, []);
 
   useQuerySubscription<DeploymentLogState>(`/sse-proxy/deployments/logs/${repoName}`, baseUrl, stateCallback);
   return <>{children}</>;
