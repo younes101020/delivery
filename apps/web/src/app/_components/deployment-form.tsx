@@ -15,6 +15,7 @@ import type { ActionState } from "../_lib/form-middleware";
 import { useDeploymentSelectedApplication } from "../_ctx/deployment-selected-application";
 import { deploy } from "../actions";
 import { Paragraph } from "./ui/paragraph";
+import { Textarea } from "./ui/textarea";
 
 interface DeploymentProps {
   isOnboarding?: boolean;
@@ -90,10 +91,9 @@ export function DeploymentForm({ isOnboarding = false, children }: DeploymentPro
             Environment variables
           </Label>
           <div className="mt-1">
-            <Input
+            <Textarea
               id="env"
               name="env"
-              type="text"
               defaultValue={state.inputs.env}
               className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
               placeholder="ex: KEY1=value1 KEY2=value2"
