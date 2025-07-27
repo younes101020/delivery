@@ -1,5 +1,4 @@
--- Insert database configurations
-INSERT INTO databases (image, port, credentials_env_var) VALUES
+INSERT INTO databases (image, port, "credentialsEnvVar") VALUES
     ('postgres', 5432, '["POSTGRES_USER", "POSTGRES_PASSWORD"]'),
     ('mongo', 27017, '["MONGO_INITDB_ROOT_USERNAME", "MONGO_INITDB_ROOT_PASSWORD"]'),
     ('redis', 6379, '["REDIS_PASSWORD", "REDIS_USER"]'),
