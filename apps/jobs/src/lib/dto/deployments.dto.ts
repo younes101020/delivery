@@ -9,7 +9,7 @@ export const insertDeploymentSchema = z.object({
     .optional(),
   env: z
     .string()
-    .regex(/^(?:\w+=[\w.-]+(?:\s+|$))*$/)
+    .regex(/^(?:\w+=\S+(?:\s+|$))*$/)
     .optional()
     .describe("Environment variables in KEY=value format, separated by spaces"),
   cache: z.coerce.boolean(),
