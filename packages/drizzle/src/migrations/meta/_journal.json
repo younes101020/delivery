@@ -29,6 +29,13 @@
       "when": 1753446311001,
       "tag": "0003_seed-system-config",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1753614478493,
+      "tag": "0004_seed-database-images",
+      "breakpoints": true
     }
   ]
 }
