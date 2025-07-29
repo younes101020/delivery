@@ -16,6 +16,7 @@ export function useQuerySubscription<T = Record<string, unknown>>(endpoints: `/$
 
       queryClient.setQueriesData({ queryKey }, data);
     };
+
     return () => {
       eventSource.close();
     };

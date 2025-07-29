@@ -11,5 +11,6 @@ export default function SuspensedDeploymentsPage() {
         <Stepper />
       </SubscribeToSSE>
     </section>
+
   );
 }

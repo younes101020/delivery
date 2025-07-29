@@ -1,35 +1,28 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { Card, CardContent } from "@/app/_components/ui/card";
+import { ScrollArea } from "@/app/_components/ui/scroll-area";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/app/_components/ui/dialog";
-
-interface LogsTerminalProps {
-  logs: string;
-  children: ReactNode;
+interface DeploymentLogsProps {
+  logs?: string;
 }
 
-export function LogsTerminal({ logs, children }: LogsTerminalProps) {
+export function DeploymentLogsCard({ logs }: DeploymentLogsProps) {
+  "use no memo"; // needed to ensure scrolls are updated on new logs
   const scroller = (node: HTMLDivElement | null) => {
     node?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="lg:max-w-screen-lg overflow-y-scroll max-h-[90vh] bg-black text-primary">
-        <DialogHeader>
-          <DialogTitle>Build logs</DialogTitle>
-        </DialogHeader>
-        <pre className="font-mono text-sm w-full overflow-x-auto text-white p-2 rounded-lg">{logs}</pre>
-        <div ref={scroller} />
-      </DialogContent>
-    </Dialog>
+    <Card>
+      <ScrollArea className="h-[20rem] w-[50rem] bg-black ">
+        <CardContent className="">
+          <pre className="font-mono text-sm w-full text-white p-2 rounded-lg">
+            {logs}
+          </pre>
+          <div ref={scroller} />
+        </CardContent>
+      </ScrollArea>
+    </Card>
   );
 }

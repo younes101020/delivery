@@ -1,11 +1,11 @@
 "use client";
 
-import { type ReactNode, Suspense, useEffect } from "react";
+import { type ReactNode, Suspense } from "react";
 
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { useQuerySubscription } from "@/app/_hooks/use-query-subscription";
 
-import type { DeploymentLogState } from "../types";
+import type { DeploymentLogState } from "../../types";
 
 import { useGetRepoName } from "../_hooks/use-get-repo-name";
 

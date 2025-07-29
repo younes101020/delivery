@@ -4,9 +4,10 @@ import Link from "next/link";
 
 import { Button, buttonVariants } from "@/app/_components/ui/button";
 import { Card, CardContent, CardFooter } from "@/app/_components/ui/card";
+import { Dialog, DialogTrigger } from "@/app/_components/ui/dialog";
 import { cn } from "@/app/_lib/utils";
 
-import { LogsTerminal } from "./deployment-logs";
+import { DeploymentLogsCard } from "./deployment-logs";
 
 interface DeploymentPreviewCardProps {
   id: string;
@@ -35,9 +36,12 @@ export function PreviousDeploymentPreviewCard({
       </CardContent>
 
       <CardFooter className="flex flex-wrap gap-3">
-        <LogsTerminal logs={logs}>
-          <Button className="text-xs">View build logs</Button>
-        </LogsTerminal>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button className="text-xs">View build logs</Button>
+          </DialogTrigger>
+          <DeploymentLogsCard logs={logs} />
+        </Dialog>
         <Link href={`/dashboard/applications/${applicationId}`} className={cn(buttonVariants({ variant: "outline" }), "text-xs")}>
           Application setting
         </Link>

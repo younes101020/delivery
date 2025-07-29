@@ -3,3 +3,13 @@ export interface DeploymentPreviewState {
   status: string;
   repoName: string;
 }
+
+export type DeploymentLogState = {
+  jobName: "clone" | "build" | "configure";
+  jobId: string;
+  logs: string;
+  isCriticalError: boolean;
+} | {
+  completed: boolean;
+  appId: number;
+};
