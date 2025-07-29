@@ -1,9 +1,8 @@
-import createJiti from "jiti";
-import { fileURLToPath } from "node:url";
+import { createJiti } from "jiti";
 
-const jiti = createJiti(fileURLToPath(import.meta.url));
+const jiti = createJiti(import.meta.url);
 
-jiti("./src/env");
+jiti.import("./src/env");
 function nextConfig() {
   return {
     output: "standalone",
