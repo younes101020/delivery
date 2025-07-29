@@ -1,6 +1,9 @@
 import { env } from "@/env";
 
+import { setupMocks } from "./mocks/utils";
+
 export async function GET(_: Request, { params }: { params: Promise<{ event: string }> }) {
+  setupMocks();
   const queueName = (await params).event;
   const { body } = await fetch(`${env.JOBS_API_BASEURL}/deployments/logs/${queueName}`);
   return new Response(body, {

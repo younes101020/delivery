@@ -277,9 +277,6 @@ importers:
       motion:
         specifier: ^11.13.5
         version: 11.18.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      msw:
-        specifier: ^2.10.4
-        version: 2.10.4(@types/node@20.19.0)(typescript@5.8.3)
       next:
         specifier: 15.3.3
         version: 15.3.3(@babel/core@7.27.4)(babel-plugin-react-compiler@19.0.0-beta-30d8a17-20250209)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -329,6 +326,9 @@ importers:
       concurrently:
         specifier: ^9.1.0
         version: 9.1.2
+      msw:
+        specifier: ^2.10.4
+        version: 2.10.4(@types/node@20.19.0)(typescript@5.8.3)
       postcss:
         specifier: ^8
         version: 8.5.4
