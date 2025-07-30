@@ -11,8 +11,8 @@ export const handlers = [
     const deploymentStream = new ReadableStream({
       async start(controller) {
         for (const chunk of deploymentData) {
-          await delay(9000);
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`));
+          await delay(4000);
         }
         controller.close();
       },
