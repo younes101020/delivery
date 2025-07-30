@@ -1,4 +1,4 @@
-import { delay, http, HttpResponse } from "msw";
+import { delay, http, HttpResponse, passthrough } from "msw";
 
 import { env } from "@/env";
 
@@ -6,13 +6,13 @@ import { deploymentData } from "./data";
 
 const encoder = new TextEncoder();
 
-export const handlers = [
+export default [
   http.get(`${env.JOBS_API_BASEURL}/deployments/logs/*`, () => {
     const deploymentStream = new ReadableStream({
       async start(controller) {
         for (const chunk of deploymentData) {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`));
-          await delay(4000);
+          await delay(1000);
         }
         controller.close();
       },
@@ -23,5 +23,8 @@ export const handlers = [
         "Content-Type": "text/event-stream",
       },
     });
+  }),
+  http.all("*", () => {
+    return passthrough();
   }),
 ];

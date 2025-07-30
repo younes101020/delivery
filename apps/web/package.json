@@ -46,6 +46,7 @@
     "cobe": "^0.6.3",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.36.1",
+    "eventsource": "^4.0.0",
     "framer-motion": "^11.15.0",
     "jiti": "^2.4.2",
     "jose": "^5.9.6",

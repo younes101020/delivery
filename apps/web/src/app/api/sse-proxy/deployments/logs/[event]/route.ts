@@ -1,6 +1,5 @@
+import { setupMocks } from "@/../__tests__/mocks/utils";
 import { env } from "@/env";
-
-import { setupMocks } from "./mocks/utils";
 
 export async function GET(_: Request, { params }: { params: Promise<{ event: string }> }) {
   setupMocks();

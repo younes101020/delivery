@@ -11,7 +11,8 @@
     },
     "dev": {
       "dependsOn": ["^build"],
-      "persistent": true
+      "persistent": true,
+      "env": ["BASE_URL", "AUTH_SECRET", "JOBS_BEARER_TOKEN", "JOBS_API_BASEURL", "DATABASE_URL", "MINIO_ROOT_USER", "MINIO_ROOT_PASSWORD", "MINIO_ENDPOINT", "MINIO_PORT", "MINIO_BUCKETS", "SSH_HOST", "PORT", "LOG_LEVEL", "BEARER_TOKEN", "TEST_USERS_PASSWORD", "TEST_ENTITY_COUNT", "MINIO_PUBLIC_DOMAIN", "REDIS_PASSWORD", "PUBLIC_IP"]
     },
     "lint": {},
     "lint:fix": {},
@@ -20,15 +21,18 @@
     },
 
     "db:push": {
-      "env": ["DATABASE_URL"]
+      "env": ["DATABASE_URL"],
+      "cache": false
     },
     "db:reset": {
       "dependsOn": ["^db:push"],
-      "env": ["DATABASE_URL"]
+      "env": ["DATABASE_URL"],
+      "cache": false
     },
     "db:seed": {
       "dependsOn": ["^db:push"],
-      "env": ["DATABASE_URL", "MINIO_ROOT_USER", "MINIO_ROOT_PASSWORD", "MINIO_ENDPOINT", "MINIO_PORT", "MINIO_BUCKETS", "SSH_HOST", "PORT", "LOG_LEVEL", "BEARER_TOKEN", "TEST_USERS_PASSWORD", "TEST_ENTITY_COUNT", "MINIO_PUBLIC_DOMAIN", "PUBLIC_IP"]
+      "env": ["DATABASE_URL", "MINIO_ROOT_USER", "MINIO_ROOT_PASSWORD", "MINIO_ENDPOINT", "MINIO_PORT", "MINIO_BUCKETS", "SSH_HOST", "PORT", "LOG_LEVEL", "BEARER_TOKEN", "TEST_USERS_PASSWORD", "TEST_ENTITY_COUNT", "MINIO_PUBLIC_DOMAIN", "PUBLIC_IP"],
+      "cache": false
     },
     "test": {
       "dependsOn": ["^build"],

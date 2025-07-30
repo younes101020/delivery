@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [react()] as ViteUserConfig["plugins"],
   test: {
     environment: "jsdom",
+    setupFiles: ["./__tests__/setup.ts"],
   },
   resolve: {
     alias: {

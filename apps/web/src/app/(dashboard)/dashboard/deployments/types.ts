@@ -13,3 +13,6 @@ export type DeploymentLogState = {
   completed: boolean;
   appId: number;
 };
+
+export type OngoingDeploymentData = Extract<DeploymentLogState, { jobName: string }>;
+export type FinishedDeploymentData = Extract<DeploymentLogState, { completed: boolean }>;

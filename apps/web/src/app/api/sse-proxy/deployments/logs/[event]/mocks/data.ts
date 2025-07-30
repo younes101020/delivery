@@ -5,17 +5,17 @@ export const deploymentData = [
     logs: "Cloning repository from git@github.com:user/repo.git...\nClone completed successfully\n",
     isCriticalError: false,
   },
+    {
+    jobName: "build",
+    jobId: "job_455gef",
+    logs: "Installing dependencies...\nRunning npm install\nBuild started...\n",
+    isCriticalError: true,
+  },
   {
     jobName: "build",
     jobId: "job_456def",
     logs: "Installing dependencies...\nRunning npm install\nBuild started...\nBuild completed\n",
     isCriticalError: false,
-  },
-  {
-    jobName: "configure",
-    jobId: "job_789ghi",
-    logs: "Configuring environment variables...\nSetting up database connections\nConfiguration complete\n",
-    isCriticalError: true,
   },
   {
     jobName: "build",
