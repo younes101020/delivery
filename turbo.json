@@ -12,12 +12,41 @@
     "dev": {
       "dependsOn": ["^build"],
       "persistent": true,
-      "env": ["BASE_URL", "AUTH_SECRET", "JOBS_BEARER_TOKEN", "JOBS_API_BASEURL", "DATABASE_URL", "MINIO_ROOT_USER", "MINIO_ROOT_PASSWORD", "MINIO_ENDPOINT", "MINIO_PORT", "MINIO_BUCKETS", "SSH_HOST", "PORT", "LOG_LEVEL", "BEARER_TOKEN", "TEST_USERS_PASSWORD", "TEST_ENTITY_COUNT", "MINIO_PUBLIC_DOMAIN", "REDIS_PASSWORD", "PUBLIC_IP"]
+      "env": [
+        "WEB_BASE_URL",
+        "AUTH_SECRET",
+        "JOBS_BEARER_TOKEN",
+        "JOBS_API_BASEURL",
+        "DATABASE_URL",
+        "MINIO_ROOT_USER",
+        "MINIO_ROOT_PASSWORD",
+        "MINIO_ENDPOINT",
+        "MINIO_PORT",
+        "MINIO_BUCKETS",
+        "SSH_HOST",
+        "PORT",
+        "LOG_LEVEL",
+        "BEARER_TOKEN",
+        "TEST_USERS_PASSWORD",
+        "TEST_ENTITY_COUNT",
+        "MINIO_PUBLIC_DOMAIN",
+        "REDIS_PASSWORD",
+        "PUBLIC_IP"
+      ]
     },
     "lint": {},
     "lint:fix": {},
     "migrate": {
-      "env": ["DATABASE_URL", "LOG_LEVEL", "BEARER_TOKEN", "REDIS_PASSWORD", "MINIO_PUBLIC_DOMAIN", "MINIO_ROOT_USER", "MINIO_ROOT_PASSWORD", "PUBLIC_IP"]
+      "env": [
+        "DATABASE_URL",
+        "LOG_LEVEL",
+        "BEARER_TOKEN",
+        "REDIS_PASSWORD",
+        "MINIO_PUBLIC_DOMAIN",
+        "MINIO_ROOT_USER",
+        "MINIO_ROOT_PASSWORD",
+        "PUBLIC_IP"
+      ]
     },
     "db:push": {
       "env": ["DATABASE_URL"],
@@ -30,20 +59,93 @@
     },
     "db:seed": {
       "dependsOn": ["^db:push"],
-      "env": ["DATABASE_URL", "MINIO_ROOT_USER", "MINIO_ROOT_PASSWORD", "MINIO_ENDPOINT", "MINIO_PORT", "MINIO_BUCKETS", "SSH_HOST", "PORT", "LOG_LEVEL", "BEARER_TOKEN", "TEST_USERS_PASSWORD", "TEST_ENTITY_COUNT", "MINIO_PUBLIC_DOMAIN", "PUBLIC_IP"],
+      "env": [
+        "DATABASE_URL",
+        "MINIO_ROOT_USER",
+        "MINIO_ROOT_PASSWORD",
+        "MINIO_ENDPOINT",
+        "MINIO_PORT",
+        "MINIO_BUCKETS",
+        "SSH_HOST",
+        "PORT",
+        "LOG_LEVEL",
+        "BEARER_TOKEN",
+        "TEST_USERS_PASSWORD",
+        "TEST_ENTITY_COUNT",
+        "MINIO_PUBLIC_DOMAIN",
+        "PUBLIC_IP"
+      ],
       "cache": false
     },
     "test": {
       "dependsOn": ["^build"],
-      "env": ["BASE_URL", "AUTH_SECRET", "JOBS_BEARER_TOKEN", "JOBS_API_BASEURL", "DATABASE_URL", "MINIO_ROOT_USER", "MINIO_ROOT_PASSWORD", "MINIO_ENDPOINT", "MINIO_PORT", "MINIO_BUCKETS", "SSH_HOST", "PORT", "LOG_LEVEL", "BEARER_TOKEN", "TEST_USERS_PASSWORD", "TEST_ENTITY_COUNT", "MINIO_PUBLIC_DOMAIN", "REDIS_PASSWORD", "PUBLIC_IP"]
+      "env": [
+        "WEB_BASE_URL",
+        "AUTH_SECRET",
+        "JOBS_BEARER_TOKEN",
+        "JOBS_API_BASEURL",
+        "DATABASE_URL",
+        "MINIO_ROOT_USER",
+        "MINIO_ROOT_PASSWORD",
+        "MINIO_ENDPOINT",
+        "MINIO_PORT",
+        "MINIO_BUCKETS",
+        "SSH_HOST",
+        "PORT",
+        "LOG_LEVEL",
+        "BEARER_TOKEN",
+        "TEST_USERS_PASSWORD",
+        "TEST_ENTITY_COUNT",
+        "MINIO_PUBLIC_DOMAIN",
+        "REDIS_PASSWORD",
+        "PUBLIC_IP"
+      ]
     },
     "@delivery/web#build": {
       "dependsOn": ["@delivery/jobs#build"],
-      "env": ["BASE_URL", "AUTH_SECRET", "JOBS_BEARER_TOKEN", "JOBS_API_BASEURL", "DATABASE_URL", "MINIO_ROOT_USER", "MINIO_ROOT_PASSWORD", "MINIO_ENDPOINT", "MINIO_PORT", "MINIO_BUCKETS", "SSH_HOST", "PORT", "LOG_LEVEL", "BEARER_TOKEN", "TEST_USERS_PASSWORD", "TEST_ENTITY_COUNT", "MINIO_PUBLIC_DOMAIN", "PUBLIC_IP"]
+      "env": [
+        "WEB_BASE_URL",
+        "AUTH_SECRET",
+        "JOBS_BEARER_TOKEN",
+        "JOBS_API_BASEURL",
+        "DATABASE_URL",
+        "MINIO_ROOT_USER",
+        "MINIO_ROOT_PASSWORD",
+        "MINIO_ENDPOINT",
+        "MINIO_PORT",
+        "MINIO_BUCKETS",
+        "SSH_HOST",
+        "PORT",
+        "LOG_LEVEL",
+        "BEARER_TOKEN",
+        "TEST_USERS_PASSWORD",
+        "TEST_ENTITY_COUNT",
+        "MINIO_PUBLIC_DOMAIN",
+        "PUBLIC_IP"
+      ]
     },
     "@delivery/web#test": {
       "dependsOn": ["@delivery/jobs#test"],
-      "env": ["BASE_URL", "AUTH_SECRET", "JOBS_BEARER_TOKEN", "JOBS_API_BASEURL", "DATABASE_URL", "MINIO_ROOT_USER", "MINIO_ROOT_PASSWORD", "MINIO_ENDPOINT", "MINIO_PORT", "MINIO_BUCKETS", "SSH_HOST", "PORT", "LOG_LEVEL", "BEARER_TOKEN", "TEST_USERS_PASSWORD", "TEST_ENTITY_COUNT", "MINIO_PUBLIC_DOMAIN", "PUBLIC_IP"]
+      "env": [
+        "WEB_BASE_URL",
+        "AUTH_SECRET",
+        "JOBS_BEARER_TOKEN",
+        "JOBS_API_BASEURL",
+        "DATABASE_URL",
+        "MINIO_ROOT_USER",
+        "MINIO_ROOT_PASSWORD",
+        "MINIO_ENDPOINT",
+        "MINIO_PORT",
+        "MINIO_BUCKETS",
+        "SSH_HOST",
+        "PORT",
+        "LOG_LEVEL",
+        "BEARER_TOKEN",
+        "TEST_USERS_PASSWORD",
+        "TEST_ENTITY_COUNT",
+        "MINIO_PUBLIC_DOMAIN",
+        "PUBLIC_IP"
+      ]
     }
   }
 }

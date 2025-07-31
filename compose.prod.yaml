@@ -12,7 +12,7 @@ services:
         - AUTH_SECRET=${AUTH_SECRET}
         - JOBS_BEARER_TOKEN=${JOBS_BEARER_TOKEN}
         - JOBS_API_BASEURL=${JOBS_API_BASEURL}
-        - BASE_URL=${BASE_URL}
+        - WEB_BASE_URL=${WEB_BASE_URL}
     deploy:
       labels:
         - "traefik.enable=true"
@@ -27,7 +27,7 @@ services:
       - AUTH_SECRET=${AUTH_SECRET}
       - JOBS_BEARER_TOKEN=${JOBS_BEARER_TOKEN}
       - JOBS_API_BASEURL=${JOBS_API_BASEURL}
-      - BASE_URL=${BASE_URL}
+      - WEB_BASE_URL=${WEB_BASE_URL}
     ports:
       - 3000:3000
     networks:

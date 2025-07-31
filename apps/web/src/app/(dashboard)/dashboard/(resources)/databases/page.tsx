@@ -42,7 +42,7 @@ export default function DatabasesPage() {
 }
 
 async function Databases() {
-  const baseUrl = env.BASE_URL;
+  const baseUrl = env.WEB_BASE_URL;
 
   const queryClient = getQueryClient();
 

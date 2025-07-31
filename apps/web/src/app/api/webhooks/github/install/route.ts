@@ -30,5 +30,5 @@ export async function GET(req: NextRequest) {
     redirect(url.failure);
   }
 
-  return Response.redirect(new URL(url.success, env.BASE_URL));
+  return Response.redirect(new URL(url.success, env.WEB_BASE_URL));
 }

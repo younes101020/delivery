@@ -4,7 +4,7 @@ import { Deployment } from "./_components/deployment";
 import { SubscribeToSSE } from "./_components/subscribe-to-sse";
 
 export default function SuspensedDeploymentsPage() {
-  const baseUrl = env.BASE_URL;
+  const baseUrl = env.WEB_BASE_URL;
   return (
     <section className="h-full flex justify-center items-center py-4">
       <SubscribeToSSE baseUrl={baseUrl}>

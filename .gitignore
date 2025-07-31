@@ -8,3 +8,4 @@ letsencrypt
 config
 /infrastructure/traefik-config/acme.json
 .github/copilot-instructions.md
+packages/utils/tsconfig.tsbuildinfo

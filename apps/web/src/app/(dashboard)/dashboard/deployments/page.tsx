@@ -26,7 +26,7 @@ export default function DeploymentsPage() {
 
 async function Deployments() {
   const queryClient = getQueryClient();
-  const baseUrl = env.BASE_URL;
+  const baseUrl = env.WEB_BASE_URL;
 
   await Promise.all([
     queryClient.prefetchQuery({

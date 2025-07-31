@@ -64,13 +64,12 @@ jobs:
       PORT: ${{ vars.PORT }}
       LOG_LEVEL: ${{ vars.LOG_LEVEL }}
       JOBS_API_BASEURL: ${{ vars.JOBS_API_BASEURL }}
-      BASE_URL: ${{ vars.BASE_URL }}
+      WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}
       TEST_USERS_PASSWORD: ${{ secrets.TEST_USERS_PASSWORD }}
-      CI: true
         
     services:
       db:
-        image: postgres:13.21-alpine3.20
+        image: postgres:13.21-alpine3.20 
         env:
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}

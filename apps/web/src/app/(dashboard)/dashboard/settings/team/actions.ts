@@ -69,7 +69,7 @@ export const inviteTeamMember = validatedActionWithUser(inviteTeamMemberSchema, 
 
   return { success: "Invitation created", inputs: {
     ...inputs,
-    inviteUrl: `${env.BASE_URL}?inviteId=${inviteId}`,
+    inviteUrl: `${env.WEB_BASE_URL}?inviteId=${inviteId}`,
   } };
 });
 

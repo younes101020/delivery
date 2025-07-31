@@ -24,7 +24,7 @@ jobs:
       REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
       PORT: ${{ vars.PORT }}
       LOG_LEVEL: ${{ vars.LOG_LEVEL }}
-      BASE_URL: ${{ vars.BASE_URL }}
+      WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}
 
     steps:
       - name: Checkout code

@@ -12,7 +12,7 @@ export const env = createEnv({
     AUTH_SECRET: z.string(),
     JOBS_BEARER_TOKEN: z.string(),
     JOBS_API_BASEURL: z.string(),
-    BASE_URL: z.string(),
+    WEB_BASE_URL: z.string(),
     NODE_ENV: z.string(),
   },
   experimental__runtimeEnv: {},

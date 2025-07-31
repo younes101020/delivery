@@ -11,7 +11,7 @@ const encoder = new TextEncoder();
   in test, we mock browser fetch (eventsource) response
 */
 const DEPLOYMENT_LOGS_URL = env.NODE_ENV === "test"
-  ? `${env.BASE_URL}/api/sse-proxy/deployments/logs/*`
+  ? `${env.WEB_BASE_URL}/api/sse-proxy/deployments/logs/*`
   : `${env.JOBS_API_BASEURL}/deployments/logs/*`;
 
 export default [
