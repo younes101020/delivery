@@ -12,7 +12,8 @@
   "scripts": {
     "build": "tsc",
     "lint": "eslint .",
-    "lint:fix": "pnpm lint --fix"
+    "lint:fix": "pnpm lint --fix",
+    "postinstall": "pnpm build"
   },
   "devDependencies": {
     "@delivery/eslint-config": "workspace:*",

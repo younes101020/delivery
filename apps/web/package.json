@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "LINT=true next lint",
     "lint:fix": "LINT=true next lint --fix",
-    "test": "vitest"
+    "test": "vitest run"
   },
   "dependencies": {
     "@delivery/jobs": "workspace:*",
@@ -48,9 +48,9 @@
     "drizzle-orm": "^0.36.1",
     "eventsource": "^4.0.0",
     "framer-motion": "^11.15.0",
+    "happy-dom": "^18.0.1",
     "jiti": "^2.4.2",
     "jose": "^5.9.6",
-    "jsdom": "^26.1.0",
     "lucide-react": "^0.473.0",
     "motion": "^11.13.5",
     "next": "15.3.3",

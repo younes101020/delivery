@@ -5,7 +5,7 @@ export const deploymentData = [
     logs: "Cloning repository from git@github.com:user/repo.git...\nClone completed successfully\n",
     isCriticalError: false,
   },
-    {
+  {
     jobName: "build",
     jobId: "job_455gef",
     logs: "Installing dependencies...\nRunning npm install\nBuild started...\n",

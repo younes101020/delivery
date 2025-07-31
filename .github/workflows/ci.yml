@@ -47,6 +47,9 @@ jobs:
       - name: Lint
         run: pnpm run lint
 
+      - name: Build
+        run: pnpm run build
+
       - name: Integration and unit tests
         run: pnpm run test
 
@@ -63,6 +66,7 @@ jobs:
       JOBS_API_BASEURL: ${{ vars.JOBS_API_BASEURL }}
       BASE_URL: ${{ vars.BASE_URL }}
       TEST_USERS_PASSWORD: ${{ secrets.TEST_USERS_PASSWORD }}
+      CI: true
         
     services:
       db:

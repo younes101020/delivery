@@ -19,7 +19,6 @@
     "migrate": {
       "env": ["DATABASE_URL", "LOG_LEVEL", "BEARER_TOKEN", "REDIS_PASSWORD", "MINIO_PUBLIC_DOMAIN", "MINIO_ROOT_USER", "MINIO_ROOT_PASSWORD", "PUBLIC_IP"]
     },
-
     "db:push": {
       "env": ["DATABASE_URL"],
       "cache": false

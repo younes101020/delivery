@@ -19,7 +19,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "pnpm lint --fix",
-    "test": "vitest",
+    "test": "vitest run",
     "build": "tsc -p tsconfig.build.json && tsc-alias"
   },
   "dependencies": {

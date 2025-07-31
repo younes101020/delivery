@@ -26,12 +26,6 @@ describe("onboarding process", () => {
       signIn.mockResolvedValue({ error: "Impossible to sign in", inputs: { email: "", password: "" } });
       return { signIn };
     });
-
-    globalThis.ResizeObserver = vi.fn().mockImplementation(() => ({
-      observe: vi.fn(),
-      unobserve: vi.fn(),
-      disconnect: vi.fn(),
-    }));
   });
 
   afterEach(() => {

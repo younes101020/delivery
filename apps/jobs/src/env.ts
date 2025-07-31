@@ -3,7 +3,7 @@ import { config } from "dotenv";
 import { z } from "zod/v4";
 
 if (process.env.CI !== "true") {
-  config({ path: process.env.NODE_ENV === "test" ? "../../.env.test" : "../../.env" });
+  config({ path: process.env.NODE_ENV === "test" ? "../../.env.test" : "../../.env", override: true });
 }
 
 const EnvSchema = z.object({
