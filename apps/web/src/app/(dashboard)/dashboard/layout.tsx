@@ -1,7 +1,11 @@
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+
 import { AppSidebar } from "@/app/_components/app-sidebar";
 import { Breadcrumb, BreadcrumbList } from "@/app/_components/ui/breadcrumb";
 import { Separator } from "@/app/_components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/app/_components/ui/sidebar";
+import { getQueryClient } from "@/app/_lib/get-rsc-query-client";
+import { getDeliveryVersionInfo } from "@/app/_lib/jobs/queries";
 
 import { DynamicBreadcrumb } from "./_components/breadcrumb";
 
@@ -10,9 +14,18 @@ export default function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const queryClient = getQueryClient();
+
+  queryClient.prefetchQuery({
+    queryKey: ["version"],
+    queryFn: () => getDeliveryVersionInfo(),
+  });
+
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <AppSidebar />
+      </HydrationBoundary>
       <SidebarInset>
         <div className="flex h-16 shrink-0 items-center gap-2">
           <div className="flex items-center gap-2 px-4">
