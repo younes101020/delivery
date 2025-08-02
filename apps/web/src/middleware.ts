@@ -2,69 +2,61 @@ import type { NextRequest } from "next/server";
 
 import { NextResponse } from "next/server";
 
-import { signToken, verifyToken } from "@/app/_lib/session";
+import { checkSession } from "@/app/_lib/session";
 
-import { ONBOARDING_PREFIX_ROUTE, onboardingMiddleware } from "./app/(onboarding)/onboarding/middleware";
-
-export const PROTECTED_PREFIX_ROUTE = "/dashboard";
+import { dashboardMiddleware } from "./app/(dashboard)/dashboard/middleware";
+import { onboardingMiddleware } from "./app/(onboarding)/onboarding/middleware";
+import { apiMiddleware } from "./app/api/middleware";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const sessionCookie = request.cookies.get("session");
-  const isProtectedRoute = pathname.startsWith(PROTECTED_PREFIX_ROUTE);
+  const isApiRoute = pathname.startsWith("/api");
+  const isOnboardingRoute = pathname.startsWith("/onboarding");
+  const isDashboardRoute = pathname.startsWith("/dashboard");
 
-  const isOnboardingRoute = pathname.startsWith(ONBOARDING_PREFIX_ROUTE);
-  const isOnboardingAuthStepRoute = isOnboardingRoute && !request.nextUrl.searchParams.get("step");
+  if (isDashboardRoute)
+    return dashboardMiddleware(request);
+  if (isOnboardingRoute)
+    return onboardingMiddleware(request);
+  if (isApiRoute)
+    return apiMiddleware(request);
 
   const res = NextResponse.next();
 
-  if (isProtectedRoute && !sessionCookie) {
+  try {
+    await checkSession(request);
+    // Redirect to the dashboard if the user is authenticated
+    if (!isDashboardRoute)
+      return NextResponse.redirect(new URL("/dashboard/applications", request.url));
+  }
+  catch (error) {
+    console.error("Error checking session in middleware:", error);
     return NextResponse.redirect(new URL("/", request.url));
-  }
-
-  const onboardingResponse = await onboardingMiddleware(request);
-
-  if (onboardingResponse) {
-    return onboardingResponse;
-  }
-
-  if (sessionCookie) {
-    try {
-      const parsed = await verifyToken(sessionCookie.value);
-      const expiresInOneDay = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-      res.cookies.set({
-        name: "session",
-        value: await signToken({
-          ...parsed,
-          expires: expiresInOneDay.toISOString(),
-        }),
-        httpOnly: true,
-        secure: true,
-        sameSite: "lax",
-        expires: expiresInOneDay,
-      });
-
-      if (isOnboardingAuthStepRoute) {
-        const onboardingUrl = new URL(ONBOARDING_PREFIX_ROUTE, request.url);
-        onboardingUrl.searchParams.set("step", "2");
-
-        return NextResponse.redirect(onboardingUrl);
-      }
-    }
-    catch (error) {
-      console.error("Error updating session:", error);
-      res.cookies.delete("session");
-      if (isProtectedRoute) {
-        return NextResponse.redirect(new URL("/", request.url));
-      }
-    }
   }
 
   return res;
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\.svg|mockServiceWorker).*)"],
+  matcher: [
+    {
+      source: "/",
+      has: [
+        {
+          type: "cookie",
+          key: "session",
+        },
+      ],
+    },
+    {
+      source: "/api/:path*",
+    },
+    {
+      source: "/onboarding/:path*",
+    },
+    {
+      source: "/dashboard/:path*",
+    },
+  ],
 };

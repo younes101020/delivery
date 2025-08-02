@@ -2,20 +2,54 @@ import type { NextRequest } from "next/server";
 
 import { NextResponse } from "next/server";
 
+import { checkSession } from "@/app/_lib/session";
 import { parseSetCookie } from "@/app/_lib/utils";
-import { PROTECTED_PREFIX_ROUTE } from "@/middleware";
 
 export const ONBOARDING_PREFIX_ROUTE = "/onboarding";
 
 export async function onboardingMiddleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const isProtectedRoute = pathname.startsWith(PROTECTED_PREFIX_ROUTE);
   const sessionCookie = request.cookies.get("session");
   const isOnboardingRoute = pathname.startsWith(ONBOARDING_PREFIX_ROUTE);
   const isOnboardingAuthStepRoute = isOnboardingRoute && !request.nextUrl.searchParams.get("step");
-  const onboardingCookie = request.cookies.get("skiponboarding");
 
+  const res = NextResponse.next();
+
+  const skiponboarding = await shouldSkipOnboarding(request);
+
+  if (isOnboardingRoute && skiponboarding)
+    return NextResponse.redirect(new URL("/", request.url));
+
+  const attemptToAccessRestrictedOnboardingRoute = isOnboardingRoute && !sessionCookie && !isOnboardingAuthStepRoute;
+
+  if (attemptToAccessRestrictedOnboardingRoute) {
+    const urlSearchParams = new URLSearchParams(request.nextUrl.search);
+    const params = Object.fromEntries(urlSearchParams.entries());
+    const urlParams = `?${new URLSearchParams(params)}`;
+    const redirectTo = request.nextUrl.pathname + urlParams;
+
+    return NextResponse.redirect(new URL(`${ONBOARDING_PREFIX_ROUTE}/verify?redirectTo=${redirectTo}`, request.url));
+  }
+
+  try {
+    await checkSession(request);
+    if (isOnboardingAuthStepRoute) {
+      const onboardingUrl = new URL(ONBOARDING_PREFIX_ROUTE, request.url);
+      onboardingUrl.searchParams.set("step", "2");
+      return NextResponse.redirect(onboardingUrl);
+    }
+  }
+  catch (error) {
+    console.error("Error checking session in onboarding middleware:", error);
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  return res;
+}
+
+export async function shouldSkipOnboarding(request: NextRequest) {
+  const onboardingCookie = request.cookies.get("skiponboarding");
   const res = NextResponse.next();
 
   if (!onboardingCookie)
@@ -23,34 +57,12 @@ export async function onboardingMiddleware(request: NextRequest) {
 
   const forwardedOnboardingCookie = res.cookies.get("skiponboarding");
 
-  if (onboardingCookie || forwardedOnboardingCookie) {
-    const skiponboarding
-      = onboardingCookie?.value === "true" || forwardedOnboardingCookie?.value === "true";
-
-    if (isOnboardingRoute && skiponboarding)
-      return NextResponse.redirect(new URL("/", request.url));
-
-    if (!skiponboarding && !isOnboardingRoute)
-      return NextResponse.redirect(new URL(ONBOARDING_PREFIX_ROUTE, request.url));
-
-    if (!sessionCookie && !isOnboardingAuthStepRoute && isOnboardingRoute) {
-      const urlSearchParams = new URLSearchParams(request.nextUrl.search);
-      const params = Object.fromEntries(urlSearchParams.entries());
-      const urlParams = `?${new URLSearchParams(params)}`;
-      const redirectTo = request.nextUrl.pathname + urlParams;
-
-      return NextResponse.redirect(new URL(`${ONBOARDING_PREFIX_ROUTE}/verify?redirectTo=${redirectTo}`, request.url));
-    }
-  }
-
-  if (!isProtectedRoute && !isOnboardingRoute && sessionCookie) {
-    return NextResponse.redirect(new URL(`${PROTECTED_PREFIX_ROUTE}/applications`, request.url));
-  }
+  return onboardingCookie?.value === "true" || forwardedOnboardingCookie?.value === "true";
 }
 
 /**
- * If no onboarding cookie exists, this function fetches the onboarding completion status from the jobs API
- * and forwards it to the client as a cookie
+ * If no onboarding cookie exists on incoming request, this function fetches the onboarding completion status from the jobs API
+ * and forwards it to the client as a cookie in the response.
  */
 async function forwardOnboardingStatus(res: NextResponse) {
   // eslint-disable-next-line node/no-process-env
