@@ -11,6 +11,8 @@ import {
   SidebarMenuItem,
 } from "@/app/_components/ui/sidebar";
 
+import { VersionUpgrade } from "./version-upgrade";
+
 export function NavSecondary({
   items,
   ...props
@@ -24,6 +26,7 @@ export function NavSecondary({
   return (
     <SidebarGroup {...props}>
       <SidebarGroupContent>
+        <VersionUpgrade />
         <DeploymentTracker />
         <SidebarMenu>
           {items.map(item => (

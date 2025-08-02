@@ -20,14 +20,14 @@ export function DeploymentTracker() {
           ? (
               <>
                 <Spinner />
-                <span className="font-thin">/</span>
+                <span className="font-thin">|</span>
                 <p>Deployment in progress.</p>
               </>
             )
           : (
               <>
                 <PowerOff size={14} />
-                <span className="font-thin">/</span>
+                <span className="font-thin">|</span>
                 No deployment.
               </>
             )}

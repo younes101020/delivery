@@ -11,6 +11,7 @@ import serverConfig from "@/routes/server-config/server-config.index";
 import invitation from "@/routes/users/team/invitation/invitation.index";
 import team from "@/routes/users/team/team.index";
 import users from "@/routes/users/users.index";
+import version from "@/routes/version/version.index";
 
 import env from "./env";
 
@@ -31,6 +32,7 @@ const routes = [
   auth,
   applications,
   databases,
+  version,
 ] as const;
 
 routes.forEach((route) => {
