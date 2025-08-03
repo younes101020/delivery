@@ -6,16 +6,10 @@ import { deploymentData } from "./data";
 
 const encoder = new TextEncoder();
 
-/*
-  in development, we mock backend-for-frontend api route handler response
-  in test, we mock browser fetch (eventsource) response
-*/
-const DEPLOYMENT_LOGS_URL = env.NODE_ENV === "test"
-  ? `${env.WEB_BASE_URL}/api/sse-proxy/deployments/logs/*`
-  : `${env.JOBS_API_BASEURL}/deployments/logs/*`;
+const DELIVERY_DEPLOY_LOGS_URL = new URL("/deployments/logs", env.JOBS_API_BASEURL).toString();
 
 export default [
-  http.get(DEPLOYMENT_LOGS_URL, () => {
+  http.get(`${DELIVERY_DEPLOY_LOGS_URL}/*`, () => {
     const deploymentStream = new ReadableStream({
       async start(controller) {
         for (const chunk of deploymentData) {
