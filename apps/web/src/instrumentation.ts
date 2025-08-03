@@ -1,7 +1,17 @@
-// Allow HTTP mocking in development environment
+/* eslint-disable node/no-process-env */
+
 export async function register() {
-  // eslint-disable-next-line node/no-process-env
   if (process.env.NEXT_RUNTIME === "nodejs") {
-    await import("../__mocks__/enable");
+    if (process.env.CI !== "true") {
+      const { config } = await import("dotenv");
+      config({ path: process.env.NODE_ENV === "test" ? "../../.env.test" : "../../.env" });
+    }
+
+    const enableHTTPMocking = process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
+    if (enableHTTPMocking) {
+      console.warn("HTTP mocking enabled for development or test environment");
+      const { server } = await import("../__mocks__/node");
+      server.listen();
+    };
   }
 }
