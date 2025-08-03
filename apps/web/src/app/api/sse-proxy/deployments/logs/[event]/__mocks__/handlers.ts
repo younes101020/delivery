@@ -1,4 +1,4 @@
-import { delay, http, HttpResponse, passthrough } from "msw";
+import { delay, http, HttpResponse } from "msw";
 
 import { env } from "@/env";
 
@@ -31,8 +31,5 @@ export default [
         "Content-Type": "text/event-stream",
       },
     });
-  }),
-  http.all("*", () => {
-    return passthrough();
   }),
 ];

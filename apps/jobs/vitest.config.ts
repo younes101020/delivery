@@ -3,7 +3,8 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    globalSetup: ["./__tests__/setup.ts"],
+    globalSetup: ["./__tests__/global-setup.ts"],
+    setupFiles: ["./__tests__/per-test-file-setup.ts"],
   },
   resolve: {
     alias: {
