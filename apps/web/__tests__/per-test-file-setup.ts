@@ -3,8 +3,8 @@ import { server } from "../__mocks__/node";
 import { EventSource } from "eventsource";
  
 beforeAll(async () => {
-    const { server } = await import("../__mocks__/node");
     server.listen();
+
     const IntersectionObserverMock = vi.fn(() => ({
         disconnect: vi.fn(),
         observe: vi.fn(),

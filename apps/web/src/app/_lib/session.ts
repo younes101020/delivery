@@ -8,10 +8,6 @@ import { NextResponse } from "next/server";
 // eslint-disable-next-line node/no-process-env
 const key = new TextEncoder().encode(process.env.AUTH_SECRET);
 
-if (key.length < 32) {
-  throw new Error("AUTH_SECRET must be at least 32 bytes (256 bits) long.");
-}
-
 interface SessionData {
   user: { id: number };
   expires: string;

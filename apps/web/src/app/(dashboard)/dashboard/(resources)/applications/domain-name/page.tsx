@@ -10,6 +10,8 @@ import { ApplicationDomainConfigurationForm } from "./_components/app-domain-nam
 import { DNSRecords } from "./_components/dns-records-table";
 import { getApplicationsDomainConfiguration } from "./_lib/queries";
 
+export const dynamic = "force-dynamic";
+
 export default function DomainNamePage() {
   return (
     <section className="p-5 bg-background/50 border h-[90%]">

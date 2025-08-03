@@ -5,6 +5,8 @@ import { PageDescription } from "@/app/_components/ui/page-description";
 import { PageTitle } from "@/app/_components/ui/page-title";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 
+export const dynamic = "force-dynamic";
+
 export default function NewApplicationPage(props: {
   searchParams?: Promise<{ page: string }>;
 }) {

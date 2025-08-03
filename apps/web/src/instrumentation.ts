@@ -4,10 +4,10 @@ export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
     if (process.env.CI !== "true") {
       const { config } = await import("dotenv");
-      config({ path: process.env.NODE_ENV === "test" ? "../../.env.test" : "../../.env" });
+      config({ path: "../../.env" });
     }
 
-    const enableHTTPMocking = process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
+    const enableHTTPMocking = process.env.NODE_ENV === "development";
     if (enableHTTPMocking) {
       console.warn("HTTP mocking enabled for development or test environment");
       const { server } = await import("../__mocks__/node");
