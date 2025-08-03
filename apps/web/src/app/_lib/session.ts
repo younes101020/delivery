@@ -5,9 +5,12 @@ import { jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-// TODO: wait for nextjs middleware to be nodejs compatible (https://github.com/vercel/next.js/discussions/71727) to use `serverEnv.AUTH_SECRET`
 // eslint-disable-next-line node/no-process-env
 const key = new TextEncoder().encode(process.env.AUTH_SECRET);
+
+if (key.length < 32) {
+  throw new Error("AUTH_SECRET must be at least 32 bytes (256 bits) long.");
+}
 
 interface SessionData {
   user: { id: number };
@@ -17,12 +20,11 @@ interface SessionData {
 export async function checkSession(request: NextRequest) {
   const sessionCookie = request.cookies.get("session");
 
-  if (!sessionCookie)
-    throw new Error("Session cookie not found");
-
   const res = NextResponse.next();
 
   try {
+    if (!sessionCookie)
+      throw new Error("Session cookie not found");
     const parsed = await verifyToken(sessionCookie.value);
     const expiresInOneDay = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
