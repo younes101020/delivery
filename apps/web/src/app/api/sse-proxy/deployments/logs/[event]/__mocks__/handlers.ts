@@ -6,7 +6,13 @@ import { deploymentData } from "./data";
 
 const encoder = new TextEncoder();
 
-const DELIVERY_DEPLOY_LOGS_URL = new URL("/deployments/logs", env.JOBS_API_BASEURL).toString();
+/*
+  in development, we mock backend-for-frontend api route handler response
+  in test, we mock browser fetch (eventsource) response
+*/
+const DELIVERY_DEPLOY_LOGS_URL = env.NODE_ENV === "test"
+  ? new URL("/api/sse-proxy/deployments/logs", env.WEB_BASE_URL).toString()
+  : new URL("/deployments/logs", env.JOBS_API_BASEURL).toString();
 
 export default [
   http.get(`${DELIVERY_DEPLOY_LOGS_URL}/*`, () => {

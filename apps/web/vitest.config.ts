@@ -8,7 +8,8 @@ export default defineConfig({
   plugins: [react()] as ViteUserConfig["plugins"],
   test: {
     environment: "happy-dom",
-    setupFiles: ["./__tests__/setup.ts"],
+    setupFiles: ["./__tests__/per-test-file-setup.ts"],
+    globalSetup: ["./__tests__/global-setup.ts"],
   },
   resolve: {
     alias: {
