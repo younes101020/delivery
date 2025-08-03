@@ -1,6 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalEnv": ["DATABASE_URL", "LOG_LEVEL", "BEARER_TOKEN"],
+  "globalEnv": ["DATABASE_URL", "LOG_LEVEL", "BEARER_TOKEN", "AUTH_SECRET"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
