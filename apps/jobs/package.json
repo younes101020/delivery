@@ -60,6 +60,7 @@
     "@types/ssh2": "^1.15.3",
     "dotenv": "^16.4.7",
     "eslint": "catalog:",
+    "msw": "^2.10.4",
     "tsc-alias": "^1.8.16",
     "tsx": "^4.19.1",
     "typescript": "^5.8.3",

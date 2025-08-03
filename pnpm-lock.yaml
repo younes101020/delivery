@@ -142,6 +142,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 9.28.0(jiti@2.4.2)
+      msw:
+        specifier: ^2.10.4
+        version: 2.10.4(@types/node@22.15.30)(typescript@5.8.3)
       tsc-alias:
         specifier: ^1.8.16
         version: 1.8.16
@@ -8113,7 +8116,6 @@ snapshots:
       '@inquirer/type': 3.0.8(@types/node@22.15.30)
     optionalDependencies:
       '@types/node': 22.15.30
-    optional: true
 
   '@inquirer/core@10.1.15(@types/node@20.19.0)':
     dependencies:
@@ -8140,7 +8142,6 @@ snapshots:
       yoctocolors-cjs: 2.1.2
     optionalDependencies:
       '@types/node': 22.15.30
-    optional: true
 
   '@inquirer/figures@1.0.13': {}
 
@@ -8151,7 +8152,6 @@ snapshots:
   '@inquirer/type@3.0.8(@types/node@22.15.30)':
     optionalDependencies:
       '@types/node': 22.15.30
-    optional: true
 
   '@ioredis/commands@1.2.0': {}
 
@@ -12534,7 +12534,6 @@ snapshots:
       typescript: 5.8.3
     transitivePeerDependencies:
       - '@types/node'
-    optional: true
 
   mute-stream@2.0.0: {}
 

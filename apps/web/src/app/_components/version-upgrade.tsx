@@ -25,6 +25,10 @@ function VersionUpgradeCard() {
     queryFn: () => fetcher("/api/version"),
   });
 
+  if (!data) {
+    return null;
+  }
+
   return (
     <div className={`${roboto.className} p-4 flex items-center gap-4 bg-secondary border mb-2 text-xs border-green-500`}>
       <div className="flex items-center gap-2">

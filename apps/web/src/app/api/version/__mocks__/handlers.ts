@@ -1,16 +1,12 @@
-import { http, HttpResponse, passthrough } from "msw";
-
-import { env } from "@/env";
-
-const DELIVERY_VERSION_URL = env.NODE_ENV === "test"
-  ? `${env.WEB_BASE_URL}/api/version`
-  : `${env.JOBS_API_BASEURL}/deployments/logs/*`;
+import { http, HttpResponse } from "msw";
 
 export default [
-  http.get(DELIVERY_VERSION_URL, () => {
-    return HttpResponse.json({ name: "hello world" });
-  }),
-  http.all("*", () => {
-    return passthrough();
+  http.get(/\/version/, () => {
+    console.log("Mocked GET /version request");
+    return HttpResponse.json({
+      version: "1.0.0",
+      imageDigest: "sha256:1234567890abcdef",
+      isLatest: true,
+    });
   }),
 ];

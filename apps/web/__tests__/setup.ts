@@ -1,10 +1,9 @@
 import { beforeAll, afterEach, afterAll, vi } from "vitest";
-import { setupMocks } from "./mocks/utils";
-import { server } from "./mocks/server";
+import { server } from "../__mocks__/server";
 import { EventSource } from "eventsource";
  
-beforeAll(() => {
-    setupMocks()
+beforeAll(async () => {
+    await import("../__mocks__/enable");
     const IntersectionObserverMock = vi.fn(() => ({
         disconnect: vi.fn(),
         observe: vi.fn(),
