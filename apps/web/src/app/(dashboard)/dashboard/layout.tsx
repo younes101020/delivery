@@ -1,5 +1,6 @@
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
+import { enableHTTPMocks } from "@/../__mocks__/utils";
 import { AppSidebar } from "@/app/_components/app-sidebar";
 import { Breadcrumb, BreadcrumbList } from "@/app/_components/ui/breadcrumb";
 import { Separator } from "@/app/_components/ui/separator";
@@ -14,6 +15,7 @@ export default function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  enableHTTPMocks();
   const queryClient = getQueryClient();
 
   queryClient.prefetchQuery({

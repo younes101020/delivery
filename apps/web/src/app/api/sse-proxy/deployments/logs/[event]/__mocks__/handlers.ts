@@ -15,7 +15,7 @@ const DELIVERY_DEPLOY_LOGS_URL = env.NODE_ENV === "test"
   : new URL("/deployments/logs", env.JOBS_API_BASEURL).toString();
 
 export default [
-  http.get(`${DELIVERY_DEPLOY_LOGS_URL}/*`, () => {
+  http.get(`${DELIVERY_DEPLOY_LOGS_URL}/:appName`, () => {
     const deploymentStream = new ReadableStream({
       async start(controller) {
         for (const chunk of deploymentData) {
