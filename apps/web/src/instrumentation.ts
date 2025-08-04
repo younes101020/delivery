@@ -6,12 +6,5 @@ export async function register() {
       const { config } = await import("dotenv");
       config({ path: "../../.env" });
     }
-
-    const enableHTTPMocking = process.env.NODE_ENV === "development";
-    if (enableHTTPMocking) {
-      console.warn("HTTP mocking enabled for development or test environment");
-      const { server } = await import("../__mocks__/node");
-      server.listen();
-    };
   }
 }
