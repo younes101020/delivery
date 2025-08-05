@@ -26,8 +26,8 @@ export function NavSecondary({
   return (
     <SidebarGroup {...props}>
       <SidebarGroupContent>
-        <VersionUpgrade />
         <DeploymentTracker />
+        <VersionUpgrade />
         <SidebarMenu>
           {items.map(item => (
             <SidebarMenuItem key={item.title}>

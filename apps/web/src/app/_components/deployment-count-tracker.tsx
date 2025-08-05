@@ -9,6 +9,7 @@ import { roboto } from "@/app/font";
 import type { DeploymentCountState } from "../types";
 
 import { getQueryClient } from "../_lib/react-query-provider";
+import { Separator } from "./ui/separator";
 
 export function DeploymentTracker() {
   const { data } = useQuery<DeploymentCountState>({ queryKey: ["deployment-tracker"] }, getQueryClient(true));
@@ -20,14 +21,14 @@ export function DeploymentTracker() {
           ? (
               <>
                 <Spinner />
-                <span className="font-thin">|</span>
+                <Separator orientation="vertical" className="h-[1.5rem]" />
                 <p>Deployment in progress.</p>
               </>
             )
           : (
               <>
                 <PowerOff size={14} />
-                <span className="font-thin">|</span>
+                <Separator orientation="vertical" className="h-[1.5rem]" />
                 No deployment.
               </>
             )}
