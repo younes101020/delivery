@@ -18,7 +18,7 @@ interface SearchParams {
 
 export default function OnboardingPage({ searchParams }: SearchParams) {
   return (
-    <div className="flex justify-center items-center h-full *:lg:w-[70%] *:w-[90%]">
+    <div className="flex justify-center items-center h-full lg:*:w-[70%] *:w-[90%]">
       <StepProvider>
         <Suspense fallback={<CheckStepStatusLoadingScreen />}>
           <LoginStep searchParams={searchParams} />

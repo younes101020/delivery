@@ -34,7 +34,7 @@ export function DatabaseCard({ label, colorEffectHexClassUtility, fillIcon, desc
       >
         <div
           className={cn(
-            `absolute -translate-x-1/2 -translate-y-1/2 transform-gpu bg-gradient-to-br from-primary to-secondary transition-transform duration-500 group-hover:scale-[3]`,
+            `absolute -translate-x-1/2 -translate-y-1/2 transform-gpu bg-linear-to-br from-primary to-secondary transition-transform duration-500 group-hover:scale-[3]`,
             mouse.elementX === null || mouse.elementY === null
               ? "opacity-0"
               : "opacity-25",

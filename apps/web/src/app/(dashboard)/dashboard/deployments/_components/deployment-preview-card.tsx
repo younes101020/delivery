@@ -34,7 +34,7 @@ export function DeploymentPreviewCard({
     <Card
       className="flex flex-col border py-10 relative group/feature"
     >
-      <div className={`opacity-0 group-hover/feature:opacity-100 transition duration-200 absolute inset-0 h-full w-full bg-gradient-to-t ${data?.status === "failed" && "from-red-500/25"} ${data?.status === "active" && "from-green-500/25"} to-transparent pointer-events-none`} />
+      <div className={`opacity-0 group-hover/feature:opacity-100 transition duration-200 absolute inset-0 h-full w-full bg-linear-to-t ${data?.status === "failed" && "from-red-500/25"} ${data?.status === "active" && "from-green-500/25"} to-transparent pointer-events-none`} />
       <CardContent className="px-0">
         {data?.status === "active" && (
           <div className="mb-4 relative z-10 px-10">

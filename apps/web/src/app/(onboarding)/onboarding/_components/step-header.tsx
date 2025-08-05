@@ -37,7 +37,7 @@ export function StepsHeader({ className }: { className?: string }) {
           <CardDescription className="italic">{step.description}</CardDescription>
           <div
             className={`
-              absolute top-[-2rem] left-[-.8rem] text-primary/75 font-bold text-6xl opacity-30
+              absolute -top-8 left-[-.8rem] text-primary/75 font-bold text-6xl opacity-30
               before:content-[''] 
               before:absolute 
             `}

@@ -14,7 +14,7 @@ export function WithBannerBadge({
 }: WithBannerBadgeProps) {
   return (
     <div
-      className={cn("relative overflow-hidden shadow-sm", className)}
+      className={cn("relative overflow-hidden shadow-xs", className)}
       {...props}
     >
       {children}

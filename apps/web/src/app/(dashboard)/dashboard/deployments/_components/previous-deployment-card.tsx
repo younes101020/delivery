@@ -25,7 +25,7 @@ export function PreviousDeploymentPreviewCard({
     <Card
       className="flex flex-col border py-10 relative group/feature"
     >
-      <div className="opacity-0 group-hover/feature:opacity-100 transition duration-200 absolute inset-0 h-full w-full bg-gradient-to-t to-transparent pointer-events-none from-primary/25" />
+      <div className="opacity-0 group-hover/feature:opacity-100 transition duration-200 absolute inset-0 h-full w-full bg-linear-to-t to-transparent pointer-events-none from-primary/25" />
 
       <CardContent className="px-0">
         <div className="text-lg mb-2 relative z-10 px-10 flex flex-col">
@@ -42,7 +42,7 @@ export function PreviousDeploymentPreviewCard({
           </DialogTrigger>
           <DeploymentLogsCard logs={logs} />
         </Dialog>
-        <Link href={`/dashboard/applications/${applicationId}`} className={cn(buttonVariants({ variant: "outline" }), "text-xs")}>
+        <Link href={`/dashboard/applications/${applicationId}`} className={cn(buttonVariants({ variant: "outline-solid" }), "text-xs")}>
           Application setting
         </Link>
       </CardFooter>

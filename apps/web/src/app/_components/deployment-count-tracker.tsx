@@ -21,14 +21,14 @@ export function DeploymentTracker() {
           ? (
               <>
                 <Spinner />
-                <Separator orientation="vertical" className="h-[1.5rem]" />
+                <Separator orientation="vertical" className="h-6" />
                 <p>Deployment in progress.</p>
               </>
             )
           : (
               <>
                 <PowerOff size={14} />
-                <Separator orientation="vertical" className="h-[1.5rem]" />
+                <Separator orientation="vertical" className="h-6" />
                 No deployment.
               </>
             )}

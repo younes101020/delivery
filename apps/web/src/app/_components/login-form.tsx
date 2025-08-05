@@ -61,7 +61,7 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", is
             autoComplete={mode === "signin" ? "current-password" : "new-password"}
             required
             minLength={8}
-            className="appearance-none relative block w-full px-3 py-2 border focus:outline-none focus:z-10 sm:text-sm"
+            className="appearance-none relative block w-full px-3 py-2 border focus:outline-hidden focus:z-10 sm:text-sm"
             placeholder="Enter your password"
             defaultValue={state.inputs.password ?? ""}
           />
@@ -81,7 +81,7 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", is
               autoComplete="new-password"
               required
               minLength={8}
-              className="appearance-none relative block w-full px-3 py-2 border focus:outline-none focus:z-10 sm:text-sm"
+              className="appearance-none relative block w-full px-3 py-2 border focus:outline-hidden focus:z-10 sm:text-sm"
               placeholder="Repeat your password"
               defaultValue={state.inputs.repeatPassword ?? ""}
             />

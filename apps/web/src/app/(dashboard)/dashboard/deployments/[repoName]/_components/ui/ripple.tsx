@@ -20,7 +20,7 @@ const Ripple = React.memo(({
   return (
     <div
       className={cn(
-        "pointer-events-none select-none absolute inset-0 [mask-image:linear-gradient(to_bottom,white,transparent)]",
+        "pointer-events-none select-none absolute inset-0 mask-[linear-gradient(to_bottom,white,transparent)]",
         className,
       )}
     >
