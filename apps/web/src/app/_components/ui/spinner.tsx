@@ -1,12 +1,25 @@
+import { cva, type VariantProps } from "class-variance-authority";
 import { motion } from "motion/react";
 
 import { cn } from "@/app/_lib/utils";
 
-interface SpinnerProps {
+const spinnerVariants = cva("border border-dashed size-2", {
+  variants: {
+    variant: {
+      primary: "border-primary bg-transparent",
+      secondary: "border-secondary bg-transparent",
+    },
+  },
+  defaultVariants: {
+    variant: "primary",
+  },
+});
+
+interface SpinnerProps extends VariantProps<typeof spinnerVariants> {
   className?: string;
 }
 
-export function Spinner({ className }: SpinnerProps) {
+export function Spinner({ className, variant }: SpinnerProps) {
   return (
     <motion.div
       animate={{
@@ -21,10 +34,7 @@ export function Spinner({ className }: SpinnerProps) {
         repeat: Infinity,
         repeatDelay: 1,
       }}
-      className={cn(
-        "bg-transparent border border-primary border-dashed size-2",
-        className,
-      )}
+      className={cn(spinnerVariants({ variant }), className)}
     />
   );
 }

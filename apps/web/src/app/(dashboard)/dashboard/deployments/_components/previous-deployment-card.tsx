@@ -42,7 +42,7 @@ export function PreviousDeploymentPreviewCard({
           </DialogTrigger>
           <DeploymentLogsCard logs={logs} />
         </Dialog>
-        <Link href={`/dashboard/applications/${applicationId}`} className={cn(buttonVariants({ variant: "outline-solid" }), "text-xs")}>
+        <Link href={`/dashboard/applications/${applicationId}`} className={cn(buttonVariants({ variant: "outline" }), "text-xs")}>
           Application setting
         </Link>
       </CardFooter>

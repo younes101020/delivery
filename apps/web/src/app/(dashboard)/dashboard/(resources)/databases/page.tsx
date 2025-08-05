@@ -26,7 +26,7 @@ export default function DatabasesPage() {
           <PageDescription>A list of all your databases.</PageDescription>
         </div>
 
-        <Link href="/dashboard/applications/hub" className={buttonVariants({ variant: "outline-solid" })}>
+        <Link href="/dashboard/applications/hub" className={buttonVariants({ variant: "outline" })}>
           <Boxes className="mr-1 mt-[.1rem] stroke-1" />
           Database Hub
         </Link>

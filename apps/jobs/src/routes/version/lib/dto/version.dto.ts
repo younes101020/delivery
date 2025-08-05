@@ -5,3 +5,7 @@ export const versionSchema = z.object({
   imageDigest: z.string(),
   isLatest: z.boolean(),
 });
+
+export const updatedVersionSchema = z.object({
+  version: z.string(),
+});
