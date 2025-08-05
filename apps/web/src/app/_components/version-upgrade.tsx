@@ -9,6 +9,8 @@ import type { DeliveryVersion } from "../_lib/jobs/queries";
 import { useFetch } from "../_lib/fetch-provider";
 import { roboto } from "../font";
 import { Skeleton } from "./ui/skeleton";
+import { Separator } from "./ui/separator";
+import { Button } from "./ui/button";
 
 export function VersionUpgrade() {
   return (
@@ -33,8 +35,13 @@ function VersionUpgradeCard() {
     <div className={`${roboto.className} p-4 flex items-center gap-4 bg-secondary border mb-2 text-xs border-green-500`}>
       <div className="flex items-center gap-2">
         <CircleFadingArrowUp size={15} />
-        <span className="font-thin">|</span>
-        <p>Version upgrade available.</p>
+        <Separator orientation="vertical" className="h-[1.5rem]" />
+        <div className="flex flex-col gap-1">
+          <p>Delivery {data.version}</p>
+        <Separator />
+        <Button size={"sm"}>update</Button>
+        </div>
+        
       </div>
     </div>
   );
