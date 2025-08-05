@@ -24,7 +24,7 @@ export default function ApplicationsPage() {
           <PageDescription>A list of all your applications.</PageDescription>
         </div>
 
-        <Link href="/dashboard/applications/new" className={buttonVariants({ variant: "outline-solid" })}>
+        <Link href="/dashboard/applications/new" className={buttonVariants({ variant: "outline" })}>
           <PackagePlus className="mr-1 mt-[.1rem]" />
           Deploy
         </Link>

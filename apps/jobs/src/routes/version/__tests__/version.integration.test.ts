@@ -20,4 +20,12 @@ describe("version routes / integration test", () => {
       expect(json.imageDigest).toBeDefined();
     }
   });
+  it("post /version return new version", async () => {
+    const response = await client.version.$put();
+    expect(response.status).toBe(200);
+    if (response.status === 200) {
+      const json = await response.json();
+      expect(json.version).toBeDefined();
+    }
+  });
 });

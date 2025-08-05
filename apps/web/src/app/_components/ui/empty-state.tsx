@@ -64,7 +64,7 @@ export function EmptyState({
       <h2 className="text-foreground font-medium mt-6">{title}</h2>
       <p className="text-sm text-muted-foreground mt-1 whitespace-pre-line">{description}</p>
       {action && (
-        <Link href={`/dashboard${action.href}`} className={cn(buttonVariants({ variant: "outline-solid" }), "mt-4")}>{action.label}</Link>
+        <Link href={`/dashboard${action.href}`} className={cn(buttonVariants({ variant: "outline" }), "mt-4")}>{action.label}</Link>
       )}
     </div>
   );

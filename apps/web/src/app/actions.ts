@@ -188,3 +188,13 @@ export const domainName = validatedAction(domainNameSchema, async (data) => {
   }
   redirect("/onboarding?step=3");
 });
+
+export async function updateDelivery() {
+  const response = await client.version.$put();
+  if (!response.ok) {
+    return { error: "Failed to update Delivery version", inputs: {} };
+  }
+  const data = await response.json();
+  console.log("Delivery updated to version", data.version);
+  return { success: `Delivery updated to version ${data.version}`, inputs: {} };
+}
