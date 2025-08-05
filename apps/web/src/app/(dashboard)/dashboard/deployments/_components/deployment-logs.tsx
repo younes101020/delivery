@@ -16,7 +16,7 @@ export function DeploymentLogsCard({ logs, children }: DeploymentLogsProps) {
 
   return (
     <Card>
-      <ScrollArea className="h-[20rem] w-[50rem] bg-black ">
+      <ScrollArea className="h-80 w-200 bg-black ">
         <CardContent className="relative">
           <pre className="font-mono text-sm w-full text-white p-2 rounded-lg">
             {logs}

@@ -35,7 +35,7 @@ function VersionUpgradeCard() {
     <div className={`${roboto.className} p-4 flex items-center gap-4 bg-secondary border mb-2 text-xs border-green-500`}>
       <div className="flex items-center gap-2">
         <CircleFadingArrowUp size={15} />
-        <Separator orientation="vertical" className="h-[1.5rem]" />
+        <Separator orientation="vertical" className="h-6" />
         <div className="flex flex-col gap-1">
           <p>Delivery {data.version}</p>
         <Separator />

@@ -27,7 +27,7 @@ interface DeploymentLogsHeaderProps {
 
 export function DeploymentLogsHeader({ data }: DeploymentLogsHeaderProps) {
   return (
-    <div className="w-[50rem] flex flex-col">
+    <div className="w-200 flex flex-col">
       {data?.jobName && (
         <BoxReveal duration={0.5}>
           <p className="text-xl font-medium tracking-tighter">

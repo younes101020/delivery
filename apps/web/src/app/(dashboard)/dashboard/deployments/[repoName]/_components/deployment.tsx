@@ -34,7 +34,7 @@ export function Deployment() {
 
       <Ripple />
 
-      <div className="w-[50rem]">
+      <div className="w-200">
         {data && "completed" in data
         && <FinishDeployment appId={data.appId} />}
       </div>
@@ -45,13 +45,13 @@ export function Deployment() {
 
 function PendingDeployment() {
   return (
-    <div className="flex flex-col gap-4 w-[50rem]">
+    <div className="flex flex-col gap-4 w-200">
       <div className="flex justify-between">
-        <Skeleton className="w-[40%] h-[3rem]" />
-        <Skeleton className="w-[10%] h-[1rem] self-end" />
+        <Skeleton className="w-[40%] h-12" />
+        <Skeleton className="w-[10%] h-4 self-end" />
       </div>
 
-      <Skeleton className="h-[20rem]" />
+      <Skeleton className="h-80" />
     </div>
   );
 }
