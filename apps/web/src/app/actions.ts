@@ -51,12 +51,7 @@ export async function signOut() {
   (await cookies()).delete("session");
 }
 
-const skipDeploySchema = z.object({
-  action: z.literal("skip"),
-  isOnboarding: z.coerce.boolean(),
-});
-
-const fullDeploySchema = z.object({
+const deploySchema = z.object({
   action: z.literal("deploy"),
   repoUrl: z.string(),
   githubAppId: z.coerce.number(),
@@ -99,24 +94,16 @@ const fullDeploySchema = z.object({
   }
 });
 
-const deploySchema = z.union([
-  skipDeploySchema,
-  fullDeploySchema,
-]);
-
 export const deploy = validatedActionWithUser(
   deploySchema,
   async (data, _, prev, user) => {
-    const { action, isOnboarding } = data;
+    const { isOnboarding } = data;
 
-    let deploymentResponse;
-    if (action === "deploy") {
-      deploymentResponse = await client.deployments.$post({
-        json: data,
-      });
-      if (deploymentResponse.status !== 202) {
-        return { error: "Impossible to start the deployment.", inputs: data };
-      }
+    const deploymentResponse = await client.deployments.$post({
+      json: data,
+    });
+    if (deploymentResponse.status !== 202) {
+      return { error: "Impossible to start the deployment.", inputs: data };
     }
 
     if (isOnboarding) {
@@ -135,9 +122,30 @@ export const deploy = validatedActionWithUser(
       });
     }
 
-    if (action === "deploy") {
-      const result = await deploymentResponse!.json();
-      redirect(`/dashboard/deployments/${result.queueName}`);
+    const result = await deploymentResponse!.json();
+    redirect(`/dashboard/deployments/${result.queueName}`);
+  },
+);
+
+export const skipOnboardingDeployment = validatedActionWithUser(
+  deploySchema,
+  async (data, _, prev, user) => {
+    const { isOnboarding } = data;
+
+    if (isOnboarding) {
+      const response = await client.serverconfig.$patch({
+        json: {
+          completedByUserId: user.id.toString(),
+          onboardingCompleted: true,
+        },
+      });
+      if (!response.ok) {
+        return { error: "Something went wrong, please retry later.", inputs: data };
+      }
+      (await cookies()).set("skiponboarding", "true", {
+        maxAge: 60 * 60 * 24 * 7,
+        path: "/",
+      });
     }
 
     redirect(`/dashboard/applications`);

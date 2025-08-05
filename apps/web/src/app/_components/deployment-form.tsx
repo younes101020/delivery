@@ -13,7 +13,7 @@ import { Label } from "@/app/_components/ui/label";
 import type { ActionState } from "../_lib/form-middleware";
 
 import { useDeploymentSelectedApplication } from "../_ctx/deployment-selected-application";
-import { deploy } from "../actions";
+import { deploy, skipOnboardingDeployment } from "../actions";
 import { Paragraph } from "./ui/paragraph";
 import { Textarea } from "./ui/textarea";
 
@@ -31,12 +31,14 @@ export function DeploymentForm({ isOnboarding = false, children }: DeploymentPro
       env: "",
       cache: true,
       staticdeploy: initialStaticChoice,
-      action: "deploy",
     },
+  });
+  const [_, skipDeploymentFormAction, skipDeploymentPending] = useActionState<ActionState, FormData>(skipOnboardingDeployment, {
+    error: "",
+    inputs: {},
   });
   const { selectedApplication } = useDeploymentSelectedApplication();
   const [isStaticDeployment, setIsStaticDeployment] = useState<CheckedState>(initialStaticChoice);
-  const [shouldSkipDeployment, setShouldSkipDeployment] = useState(false);
 
   return (
     <>
@@ -53,7 +55,7 @@ export function DeploymentForm({ isOnboarding = false, children }: DeploymentPro
                     id="publishdir"
                     name="publishdir"
                     type="text"
-                    required={isStaticDeployment !== "indeterminate" || !shouldSkipDeployment}
+                    required={isStaticDeployment !== "indeterminate"}
                     defaultValue={state.inputs.publishdir}
                     className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
                     placeholder="ex: /dist"
@@ -74,7 +76,7 @@ export function DeploymentForm({ isOnboarding = false, children }: DeploymentPro
                     id="port"
                     name="port"
                     type="text"
-                    required={!isStaticDeployment && !shouldSkipDeployment}
+                    required={!isStaticDeployment}
                     defaultValue={state.inputs.port}
                     className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
                     placeholder="ex: 3000"
@@ -174,13 +176,11 @@ export function DeploymentForm({ isOnboarding = false, children }: DeploymentPro
             {isOnboarding && (
               <Button
                 type="submit"
-                name="action"
-                value="skip"
                 variant="outline"
                 disabled={pending}
-                onClick={() => setShouldSkipDeployment(true)}
+                formAction={skipDeploymentFormAction}
               >
-                {pending
+                {skipDeploymentPending
                   ? (
                       <>
                         <Loader2 className="animate-spin mr-2 h-4 w-4" />
@@ -197,7 +197,7 @@ export function DeploymentForm({ isOnboarding = false, children }: DeploymentPro
               </Button>
             )}
 
-            <Button type="submit" name="action" value="deploy" disabled={!selectedApplication.name || pending} aria-label="submit">
+            <Button type="submit" disabled={!selectedApplication.name || pending} aria-label="submit">
               {pending
                 ? (
                     <>
