@@ -57,10 +57,10 @@ function VersionUpgradeCard() {
 
   return (
     <div
-      className={`${roboto.className} p-4 flex items-center gap-4 border mb-2 text-xs bg-linear-to-r from-sky-400 to-sky-900 text-primary-foreground relative`}
+      className={`${roboto.className} p-4 flex items-center gap-4 border mb-2 text-xs bg-linear-to-r from-sky-400 to-sky-300 text-primary-foreground relative`}
       data-testid="version-upgrade-card"
     >
-      <span className={`absolute top-0 bg-secondary text-secondary-foreground px-2 py-1 ${data.isLatest ? "right-0" : "left-0"} rounded-bl-lg rounded-tr-lg`}>
+      <span className={`absolute top-0 bg-secondary text-secondary-foreground px-2 py-1 ${data.isLatest ? "right-0" : "left-0"} rounded-bl-lg rounded-tr-lg italic`}>
         {data.version}
       </span>
       <div className="flex items-center gap-2">
