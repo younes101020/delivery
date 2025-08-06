@@ -4,8 +4,8 @@ import { describe, expect, it } from "vitest";
 
 import { server } from "@/../__mocks__/node";
 
-import { TEST_DELIVERY_VERSION_URL } from "../__mocks__/handlers";
-import { isLatestVersionResolver } from "../__mocks__/resolvers";
+import { DELIVERY_VERSION_URL } from "../__mocks__/handlers";
+import { getVersionResolver } from "../__mocks__/resolvers";
 import { VersionUpgrade } from "../_components/version-upgrade";
 import { setup } from "./utils";
 
@@ -16,7 +16,7 @@ describe("version upgrade", () => {
       // Here, let's change the response to /GET /api/version
       // to mock the behavior of a delivery version that is already the latest one
       server.use(
-        http.get(TEST_DELIVERY_VERSION_URL, isLatestVersionResolver),
+        http.get(DELIVERY_VERSION_URL, getVersionResolver),
       );
 
       await setup(<VersionUpgrade />);
