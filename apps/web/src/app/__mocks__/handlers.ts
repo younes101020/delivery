@@ -4,12 +4,15 @@ import { env } from "@/env";
 
 import { isLatestVersionResolver, updateVersionResolver } from "./resolvers";
 
-const DELIVERY_VERSION_URL = new URL("/version", env.JOBS_API_BASEURL).toString();
-export const TEST_DELIVERY_VERSION_URL = new URL("/api/version", env.WEB_BASE_URL).toString();
+/*
+  In test environment, we mock the web API version endpoint
+  Whereas in development, we mock the jobs API version endpoint.
+*/
+const DELIVERY_VERSION_URL = env.NODE_ENV === "test"
+  ? new URL("/api/version", env.WEB_BASE_URL).toString()
+  : new URL("/version", env.JOBS_API_BASEURL).toString();
 
 export default [
   http.get(DELIVERY_VERSION_URL, isLatestVersionResolver),
-  http.get(TEST_DELIVERY_VERSION_URL, isLatestVersionResolver),
   http.put(DELIVERY_VERSION_URL, updateVersionResolver),
-  http.put(TEST_DELIVERY_VERSION_URL, updateVersionResolver),
 ];
