@@ -1,13 +1,15 @@
 import { hashPassword } from "@delivery/utils";
+import { getCookie } from "hono/cookie";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/lib/types";
 
 import { verifyPassword } from "@/lib/auth";
-import { getUserByEmail, setUser } from "@/lib/queries/queries";
 
 import type { RegisterRoute, VerifyRoute } from "./auth.routes";
+
+import { getUserByEmail, initTeam, setUser } from "./lib/queries";
 
 export const verify: AppRouteHandler<VerifyRoute> = async (c) => {
   const { email, password } = c.req.valid("json");

@@ -4,7 +4,9 @@ import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema } from "stoker/openapi/schemas";
 
 import { unauthorizedSchema } from "@/lib/constants";
-import { authRegisterSchema, authVerifySchema, selectUserSchema } from "@/lib/dto";
+import { selectUserSchema } from "@/lib/dto";
+
+import { authRegisterSchema, authVerifySchema } from "./lib/dto";
 
 const tags = ["Auth"];
 

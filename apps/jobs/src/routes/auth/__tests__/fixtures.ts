@@ -4,9 +4,9 @@ import { faker } from "@faker-js/faker";
 import { eq, not } from "drizzle-orm";
 import { it as base } from "vitest";
 
-import type { AuthRegisterSchema, AuthVerifySchema } from "@/lib/dto";
-
 import env from "@/env";
+
+import type { AuthRegisterSchema, AuthVerifySchema } from "../lib/dto";
 
 interface Fixtures {
   authRegisteredUser: AuthVerifySchema;

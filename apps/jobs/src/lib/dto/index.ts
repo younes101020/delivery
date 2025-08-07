@@ -1,5 +1,4 @@
 export * from "./applications.dto";
-export * from "./auth.dto";
 export * from "./databases.dto";
 export * from "./deployments.dto";
 export * from "./envvars.dto";
