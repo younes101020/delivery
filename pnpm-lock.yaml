@@ -314,6 +314,9 @@ importers:
       '@delivery/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@faker-js/faker':
+        specifier: ^9.9.0
+        version: 9.9.0
       '@tailwindcss/postcss':
         specifier: ^4.1.11
         version: 4.1.11
@@ -1177,6 +1180,10 @@ packages:
 
   '@faker-js/faker@9.8.0':
     resolution: {integrity: sha512-U9wpuSrJC93jZBxx/Qq2wPjCuYISBueyVUGK7qqdmj7r/nxaxwW8AQDCLeRO7wZnjj94sh3p246cAYjUKuqgfg==}
+    engines: {node: '>=18.0.0', npm: '>=9.0.0'}
+
+  '@faker-js/faker@9.9.0':
+    resolution: {integrity: sha512-OEl393iCOoo/z8bMezRlJu+GlRGlsKbUAN7jKB6LhnKoqKve5DXRpalbItIIcwnCjs1k/FOPjFzcA6Qn+H+YbA==}
     engines: {node: '>=18.0.0', npm: '>=9.0.0'}
 
   '@floating-ui/core@1.7.1':
@@ -7936,6 +7943,8 @@ snapshots:
       levn: 0.4.1
 
   '@faker-js/faker@9.8.0': {}
+
+  '@faker-js/faker@9.9.0': {}
 
   '@floating-ui/core@1.7.1':
     dependencies:

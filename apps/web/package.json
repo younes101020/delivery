@@ -65,6 +65,7 @@
   },
   "devDependencies": {
     "@delivery/eslint-config": "workspace:*",
+    "@faker-js/faker": "^9.9.0",
     "@tailwindcss/postcss": "^4.1.11",
     "@tanstack/react-query-devtools": "5.0.0-alpha.91",
     "@types/node": "^20",
