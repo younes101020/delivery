@@ -26,9 +26,12 @@ import { RevokeTeamMemberForm } from "./revoke-team-member-form";
 
 export function TeamList() {
   return (
-    <Suspense fallback={<PendingTeamList />}>
-      <TeamMemberList />
-    </Suspense>
+    <div className="mt-2">
+      <h2>Team Members</h2>
+      <Suspense fallback={<PendingTeamList />}>
+        <TeamMemberList />
+      </Suspense>
+    </div>
   );
 }
 
@@ -44,10 +47,10 @@ function TeamMemberList() {
   }
 
   return (
-    <ScrollArea className="my-2 w-full">
-      <ul className="flex flex-col gap-4 h-full mt-4 text-sm max-h-80">
+    <ScrollArea className="my-2 w-full border border-muted">
+      <ul className="flex flex-col h-full mt-4 text-sm max-h-80">
         {team.teamMembers
-          .sort((a, b) => a.role === "owner" ? -1 : b.role === "owner" ? 1 : 0)
+          .sort((a, b) => (a.role === "owner" ? -1 : b.role === "owner" ? 1 : 0))
           .map(member => (
             <li key={member.user.id} className="flex justify-between p-4">
               <div>
