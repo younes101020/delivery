@@ -16,7 +16,7 @@ export async function onboardingMiddleware(request: NextRequest) {
 
   const res = NextResponse.next();
 
-  const skiponboarding = await shouldSkipOnboarding(request);
+  const skiponboarding = await shouldSkipOnboarding(request, res);
 
   if (isOnboardingRoute && skiponboarding)
     return NextResponse.redirect(new URL("/", request.url));
@@ -48,14 +48,13 @@ export async function onboardingMiddleware(request: NextRequest) {
   return res;
 }
 
-export async function shouldSkipOnboarding(request: NextRequest) {
+export async function shouldSkipOnboarding(request: NextRequest, response: NextResponse) {
   const onboardingCookie = request.cookies.get("skiponboarding");
-  const res = NextResponse.next();
 
   if (!onboardingCookie)
-    await forwardOnboardingStatus(res);
+    await forwardOnboardingStatus(response);
 
-  const forwardedOnboardingCookie = res.cookies.get("skiponboarding");
+  const forwardedOnboardingCookie = response.cookies.get("skiponboarding");
 
   return onboardingCookie?.value === "true" || forwardedOnboardingCookie?.value === "true";
 }

@@ -6,12 +6,12 @@ import { checkSession } from "@/app/_lib/session";
 import { ONBOARDING_PREFIX_ROUTE, shouldSkipOnboarding } from "@/app/(onboarding)/onboarding/middleware";
 
 export async function dashboardMiddleware(request: NextRequest) {
-  const skiponboarding = await shouldSkipOnboarding(request);
+  const res = NextResponse.next();
+
+  const skiponboarding = await shouldSkipOnboarding(request, res);
 
   if (!skiponboarding)
     return NextResponse.redirect(new URL(ONBOARDING_PREFIX_ROUTE, request.url));
-
-  const res = NextResponse.next();
 
   try {
     await checkSession(request);
