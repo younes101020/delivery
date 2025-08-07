@@ -7,7 +7,8 @@ type GetApplicationByNameParams = Promise<{ name: string }>;
 export async function getApplicationByName(params: GetApplicationByNameParams) {
   const { name } = await params;
 
-  const response = await client.applications[":name"].$get({
+  const http = await client();
+  const response = await http.applications[":name"].$get({
     param: {
       name,
     },
@@ -19,7 +20,8 @@ export async function getApplicationByName(params: GetApplicationByNameParams) {
 }
 
 export async function getApplications() {
-  const response = await client.applications.$get();
+  const http = await client();
+  const response = await http.applications.$get();
   if (response.status !== 200) {
     return null;
   }

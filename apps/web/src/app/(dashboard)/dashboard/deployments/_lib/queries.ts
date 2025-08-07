@@ -3,7 +3,8 @@ import "server-only";
 import { client } from "@/app/_lib/client-http";
 
 export async function getCurrentDeploymentsState() {
-  const response = await client.deployments.jobs.ongoing.$get();
+  const http = await client();
+  const response = await http.deployments.jobs.ongoing.$get();
   if (!response.ok) {
     return [];
   }
@@ -11,7 +12,8 @@ export async function getCurrentDeploymentsState() {
 }
 
 export async function getPreviousDeploymentsState() {
-  const response = await client.deployments.jobs.previous.$get();
+  const http = await client();
+  const response = await http.deployments.jobs.previous.$get();
   if (!response.ok) {
     return [];
   }

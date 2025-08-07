@@ -13,7 +13,8 @@ const inviteTeamMemberSchema = z.object({
 
 export const inviteTeamMember = validatedActionWithUser(inviteTeamMemberSchema, async (inputs, _, __, user) => {
   const { email, role } = inputs;
-  const response = await client.users[":id"].team.$get({
+  const http = await client();
+  const response = await http.users[":id"].team.$get({
     param: { id: user.id.toString() },
   });
 
@@ -31,7 +32,7 @@ export const inviteTeamMember = validatedActionWithUser(inviteTeamMemberSchema, 
     return { error: "This user is already member of your team", inputs };
   }
 
-  const inviteResponse = await client.users.team[":id"].invitation.$get({
+  const inviteResponse = await http.users.team[":id"].invitation.$get({
     param: { id: teamId },
     query: {
       status: "pending",
@@ -50,7 +51,7 @@ export const inviteTeamMember = validatedActionWithUser(inviteTeamMemberSchema, 
     return { error: "This user is already invited to your team", inputs };
   }
 
-  const createInvitationResponse = await client.users.team[":id"].invitation.$post({
+  const createInvitationResponse = await http.users.team[":id"].invitation.$post({
     param: { id: teamId },
     json: {
       email,
@@ -79,7 +80,8 @@ const revokeTeamMemberSchema = z.object({
 
 export const revokeTeamMember = validatedActionWithUser(revokeTeamMemberSchema, async (inputs, _, __, user) => {
   const { memberId } = inputs;
-  const response = await client.users[":id"].team.$get({
+  const http = await client();
+  const response = await http.users[":id"].team.$get({
     param: { id: user.id.toString() },
   });
 
@@ -89,7 +91,7 @@ export const revokeTeamMember = validatedActionWithUser(revokeTeamMemberSchema, 
 
   const userWithTeam = await response.json();
 
-  const revokeResponse = await client.users.team[":id"].$delete({
+  const revokeResponse = await http.users.team[":id"].$delete({
     param: {
       id: userWithTeam.id.toString(),
     },

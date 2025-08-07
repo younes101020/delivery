@@ -10,7 +10,8 @@ const applicationDomainSchema = z.object({
 });
 
 export const applicationDomainForm = validatedAction(applicationDomainSchema, async (data) => {
-  const response = await client.serverconfig.$patch({
+  const http = await client();
+  const response = await http.serverconfig.$patch({
     json: {
       wildcardDomain: data.wildcardDomain,
     },

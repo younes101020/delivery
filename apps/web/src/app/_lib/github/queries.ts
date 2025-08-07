@@ -3,7 +3,8 @@ import "server-only";
 import { client } from "../client-http";
 
 export async function getAllGithubAppCreds() {
-  const response = await client.githubapps.$get();
+  const http = await client();
+  const response = await http.githubapps.$get();
   if (response.status !== 200) {
     return null;
   }
@@ -12,7 +13,8 @@ export async function getAllGithubAppCreds() {
 }
 
 export async function setInstallationIdOnGithubApp({ githubAppId, installationId }: { githubAppId: string; installationId: number }) {
-  await client.githubapps[":id"].$patch({
+  const http = await client();
+  await http.githubapps[":id"].$patch({
     param: {
       id: githubAppId,
     },

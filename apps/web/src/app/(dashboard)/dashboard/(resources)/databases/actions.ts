@@ -11,7 +11,8 @@ const updateContainerStatusSchema = z.object({
 
 export const stopDatabaseService = validatedAction(updateContainerStatusSchema, async (inputs) => {
   const { serviceId } = inputs;
-  const response = await client.databases[":id"].stop.$post({
+  const http = await client();
+  const response = await http.databases[":id"].stop.$post({
     param: { id: serviceId },
   });
 
@@ -24,7 +25,8 @@ export const stopDatabaseService = validatedAction(updateContainerStatusSchema, 
 
 export const startDatabaseService = validatedAction(updateContainerStatusSchema, async (inputs) => {
   const { serviceId } = inputs;
-  const response = await client.databases[":id"].start.$post({
+  const http = await client();
+  const response = await http.databases[":id"].start.$post({
     param: { id: serviceId },
   });
 
@@ -36,7 +38,8 @@ export const startDatabaseService = validatedAction(updateContainerStatusSchema,
 });
 
 export async function removeDatabaseService(serviceId: string) {
-  const response = await client.databases[":id"].$delete({
+  const http = await client();
+  const response = await http.databases[":id"].$delete({
     param: { id: serviceId },
   });
 

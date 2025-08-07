@@ -32,7 +32,8 @@ const signInSchema = z.object({
 export const signIn = validatedAction(signInSchema, async (data) => {
   const { email, password, redirectTo, inviteId } = data;
 
-  const response = await client.auth.verify.$post({
+  const http = await client();
+  const response = await http.auth.verify.$post({
     json: {
       email,
       password,

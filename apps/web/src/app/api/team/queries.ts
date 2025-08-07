@@ -8,7 +8,8 @@ export async function getTeamForUser() {
   if (!sessionData || new Date(sessionData.expires) < new Date()) {
     return null;
   }
-  const response = await client.users[":id"].team.$get({
+  const http = await client();
+  const response = await http.users[":id"].team.$get({
     param: {
       id: sessionData.user.id.toString(),
     },

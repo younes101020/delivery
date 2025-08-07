@@ -20,7 +20,8 @@ const createDatabaseSchema = z.object({
 export const createContainer = validatedAction(createDatabaseSchema, async (inputs) => {
   const { type, name } = inputs;
 
-  const response = await client.databases.$post({
+  const http = await client();
+  const response = await http.databases.$post({
     json: {
       type,
       name,

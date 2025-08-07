@@ -38,7 +38,8 @@ export const editApplication = validatedAction(
     const { environmentVariables, ...applicationData } = changes;
     const environmentVariable = environmentVariables ? plainEnvVarsToStructured(environmentVariables) : typeof environmentVariables === "string" ? [] : undefined;
 
-    const response = await client.applications[":name"].$patch({
+    const http = await client();
+    const response = await http.applications[":name"].$patch({
       param: { name },
       json: {
         applicationData,
@@ -56,7 +57,8 @@ export const editApplication = validatedAction(
 );
 
 export async function removeApplication(name: string, redirectToList: boolean) {
-  const response = await client.applications[":name"].$delete({
+  const http = await client();
+  const response = await http.applications[":name"].$delete({
     param: { name },
   });
   if (response.status !== 204) {
@@ -77,7 +79,8 @@ const updateApplicationStateSchema = z.object({
 
 export const stopApplication = validatedAction(updateApplicationStateSchema, async (inputs) => {
   const { serviceId } = inputs;
-  const response = await client.applications[":id"].stop.$post({
+  const http = await client();
+  const response = await http.applications[":id"].stop.$post({
     param: { id: serviceId },
   });
 
@@ -90,7 +93,8 @@ export const stopApplication = validatedAction(updateApplicationStateSchema, asy
 
 export const startApplication = validatedAction(updateApplicationStateSchema, async (inputs) => {
   const { serviceId } = inputs;
-  const response = await client.applications[":id"].start.$post({
+  const http = await client();
+  const response = await http.applications[":id"].start.$post({
     param: { id: serviceId },
   });
 
@@ -102,7 +106,8 @@ export const startApplication = validatedAction(updateApplicationStateSchema, as
 });
 
 export async function redeploy(applicationName: string) {
-  const response = await client.deployments.redeploy[":queueName"].$post({
+  const http = await client();
+  const response = await http.deployments.redeploy[":queueName"].$post({
     param: { queueName: applicationName },
   });
   if (response.status !== 202) {
@@ -120,7 +125,8 @@ const injectEnvSchema = z.object({
 export const injectEnv = validatedAction(injectEnvSchema, async (inputs) => {
   const { env, dbId, applicationName } = inputs;
 
-  const envResponse = await client.databases[":id"].link.$post({
+  const http = await client();
+  const envResponse = await http.databases[":id"].link.$post({
     param: { id: dbId },
     json: {
       environmentKey: env,

@@ -29,7 +29,9 @@ export async function GET(request: NextRequest) {
   }
   const result = (await response.json()) as GithubAppResponse;
 
-  const appResponse = await client.githubapps.$post({
+  const http = await client();
+
+  const appResponse = await http.githubapps.$post({
     json: {
       webhookSecret: result.webhook_secret,
       clientId: result.client_id,

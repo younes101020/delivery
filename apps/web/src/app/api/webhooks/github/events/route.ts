@@ -20,7 +20,8 @@ export async function POST(req: Request) {
   }
   const isApplicationRegistered = applications.some(app => app.name === queueName);
   if (isApplicationRegistered) {
-    await client.deployments.redeploy[":queueName"].$post({
+    const http = await client();
+    await http.deployments.redeploy[":queueName"].$post({
       param: {
         queueName,
       },

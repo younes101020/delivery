@@ -10,7 +10,8 @@ interface ApproveTeamMemberInvite {
 export async function approveTeamMemberInvite({ invitationId, invitedUserEmail }: ApproveTeamMemberInvite) {
   if (!invitationId || !invitedUserEmail)
     return;
-  const response = await client.users.team.invitation[":id"].$patch(
+  const http = await client();
+  const response = await http.users.team.invitation[":id"].$patch(
     {
       param: {
         id: invitationId,

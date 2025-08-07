@@ -3,7 +3,8 @@ import "server-only";
 import { client } from "../client-http";
 
 export async function getDeliveryVersionInfo() {
-  const response = await client.version.$get();
+  const http = await client();
+  const response = await http.version.$get();
   if (response.status !== 200) {
     return null;
   }

@@ -14,7 +14,8 @@ export const updateAccount = validatedActionWithUser(
   updateAccountSchema,
   async (data, _, prevState, user) => {
     const changes = getFormChangesAction(data, prevState);
-    const response = await client.users[":id"].$patch({
+    const http = await client();
+    const response = await http.users[":id"].$patch({
       param: { id: user.id.toString() },
       json: changes,
     });
@@ -41,7 +42,8 @@ const updateSecuritySettingsSchema = z.object({
 export const updateSecuritySettings = validatedActionWithUser(
   updateSecuritySettingsSchema,
   async (data, _, prevState, user) => {
-    const response = await client.users[":id"].$patch({
+    const http = await client();
+    const response = await http.users[":id"].$patch({
       param: { id: user.id.toString() },
       json: { password: data.password },
     });

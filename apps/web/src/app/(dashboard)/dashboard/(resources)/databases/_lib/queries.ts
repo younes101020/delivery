@@ -3,7 +3,8 @@ import "server-only";
 import { client } from "@/app/_lib/client-http";
 
 export async function getDatabaseService() {
-  const response = await client.databases.$get();
+  const http = await client();
+  const response = await http.databases.$get();
   if (response.status !== 200) {
     return null;
   }
@@ -11,7 +12,8 @@ export async function getDatabaseService() {
 }
 
 export async function getActiveDatabaseServices() {
-  const response = await client.databases.$get();
+  const http = await client();
+  const response = await http.databases.$get();
   if (response.status !== 200) {
     return null;
   }

@@ -30,7 +30,8 @@ export const signUp = validatedAction(signUpSchema, async (data) => {
     return { error: approveResp.error, inputs: data };
   }
 
-  const response = await client.auth.register.$post({
+  const http = await client();
+  const response = await http.auth.register.$post({
     json: {
       email,
       password,
@@ -99,7 +100,8 @@ export const deploy = validatedActionWithUser(
   async (data, _, prev, user) => {
     const { isOnboarding } = data;
 
-    const deploymentResponse = await client.deployments.$post({
+    const http = await client();
+    const deploymentResponse = await http.deployments.$post({
       json: data,
     });
     if (deploymentResponse.status !== 202) {
@@ -107,7 +109,7 @@ export const deploy = validatedActionWithUser(
     }
 
     if (isOnboarding) {
-      const response = await client.serverconfig.$patch({
+      const response = await http.serverconfig.$patch({
         json: {
           completedByUserId: user.id.toString(),
           onboardingCompleted: true,
@@ -132,8 +134,9 @@ export const skipOnboardingDeployment = validatedActionWithUser(
   async (data, _, prev, user) => {
     const { isOnboarding } = data;
 
+    const http = await client();
     if (isOnboarding) {
-      const response = await client.serverconfig.$patch({
+      const response = await http.serverconfig.$patch({
         json: {
           completedByUserId: user.id.toString(),
           onboardingCompleted: true,
@@ -159,7 +162,8 @@ const retryDeploySchema = z.object({
 
 export const retryDeploy = validatedAction(retryDeploySchema, async (data) => {
   const { jobId, repoName } = data;
-  const response = await client.deployments.jobs.retry[":jobId"].$post({
+  const http = await client();
+  const response = await http.deployments.jobs.retry[":jobId"].$post({
     param: {
       jobId,
     },
@@ -178,7 +182,8 @@ const domainNameSchema = z.object({
 });
 
 export const domainName = validatedAction(domainNameSchema, async (data) => {
-  const response = await client.serverconfig.$patch({
+  const http = await client();
+  const response = await http.serverconfig.$patch({
     json: {
       domainName: data.domainName,
     },
@@ -190,7 +195,8 @@ export const domainName = validatedAction(domainNameSchema, async (data) => {
 });
 
 export async function updateDelivery() {
-  const response = await client.version.$put();
+  const http = await client();
+  const response = await http.version.$put();
   if (!response.ok) {
     return { error: "Failed to update Delivery version", inputs: {} };
   }

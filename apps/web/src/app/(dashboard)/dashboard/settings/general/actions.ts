@@ -12,7 +12,8 @@ const deliveryInstanceFormSchema = z.object({
 });
 
 export const deliveryInstanceForm = validatedAction(deliveryInstanceFormSchema, async (data) => {
-  const response = await client.serverconfig["web-service"][":id"].$patch({
+  const http = await client();
+  const response = await http.serverconfig["web-service"][":id"].$patch({
     param: {
       id: data.serviceId,
     },
