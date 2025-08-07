@@ -45,6 +45,14 @@ export const register: AppRouteHandler<RegisterRoute> = async (c) => {
   const user = c.req.valid("json");
   const passwordHash = await hashPassword(user.password);
   const { password, ...userWithoutNotHashedPassword } = user;
+
   const inserted = await setUser(userWithoutNotHashedPassword, passwordHash);
+
+  const onboardingCookie = getCookie(c, "skiponboarding");
+  const isOnboarding = onboardingCookie === "true";
+
+  if (isOnboarding)
+    await initTeam({ userId: inserted.id });
+
   return c.json(inserted, HttpStatusCodes.OK);
 };
