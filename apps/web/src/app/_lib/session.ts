@@ -1,7 +1,8 @@
+import type { SessionData } from "@delivery/auth";
 import type { SelectUserSchema } from "@delivery/jobs/types";
 import type { NextRequest } from "next/server";
 
-import { jwtVerify, SignJWT } from "jose";
+import { signToken, verifyToken } from "@delivery/auth";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -41,21 +42,6 @@ export async function checkSession(request: NextRequest) {
     res.cookies.delete("session");
     throw error;
   }
-}
-
-export async function signToken(payload: SessionData) {
-  return await new SignJWT({ ...payload } as unknown as Record<string, unknown>)
-    .setProtectedHeader({ alg: "HS256" })
-    .setIssuedAt()
-    .setExpirationTime("1 day from now")
-    .sign(key);
-}
-
-export async function verifyToken(input: string) {
-  const { payload } = await jwtVerify(input, key, {
-    algorithms: ["HS256"],
-  });
-  return payload as unknown as SessionData;
 }
 
 export async function getSession() {

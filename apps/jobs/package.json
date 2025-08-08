@@ -25,6 +25,7 @@
   "dependencies": {
     "@bull-board/api": "^6.9.6",
     "@bull-board/hono": "^6.9.6",
+    "@delivery/auth": "workspace:*",
     "@delivery/drizzle": "workspace:*",
     "@delivery/utils": "workspace:*",
     "@electric-sql/pglite": "^0.2.13",

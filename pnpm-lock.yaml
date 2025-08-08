@@ -6,9 +6,6 @@ settings:
 
 catalogs:
   default:
-    drizzle-orm:
-      specifier: ^0.44.2
-      version: 0.44.2
     eslint:
       specifier: ^9.18.0
       version: 9.28.0
@@ -42,6 +39,9 @@ importers:
       '@bull-board/hono':
         specifier: ^6.9.6
         version: 6.9.6
+      '@delivery/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
       '@delivery/drizzle':
         specifier: workspace:*
         version: link:../../packages/drizzle
@@ -120,7 +120,7 @@ importers:
         version: link:../../packages/eslint-config
       '@faker-js/faker':
         specifier: ^9.3.0
-        version: 9.8.0
+        version: 9.9.0
       '@types/dockerode':
         specifier: ^3.3.34
         version: 3.3.39
@@ -160,6 +160,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@delivery/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
       '@delivery/jobs':
         specifier: workspace:*
         version: link:../jobs
@@ -357,6 +360,25 @@ importers:
         specifier: ^3.1.4
         version: 3.2.2(@types/debug@4.1.12)(@types/node@20.19.0)(happy-dom@18.0.1)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.30.1)(msw@2.10.4(@types/node@20.19.0)(typescript@5.8.3))(tsx@4.19.4)(yaml@2.8.0)
 
+  packages/auth:
+    dependencies:
+      dotenv:
+        specifier: ^17.2.1
+        version: 17.2.1
+      jose:
+        specifier: ^5.10.0
+        version: 5.10.0
+    devDependencies:
+      '@delivery/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      eslint:
+        specifier: 'catalog:'
+        version: 9.28.0(jiti@2.4.2)
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.2
+
   packages/drizzle:
     dependencies:
       '@delivery/utils':
@@ -373,14 +395,14 @@ importers:
         version: 8.16.0
       zod:
         specifier: ^4.0.5
-        version: 4.0.5
+        version: 4.0.15
     devDependencies:
       '@delivery/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
       '@faker-js/faker':
         specifier: ^9.8.0
-        version: 9.8.0
+        version: 9.9.0
       '@types/pg':
         specifier: ^8.15.4
         version: 8.15.4
@@ -1177,10 +1199,6 @@ packages:
   '@eslint/plugin-kit@0.3.1':
     resolution: {integrity: sha512-0J+zgWxHN+xXONWIyPWKFMgVuJoZuGiIFu8yxk7RJjxkzpGmyja5wRFqZIVtjDVOQpV+Rw0iOAjYPE2eQyjr0w==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
-  '@faker-js/faker@9.8.0':
-    resolution: {integrity: sha512-U9wpuSrJC93jZBxx/Qq2wPjCuYISBueyVUGK7qqdmj7r/nxaxwW8AQDCLeRO7wZnjj94sh3p246cAYjUKuqgfg==}
-    engines: {node: '>=18.0.0', npm: '>=9.0.0'}
 
   '@faker-js/faker@9.9.0':
     resolution: {integrity: sha512-OEl393iCOoo/z8bMezRlJu+GlRGlsKbUAN7jKB6LhnKoqKve5DXRpalbItIIcwnCjs1k/FOPjFzcA6Qn+H+YbA==}
@@ -3810,6 +3828,10 @@ packages:
 
   dotenv@16.5.0:
     resolution: {integrity: sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==}
+    engines: {node: '>=12'}
+
+  dotenv@17.2.1:
+    resolution: {integrity: sha512-kQhDYKZecqnM0fCnzI5eIv5L4cAe/iRI+HqMbO/hbRdTAeXDG+M9FjipUxNfbARuEg4iHIbhnhs78BCHNbSxEQ==}
     engines: {node: '>=12'}
 
   drizzle-kit@0.28.1:
@@ -6987,6 +7009,11 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  typescript@5.9.2:
+    resolution: {integrity: sha512-CWBzXQrc/qOkhidw1OzBTQuYRbfyxDXJMVJ1XNwUHGROVmuaeiEm3OslpZ1RV96d7SKKjZKrSJu3+t/xlw3R9A==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
   ufo@1.6.1:
     resolution: {integrity: sha512-9a4/uxlTWJ4+a5i0ooc1rU7C7YOw3wT+UGqdeNNHWnOF9qcMBgLRS+4IYUqbczewFx4mLEig6gawh7X6mFlEkA==}
 
@@ -7354,8 +7381,8 @@ packages:
   zod@3.25.55:
     resolution: {integrity: sha512-219huNnkSLQnLsQ3uaRjXsxMrVm5C9W3OOpEVt2k5tvMKuA8nBSu38e0B//a+he9Iq2dvmk2VyYVlHqiHa4YBA==}
 
-  zod@4.0.5:
-    resolution: {integrity: sha512-/5UuuRPStvHXu7RS+gmvRf4NXrNxpSllGwDnCBcJZtQsKrviYXm54yDGV2KYNLT5kq0lHGcl7lqWJLgSaG+tgA==}
+  zod@4.0.15:
+    resolution: {integrity: sha512-2IVHb9h4Mt6+UXkyMs0XbfICUh1eUrlJJAOupBHUhLRnKkruawyDddYRCs0Eizt900ntIMk9/4RksYl+FgSpcQ==}
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -7941,8 +7968,6 @@ snapshots:
     dependencies:
       '@eslint/core': 0.14.0
       levn: 0.4.1
-
-  '@faker-js/faker@9.8.0': {}
 
   '@faker-js/faker@9.9.0': {}
 
@@ -10587,6 +10612,8 @@ snapshots:
   dotenv@16.0.3: {}
 
   dotenv@16.5.0: {}
+
+  dotenv@17.2.1: {}
 
   drizzle-kit@0.28.1:
     dependencies:
@@ -14179,6 +14206,8 @@ snapshots:
 
   typescript@5.8.3: {}
 
+  typescript@5.9.2: {}
+
   ufo@1.6.1: {}
 
   uglify-js@3.19.3:
@@ -14649,6 +14678,6 @@ snapshots:
 
   zod@3.25.55: {}
 
-  zod@4.0.5: {}
+  zod@4.0.15: {}
 
   zwitch@2.0.4: {}

@@ -1,0 +1,28 @@
+{
+  "name": "@delivery/auth",
+  "type": "module",
+  "version": "1.0.0",
+  "packageManager": "pnpm@10.11.0",
+  "author": "",
+  "license": "ISC",
+  "keywords": [],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "jose": "^5.10.0"
+  },
+  "devDependencies": {
+    "@delivery/eslint-config": "workspace:*",
+    "eslint": "catalog:",
+    "typescript": "^5.9.2"
+  }
+}

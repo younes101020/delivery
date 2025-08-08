@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@delivery/jobs": "workspace:*",
+    "@delivery/auth": "workspace:*",
     "@octokit/app": "^15.1.0",
     "@octokit/auth-app": "^7.1.3",
     "@octokit/rest": "^21.0.2",
