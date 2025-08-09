@@ -5,6 +5,7 @@ import { createErrorSchema } from "stoker/openapi/schemas";
 
 import { badRequestSchema, internalServerSchema, notFoundSchema } from "@/lib/constants";
 import { createDatabaseSchema, databaseLinkSchema, DatabaseParamsSchema, databaseSchema } from "@/lib/dto/databases.dto";
+import { rbacMiddleware } from "@/middlewares/rbac";
 
 import { DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE, NO_CONTAINER_SERVICE_ERROR_MESSAGE, UNSUPPORTED_DATABASES_ERROR_MESSAGE } from "./lib/remote-docker/const";
 
@@ -27,6 +28,7 @@ export const create = createRoute({
       "The validation error(s)",
     ),
   },
+  middleware: rbacMiddleware,
 });
 
 export const list = createRoute({
@@ -76,6 +78,7 @@ export const stop = createRoute({
     },
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Database service not found"),
   },
+  middleware: rbacMiddleware,
 });
 
 export const start = createRoute({
@@ -92,6 +95,7 @@ export const start = createRoute({
     },
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Database service not found"),
   },
+  middleware: rbacMiddleware,
 });
 
 export const remove = createRoute({
@@ -108,6 +112,7 @@ export const remove = createRoute({
     },
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Database service not found"),
   },
+  middleware: rbacMiddleware,
 });
 
 export const link = createRoute({
@@ -136,6 +141,7 @@ export const link = createRoute({
       "The validation error(s)",
     ),
   },
+  middleware: rbacMiddleware,
 });
 
 export type CreateRoute = typeof create;

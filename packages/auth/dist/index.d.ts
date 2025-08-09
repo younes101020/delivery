@@ -1,6 +1,7 @@
 export interface SessionData {
     user: {
         id: number;
+        role: string;
     };
     expires: string;
 }

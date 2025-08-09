@@ -5,6 +5,7 @@ import { createErrorSchema } from "stoker/openapi/schemas";
 
 import { notFoundSchema } from "@/lib/constants";
 import { currentJobSchema, deploymentTrackerIdentifier, insertDeploymentSchema, jobIdParamsSchema, previousJobSchema, queueSchema } from "@/lib/dto";
+import { rbacMiddleware } from "@/middlewares/rbac";
 
 const tags = ["Deployments"];
 
@@ -27,6 +28,7 @@ export const create = createRoute({
       "The validation error(s)",
     ),
   },
+  middleware: rbacMiddleware,
 });
 
 export const redeploy = createRoute({
@@ -47,6 +49,7 @@ export const redeploy = createRoute({
       "The validation error(s)",
     ),
   },
+  middleware: rbacMiddleware,
 });
 
 export const streamPreview = createRoute({
@@ -166,6 +169,7 @@ export const retryJob = createRoute({
       "The validation error(s)",
     ),
   },
+  middleware: rbacMiddleware,
 });
 
 export type StreamLogsRoute = typeof streamLog;

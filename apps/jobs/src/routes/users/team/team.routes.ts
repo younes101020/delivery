@@ -4,6 +4,7 @@ import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 
 import { notFoundSchema } from "@/lib/constants";
+import { rbacMiddleware } from "@/middlewares/rbac";
 
 import { revokedUserTeamSchema, selectUserTeamWithMembersSchema } from "./lib/dto";
 
@@ -46,6 +47,7 @@ export const revokeUserTeam = createRoute({
       "Validation error(s)",
     ),
   },
+  middleware: rbacMiddleware,
 });
 
 export type GetUserTeamRoute = typeof getUserTeam;

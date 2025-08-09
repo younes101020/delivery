@@ -4,6 +4,8 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 import { jsonContent } from "stoker/openapi/helpers";
 import { createMessageObjectSchema } from "stoker/openapi/schemas";
 
+import { rbacMiddleware } from "@/middlewares/rbac";
+
 import { updatedVersionSchema, versionSchema } from "./lib/dto/version.dto";
 
 const tags = ["Version"];
@@ -40,6 +42,7 @@ export const updateVersion = createRoute({
       "Delivery service specification not found.",
     ),
   },
+  middleware: rbacMiddleware,
 });
 
 export type GetVersionRoute = typeof getVersion;

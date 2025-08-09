@@ -7,6 +7,7 @@ import {
   insertEnvironmentVariablesSchema,
   selectEnvironmentVariablesSchema,
 } from "@/lib/dto/envvars.dto";
+import { rbacMiddleware } from "@/middlewares/rbac";
 
 const tags = ["Envvars"];
 
@@ -30,6 +31,7 @@ export const create = createRoute({
       "The validation error(s)",
     ),
   },
+  middleware: rbacMiddleware,
 });
 
 export type CreateRoute = typeof create;

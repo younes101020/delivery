@@ -4,6 +4,7 @@ import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 
 import { notFoundSchema } from "@/lib/constants";
+import { rbacMiddleware } from "@/middlewares/rbac";
 
 import { approvedInvitationSchema, createInvitationsSchema, InvitationSearchParam, selectInvitationSchema, selectInvitationsSchema } from "./lib/dto";
 
@@ -43,6 +44,7 @@ export const createTeamInvitation = createRoute({
       "The validation error(s)",
     ),
   },
+  middleware: rbacMiddleware,
 });
 
 export const approveInvitation = createRoute({
@@ -63,6 +65,7 @@ export const approveInvitation = createRoute({
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Invitation or invited user not found."),
 
   },
+  middleware: rbacMiddleware,
 });
 
 export type GetTeamInvitation = typeof getTeamInvitation;

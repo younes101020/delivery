@@ -11,6 +11,7 @@ import {
   selectApplicationsSchema,
   selectApplicationsSchemaWithSharedEnv,
 } from "@/lib/dto";
+import { rbacMiddleware } from "@/middlewares/rbac";
 
 const tags = ["Applications"];
 
@@ -62,6 +63,7 @@ export const stop = createRoute({
     },
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Application not found"),
   },
+  middleware: rbacMiddleware,
 });
 
 export const start = createRoute({
@@ -78,6 +80,7 @@ export const start = createRoute({
     },
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Application container not found"),
   },
+  middleware: rbacMiddleware,
 });
 
 export const getOne = createRoute({
@@ -119,6 +122,7 @@ export const patch = createRoute({
       "The validation error(s)",
     ),
   },
+  middleware: rbacMiddleware,
 });
 
 export const remove = createRoute({
@@ -142,6 +146,7 @@ export const remove = createRoute({
       "Failed to clean up application source from disk.",
     ),
   },
+  middleware: rbacMiddleware,
 });
 
 export type ListRoute = typeof list;

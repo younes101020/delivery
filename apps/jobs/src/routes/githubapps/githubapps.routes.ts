@@ -9,6 +9,7 @@ import {
   patchGithubAppsSchema,
   selectGithubAppsSchema,
 } from "@/lib/dto/githubapps.dto";
+import { rbacMiddleware } from "@/middlewares/rbac";
 
 const tags = ["Githubapps"];
 
@@ -38,6 +39,7 @@ export const create = createRoute({
       "The validation error(s)",
     ),
   },
+  middleware: rbacMiddleware,
 });
 
 export const getOne = createRoute({
@@ -76,6 +78,7 @@ export const patch = createRoute({
       "The validation error(s)",
     ),
   },
+  middleware: rbacMiddleware,
 });
 
 export type ListRoute = typeof list;

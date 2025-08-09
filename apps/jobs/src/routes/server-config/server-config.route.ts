@@ -4,6 +4,7 @@ import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 
 import { notFoundSchema } from "@/lib/constants";
+import { rbacMiddleware } from "@/middlewares/rbac";
 import { patchServerConfigSchema, patchServerWebServiceConfigSchema, selectServerConfigSchema, selectServerWebServiceConfigSchema } from "@/routes/server-config/lib/dto/server-config.dto";
 
 const tags = ["Server configuration"];
@@ -35,6 +36,7 @@ export const patch = createRoute({
       "The validation error(s)",
     ),
   },
+  middleware: rbacMiddleware,
 });
 
 export const getWebService = createRoute({
@@ -65,6 +67,7 @@ export const patchWebService = createRoute({
       "The validation error(s)",
     ),
   },
+  middleware: rbacMiddleware,
 });
 
 export type PatchRoute = typeof patch;
