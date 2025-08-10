@@ -41,6 +41,7 @@ services:
       - TEST_USERS_PASSWORD=${TEST_USERS_PASSWORD}
       - ENABLE_DEPLOYMENT_QUEUE_MONITORING=${ENABLE_DEPLOYMENT_QUEUE_MONITORING}
       - DOCKER_GID=${DOCKER_GID}
+      - AUTH_SECRET=${AUTH_SECRET}
     volumes:
       - /data/delivery/ssh/keys:/var/ssh/keys
       - /var/run/docker.sock:/var/run/docker.sock
