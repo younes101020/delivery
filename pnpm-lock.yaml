@@ -6,6 +6,9 @@ settings:
 
 catalogs:
   default:
+    drizzle-orm:
+      specifier: ^0.44.2
+      version: 0.44.2
     eslint:
       specifier: ^9.18.0
       version: 9.28.0
@@ -341,6 +344,9 @@ importers:
       concurrently:
         specifier: ^9.1.0
         version: 9.1.2
+      eslint:
+        specifier: 'catalog:'
+        version: 9.28.0(jiti@2.4.2)
       msw:
         specifier: ^2.10.4
         version: 2.10.4(@types/node@20.19.0)(typescript@5.8.3)

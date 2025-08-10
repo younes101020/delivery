@@ -5,6 +5,7 @@
   "license": "MIT",
   "exports": {
     "./types": "./src/lib/dto/index.ts",
+    "./session": "./src/routes/auth/lib/dto.ts",
     "./http": "./src/app.ts",
     "./hc": {
       "import": {

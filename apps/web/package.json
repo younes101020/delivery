@@ -12,8 +12,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@delivery/jobs": "workspace:*",
     "@delivery/auth": "workspace:*",
+    "@delivery/jobs": "workspace:*",
     "@octokit/app": "^15.1.0",
     "@octokit/auth-app": "^7.1.3",
     "@octokit/rest": "^21.0.2",
@@ -74,6 +74,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "concurrently": "^9.1.0",
+    "eslint": "catalog:",
     "msw": "^2.10.4",
     "postcss": "^8",
     "tailwindcss": "4.1.11",

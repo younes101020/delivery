@@ -4,9 +4,8 @@ import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema } from "stoker/openapi/schemas";
 
 import { unauthorizedSchema } from "@/lib/constants";
-import { selectUserSchema } from "@/lib/dto";
 
-import { authRegisterSchema, authVerifySchema } from "./lib/dto";
+import { authRegisterSchema, authVerifySchema, userSessionSchema } from "./lib/dto";
 
 const tags = ["Auth"];
 
@@ -18,7 +17,7 @@ export const verify = createRoute({
   },
   tags,
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(selectUserSchema, "The authenticated user"),
+    [HttpStatusCodes.OK]: jsonContent(userSessionSchema, "User session information"),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(unauthorizedSchema, "Invalid user credentials"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(authVerifySchema),
@@ -35,7 +34,7 @@ export const register = createRoute({
   },
   tags,
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(selectUserSchema, "The registered user"),
+    [HttpStatusCodes.OK]: jsonContent(userSessionSchema, "User session information"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(authRegisterSchema),
       "The validation error(s)",

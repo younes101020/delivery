@@ -8,8 +8,6 @@ import { client } from "@/app/_lib/client-http";
 import { validatedAction } from "@/app/_lib/form-middleware";
 import { setSession } from "@/app/_lib/session";
 
-import { approveTeamMemberInvite } from "../_lib/server-utils";
-
 export async function signOut() {
   (await cookies()).delete("session");
 }
@@ -37,20 +35,12 @@ export const signIn = validatedAction(signInSchema, async (data) => {
     json: {
       email,
       password,
+      invitationId: inviteId ? Number.parseInt(inviteId) : undefined,
     },
   });
 
   if (response.status !== 200) {
     return { error: "Invalid email or password. Please try again.", inputs: data };
-  }
-
-  const approveResp = await approveTeamMemberInvite({
-    invitationId: inviteId,
-    invitedUserEmail: email,
-  });
-
-  if (approveResp?.error) {
-    return { error: approveResp.error, inputs: data };
   }
 
   const user = await response.json();

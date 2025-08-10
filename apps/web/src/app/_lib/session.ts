@@ -1,5 +1,5 @@
 import type { SessionData } from "@delivery/auth";
-import type { SelectUserSchema } from "@delivery/jobs/types";
+import type { UserSession } from "@delivery/jobs/session";
 import type { NextRequest } from "next/server";
 
 import { signToken, verifyToken } from "@delivery/auth";
@@ -47,7 +47,7 @@ export async function getSession() {
   return await verifyToken(session);
 }
 
-export async function setSession(user: SelectUserSchema) {
+export async function setSession(user: UserSession) {
   const expiresInOneDay = new Date(Date.now() + 24 * 60 * 60 * 1000);
   const session: SessionData = {
     user: { id: user.id, role: user.role },

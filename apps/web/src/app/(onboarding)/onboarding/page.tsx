@@ -9,6 +9,7 @@ import { getUser } from "@/app/_lib/user-session";
 import { Login } from "../../_components/login-form";
 import { DomainNameForm } from "./_components/domain-name-form";
 import { GithubAppForm } from "./_components/github-app-form";
+import { SkipOnboardingForm } from "./_components/skip-onboarding";
 import { StepProvider } from "./_components/step";
 import { getServerConfiguration } from "./_lib/queries";
 
@@ -18,7 +19,11 @@ interface SearchParams {
 
 export default function OnboardingPage({ searchParams }: SearchParams) {
   return (
-    <div className="flex justify-center items-center h-full lg:*:w-[70%] *:w-[90%]">
+    <div className="flex justify-center items-center h-full max-w-7xl mx-auto relative">
+      <Suspense fallback={<PendingSkipStepper />}>
+        <SkipDeploymentForm searchParams={searchParams} />
+      </Suspense>
+
       <StepProvider>
         <Suspense fallback={<CheckStepStatusLoadingScreen />}>
           <LoginStep searchParams={searchParams} />
@@ -72,6 +77,30 @@ async function LoginStep(props: SearchParams) {
     redirect("/onboarding/?step=2");
   }
   return <Login isOnboarding={true} />;
+}
+
+async function SkipDeploymentForm(props: SearchParams) {
+  const searchParams = await props.searchParams;
+  const onboardingStep = searchParams ? (Number.parseInt(searchParams.step) || 0) : null;
+
+  if (!onboardingStep)
+    return null;
+
+  // At least, complete first step (login) to skip deployment
+  if (onboardingStep < 2)
+    return null;
+
+  return (
+    <div className="absolute top-4 right-0 shadow-lg">
+      <SkipOnboardingForm />
+    </div>
+  );
+}
+
+function PendingSkipStepper() {
+  return (
+    <Skeleton className="h-28 w-44" />
+  );
 }
 
 function CheckStepStatusLoadingScreen() {

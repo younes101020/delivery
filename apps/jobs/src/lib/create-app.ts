@@ -1,6 +1,7 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { bearerAuth } from "hono/bearer-auth";
 import { except } from "hono/combine";
+import { contextStorage } from "hono/context-storage";
 import { cors } from "hono/cors";
 import { notFound, onError, serveEmojiFavicon } from "stoker/middlewares";
 import { defaultHook } from "stoker/openapi";
@@ -40,6 +41,9 @@ export default function createApp() {
       console.error("Error in app:", e);
     return onError(e, c);
   });
+
+  app.use(contextStorage());
+
   return app;
 }
 

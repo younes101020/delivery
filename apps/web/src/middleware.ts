@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { checkSession } from "@/app/_lib/session";
 
 import { dashboardMiddleware } from "./app/(dashboard)/dashboard/middleware";
-import { onboardingMiddleware } from "./app/(onboarding)/onboarding/middleware";
+import { ONBOARDING_PREFIX_ROUTE, onboardingMiddleware, shouldSkipOnboarding } from "./app/(onboarding)/onboarding/middleware";
 import { apiMiddleware } from "./app/api/middleware";
 
 export async function middleware(request: NextRequest) {
@@ -15,6 +15,8 @@ export async function middleware(request: NextRequest) {
   const isOnboardingRoute = pathname.startsWith("/onboarding");
   const isDashboardRoute = pathname.startsWith("/dashboard");
 
+  const sessionCookie = request.cookies.get("session");
+
   if (isDashboardRoute)
     return dashboardMiddleware(request);
   if (isOnboardingRoute)
@@ -23,6 +25,14 @@ export async function middleware(request: NextRequest) {
     return apiMiddleware(request);
 
   const res = NextResponse.next();
+
+  const skiponboarding = await shouldSkipOnboarding(request, res);
+
+  if (!skiponboarding)
+    return NextResponse.redirect(new URL(ONBOARDING_PREFIX_ROUTE, request.url));
+
+  if (!sessionCookie)
+    return res;
 
   try {
     await checkSession(request);
@@ -42,12 +52,6 @@ export const config = {
   matcher: [
     {
       source: "/",
-      has: [
-        {
-          type: "cookie",
-          key: "session",
-        },
-      ],
     },
     {
       source: "/api/:path*",

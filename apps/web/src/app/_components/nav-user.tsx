@@ -91,11 +91,12 @@ function UserInfo() {
   if (!session.user)
     return null;
   const { user } = session;
-
+  console.log("User Info:", user);
   return (
     <div className="grid flex-1 text-left text-sm leading-tight">
       <span className="truncate font-semibold">{user.name}</span>
       <span className="truncate text-xs">{user.email}</span>
+      <span className="truncate text-xs text-muted-foreground">{user.role}</span>
     </div>
   );
 }

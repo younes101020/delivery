@@ -66,7 +66,7 @@ describe("auth routes / integration test", () => {
     }
   });
 
-  it("post /auth/verify return user info when credentials are correct", async ({ authRegisteredUser }) => {
+  it("post /auth/verify return user session when credentials are correct", async ({ authRegisteredUser }) => {
     const { email, password } = authRegisteredUser;
     const response = await client.auth.verify.$post(
       {
@@ -78,11 +78,12 @@ describe("auth routes / integration test", () => {
     );
     if (response.status === 200) {
       const json = await response.json();
-      expect(json.email).toBe(authRegisteredUser.email);
+      expect(json.id).toBeDefined();
+      expect(json.role).toBeDefined();
     }
   });
 
-  it("post /auth/register return user info when payload submited", async ({ authUnregisteredUser }) => {
+  it("post /auth/register return user session info when payload submited", async ({ authUnregisteredUser }) => {
     const { email, password } = authUnregisteredUser;
     const response = await client.auth.register.$post(
       {
@@ -94,7 +95,8 @@ describe("auth routes / integration test", () => {
     );
     if (response.status === 200) {
       const json = await response.json();
-      expect(json.email).toBe(authUnregisteredUser.email);
+      expect(json.id).toBeDefined();
+      expect(json.role).toBeDefined();
     }
   });
 

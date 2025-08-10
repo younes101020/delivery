@@ -5,7 +5,6 @@ import {
   environmentVariables,
   githubApp,
   githubAppSecret,
-  teamMembers,
   users,
 } from "@delivery/drizzle/schema";
 import { eq } from "drizzle-orm";
@@ -134,22 +133,6 @@ export async function createUser(user: InsertUserSchema, passwordHash: string) {
     .values({ ...user, passwordHash })
     .returning();
   return inserted;
-}
-
-export async function getUserById(userId: number) {
-  const result = await db
-    .select({
-      user: users,
-      teamId: teamMembers.teamId,
-    })
-    .from(users)
-    .leftJoin(teamMembers, eq(users.id, teamMembers.userId))
-    .where(eq(users.id, userId))
-    .limit(1);
-
-  const { passwordHash, ...userWithoutPassword } = result[0].user;
-
-  return { ...userWithoutPassword, teamId: result[0].teamId };
 }
 
 export async function updateUser(id: number, updates: Partial<InsertUserSchema>) {

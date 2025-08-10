@@ -15,13 +15,9 @@ export const users = pgTable("users", {
   name: text("name"),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
-  role: text("role").notNull().default("member"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   deletedAt: timestamp("deleted_at"),
-  emailVerified: boolean("email_verified").default(false),
-  emailVerificationToken: text("email_verification_token"),
-  emailVerificationTokenExpiresAt: timestamp("email_verification_token_expires_at"),
 });
 
 export const githubApp = pgTable("github_app", {

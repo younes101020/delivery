@@ -36,7 +36,7 @@ export const it = base.extend<Fixtures>({
   },
   registeredUser: async ({}, use) => {
     const registeredUser = await getRandomRegisteredUser();
-    await use(registeredUser);
+    await use({ ...registeredUser, role: "member" });
   },
   randomRegisteredTeamId: async ({}, use) => {
     const randomRegisteredTeamId = await getRandomRegisteredTeamId();

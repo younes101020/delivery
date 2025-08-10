@@ -6,8 +6,8 @@ import { z } from "zod";
 
 import { client } from "./_lib/client-http";
 import { validatedAction, validatedActionWithUser } from "./_lib/form-middleware";
-import { approveTeamMemberInvite } from "./_lib/server-utils";
 import { setSession } from "./_lib/session";
+import { getUser } from "./_lib/user-session";
 
 const signUpSchema = z.object({
   email: z.string().email(),
@@ -21,20 +21,12 @@ const signUpSchema = z.object({
 export const signUp = validatedAction(signUpSchema, async (data) => {
   const { email, password, inviteId } = data;
 
-  const approveResp = await approveTeamMemberInvite({
-    invitationId: inviteId,
-    invitedUserEmail: email,
-  });
-
-  if (approveResp?.error) {
-    return { error: approveResp.error, inputs: data };
-  }
-
   const http = await client();
   const response = await http.auth.register.$post({
     json: {
       email,
       password,
+      invitationId: inviteId ? Number.parseInt(inviteId) : undefined,
     },
   });
 
@@ -129,31 +121,29 @@ export const deploy = validatedActionWithUser(
   },
 );
 
-export const skipOnboardingDeployment = validatedActionWithUser(
-  deploySchema,
-  async (data, _, prev, user) => {
-    const { isOnboarding } = data;
+export async function skipOnboardingDeployment() {
+  const user = await getUser();
 
-    const http = await client();
-    if (isOnboarding) {
-      const response = await http.serverconfig.$patch({
-        json: {
-          completedByUserId: user.id.toString(),
-          onboardingCompleted: true,
-        },
-      });
-      if (!response.ok) {
-        return { error: "Something went wrong, please retry later.", inputs: data };
-      }
-      (await cookies()).set("skiponboarding", "true", {
-        maxAge: 60 * 60 * 24 * 7,
-        path: "/",
-      });
-    }
+  if (!user)
+    throw new Error("User is not authenticated");
 
-    redirect(`/dashboard/applications`);
-  },
-);
+  const http = await client();
+
+  const response = await http.serverconfig.$patch({
+    json: {
+      completedByUserId: user.id.toString(),
+      onboardingCompleted: true,
+    },
+  });
+  if (!response.ok)
+    throw new Error("Something went wrong, please retry later.");
+  (await cookies()).set("skiponboarding", "true", {
+    maxAge: 60 * 60 * 24 * 7,
+    path: "/",
+  });
+
+  redirect(`/dashboard/applications`);
+}
 
 const retryDeploySchema = z.object({
   repoName: z.string(),

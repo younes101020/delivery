@@ -17,7 +17,6 @@ export async function onboardingMiddleware(request: NextRequest) {
   const res = NextResponse.next();
 
   const skiponboarding = await shouldSkipOnboarding(request, res);
-
   if (isOnboardingRoute && skiponboarding)
     return NextResponse.redirect(new URL("/", request.url));
 
@@ -31,6 +30,9 @@ export async function onboardingMiddleware(request: NextRequest) {
 
     return NextResponse.redirect(new URL(`${ONBOARDING_PREFIX_ROUTE}/verify?redirectTo=${redirectTo}`, request.url));
   }
+
+  if (!sessionCookie)
+    return res;
 
   try {
     await checkSession(request);

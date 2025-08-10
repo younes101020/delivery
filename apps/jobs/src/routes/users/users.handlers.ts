@@ -5,13 +5,15 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 import type { AppRouteHandler } from "@/lib/types";
 
 import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
-import { getUserById, updateUser } from "@/lib/queries/queries";
+import { updateUser } from "@/lib/queries/queries";
 
 import type { GetOneRoute, PatchRoute } from "./users.routes";
 
+import { getUserInfoById } from "./lib/services";
+
 export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   const { id } = c.req.valid("param");
-  const user = await getUserById(id);
+  const user = await getUserInfoById(id);
 
   if (!user) {
     return c.json(

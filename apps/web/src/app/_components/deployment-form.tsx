@@ -2,7 +2,7 @@
 
 import type { CheckedState } from "@radix-ui/react-checkbox";
 
-import { ChevronLast, Loader2, Rocket } from "lucide-react";
+import { Loader2, Rocket } from "lucide-react";
 import { useActionState, useState } from "react";
 
 import { Button } from "@/app/_components/ui/button";
@@ -13,8 +13,9 @@ import { Label } from "@/app/_components/ui/label";
 import type { ActionState } from "../_lib/form-middleware";
 
 import { useDeploymentSelectedApplication } from "../_ctx/deployment-selected-application";
-import { deploy, skipOnboardingDeployment } from "../actions";
+import { deploy } from "../actions";
 import { Paragraph } from "./ui/paragraph";
+import { Separator } from "./ui/separator";
 import { Textarea } from "./ui/textarea";
 
 interface DeploymentProps {
@@ -32,10 +33,6 @@ export function DeploymentForm({ isOnboarding = false, children }: DeploymentPro
       cache: true,
       staticdeploy: initialStaticChoice,
     },
-  });
-  const [_, skipDeploymentFormAction, skipDeploymentPending] = useActionState<ActionState, FormData>(skipOnboardingDeployment, {
-    error: "",
-    inputs: {},
   });
   const { selectedApplication } = useDeploymentSelectedApplication();
   const [isStaticDeployment, setIsStaticDeployment] = useState<CheckedState>(initialStaticChoice);
@@ -172,48 +169,24 @@ export function DeploymentForm({ isOnboarding = false, children }: DeploymentPro
               {state.error}
             </Paragraph>
           )}
-          <div className="flex gap-2">
-            {isOnboarding && (
-              <Button
-                type="submit"
-                variant="outline"
-                disabled={pending}
-                formAction={skipDeploymentFormAction}
-              >
-                {skipDeploymentPending
-                  ? (
-                      <>
-                        <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                        Loading...
-                      </>
-                    )
-                  : (
-                      <>
-                        <ChevronLast />
-                        {" "}
-                        | Skip
-                      </>
-                    )}
-              </Button>
-            )}
-
-            <Button type="submit" disabled={!selectedApplication.name || pending} aria-label="submit">
-              {pending
-                ? (
-                    <>
-                      <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                      Loading...
-                    </>
-                  )
-                : (
-                    <>
-                      <Rocket />
-                      {" "}
-                      | Deploy
-                    </>
-                  )}
-            </Button>
-          </div>
+          <Button type="submit" disabled={!selectedApplication.name || pending} aria-label="submit">
+            {pending
+              ? (
+                  <>
+                    <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                    Loading...
+                  </>
+                )
+              : (
+                  <>
+                    <Rocket />
+                    {" "}
+                    <Separator orientation="vertical" />
+                    {" "}
+                    Deploy
+                  </>
+                )}
+          </Button>
 
         </div>
       </form>
