@@ -4,7 +4,7 @@ import type { AppRouteHandler } from "@/lib/types";
 
 import type { GetVersionRoute, UpdateVersionRoute } from "./version.routes";
 
-import { getLatestDeliveryVersion } from "./lib/github";
+import { getLatestDeliveryVersion, isPipelineInProgress } from "./lib/github";
 import { getDeliveryServiceVersionInfo, updateDeliveryVersion } from "./lib/remote-docker/service";
 
 export const getVersion: AppRouteHandler<GetVersionRoute> = async (c) => {
@@ -13,7 +13,9 @@ export const getVersion: AppRouteHandler<GetVersionRoute> = async (c) => {
     getLatestDeliveryVersion(),
   ]);
 
-  const isLatest = versionInfo.version === latestVersionInfo;
+  const shouldBeInferredAsLatest = await isPipelineInProgress();
+
+  const isLatest = versionInfo.version === latestVersionInfo || shouldBeInferredAsLatest;
 
   return c.json(
     {

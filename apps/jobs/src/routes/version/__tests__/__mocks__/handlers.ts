@@ -10,4 +10,10 @@ export default [
       tag_name,
     });
   }),
+  http.get(DELIVERY_LATEST_URL, () => {
+    const total_count = faker.number.int({ min: 0, max: 10 });
+    return HttpResponse.json({
+      total_count,
+    });
+  }),
 ];
