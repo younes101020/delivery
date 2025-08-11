@@ -15,6 +15,7 @@ import { Paragraph } from "@/app/_components/ui/paragraph";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { Textarea } from "@/app/_components/ui/textarea";
 import { useFetch } from "@/app/_lib/fetch-provider";
+import { withInvalidation } from "@/app/_lib/utils";
 
 import type { Application } from "../../_lib/queries";
 
@@ -56,7 +57,7 @@ interface AppFormProps {
 
 export function AppForm(applicationData: AppFormProps) {
   const [state, formAction, pending] = useActionState<ActionState<AppFormProps>, FormData>(
-    editApplication,
+    withInvalidation(editApplication, ["applications", "details"]),
     {
       error: "",
       success: "",

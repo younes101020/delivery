@@ -1,6 +1,10 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+import type { ActionState } from "./form-middleware";
+
+import { getQueryClient } from "./react-query-provider";
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -78,3 +82,14 @@ export const createAPIMethod: CreateAPIMethod
         .catch(error => ({ error: `API call failed: ${error}` }))
     );
   };
+
+export function withInvalidation<Args extends unknown[], T extends ActionState>(fn: (...args: Args) => Promise<T>, queryKey: string[]) {
+  return async (...args: Args) => {
+    const queryClient = getQueryClient();
+    const promise = fn(...args);
+
+    queryClient.invalidateQueries({ queryKey });
+
+    return promise;
+  };
+}
