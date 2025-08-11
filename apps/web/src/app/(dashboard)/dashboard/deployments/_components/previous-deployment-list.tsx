@@ -14,11 +14,9 @@ import { PreviousDeploymentPreviewCard } from "./previous-deployment-card";
 
 export function PreviousDeploymentList() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-10 py-10">
-      <Suspense fallback={<Skeleton className="w-full h-16" />}>
-        <List />
-      </Suspense>
-    </div>
+    <Suspense fallback={<Skeleton className="w-full h-16" />}>
+      <List />
+    </Suspense>
   );
 }
 

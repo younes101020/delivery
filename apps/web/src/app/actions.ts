@@ -45,7 +45,6 @@ export async function signOut() {
 }
 
 const deploySchema = z.object({
-  action: z.literal("deploy"),
   repoUrl: z.string(),
   githubAppId: z.coerce.number(),
   isOnboarding: z.coerce.boolean(),
@@ -191,6 +190,5 @@ export async function updateDelivery() {
     return { error: "Failed to update Delivery version", inputs: {} };
   }
   const data = await response.json();
-  console.log("Delivery updated to version", data.version);
   return { success: `Delivery updated to version ${data.version}`, inputs: {} };
 }
