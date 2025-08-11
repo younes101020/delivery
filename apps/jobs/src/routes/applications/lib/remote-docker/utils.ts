@@ -4,7 +4,7 @@ import type { PatchEnvironmentVariablesSchema } from "@/lib/dto";
 import type { ServicesDto } from "@/lib/dto/services.dto";
 
 import { withDocker } from "@/lib/remote-docker/middleware";
-import { getSwarmServiceByName, toServiceSpec } from "@/lib/remote-docker/utils";
+import { getSwarmServicesByName, toServiceSpec } from "@/lib/remote-docker/utils";
 
 export const listApplicationServicesSpec = withDocker<ServicesDto[], Dockerode.ServiceListOptions | undefined>(
   async (docker, opts) => {
@@ -48,7 +48,9 @@ interface PatchApplication {
 
 export const patchApplicationService = withDocker<void, PatchApplication>(
   async (docker, ctx) => {
-    const appServiceMetadata = await getSwarmServiceByName(ctx?.serviceName);
+    const appServicesMetadata = await getSwarmServicesByName([ctx!.serviceName]);
+    const appServiceMetadata = appServicesMetadata[0];
+
     const appService = docker.getService(appServiceMetadata.ID);
 
     const appServiceInspect = await appService.inspect();

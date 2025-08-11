@@ -15,7 +15,7 @@ import {
   patchApplication,
 } from "@/lib/queries/queries";
 import { getDockerResourceEvents } from "@/lib/remote-docker";
-import { getSwarmServiceByName } from "@/lib/remote-docker/utils";
+import { getSwarmServicesByName } from "@/lib/remote-docker/utils";
 import { ssh } from "@/lib/ssh";
 import { getJobAndQueueNameByJobId } from "@/lib/tasks/utils";
 
@@ -163,7 +163,8 @@ export const streamCurrentApplication: AppRouteHandler<StreamCurrentApplicationR
 
 export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   const { name } = c.req.valid("param");
-  const [application, applicationService] = await Promise.all([getApplicationWithEnvVarsByName(name), getSwarmServiceByName(name)]);
+  const [application, applicationServices] = await Promise.all([getApplicationWithEnvVarsByName(name), getSwarmServicesByName([name])]);
+  const applicationService = applicationServices[0];
 
   if (!application) {
     return c.json(
@@ -247,7 +248,7 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
 export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
   const { name } = c.req.valid("param");
 
-  const applicationService = await getSwarmServiceByName(name)
+  const applicationServices = await getSwarmServicesByName([name])
     .catch((error) => {
       if (error instanceof Error) {
         const errorResponse = error instanceof HTTPException && error.getResponse();
@@ -257,6 +258,8 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
         }
       }
     });
+
+  const applicationService = applicationServices ? applicationServices[0] : null;
 
   await Promise.all([
     ...(applicationService ? [removeApplicationResource(applicationService.ID)] : []),

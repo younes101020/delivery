@@ -8,7 +8,7 @@ import type { ServicesDto } from "@/lib/dto/services.dto";
 
 import { getDocker } from "@/lib/remote-docker";
 import { withDocker, withSwarmService } from "@/lib/remote-docker/middleware";
-import { getSwarmServiceByName, toServiceSpec } from "@/lib/remote-docker/utils";
+import { getSwarmServicesByName, toServiceSpec } from "@/lib/remote-docker/utils";
 import { generateRandomString } from "@/lib/utils";
 
 import { DATABASES_CONTAINER_NOT_FOUND_ERROR_MESSAGE, DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE, NO_CONTAINER_SERVICE_ERROR_MESSAGE, UNSUPPORTED_DATABASES_ERROR_MESSAGE } from "./const";
@@ -91,7 +91,8 @@ export async function getDatabaseEnvVarsByEnvVarKeys(containerId: string, envVar
 
 export const addEnvironmentVariableToAppService = withDocker<void, { serviceName: string; plainEnv: string }>(
   async (docker, ctx) => {
-    const appServiceMetadata = await getSwarmServiceByName(ctx?.serviceName);
+    const appServicesMetadata = await getSwarmServicesByName([ctx!.serviceName]);
+    const appServiceMetadata = appServicesMetadata[0];
 
     const appService = docker.getService(appServiceMetadata.ID);
     const appServiceInspect = await appService.inspect();

@@ -1,8 +1,8 @@
 import { DeploymentError } from "@/lib/error";
-import { getSwarmServiceByName } from "@/lib/remote-docker/utils";
+import { getSwarmServicesByName } from "@/lib/remote-docker/utils";
 
 export async function synchroniseApplicationServiceWithLocalImage(targetApplicationServiceName: string) {
-  const applicationService = await getSwarmServiceByName(targetApplicationServiceName)
+  const applicationServices = await getSwarmServicesByName([targetApplicationServiceName])
     .catch((error) => {
       throw new DeploymentError({
         name: "DEPLOYMENT_APP_ERROR",
@@ -10,6 +10,7 @@ export async function synchroniseApplicationServiceWithLocalImage(targetApplicat
       });
     });
 
+  const applicationService = applicationServices[0];
   const currentServiceSpec = await applicationService.inspect();
 
   currentServiceSpec.Spec.TaskTemplate.ForceUpdate = 1;
