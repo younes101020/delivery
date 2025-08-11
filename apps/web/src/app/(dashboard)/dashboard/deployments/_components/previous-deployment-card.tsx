@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { Button, buttonVariants } from "@/app/_components/ui/button";
 import { Card, CardContent, CardFooter } from "@/app/_components/ui/card";
-import { Dialog, DialogTrigger } from "@/app/_components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/app/_components/ui/dialog";
 import { cn } from "@/app/_lib/utils";
 
 import { DeploymentLogsCard } from "./deployment-logs";
@@ -40,7 +40,9 @@ export function PreviousDeploymentPreviewCard({
           <DialogTrigger asChild>
             <Button className="text-xs">View build logs</Button>
           </DialogTrigger>
-          <DeploymentLogsCard logs={logs} />
+          <DialogContent>
+            <DeploymentLogsCard logs={logs} />
+          </DialogContent>
         </Dialog>
         <Link href={`/dashboard/applications/${applicationId}`} className={cn(buttonVariants({ variant: "outline" }), "text-xs")}>
           Application setting
