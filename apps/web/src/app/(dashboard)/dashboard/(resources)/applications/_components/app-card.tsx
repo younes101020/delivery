@@ -13,7 +13,6 @@ import type { ContainerStatusProps } from "../../types";
 import { AppOptions } from "./app-options";
 import { ApplicationActions } from "./application-actions";
 import { ApplicationStatus } from "./application-status";
-import { InjectEnvCard } from "./link-to-database";
 // to avoid hydration mismatch
 const AppDeploymentDate = dynamic(() => import("./app-deployment-date"), { ssr: false });
 
@@ -23,13 +22,9 @@ interface AppCardProps {
   id: string;
   firstDeploymentAt: string;
   lastDeployed?: string;
-  databases: {
-    id: string;
-    name: string;
-  }[] | null;
 }
 
-export function AppCard({ name, firstDeploymentAt, id, initialState, databases }: AppCardProps) {
+export function AppCard({ name, firstDeploymentAt, id, initialState }: AppCardProps) {
   return (
 
     <Card className="w-full transition-all">
@@ -59,9 +54,8 @@ export function AppCard({ name, firstDeploymentAt, id, initialState, databases }
           </Suspense>
         </dl>
       </CardContent>
-      <CardFooter className="flex flex-wrap gap-2">
+      <CardFooter>
         <Link href={`/dashboard/applications/${name}`} className={buttonVariants()}>View details</Link>
-        <InjectEnvCard applicationName={name} databases={databases} />
       </CardFooter>
     </Card>
 

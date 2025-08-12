@@ -9,7 +9,7 @@ import { Skeleton } from "@/app/_components/ui/skeleton";
 import { useFetch } from "@/app/_lib/fetch-provider";
 import { formatDate } from "@/app/_lib/utils";
 
-import type { ActiveContainers, Applications } from "./types";
+import type { Applications } from "./types";
 
 import { AppCard } from "./app-card";
 import { NewAppCard } from "./new-app-card";
@@ -27,15 +27,15 @@ export function ApplicationList() {
 
 function List() {
   const { fetcher } = useFetch();
-  const apps = useSuspenseQuery<[Applications, ActiveContainers]>({
+  const apps = useSuspenseQuery<Applications>({
     queryKey: ["applications"],
     queryFn: () => fetcher("/api/applications"),
   });
 
-  if (!apps.data || !apps.data[0] || apps.data[0].length < 1)
+  if (!apps.data || apps.data.length < 1)
     return <NoApplication />;
 
-  const [applications, dbServices] = apps.data;
+  const applications = apps.data;
 
   return (
     <>
@@ -46,7 +46,6 @@ function List() {
           name={application.name}
           initialState={application.isActive ? "running" : "stop"}
           firstDeploymentAt={formatDate(application.createdAt) ?? "Unknown"}
-          databases={dbServices}
         />
       ))}
     </>

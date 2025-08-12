@@ -5,15 +5,14 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import { patchApplication } from "@/lib/queries/queries";
 import { getDockerResourceEvents } from "@/lib/remote-docker";
 import { queueNames } from "@/lib/tasks/const";
 import { getJobAndQueueNameByJobId } from "@/lib/tasks/utils";
 
-import type { CreateRoute, LinkRoute, ListRoute, RemoveRoute, StartRoute, StopRoute, StreamCurrentDatabaseRoute } from "./databases.routes";
+import type { CreateRoute, ListRoute, RemoveRoute, StartRoute, StopRoute, StreamCurrentDatabaseRoute } from "./databases.routes";
 import type { AllQueueDatabaseJobsData } from "./lib/tasks/types";
 
-import { addEnvironmentVariableToAppService, buildDatabaseUriFromEnvVars, getDbCredentialsEnvVarsAndDatabaseByServiceId, listDatabaseServicesSpec } from "./lib/remote-docker/utils";
+import { databaseUriBuilderMap, listDatabaseServicesSpec } from "./lib/remote-docker/utils";
 import { PREFIX } from "./lib/tasks/const";
 import { createDatabase } from "./lib/tasks/create-database";
 import { removeDatabase } from "./lib/tasks/remove-database";
@@ -32,17 +31,25 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
     listDatabaseServicesSpec(),
     getDatabasesActiveJobs(),
   ]);
-  const databasesWithStatus = databases.map((db) => {
-    const activeJob = activeJobs.find(job => job.containerId === db.id);
-    if (activeJob) {
+  const databasesWithStatusAndUriConnection = databases.map(
+    ({ environmentVariables, ...dbWithoutEnv }) => {
+      const activeJob = activeJobs.find(job => job.containerId === dbWithoutEnv.id);
+      const dbUriBuilder = databaseUriBuilderMap.get(dbWithoutEnv.image);
+      const dbConnectionUri = dbUriBuilder ? dbUriBuilder.buildUri(environmentVariables) : null;
+      if (activeJob) {
+        return {
+          ...dbWithoutEnv,
+          isProcessing: true,
+          dbConnectionUri,
+        };
+      }
       return {
-        ...db,
-        isProcessing: true,
+        ...dbWithoutEnv,
+        dbConnectionUri,
       };
-    }
-    return db;
-  });
-  return c.json(databasesWithStatus, HttpStatusCodes.OK);
+    },
+  );
+  return c.json(databasesWithStatusAndUriConnection, HttpStatusCodes.OK);
 };
 
 export const stop: AppRouteHandler<StopRoute> = async (c) => {
@@ -154,20 +161,4 @@ export const streamCurrentDatabase: AppRouteHandler<StreamCurrentDatabaseRoute> 
     });
     // casting cause: no typescript support for sse in hono https://github.com/honojs/hono/issues/3309
   }) as any;
-};
-
-export const link: AppRouteHandler<LinkRoute> = async (c) => {
-  const { id } = c.req.valid("param");
-  const { environmentKey, applicationName } = c.req.valid("json");
-
-  const { credentialsEnvVars, database } = await getDbCredentialsEnvVarsAndDatabaseByServiceId(id);
-
-  const databaseUri = buildDatabaseUriFromEnvVars(credentialsEnvVars, database);
-
-  await Promise.all([
-    patchApplication(applicationName, { applicationData: {}, environmentVariable: [{ key: environmentKey, value: databaseUri! }] }),
-    addEnvironmentVariableToAppService({ serviceName: applicationName, plainEnv: `${environmentKey}=${databaseUri}` }),
-  ]);
-
-  return c.json(null, HttpStatusCodes.OK);
 };

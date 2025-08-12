@@ -15,12 +15,14 @@ const checkIfResourceRunning = withDocker<boolean, string>(async (docker, servic
 
 export async function toServiceSpec(service: Dockerode.Service) {
   const taskTemplate = service.Spec?.TaskTemplate as Dockerode.ContainerTaskSpec;
+  const environmentVariables = taskTemplate.ContainerSpec?.Env || [];
   const name = service.Spec?.Name ?? "Anonymous";
   const isActive = await checkIfResourceRunning(service.Spec?.Name);
   return {
     id: service.ID,
     name,
-    image: taskTemplate.ContainerSpec?.Image,
+    image: taskTemplate.ContainerSpec?.Image || "Unknown",
+    environmentVariables,
     isActive,
     isProcessing: false,
     createdAt: service.CreatedAt!,

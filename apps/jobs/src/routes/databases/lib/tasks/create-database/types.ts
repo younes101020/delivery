@@ -1,7 +1,8 @@
 import type { Job } from "bullmq";
 
-import type { CreateDatabaseSchema } from "@/lib/dto";
 import type { MergeSubJobs } from "@/lib/tasks/types";
+
+import type { CreateDatabaseSchema } from "../../dto";
 
 type dbType = CreateDatabaseSchema["type"];
 

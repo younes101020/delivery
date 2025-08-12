@@ -19,9 +19,9 @@ import { Separator } from "@/app/_components/ui/separator";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { useUser } from "@/app/_hooks/use-user";
 import { useFetch } from "@/app/_lib/fetch-provider";
+import { CopyButton } from "@/app/(dashboard)/dashboard/_components/copy-button";
 
 import { inviteTeamMember } from "../actions";
-import { CopyButton } from "./invitation-url";
 import { RevokeTeamMemberForm } from "./revoke-team-member-form";
 
 export function TeamList() {

@@ -33,20 +33,18 @@ export default function DatabasesPage() {
       </div>
 
       <div className="h-full mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <Suspense fallback={<PendingDatabaseList />}>
-          <Databases />
-        </Suspense>
+        <Databases />
       </div>
     </section>
   );
 }
 
-async function Databases() {
+function Databases() {
   const baseUrl = env.WEB_BASE_URL;
 
   const queryClient = getQueryClient();
 
-  await queryClient.prefetchQuery({
+  queryClient.prefetchQuery({
     queryKey: ["databases"],
     queryFn: () => getDatabaseService(),
   });

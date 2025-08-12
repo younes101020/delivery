@@ -8,7 +8,6 @@ import { PageTitle } from "@/app/_components/ui/page-title";
 import { getQueryClient } from "@/app/_lib/get-rsc-query-client";
 import { env } from "@/env";
 
-import { getActiveDatabaseServices } from "../databases/_lib/queries";
 import { ApplicationList } from "./_components/application-list";
 import { SubscribeToSSE } from "./_components/subscribe-to-sse";
 import { getApplications } from "./_lib/queries";
@@ -44,10 +43,7 @@ function Applications() {
 
   queryClient.prefetchQuery({
     queryKey: ["applications"],
-    queryFn: () => Promise.all([
-      getApplications(),
-      getActiveDatabaseServices(),
-    ]),
+    queryFn: () => getApplications(),
   });
 
   return (

@@ -3,79 +3,59 @@ import type Dockerode from "dockerode";
 import { HTTPException } from "hono/http-exception";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
-import type { Database } from "@/lib/dto";
-import type { ServicesDto } from "@/lib/dto/services.dto";
-
 import { getDocker } from "@/lib/remote-docker";
-import { withDocker, withSwarmService } from "@/lib/remote-docker/middleware";
-import { getSwarmServicesByName, toServiceSpec } from "@/lib/remote-docker/utils";
+import { withDocker } from "@/lib/remote-docker/middleware";
+import { toServiceSpec } from "@/lib/remote-docker/utils";
 import { generateRandomString } from "@/lib/utils";
 
-import { DATABASES_CONTAINER_NOT_FOUND_ERROR_MESSAGE, DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE, NO_CONTAINER_SERVICE_ERROR_MESSAGE, UNSUPPORTED_DATABASES_ERROR_MESSAGE } from "./const";
-import { getDatabasePortAndCredsEnvVarByImage, getDatabasesName } from "./queries";
+import type { Database, DatabaseService } from "../dto";
 
-export const getDbCredentialsEnvVarsAndDatabaseByServiceId = withSwarmService(async (dbService) => {
-  const inspectedService = await dbService.inspect();
-  const taskTemplate = inspectedService.Spec?.TaskTemplate;
+import { DATABASES_CONTAINER_NOT_FOUND_ERROR_MESSAGE } from "./const";
 
-  const containerSpecExist = assertTaskTemplateIsContainerTaskSpecGuard(taskTemplate);
-  if (!containerSpecExist)
-    throw new HTTPException(HttpStatusCodes.INTERNAL_SERVER_ERROR, { message: NO_CONTAINER_SERVICE_ERROR_MESSAGE });
-
-  // Get database name (excluding the version tag)
-  const database = taskTemplate?.ContainerSpec?.Image!.split(":")[0];
-
-  const databaseExist = await checkIfDatabaseExist(database || "");
-  if (!databaseExist || !database)
-    throw new HTTPException(HttpStatusCodes.BAD_REQUEST, { message: UNSUPPORTED_DATABASES_ERROR_MESSAGE });
-
-  const databaseWithMetadata = await getDatabasePortAndCredsEnvVarByImage(database);
-
-  const envVars = taskTemplate.ContainerSpec?.Env;
-  if (!envVars || envVars.length === 0)
-    throw new HTTPException(HttpStatusCodes.INTERNAL_SERVER_ERROR, { message: DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE });
-
-  const credentialsEnvVars = getFullDatabaseServiceEnvVarsByEnvVarsKey(envVars, databaseWithMetadata.credentialsEnvVar);
-
-  return { credentialsEnvVars, database };
-},
-);
-
-function getFullDatabaseServiceEnvVarsByEnvVarsKey(databaseServiceEnvVars: string[], credentialsEnvVarKey: string[]) {
+export function getEnvironmentVariablesByKeys(databaseServiceEnvVars: string[], credentialsEnvVarKey: string[]) {
   return databaseServiceEnvVars.filter(envVar => credentialsEnvVarKey.some(key => envVar.includes(key)));
 }
 
-export function buildDatabaseUriFromEnvVars(dbCredentialsEnvVars: string[], database: string) {
-  if (database === "postgres") {
-    const postgresUserEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("POSTGRES_USER"));
-    const postgresPasswordEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("POSTGRES_PASSWORD"));
-
-    const postgresUser = postgresUserEnv?.split("=")[1];
-    const postgresPassword = postgresPasswordEnv?.split("=")[1];
-
-    return `postgres://${postgresUser}:${postgresPassword}@localhost:5432`;
-  }
-
-  if (database === "mongo") {
-    const mongoUserEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("MONGO_INITDB_ROOT_USERNAME"));
-    const mongoPasswordEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("MONGO_INITDB_ROOT_PASSWORD"));
-
-    const mongoUser = mongoUserEnv?.split("=")[1];
-    const mongoPassword = mongoPasswordEnv?.split("=")[1];
-
-    return `mongodb://${mongoUser}:${mongoPassword}@localhost:27017`;
-  }
-
-  if (database === "redis") {
-    const redisPasswordEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("REDIS_PASSWORD"));
-    const redisUserEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("REDIS_USER"));
-
-    const redisPassword = redisPasswordEnv?.split("=")[1];
-    const redisUser = redisUserEnv?.split("=")[1];
-
-    return `redis://${redisUser}:${redisPassword}@localhost:6379/0`;
-  }
+type DatabaseCredentialsEnvVars = string[];
+interface DatabaseUriBuilderMap {
+  buildUri: (dbCredentialsEnvVars: DatabaseCredentialsEnvVars) => string;
 }
+
+export const databaseUriBuilderMap = new Map<string, DatabaseUriBuilderMap>([
+  ["postgres", {
+    buildUri: (dbCredentialsEnvVars: DatabaseCredentialsEnvVars) => {
+      const postgresUserEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("POSTGRES_USER"));
+      const postgresPasswordEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("POSTGRES_PASSWORD"));
+
+      const postgresUser = postgresUserEnv?.split("=")[1];
+      const postgresPassword = postgresPasswordEnv?.split("=")[1];
+
+      return `postgres://${postgresUser}:${postgresPassword}@localhost:5432`;
+    },
+  }],
+  ["mongo", {
+    buildUri: (dbCredentialsEnvVars: DatabaseCredentialsEnvVars) => {
+      const mongoUserEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("MONGO_INITDB_ROOT_USERNAME"));
+      const mongoPasswordEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("MONGO_INITDB_ROOT_PASSWORD"));
+
+      const mongoUser = mongoUserEnv?.split("=")[1];
+      const mongoPassword = mongoPasswordEnv?.split("=")[1];
+
+      return `mongodb://${mongoUser}:${mongoPassword}@localhost:27017`;
+    },
+  }],
+  ["redis", {
+    buildUri: (dbCredentialsEnvVars: DatabaseCredentialsEnvVars) => {
+      const redisPasswordEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("REDIS_PASSWORD"));
+      const redisUserEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("REDIS_USER"));
+
+      const redisPassword = redisPasswordEnv?.split("=")[1];
+      const redisUser = redisUserEnv?.split("=")[1];
+
+      return `redis://${redisUser}:${redisPassword}@localhost:6379/0`;
+    },
+  }],
+]);
 
 export async function getDatabaseEnvVarsByEnvVarKeys(containerId: string, envVarKey: string[]) {
   const docker = await getDocker();
@@ -88,32 +68,6 @@ export async function getDatabaseEnvVarsByEnvVarKeys(containerId: string, envVar
 
   return envVars.filter(envVar => envVarKey.some(key => envVar.includes(key)));
 }
-
-export const addEnvironmentVariableToAppService = withDocker<void, { serviceName: string; plainEnv: string }>(
-  async (docker, ctx) => {
-    const appServicesMetadata = await getSwarmServicesByName([ctx!.serviceName]);
-    const appServiceMetadata = appServicesMetadata[0];
-
-    const appService = docker.getService(appServiceMetadata.ID);
-    const appServiceInspect = await appService.inspect();
-
-    const appServiceSpec = appServiceInspect.Spec;
-
-    let currentEnv = [];
-    if (appServiceSpec.TaskTemplate.ContainerSpec.Env) {
-      currentEnv = appServiceSpec.TaskTemplate.ContainerSpec.Env;
-    }
-
-    currentEnv.push(ctx?.plainEnv);
-
-    appServiceSpec.TaskTemplate.ContainerSpec.Env = currentEnv;
-
-    await appService.update({
-      ...appServiceSpec,
-      version: Number.parseInt(appServiceInspect.Version.Index),
-    });
-  },
-);
 
 export function createDatabaseEnvVarsCredential(databaseImage: Database) {
   const randomId = generateRandomString();
@@ -136,17 +90,7 @@ export function createDatabaseEnvVarsCredential(databaseImage: Database) {
   }
 }
 
-async function checkIfDatabaseExist(dbName: string) {
-  const dbNames = await getDatabasesName();
-  return dbNames.includes(dbName);
-}
-
-function assertTaskTemplateIsContainerTaskSpecGuard(taskTemplate?: Dockerode.ServiceSpec["TaskTemplate"]): taskTemplate is Dockerode.ContainerTaskSpec {
-  const taskTemplateType = taskTemplate as Dockerode.ContainerTaskSpec;
-  return taskTemplateType?.ContainerSpec !== undefined;
-}
-
-export const listDatabaseServicesSpec = withDocker<ServicesDto[], Dockerode.ServiceListOptions | undefined>(
+export const listDatabaseServicesSpec = withDocker<DatabaseService[], Dockerode.ServiceListOptions | undefined>(
   async (docker, opts) => {
     const inputFilters = opts && typeof opts.filters === "object" ? opts.filters : {};
     const dbServices = await docker.listServices({ filters: { label: ["resource=database"], ...inputFilters } });

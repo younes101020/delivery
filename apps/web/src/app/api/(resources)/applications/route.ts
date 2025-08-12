@@ -1,13 +1,8 @@
 import { getApplications } from "@/app/(dashboard)/dashboard/(resources)/applications/_lib/queries";
-import { getActiveDatabaseServices } from "@/app/(dashboard)/dashboard/(resources)/databases/_lib/queries";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return Response.json(
-    await Promise.all([
-      getApplications(),
-      getActiveDatabaseServices(),
-    ]),
-  );
+  const applications = await getApplications();
+  return Response.json(applications);
 }

@@ -1,8 +1,8 @@
 import type Dockerode from "dockerode";
 
-import type { Database } from "@/lib/dto";
-
 import { withDocker, withSwarmService } from "@/lib/remote-docker/middleware";
+
+import type { Database } from "../dto";
 
 import { DATABASE_INSTANCE_REPLICAS, DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE, MISSING_DATABASE_NAME_AND_IMAGE_ERROR_MESSAGE } from "./const";
 import { createDatabaseServiceSpec } from "./manifest";

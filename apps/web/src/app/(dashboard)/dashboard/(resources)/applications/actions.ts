@@ -115,28 +115,3 @@ export async function redeploy(applicationName: string) {
   }
   redirect(`/dashboard/deployments/${applicationName}`);
 }
-
-const injectEnvSchema = z.object({
-  dbId: z.string().min(1, "Please select a database"),
-  env: z.string().min(1, "Please choose an environment variable key"),
-  applicationName: z.string(),
-});
-
-export const injectEnv = validatedAction(injectEnvSchema, async (inputs) => {
-  const { env, dbId, applicationName } = inputs;
-
-  const http = await client();
-  const envResponse = await http.databases[":id"].link.$post({
-    param: { id: dbId },
-    json: {
-      environmentKey: env,
-      applicationName,
-    },
-  });
-
-  if (envResponse.status !== 200) {
-    return { error: "Unable to inject the environment variable", inputs };
-  }
-
-  return { success: "Environment variable successfully injected", inputs };
-});

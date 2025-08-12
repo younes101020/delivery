@@ -1,10 +1,10 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import type { CreateDatabaseSchema } from "@/lib/dto";
-
 import env from "@/env";
 import { subscribeWorkerTo } from "@/lib/tasks/utils";
+
+import type { CreateDatabaseSchema } from "../../dto";
 
 import { getCreateDatabaseQueue, PREFIX, queueName } from "./utils";
 

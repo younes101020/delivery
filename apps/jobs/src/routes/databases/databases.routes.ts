@@ -3,11 +3,10 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema } from "stoker/openapi/schemas";
 
-import { badRequestSchema, internalServerSchema, notFoundSchema } from "@/lib/constants";
-import { createDatabaseSchema, databaseLinkSchema, DatabaseParamsSchema, databaseSchema } from "@/lib/dto/databases.dto";
+import { notFoundSchema } from "@/lib/constants";
 import { rbacMiddleware } from "@/middlewares/rbac";
 
-import { DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE, NO_CONTAINER_SERVICE_ERROR_MESSAGE, UNSUPPORTED_DATABASES_ERROR_MESSAGE } from "./lib/remote-docker/const";
+import { createDatabaseSchema, DatabaseParamsSchema, databaseSchema } from "./lib/dto";
 
 const tags = ["Databases"];
 
@@ -115,39 +114,9 @@ export const remove = createRoute({
   middleware: rbacMiddleware,
 });
 
-export const link = createRoute({
-  path: "/databases/{id}/link",
-  method: "post",
-  description: "Link a database container to an application, the database url environment variable will be injected into the application.",
-  request: {
-    params: DatabaseParamsSchema,
-    body: jsonContentRequired(databaseLinkSchema, "Needed to link the database to the application"),
-  },
-  tags,
-  responses: {
-    [HttpStatusCodes.OK]: {
-      description: "Database service linked to the application",
-    },
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Database service not found"),
-    [HttpStatusCodes.BAD_REQUEST]: jsonContent(badRequestSchema, UNSUPPORTED_DATABASES_ERROR_MESSAGE),
-    [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(internalServerSchema, `${NO_CONTAINER_SERVICE_ERROR_MESSAGE}, ${DEFAULT_DATABASES_CREDENTIALS_ENV_VAR_NOT_FOUND_ERROR_MESSAGE}`),
-    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(
-        z.object({
-          id: z.string().describe("The ID of the database service to link"),
-        })
-          .or(databaseLinkSchema),
-      ),
-      "The validation error(s)",
-    ),
-  },
-  middleware: rbacMiddleware,
-});
-
 export type CreateRoute = typeof create;
 export type ListRoute = typeof list;
 export type StreamCurrentDatabaseRoute = typeof streamCurrentDatabase;
 export type StopRoute = typeof stop;
 export type StartRoute = typeof start;
 export type RemoveRoute = typeof remove;
-export type LinkRoute = typeof link;

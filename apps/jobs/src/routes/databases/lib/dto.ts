@@ -1,8 +1,6 @@
 import { z } from "@hono/zod-openapi";
 import { IdParamsSchema } from "stoker/openapi/schemas";
 
-import { servicesDto } from "./services.dto";
-
 const database = z.union([
   z.literal("mysql"),
   z.literal("mariadb"),
@@ -20,15 +18,30 @@ export const createDatabaseSchemaResp = z.object({
   success: z.literal(true),
 });
 
-export const databaseSchema = servicesDto;
-
-export const databaseLinkSchema = z.object({
-  environmentKey: z.string().describe("Used environment variable key which contains the database connection URI."),
-  applicationName: z.string().describe("Name of the application to link the database to."),
+export const databaseSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  image: z.string(),
+  isActive: z.boolean(),
+  createdAt: z.string(),
+  isProcessing: z.boolean(),
+  dbConnectionUri: z.string().nullable(),
 });
+
+export const databaseService = databaseSchema.extend(
+  {
+    environmentVariables: z.array(z.string()),
+  },
+).omit(
+  {
+    dbConnectionUri: true,
+  },
+);
 
 export const DatabaseParamsSchema = IdParamsSchema.extend({ id: z.string() }).describe("The database swarm service id.");
 
 export type CreateDatabaseSchema = z.infer<typeof createDatabaseSchema>;
 export type DatabaseSchema = z.infer<typeof databaseSchema>;
 export type Database = z.infer<typeof database>;
+
+export type DatabaseService = z.infer<typeof databaseService>;
