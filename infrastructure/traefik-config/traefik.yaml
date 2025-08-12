@@ -22,6 +22,8 @@ entryPoints:
     #      scheme: https
   web-secure:
     address: ':443' # https
+  tcp:
+    address: ':5432' # tcp
 certificatesResolvers:
   deliveryresolver:
     acme:
