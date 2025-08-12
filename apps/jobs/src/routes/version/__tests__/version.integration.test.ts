@@ -17,7 +17,6 @@ describe("version routes / integration test", () => {
       const json = await response.json();
       expect(json.isLatest).toBeDefined();
       expect(json.version).toBeDefined();
-      expect(json.imageDigest).toBeDefined();
     }
   });
   it("post /version return new version", async () => {

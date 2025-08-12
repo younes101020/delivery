@@ -8,7 +8,7 @@ import { getSwarmServiceById, getSwarmServicesByName } from "@/lib/remote-docker
 
 import { getLatestDeliveryVersion } from "../github";
 import { DELIVERY_JOBS_IMAGE_NAME, DELIVERY_JOBS_SERVICE_NAME, DELIVERY_WEB_IMAGE_NAME, DELIVERY_WEB_SERVICE_NAME } from "./const";
-import { getImageDigest, getVersionFromImageRef } from "./utils";
+import { getVersionFromImageRef } from "./utils";
 
 export async function getDeliveryServiceVersionInfo() {
   const deliveryServices = await getSwarmServicesByName([DELIVERY_WEB_SERVICE_NAME]);
@@ -17,15 +17,12 @@ export async function getDeliveryServiceVersionInfo() {
   if (!deliveryService.Spec)
     throw new HTTPException(HttpStatusCodes.NOT_FOUND, { message: HttpStatusPhrases.NOT_FOUND });
 
-  const imageName = deliveryService.Spec.Labels && deliveryService.Spec.Labels["com.docker.stack.image"];
-  const fullImageName = deliveryService.Spec.TaskTemplate ? (deliveryService.Spec.TaskTemplate as ContainerTaskSpec).ContainerSpec?.Image : `${imageName}@none`;
+  const fullImageName = deliveryService.Spec.TaskTemplate ? (deliveryService.Spec.TaskTemplate as ContainerTaskSpec).ContainerSpec?.Image : "Unknown";
 
-  const deliveryVersion = getVersionFromImageRef(imageName || "");
-  const deliveryCurrentImageDigest = getImageDigest(fullImageName || "");
+  const deliveryVersion = getVersionFromImageRef(fullImageName || "");
 
   return {
     version: deliveryVersion,
-    deliveryCurrentImageDigest,
   };
 }
 

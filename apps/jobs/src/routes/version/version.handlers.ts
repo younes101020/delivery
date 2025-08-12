@@ -20,7 +20,6 @@ export const getVersion: AppRouteHandler<GetVersionRoute> = async (c) => {
   return c.json(
     {
       version: versionInfo.version,
-      imageDigest: versionInfo.deliveryCurrentImageDigest,
       isLatest,
     },
     HttpStatusCodes.OK,

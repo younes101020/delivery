@@ -8,7 +8,6 @@ interface Fixtures {
   imageName: string;
   fullImageName: string;
   versionSchema: ZodTemplateLiteral<`${number}.${number}.${number}`>;
-  imageDigestSchema: ZodTemplateLiteral<`sha256:${string}`>;
 }
 
 const versionSchema = z.templateLiteral([
@@ -17,11 +16,6 @@ const versionSchema = z.templateLiteral([
   z.number(),
   ".",
   z.number(),
-]);
-
-const imageDigestSchema = z.templateLiteral([
-  z.literal("sha256:"),
-  z.string(),
 ]);
 
 export const it = base.extend<Fixtures>({
@@ -34,5 +28,4 @@ export const it = base.extend<Fixtures>({
     await use(fullImageName);
   },
   versionSchema: async ({}, use) => use(versionSchema),
-  imageDigestSchema: async ({}, use) => use(imageDigestSchema),
 });
