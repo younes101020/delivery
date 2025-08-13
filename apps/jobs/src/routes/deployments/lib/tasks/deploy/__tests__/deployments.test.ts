@@ -93,7 +93,7 @@ describe("deployments tests", () => {
     });
 
     it("call the add method from bullmq flowproducer with jobs dependencies", async ({ githubApp, deployAppPayload }) => {
-      const { repoUrl, cache, publishdir, port: exposedPort, staticdeploy } = deployAppPayload;
+      const { repoUrl, cache, publishdir, port: exposedPort, staticdeploy, startCmd } = deployAppPayload;
       const queueName = mocks.fromGitUrlToQueueName();
       const env = mocks.transformEnvVars();
       const fqdn = mocks.parseAppHost();
@@ -119,7 +119,18 @@ describe("deployments tests", () => {
         children: [
           {
             name: JOBS.build,
-            data: { env: env.cmdEnvVars, cache, ...(staticdeploy && { publishdir }), port, staticdeploy, fqdn, repoName: queueName, isRedeploy: false, enableTls: false },
+            data: {
+              env: env.cmdEnvVars,
+              cache,
+              ...(staticdeploy && { publishdir }),
+              port,
+              staticdeploy,
+              fqdn,
+              repoName: queueName,
+              isRedeploy: false,
+              enableTls: false,
+              startCmd,
+            },
             queueName,
             opts: { failParentOnFailure: true },
             children: [

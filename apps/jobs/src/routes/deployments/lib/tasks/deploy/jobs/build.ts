@@ -13,12 +13,12 @@ export interface ISSH {
 }
 
 export async function build(job: QueueDeploymentJob<"build">) {
-  const { repoName, port, env, cache, staticdeploy, publishdir, isRedeploy, fqdn, enableTls } = job.data;
+  const { repoName, port, env, cache, staticdeploy, publishdir, isRedeploy, fqdn, enableTls, startCmd } = job.data;
   await job.updateProgress({ logs: "\nImage will be built..." });
 
   // BUILD APP IMAGE
 
-  const buildImageFromSourceCmd = `nixpacks build ./ --name ${repoName} --env CI=false ${env ?? ""} ${!cache ? "--no-cache" : ""}`;
+  const buildImageFromSourceCmd = `nixpacks build ./ --name ${repoName} --env CI=false ${env ?? ""} ${!cache ? "--no-cache" : ""} ${startCmd ? `--start-cmd "${startCmd}"` : ""}`;
 
   const extractStaticArtefactCmd = staticdeploy && `nixpacks build ./ --name buildonly-${repoName} --env CI=false --start-cmd "echo 'static web files extraction in progress...'; /bin/bash" ${!cache ? "--no-cache" : ""} && docker run -dt --name temp-${repoName} buildonly-${repoName} && mkdir -p ./build-artefact && pushd ./build-artefact && docker container cp temp-${repoName}:/app${publishdir} ./ && docker ps -aq --filter ancestor="buildonly-${repoName}" | xargs -r docker stop | xargs -r docker rm && docker rmi buildonly-${repoName} &&`;
 

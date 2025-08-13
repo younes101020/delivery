@@ -13,6 +13,7 @@ export const insertDeploymentSchema = z.object({
     .optional()
     .describe("Environment variables in KEY=value format, separated by spaces"),
   cache: z.coerce.boolean(),
+  startCmd: z.string().optional(),
   staticdeploy: z.coerce.boolean(),
   publishdir: z.string().optional(),
 }).superRefine((input, ctx) => {

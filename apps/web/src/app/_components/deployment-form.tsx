@@ -32,6 +32,7 @@ export function DeploymentForm({ isOnboarding = false, children }: DeploymentPro
       env: "",
       cache: true,
       staticdeploy: initialStaticChoice,
+      startCmd: "",
     },
   });
   const { selectedApplication } = useDeploymentSelectedApplication();
@@ -64,24 +65,44 @@ export function DeploymentForm({ isOnboarding = false, children }: DeploymentPro
               </div>
             )
           : (
-              <div>
-                <Label htmlFor="port" className="block text-sm font-medium">
-                  Running port
-                </Label>
-                <div className="mt-1">
-                  <Input
-                    id="port"
-                    name="port"
-                    type="text"
-                    required={!isStaticDeployment}
-                    defaultValue={state.inputs.port}
-                    className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
-                    placeholder="ex: 3000"
-                  />
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <Label htmlFor="port" className="block text-sm font-medium">
+                    Running port
+                  </Label>
+                  <div className="mt-1">
+                    <Input
+                      id="port"
+                      name="port"
+                      type="text"
+                      required={!isStaticDeployment}
+                      defaultValue={state.inputs.port}
+                      className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
+                      placeholder="ex: 3000"
+                    />
+                  </div>
+                  <p className="text-muted-foreground text-xs pt-1">
+                    Port on which your application runs.
+                  </p>
                 </div>
-                <p className="text-muted-foreground text-xs pt-1">
-                  Port on which your application runs.
-                </p>
+                <div>
+                  <Label htmlFor="startCmd" className="block text-sm font-medium">
+                    Starting command
+                  </Label>
+                  <div className="mt-1">
+                    <Input
+                      id="startCmd"
+                      name="startCmd"
+                      type="text"
+                      defaultValue={state.inputs.startCmd}
+                      className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
+                      placeholder="ex: npm run migrate && npm run start"
+                    />
+                  </div>
+                  <p className="text-muted-foreground text-xs pt-1">
+                    By default, your application will start automatically; however, you can specify a custom command to launch the application. This can be ideal if you want to perform your database migrations beforehand.
+                  </p>
+                </div>
               </div>
             )}
 

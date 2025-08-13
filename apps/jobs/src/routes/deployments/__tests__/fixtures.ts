@@ -29,6 +29,7 @@ interface UTFixtures {
       repoUrl?: string;
       port?: number;
       staticdeploy?: boolean;
+      startCmd?: string;
       env?: string;
       repoName: string;
       publishdir?: string;
@@ -83,6 +84,7 @@ const deployAppPayload = {
   githubAppId: faker.number.int({ min: 1, max: 100 }),
   port: faker.number.int({ min: 3000, max: 9000 }),
   staticdeploy,
+  startCmd: "npm db:migrate",
   env: `${faker.string.alphanumeric(8)}=${faker.string.alphanumeric(16)} ${faker.string.alphanumeric(8)}=${faker.string.alphanumeric(16)}`,
   publishdir: staticdeploy ? `/${faker.system.directoryPath()}` : undefined,
   cache: faker.datatype.boolean(),
@@ -101,6 +103,7 @@ const completedJobs = [
     name: "build",
     data: {
       port: staticdeploy ? 80 : deployAppPayload.port,
+      startCmd: deployAppPayload.startCmd,
       staticdeploy,
       env: deployAppPayload.env,
       cache: deployAppPayload.cache,

@@ -64,7 +64,7 @@ function runDeployment(
 
 export const deployApp = runDeployment(async (payload) => {
   if (typeof payload === "object") {
-    const { githubAppId, repoUrl, staticdeploy, env, port: exposedPort, publishdir, cache } = payload;
+    const { githubAppId, repoUrl, staticdeploy, env, port: exposedPort, publishdir, cache, startCmd } = payload;
     const [githubApp, wildcardDomain] = await Promise.all([getGithubAppByAppId(githubAppId), getWildcardDomain()]);
 
     if (!githubApp)
@@ -86,6 +86,7 @@ export const deployApp = runDeployment(async (payload) => {
       build: {
         port,
         staticdeploy,
+        startCmd,
         isRedeploy: false,
         env: environmentVariables && environmentVariables.cmdEnvVars,
         cache,

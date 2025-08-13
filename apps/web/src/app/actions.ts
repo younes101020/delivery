@@ -48,6 +48,7 @@ const deploySchema = z.object({
   repoUrl: z.string(),
   githubAppId: z.coerce.number(),
   isOnboarding: z.coerce.boolean(),
+  startCmd: z.string().optional(),
   cache: z.coerce.boolean(),
   staticdeploy: z.coerce.boolean(),
   publishdir: z.string().optional(),

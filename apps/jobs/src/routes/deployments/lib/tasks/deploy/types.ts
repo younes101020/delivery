@@ -16,6 +16,7 @@ export interface QueueDeploymentJobData {
     env?: string;
     port: number;
     staticdeploy: boolean;
+    startCmd?: string;
     publishdir?: string;
     fqdn: string;
     cache: boolean;
