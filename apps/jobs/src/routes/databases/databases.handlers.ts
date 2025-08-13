@@ -35,7 +35,7 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
     ({ environmentVariables, ...dbWithoutEnv }) => {
       const activeJob = activeJobs.find(job => job.containerId === dbWithoutEnv.id);
       const dbUriBuilder = databaseUriBuilderMap.get(dbWithoutEnv.image);
-      const dbConnectionUri = dbUriBuilder ? dbUriBuilder.buildUri(environmentVariables) : null;
+      const dbConnectionUri = dbUriBuilder ? dbUriBuilder.buildUri(environmentVariables, dbWithoutEnv.name) : null;
       if (activeJob) {
         return {
           ...dbWithoutEnv,

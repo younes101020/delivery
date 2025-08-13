@@ -42,6 +42,7 @@ export function createDatabaseServiceSpec({ database, name, port, initialEnvCred
       "traefik.swarm.network": CLUSTER_NETWORK_NAME,
       [`traefik.tcp.routers.${name}.rule`]: "HostSNI(`*`)",
       [`traefik.tcp.routers.${name}.entrypoints`]: database,
+      [`traefik.tcp.routers.${name}.service`]: name,
       [`traefik.tcp.services.${name}.loadbalancer.server.port`]: port.toString(),
     },
   };

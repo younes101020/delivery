@@ -18,41 +18,41 @@ export function getEnvironmentVariablesByKeys(databaseServiceEnvVars: string[], 
 
 type DatabaseCredentialsEnvVars = string[];
 interface DatabaseUriBuilderMap {
-  buildUri: (dbCredentialsEnvVars: DatabaseCredentialsEnvVars) => string;
+  buildUri: (dbCredentialsEnvVars: DatabaseCredentialsEnvVars, dbServiceName: string) => string;
 }
 
 export const databaseUriBuilderMap = new Map<string, DatabaseUriBuilderMap>([
   ["postgres", {
-    buildUri: (dbCredentialsEnvVars: DatabaseCredentialsEnvVars) => {
+    buildUri: (dbCredentialsEnvVars, dbServiceName) => {
       const postgresUserEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("POSTGRES_USER"));
       const postgresPasswordEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("POSTGRES_PASSWORD"));
 
       const postgresUser = postgresUserEnv?.split("=")[1];
       const postgresPassword = postgresPasswordEnv?.split("=")[1];
 
-      return `postgres://${postgresUser}:${postgresPassword}@localhost:5432`;
+      return `postgres://${postgresUser}:${postgresPassword}@${dbServiceName}:5432`;
     },
   }],
   ["mongo", {
-    buildUri: (dbCredentialsEnvVars: DatabaseCredentialsEnvVars) => {
+    buildUri: (dbCredentialsEnvVars, dbServiceName) => {
       const mongoUserEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("MONGO_INITDB_ROOT_USERNAME"));
       const mongoPasswordEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("MONGO_INITDB_ROOT_PASSWORD"));
 
       const mongoUser = mongoUserEnv?.split("=")[1];
       const mongoPassword = mongoPasswordEnv?.split("=")[1];
 
-      return `mongodb://${mongoUser}:${mongoPassword}@localhost:27017`;
+      return `mongodb://${mongoUser}:${mongoPassword}@${dbServiceName}:27017`;
     },
   }],
   ["redis", {
-    buildUri: (dbCredentialsEnvVars: DatabaseCredentialsEnvVars) => {
+    buildUri: (dbCredentialsEnvVars, dbServiceName) => {
       const redisPasswordEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("REDIS_PASSWORD"));
       const redisUserEnv = dbCredentialsEnvVars.find(envVar => envVar.includes("REDIS_USER"));
 
       const redisPassword = redisPasswordEnv?.split("=")[1];
       const redisUser = redisUserEnv?.split("=")[1];
 
-      return `redis://${redisUser}:${redisPassword}@localhost:6379/0`;
+      return `redis://${redisUser}:${redisPassword}@${dbServiceName}:6379/0`;
     },
   }],
 ]);
