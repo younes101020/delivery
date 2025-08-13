@@ -28,8 +28,8 @@ entryPoints:
     address: ':27017'
   redis:
     address: ':6379'
-  mariadb:
-    address: ':3306'
+  # mariadb:
+   # address: ':3306'
   mysql:
     address: ':3306'
 certificatesResolvers:
