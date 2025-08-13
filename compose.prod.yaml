@@ -14,6 +14,7 @@ services:
         - JOBS_API_BASEURL=${JOBS_API_BASEURL}
         - WEB_BASE_URL=${WEB_BASE_URL}
     deploy:
+      replicas: 2
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.web.entrypoints=web-secure"
@@ -42,6 +43,8 @@ services:
         platforms:
           - linux/amd64
           - linux/arm64
+    deploy:
+      replicas: 2
     environment:
       - PUBLIC_IP=${PUBLIC_IP}
       - PORT=${PORT}
