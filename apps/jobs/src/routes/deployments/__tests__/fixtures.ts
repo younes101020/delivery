@@ -136,7 +136,7 @@ const randomEnvironmentVariable = {
 };
 
 const environmentVariable = {
-  plain: `${randomEnvironmentVariable.key}=${randomEnvironmentVariable.value} ${randomEnvironmentVariable.key}=${randomEnvironmentVariable.value}`,
+  plain: `${randomEnvironmentVariable.key}="${randomEnvironmentVariable.value}" ${randomEnvironmentVariable.key}="${randomEnvironmentVariable.value}"`,
   structured: [randomEnvironmentVariable],
 };
 

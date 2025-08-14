@@ -51,7 +51,7 @@ export function validatedActionWithUser<S extends z.ZodType<any, any>, T>(
 
     const result = schema.safeParse(Object.fromEntries(formData));
     if (!result.success) {
-      return { error: result.error.errors[0].message } as T;
+      return { error: result.error.errors[0].message, inputs: Object.fromEntries(formData) } as T;
     }
 
     return action(result.data, formData, prevState, user);

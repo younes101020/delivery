@@ -112,15 +112,15 @@ describe("deployments utils unit tests", () => {
 
   it("return structured environment variables from plain env vars", ({ environmentVariable }) => {
     const key = environmentVariable.structured[0].key;
-    const value = environmentVariable.structured[0].value;
+    const value = `"${environmentVariable.structured[0].value}"`;
     const expected = [{ key, value }, { key, value }];
     expect(plainEnvVarsToPersistedEnvVars(environmentVariable.plain)).toEqual(expected);
   });
 
-  it("return grouped envvironment variables from plain env vars", ({ environmentVariable }) => {
+  it("return grouped environment variables from plain env vars", ({ environmentVariable }) => {
     const key = environmentVariable.structured[0].key;
     const value = environmentVariable.structured[0].value;
-    const expected = `--env ${key}=${value} --env ${key}=${value}`;
+    const expected = `--env ${key}="${value}" --env ${key}="${value}"`;
     expect(plainEnvVarsToCmdEnvVars(environmentVariable.plain)).toStrictEqual(expected);
   });
 });
