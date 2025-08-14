@@ -15,16 +15,10 @@ const editApplicationSchema = z
       .coerce
       .number()
       .optional(),
-    environmentVariables: z.string().refine(
-      (value) => {
-        if (!value)
-          return true;
-        return value.split(" ").every(env => /^[^=]+=.+$/.test(env.trim()));
-      },
-      {
-        message: "Environment variables must be in format KEY=VALUE and separated by spaces",
-      },
-    ),
+    environmentVariables: z
+      .string()
+      .regex(/^(?:\w+=(?:"[^"]*"|'[^']*')(?:\s+|$))*$/, "Environment variables in KEY=value format, separated by spaces and value should be quoted.")
+      .optional(),
     name: z.string(),
   })
   .partial()
