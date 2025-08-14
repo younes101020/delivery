@@ -196,7 +196,7 @@ export function transformEnvVars(envs: DeploymentReferenceAndDataSchema["env"]) 
 }
 
 export function plainEnvVarsToCmdEnvVars(envs: string) {
-  return envs.split(" ")
+  return envs.split(/\s+(?=\w+=")/)
     .map((env) => {
       const [key, value] = env.split("=");
       return `--env ${key}=${value}`;

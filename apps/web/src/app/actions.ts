@@ -56,7 +56,10 @@ const deploySchema = z.object({
     .coerce
     .number()
     .optional(),
-  env: z.string().optional(),
+  env: z
+    .string()
+    .regex(/^(?:\w+=(?:"[^"]*"|'[^']*')(?:\s+|$))*$/, "Environment variables in KEY=value format, separated by spaces and value should be quoted.")
+    .optional(),
 }).superRefine((input, ctx) => {
   if (!input.port && !input.staticdeploy) {
     ctx.addIssue({
