@@ -57,7 +57,8 @@ export const patchApplicationService = withDocker<void, PatchApplication>(
     const appServiceSpec = appServiceInspect.Spec;
 
     if (ctx?.envs) {
-      const envs = ctx?.envs.map(env => `${env.key}=${env.value}`);
+      // slice the first and last character to remove quotes
+      const envs = ctx?.envs.map(env => `${env.key}=${env.value?.slice(1, -1)}`);
       appServiceSpec.TaskTemplate.ContainerSpec.Env = envs;
     }
 
