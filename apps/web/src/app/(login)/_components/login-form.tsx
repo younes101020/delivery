@@ -23,14 +23,14 @@ export function LoginForm({ className, mode }: LoginFormProps & React.ComponentP
                 </h1>
                 {mode === "signin"
                   ? (
-                      <p className="text-balance text-muted-foreground">
+                      <p className="text-balance text-muted-foreground text-xs">
                         Login to your Delivery account
                         {" "}
                         <span className="">.</span>
                       </p>
                     )
                   : (
-                      <p className="text-balance text-muted-foreground">
+                      <p className="text-balance text-muted-foreground text-xs">
                         Create your delivery account
                       </p>
                     )}
