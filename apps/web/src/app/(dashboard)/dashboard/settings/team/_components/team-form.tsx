@@ -142,7 +142,7 @@ export function TeamFormContent() {
         </div>
         <div>
           <Label>Role</Label>
-          <RadioGroup defaultValue="member" className="mt-2" disabled={!isOwner}>
+          <RadioGroup defaultValue="member" className="mt-2" disabled={!isOwner} name="role">
             <div className="flex items-center gap-3">
               <RadioGroupItem value="member" id="member" />
               <Label htmlFor="member">Member</Label>
