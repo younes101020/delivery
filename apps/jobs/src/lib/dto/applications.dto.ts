@@ -7,7 +7,11 @@ import { insertEnvironmentVariablesSchema } from "./envvars.dto";
 import { servicesDto } from "./services.dto";
 
 export const selectApplicationsSchemaWithSharedEnv = createSelectSchema(applications).extend({
-  environmentVariables: z.array(createSelectSchema(environmentVariables)).optional(),
+  environmentVariables: z
+    .array(
+      createSelectSchema(environmentVariables),
+    )
+    .optional(),
   serviceId: z.string(),
 });
 
@@ -31,7 +35,19 @@ export const patchApplicationsSchema = z.object({
       // insert new environment variables case
       insertEnvironmentVariablesSchema,
     ]),
-  ).optional(),
+  ).refine((environmentVariables) => {
+    const withoutDuplicates = Array.from(
+      new Map(
+        environmentVariables.map(environmentVariable => [
+          environmentVariable.key,
+          environmentVariable,
+        ]),
+      ).values(),
+    );
+    return withoutDuplicates.length === environmentVariables.length;
+  }, {
+    message: "Environment variables must not contain duplicates.",
+  }).optional(),
 });
 
 export const ApplicationParamsSchema = z.object({

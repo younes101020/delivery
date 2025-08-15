@@ -81,6 +81,18 @@ export const deployApp = runDeployment(async (payload) => {
     const fqdn = parseAppHost(repoName, host);
     const environmentVariables = transformEnvVars(env);
 
+    const withoutDuplicatesEnvVars = Array.from(
+      new Map(
+        environmentVariables?.persistedEnvVars.map(environmentVariable => [
+          environmentVariable.key,
+          environmentVariable,
+        ]),
+      ).values(),
+    );
+
+    if (withoutDuplicatesEnvVars.length !== environmentVariables?.persistedEnvVars.length)
+      throw new HTTPException(HttpStatusCodes.UNPROCESSABLE_ENTITY, { message: "Environment variables contain duplicate keys" });
+
     return {
       clone: { ...githubApp, repoUrl, secret: githubApp.secret, repoName },
       build: {

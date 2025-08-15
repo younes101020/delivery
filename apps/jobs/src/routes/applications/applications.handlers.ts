@@ -175,15 +175,6 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
     );
   }
 
-  application.applicationEnvironmentVariables = Array.from(
-    new Map(
-      application.applicationEnvironmentVariables.map(item => [
-        item.environmentVariable.key,
-        item,
-      ]),
-    ).values(),
-  );
-
   const { applicationEnvironmentVariables, ...appDetails } = application;
 
   return c.json(
