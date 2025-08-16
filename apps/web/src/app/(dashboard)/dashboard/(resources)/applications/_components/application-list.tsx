@@ -6,6 +6,7 @@ import { Suspense } from "react";
 
 import { EmptyState } from "@/app/_components/ui/empty-state";
 import { Skeleton } from "@/app/_components/ui/skeleton";
+import { useUser } from "@/app/_hooks/use-user";
 import { useFetch } from "@/app/_lib/fetch-provider";
 import { formatDate } from "@/app/_lib/utils";
 
@@ -15,12 +16,13 @@ import { AppCard } from "./app-card";
 import { NewAppCard } from "./new-app-card";
 
 export function ApplicationList() {
+  const { user } = useUser();
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
       <Suspense fallback={<PendingApplication />}>
         <List />
       </Suspense>
-      <NewAppCard />
+      {user.role === "owner" && <NewAppCard />}
     </div>
   );
 }
@@ -53,15 +55,18 @@ function List() {
 }
 
 function NoApplication() {
+  const { user } = useUser();
   return (
     <EmptyState
       title="No application"
       description="You can see all your applications here."
       icons={[PackagePlus]}
-      action={{
-        label: "Deploy application",
-        href: "/applications/new",
-      }}
+      action={user.role === "owner"
+        ? {
+            label: "Deploy application",
+            href: "/applications/new",
+          }
+        : undefined}
     />
   );
 }

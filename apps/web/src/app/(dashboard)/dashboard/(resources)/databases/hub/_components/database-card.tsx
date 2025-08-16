@@ -3,9 +3,8 @@
 import { Badge } from "@/app/_components/ui/badge";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/app/_components/ui/card";
 import { Separator } from "@/app/_components/ui/separator";
-import { cn } from "@/app/_lib/utils";
+import { useUser } from "@/app/_hooks/use-user";
 
-import { useMouse } from "../_hooks/use-mouse";
 import { MongoIcon } from "../../_components/ui/mongo-icon";
 import { PostgresIcon } from "../../_components/ui/postgres-icon";
 
@@ -47,10 +46,12 @@ export function DatabaseCard({ label, fillIcon, description, dbType, children }:
         </CardHeader>
 
       </div>
-      <CardFooter className="flex flex-col gap-2 items-start">
-        <Separator />
-        {children}
-      </CardFooter>
+      {user.role === "owner" && (
+        <CardFooter className="flex flex-col gap-2 items-start">
+          <Separator />
+          {children}
+        </CardFooter>
+      )}
 
     </Card>
   );

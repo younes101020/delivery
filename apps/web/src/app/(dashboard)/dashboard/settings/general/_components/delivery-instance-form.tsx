@@ -12,6 +12,7 @@ import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
 import { Paragraph } from "@/app/_components/ui/paragraph";
 import { Skeleton } from "@/app/_components/ui/skeleton";
+import { useUser } from "@/app/_hooks/use-user";
 import { useFetch } from "@/app/_lib/fetch-provider";
 
 import type { DeliveryWebInstanceConfiguration } from "../_lib/queries";
@@ -36,6 +37,7 @@ export function DeliveryInstanceForm() {
 }
 
 function Form() {
+  const { user } = useUser();
   const [state, formAction, pending] = useActionState<ActionState<DeliveryInstanceFormProps>, FormData>(
     deliveryInstanceForm,
     {
@@ -62,6 +64,7 @@ function Form() {
           <div>
             <Label htmlFor="name">Name</Label>
             <Input
+              disabled={user.role !== "owner"}
               id="name"
               name="name"
               type="text"
@@ -77,6 +80,7 @@ function Form() {
           <div>
             <Label htmlFor="fqdn">Domain name</Label>
             <Input
+              disabled={user.role !== "owner"}
               id="fqdn"
               name="fqdn"
               type="text"
@@ -91,20 +95,23 @@ function Form() {
           </div>
           <input type="hidden" name="serviceId" id="serviceId" defaultValue={state.inputs?.serviceId || deliveryWebInstanceConfiguration.data?.serviceId} />
           {state?.error && <Paragraph variant="error">{state.error}</Paragraph>}
-          <CardFooter className="flex px-0 pt-8 col-span-2">
-            <Button type="submit" disabled={pending} aria-label="submit" className="w-full">
-              {pending
-                ? (
-                    <>
-                      <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                      Loading...
-                    </>
-                  )
-                : (
-                    "Save"
-                  )}
-            </Button>
-          </CardFooter>
+          {user.role === "owner" && (
+            <CardFooter className="flex px-0 pt-8 col-span-2">
+              <Button type="submit" disabled={pending} aria-label="submit" className="w-full">
+                {pending
+                  ? (
+                      <>
+                        <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                        Loading...
+                      </>
+                    )
+                  : (
+                      "Save"
+                    )}
+              </Button>
+            </CardFooter>
+          )}
+
         </form>
       )}
     </>

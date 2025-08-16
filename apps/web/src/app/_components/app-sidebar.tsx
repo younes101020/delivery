@@ -16,6 +16,7 @@ import {
   SidebarMenuItem,
 } from "@/app/_components/ui/sidebar";
 
+import { useUser } from "../_hooks/use-user";
 import { Logo } from "./ui/logo";
 
 const data = {
@@ -77,6 +78,18 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useUser();
+
+  const dataNavMain = data.navMain.map((item) => {
+    if (item.title === "Applications" && user.role !== "owner") {
+      return {
+        ...item,
+        items: item.items?.filter(subItem => subItem.title !== "New"),
+      };
+    }
+    return item;
+  });
+
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -91,7 +104,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={dataNavMain} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
