@@ -13,7 +13,6 @@ interface DatabaseCardProps {
   label: string;
   description: string;
   dbType: string;
-  colorEffectHexClassUtility: string;
   fillIcon: string;
   circleSize?: number;
   children: React.ReactNode;
@@ -21,40 +20,22 @@ interface DatabaseCardProps {
 
 const IconComponentMap = new Map([["Postgres", PostgresIcon], ["Mongo", MongoIcon]]);
 
-export function DatabaseCard({ label, colorEffectHexClassUtility, fillIcon, description, dbType, circleSize = 400, children }: DatabaseCardProps) {
-  const [mouse, parentRef] = useMouse();
+export function DatabaseCard({ label, fillIcon, description, dbType, children }: DatabaseCardProps) {
   const Icon = IconComponentMap.get(label);
+  const { user } = useUser();
 
   return (
     <Card className="relative">
       <Badge className="w-fit absolute top-0 right-0">{dbType}</Badge>
       <div
         className="group relative overflow-hidden p-2"
-        ref={parentRef}
       >
-        <div
-          className={cn(
-            `absolute -translate-x-1/2 -translate-y-1/2 transform-gpu bg-linear-to-br from-primary to-secondary transition-transform duration-500 group-hover:scale-[3]`,
-            mouse.elementX === null || mouse.elementY === null
-              ? "opacity-0"
-              : "opacity-25",
-            colorEffectHexClassUtility,
-          )}
-          style={{
-            maskImage: `radial-gradient(${
-              circleSize / 2
-            }px circle at center, white, transparent)`,
-            width: `${circleSize}px`,
-            height: `${circleSize}px`,
-            left: `${mouse.elementX}px`,
-            top: `${mouse.elementY}px`,
-          }}
-        />
+        <div />
         <div className="absolute inset-px" />
         <CardHeader className="relative px-4 pb-2 pt-4">
           <div className="flex items-center gap-2">
             {Icon && <Icon className={fillIcon} />}
-            <p className="font-light">/</p>
+            <Separator orientation="vertical" className="h-[1.5rem]" />
             <CardTitle className="text-xl font-light">
               {label}
             </CardTitle>

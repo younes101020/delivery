@@ -18,7 +18,6 @@ export default function DatabasesPage() {
           <DatabaseCard
             key={detail.value}
             {...detail}
-            colorEffectHexClassUtility={detail.utilityClass.colorEffectHexClassUtility}
             fillIcon={detail.utilityClass.fillIcon}
           >
             <DatabaseCreateDialog triggerText="Create" type={detail.value} />

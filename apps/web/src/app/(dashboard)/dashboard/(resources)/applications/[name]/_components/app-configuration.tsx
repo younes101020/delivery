@@ -155,7 +155,6 @@ function NoApplicationConfiguration({ refetch }: NoApplicationConfigurationProps
     <div className="col-span-3 flex flex-col gap-4 h-full">
       <p>No application configuration found.</p>
       <Button onClick={refetch}>
-        <Loader2 className="animate-spin mr-2 h-4 w-4" />
         Refetch
       </Button>
     </div>

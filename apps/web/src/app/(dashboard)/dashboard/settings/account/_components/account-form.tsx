@@ -16,12 +16,9 @@ import { updateAccount } from "../actions";
 
 export function AccountForm() {
   return (
-    <div>
-      <h2 className="text-2xl py-2">Update account</h2>
-      <Suspense fallback={<PendingForm />}>
-        <Form />
-      </Suspense>
-    </div>
+    <Suspense fallback={<PendingForm />}>
+      <Form />
+    </Suspense>
   );
 }
 
@@ -81,6 +78,7 @@ function Form() {
 
             )}
       </Button>
+
     </form>
   );
 }

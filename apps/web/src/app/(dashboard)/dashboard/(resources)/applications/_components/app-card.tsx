@@ -34,7 +34,7 @@ export function AppCard({ name, firstDeploymentAt, id, initialState }: AppCardPr
             <h2 className="decoration-primary underline">{name}</h2>
           </div>
 
-          <div className="flex">
+          <div className="flex gap-2 items-center">
             <ApplicationActions serviceId={id} initialState={initialState} />
             <AppOptions applicationName={name} />
           </div>
