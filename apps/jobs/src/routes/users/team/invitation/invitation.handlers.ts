@@ -19,7 +19,6 @@ export const getTeamInvitation: AppRouteHandler<GetTeamInvitation> = async (c) =
 export const createTeamInvitation: AppRouteHandler<CreateTeamInvitation> = async (c) => {
   const { id: teamId } = c.req.valid("param");
   const invitation = c.req.valid("json");
-
   const [createdInvitation] = await createInvitationIntoTeam({ teamId, invitation });
 
   return c.json(createdInvitation, HttpStatusCodes.OK);
