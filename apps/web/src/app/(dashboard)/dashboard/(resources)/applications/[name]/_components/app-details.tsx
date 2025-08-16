@@ -1,7 +1,7 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { Suspense } from "react";
 
 import { Separator } from "@/app/_components/ui/separator";
@@ -21,16 +21,12 @@ export function ApplicationDetails() {
 }
 
 function ApplicationDetailsWithData() {
-  const router = useRouter();
   const params = useParams<{ name: string }>();
   const { fetcher } = useFetch();
   const { data } = useSuspenseQuery<Application>({
     queryKey: ["applications", "details"],
     queryFn: () => fetcher(`/api/applications/${params.name}`),
   });
-
-  if (!data)
-    router.push("/dashboard/applications");
 
   return (
     <ApplicationDetailsTemplate application={data} />
