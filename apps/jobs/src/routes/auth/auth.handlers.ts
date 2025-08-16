@@ -5,6 +5,7 @@ import type { AppRouteHandler } from "@/lib/types";
 
 import type { RegisterRoute, VerifyRoute } from "./auth.routes";
 
+import { approveTeamMember } from "../users/team/invitation/lib/queries";
 import { isValidUser, registerUser } from "./lib/services";
 
 export const verify: AppRouteHandler<VerifyRoute> = async (c) => {
@@ -26,7 +27,20 @@ export const verify: AppRouteHandler<VerifyRoute> = async (c) => {
 
 export const register: AppRouteHandler<RegisterRoute> = async (c) => {
   const user = c.req.valid("json");
-  const userSessionPayload = await registerUser(user);
+  const { role, id, registeredUser } = await registerUser(user);
 
-  return c.json(userSessionPayload, HttpStatusCodes.OK);
+  let givenRole;
+
+  if (user.invitationId) {
+    const updatedInvitation = await approveTeamMember({
+      invitationId: user.invitationId,
+      invitedUser: registeredUser,
+    });
+    givenRole = updatedInvitation.role;
+  }
+
+  return c.json({
+    role: givenRole || role,
+    id,
+  }, HttpStatusCodes.OK);
 };

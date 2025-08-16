@@ -1,12 +1,13 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { CheckCircle2Icon, Loader2 } from "lucide-react";
 import { Suspense, useActionState } from "react";
 
 import type { ActionState } from "@/app/_lib/form-middleware";
 import type { TeamForUser } from "@/app/api/team/queries";
 
+import { Alert, AlertDescription, AlertTitle } from "@/app/_components/ui/alert";
 import { AlertDialog, AlertDialogTrigger } from "@/app/_components/ui/alert-dialog";
 import { Button } from "@/app/_components/ui/button";
 import { CardFooter } from "@/app/_components/ui/card";
@@ -101,25 +102,22 @@ export function TeamFormContent() {
     <div>
       {state.inputs.inviteUrl! && (
         <>
-          <Separator />
-          <div className="mt-2">
-            <h3 className="scroll-m-20 font-semibold tracking-tight text-balance">Share your invitation link</h3>
-            <h4 className="text-xs">Your invitation URL has been successfully generated. Share this link with the member you wish to invite to the team.</h4>
-            <div className="flex items-center gap-2 my-2">
-              <div className="flex items-center gap-1">
-                <span className="text-primary text-sm">
-                  {">"}
-                </span>
-                <p className="text-sm">{state.inputs.inviteUrl}</p>
+          <Alert variant="success" className="mt-8">
+            <CheckCircle2Icon />
+            <AlertTitle>Share your invitation link</AlertTitle>
+            <AlertDescription className="text-xs">
+              Your invitation URL has been successfully generated. Share this link with the member you wish to invite to the team.
+              <Separator />
+              <div className="flex items-center gap-2 my-2 max-w-full">
+                <p className="text-xs">{state.inputs.inviteUrl}</p>
+                <CopyButton
+                  value={state.inputs.inviteUrl}
+                  variant="outline"
+                  className="h-5 w-5 text-foreground opacity-100 hover:bg-muted hover:text-foreground [&_svg]:h-3.5 [&_svg]:w-3.5"
+                />
               </div>
-              <CopyButton
-                value={state.inputs.inviteUrl}
-                variant="outline"
-                className="h-7 w-7 text-foreground opacity-100 hover:bg-muted hover:text-foreground [&_svg]:h-3.5 [&_svg]:w-3.5"
-              />
-            </div>
-          </div>
-          <Separator />
+            </AlertDescription>
+          </Alert>
         </>
       )}
 

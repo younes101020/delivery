@@ -4,7 +4,8 @@ import type { AppRouteHandler } from "@/lib/types";
 
 import type { ApproveInvitation, CreateTeamInvitation, GetTeamInvitation } from "./invitation.routes";
 
-import { approveTeamMember, createInvitationIntoTeam, getTeamInvitationByTeamId } from "./lib/queries";
+import { createInvitationIntoTeam, getTeamInvitationByTeamId } from "./lib/queries";
+import { approveInvitation } from "./lib/services";
 
 export const getTeamInvitation: AppRouteHandler<GetTeamInvitation> = async (c) => {
   const { id: teamId } = c.req.valid("param");
@@ -24,11 +25,11 @@ export const createTeamInvitation: AppRouteHandler<CreateTeamInvitation> = async
   return c.json(createdInvitation, HttpStatusCodes.OK);
 };
 
-export const approveInvitation: AppRouteHandler<ApproveInvitation> = async (c) => {
+export const approve: AppRouteHandler<ApproveInvitation> = async (c) => {
   const { id: invitationId } = c.req.valid("param");
   const { invitedUserEmail } = c.req.valid("json");
 
-  const updatedInvitation = await approveTeamMember({
+  const updatedInvitation = await approveInvitation({
     invitationId,
     invitedUserEmail,
   });

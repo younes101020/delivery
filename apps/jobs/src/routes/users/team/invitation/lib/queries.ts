@@ -1,7 +1,9 @@
 import { db } from "@delivery/drizzle";
-import { invitations, teamMembers, users } from "@delivery/drizzle/schema";
+import { invitations, teamMembers } from "@delivery/drizzle/schema";
 import { and, eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
+
+import type { SelectUserSchema } from "@/lib/dto/users.dto";
 
 import type { CreateInvitation, invitationStatus } from "./dto";
 
@@ -38,16 +40,16 @@ export async function createInvitationIntoTeam({ teamId, invitation }: CreateTea
 
 interface ApproveTeamInvitation {
   invitationId: number;
-  invitedUserEmail: string;
+  invitedUser: Omit<SelectUserSchema, "role">;
 }
 
-export async function approveTeamMember({ invitationId, invitedUserEmail }: ApproveTeamInvitation) {
+export async function approveTeamMember({ invitationId, invitedUser }: ApproveTeamInvitation) {
   return db.transaction(async (tx) => {
     const invitation = await tx.query.invitations.findFirst({
       where: and(
         eq(invitations.id, invitationId),
         eq(invitations.status, "pending"),
-        eq(invitations.email, invitedUserEmail),
+        eq(invitations.email, invitedUser.email),
       ),
     });
 
@@ -63,12 +65,6 @@ export async function approveTeamMember({ invitationId, invitedUserEmail }: Appr
         eq(invitations.id, invitationId),
       )
       .returning();
-
-    const [invitedUser] = await tx.select().from(users).where(eq(users.email, invitedUserEmail)).limit(1);
-
-    if (!invitedUser) {
-      throw new HTTPException(404, { message: "Invited user not found." });
-    }
 
     const newTeamMember = {
       teamId: updatedInvitation.teamId,

@@ -33,9 +33,15 @@ export async function isValidUser(user: AuthVerifySchema) {
   let role;
 
   if (user.invitationId) {
+    const [invitedUser] = await db.select().from(users).where(eq(users.email, user.email)).limit(1);
+
+    if (!invitedUser) {
+      throw new HTTPException(404, { message: "Invited user not found." });
+    }
+
     const updatedInvitation = await approveTeamMember({
       invitationId: user.invitationId,
-      invitedUserEmail: user.email,
+      invitedUser,
     });
     role = updatedInvitation.role;
   }
@@ -77,20 +83,16 @@ export async function registerUser(user: AuthRegisterSchema) {
       });
     }
 
-    if (user.invitationId) {
-      const updatedInvitation = await approveTeamMember({
-        invitationId: user.invitationId,
-        invitedUserEmail: user.email,
-      });
-      role = updatedInvitation.role;
-    }
-    else if (role === "member") {
+    const canNotBeInitialUser = !user.invitationId && role === "member";
+
+    if (canNotBeInitialUser) {
       throw new HTTPException(403, { message: "You must be invited to register" });
     }
 
     return {
       role,
       id: inserted.id,
+      registeredUser: inserted,
     };
   });
 }
