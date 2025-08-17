@@ -13,16 +13,13 @@ import { formatDate } from "@/app/_lib/utils";
 import type { Applications } from "./types";
 
 import { AppCard } from "./app-card";
-import { NewAppCard } from "./new-app-card";
 
 export function ApplicationList() {
-  const { user } = useUser();
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
       <Suspense fallback={<PendingApplication />}>
         <List />
       </Suspense>
-      {user.role === "owner" && <NewAppCard />}
     </div>
   );
 }
