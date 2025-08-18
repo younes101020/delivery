@@ -90,7 +90,7 @@ export const deployApp = runDeployment(async (payload) => {
       ).values(),
     );
 
-    if (withoutDuplicatesEnvVars.length !== environmentVariables?.persistedEnvVars.length)
+    if (environmentVariables?.persistedEnvVars && withoutDuplicatesEnvVars.length !== environmentVariables?.persistedEnvVars.length)
       throw new HTTPException(HttpStatusCodes.UNPROCESSABLE_ENTITY, { message: "Environment variables contain duplicate keys" });
 
     return {
