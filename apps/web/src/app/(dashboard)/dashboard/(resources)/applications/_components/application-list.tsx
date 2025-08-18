@@ -53,6 +53,10 @@ function List() {
 
 function NoApplication() {
   const { user } = useUser();
+
+  if (!user)
+    return null;
+
   return (
     <EmptyState
       title="No application"

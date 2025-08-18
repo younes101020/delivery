@@ -80,6 +80,9 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useUser();
 
+  if (!user)
+    return null;
+
   const dataNavMain = data.navMain.map((item) => {
     if (item.title === "Applications" && user.role !== "owner") {
       return {
