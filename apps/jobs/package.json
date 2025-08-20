@@ -65,7 +65,7 @@
     "msw": "^2.10.4",
     "tsc-alias": "^1.8.16",
     "tsx": "^4.19.1",
-    "typescript": "^5.8.3",
+    "typescript": "catalog:",
     "vitest": "^3.1.4"
   }
 }

@@ -23,6 +23,6 @@
   "devDependencies": {
     "@delivery/eslint-config": "workspace:*",
     "eslint": "catalog:",
-    "typescript": "^5.9.2"
+    "typescript": "catalog:"
   }
 }

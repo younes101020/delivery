@@ -5,3 +5,4 @@ packages:
 catalog:
   drizzle-orm: ^0.44.2
   eslint: ^9.18.0
+  typescript: 5.8.3

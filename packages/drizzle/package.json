@@ -41,6 +41,6 @@
     "drizzle-seed": "^0.3.1",
     "eslint": "catalog:",
     "tsx": "^4.19.4",
-    "typescript": "^5.8.3"
+    "typescript": "catalog:"
   }
 }
