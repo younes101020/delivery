@@ -11,6 +11,7 @@ import { Label } from "@/app/_components/ui/label";
 import { Paragraph } from "@/app/_components/ui/paragraph";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { useUser } from "@/app/_hooks/use-user";
+import { withToast } from "@/app/_lib/utils";
 
 import { updateAccount } from "../actions";
 
@@ -25,7 +26,7 @@ export function AccountForm() {
 function Form() {
   const { user } = useUser();
   const [state, formAction, isPending] = useActionState<ActionState, FormData>(
-    updateAccount,
+    withToast(updateAccount),
     { error: "", success: "", inputs: user ?? {} },
   );
 

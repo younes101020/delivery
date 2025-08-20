@@ -14,6 +14,7 @@ import { Paragraph } from "@/app/_components/ui/paragraph";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { useUser } from "@/app/_hooks/use-user";
 import { useFetch } from "@/app/_lib/fetch-provider";
+import { withToast } from "@/app/_lib/utils";
 
 import type { DeliveryWebInstanceConfiguration } from "../_lib/queries";
 
@@ -39,7 +40,7 @@ export function DeliveryInstanceForm() {
 function Form() {
   const { user } = useUser();
   const [state, formAction, pending] = useActionState<ActionState<DeliveryInstanceFormProps>, FormData>(
-    deliveryInstanceForm,
+    withToast(deliveryInstanceForm),
     {
       error: "",
       success: "",

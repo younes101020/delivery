@@ -20,6 +20,7 @@ import { Separator } from "@/app/_components/ui/separator";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { useUser } from "@/app/_hooks/use-user";
 import { useFetch } from "@/app/_lib/fetch-provider";
+import { withToast } from "@/app/_lib/utils";
 import { CopyButton } from "@/app/(dashboard)/dashboard/_components/copy-button";
 
 import { inviteTeamMember } from "../actions";
@@ -91,7 +92,7 @@ export function TeamFormContent() {
   const { user } = useUser();
   const isOwner = user?.role === "owner";
   const [state, formAction, pending] = useActionState<ActionState<TeamFormContentProps>, FormData>(
-    inviteTeamMember,
+    withToast(inviteTeamMember),
     {
       error: "",
       success: "",

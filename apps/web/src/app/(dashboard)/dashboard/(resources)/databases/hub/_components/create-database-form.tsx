@@ -22,7 +22,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/app/_components/ui/popover";
-import { cn } from "@/app/_lib/utils";
+import { cn, withToast } from "@/app/_lib/utils";
 
 import type { DatabaseType, DatabaseVersionsCombobox } from "./types";
 
@@ -41,7 +41,7 @@ export function CreateDatabaseForm({ type, version, versionsCombobox }: CreateDa
   };
 
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
-    createContainer,
+    withToast(createContainer),
     {
       inputs: initialInputs,
     },

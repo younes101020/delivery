@@ -15,6 +15,7 @@ import {
 } from "@/app/_components/ui/alert-dialog";
 import { Button } from "@/app/_components/ui/button";
 import { Paragraph } from "@/app/_components/ui/paragraph";
+import { withToast } from "@/app/_lib/utils";
 
 import { revokeTeamMember } from "../actions";
 
@@ -24,7 +25,7 @@ interface RevvokeTeamMemberFormProps {
 
 export function RevokeTeamMemberForm({ memberId }: RevvokeTeamMemberFormProps) {
   const [state, revokeAction, isRevokingPending] = useActionState<ActionState, FormData>(
-    revokeTeamMember,
+    withToast(revokeTeamMember),
     {
       inputs: {},
     },

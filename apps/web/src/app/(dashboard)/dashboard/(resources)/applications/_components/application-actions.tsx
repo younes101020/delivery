@@ -8,7 +8,7 @@ import type { ActionState } from "@/app/_lib/form-middleware";
 
 import { Button } from "@/app/_components/ui/button";
 import { getQueryClient } from "@/app/_lib/react-query-provider";
-import { cn } from "@/app/_lib/utils";
+import { cn, withToast } from "@/app/_lib/utils";
 
 import type { ApplicationStatusData } from "./types";
 
@@ -61,7 +61,7 @@ function StartButton({
   };
 
   const [state, formAction, pending] = useActionState<ActionState<{ serviceId: string }>, FormData>(
-    startApplication,
+    withToast(startApplication),
     {
       inputs: initialInputs,
     },
@@ -102,7 +102,7 @@ function StopButton({
   };
 
   const [state, formAction, pending] = useActionState<ActionState<{ serviceId: string }>, FormData>(
-    stopApplication,
+    withToast(stopApplication),
     {
       inputs: initialInputs,
     },

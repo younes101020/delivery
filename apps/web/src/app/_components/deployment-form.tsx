@@ -13,6 +13,7 @@ import { Label } from "@/app/_components/ui/label";
 import type { ActionState } from "../_lib/form-middleware";
 
 import { useDeploymentSelectedApplication } from "../_ctx/deployment-selected-application";
+import { withToast } from "../_lib/utils";
 import { deploy } from "../actions";
 import { Paragraph } from "./ui/paragraph";
 import { Separator } from "./ui/separator";
@@ -25,16 +26,19 @@ interface DeploymentProps {
 
 export function DeploymentForm({ isOnboarding = false, children }: DeploymentProps) {
   const initialStaticChoice = false;
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(deploy, {
-    error: "",
-    inputs: {
-      port: "",
-      env: "",
-      cache: true,
-      staticdeploy: initialStaticChoice,
-      startCmd: "",
+  const [state, formAction, pending] = useActionState<ActionState, FormData>(
+    withToast(deploy),
+    {
+      error: "",
+      inputs: {
+        port: "",
+        env: "",
+        cache: true,
+        staticdeploy: initialStaticChoice,
+        startCmd: "",
+      },
     },
-  });
+  );
   const { selectedApplication } = useDeploymentSelectedApplication();
   const [isStaticDeployment, setIsStaticDeployment] = useState<CheckedState>(initialStaticChoice);
 

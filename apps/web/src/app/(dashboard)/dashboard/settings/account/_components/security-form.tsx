@@ -9,12 +9,13 @@ import { Button } from "@/app/_components/ui/button";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
 import { Paragraph } from "@/app/_components/ui/paragraph";
+import { withToast } from "@/app/_lib/utils";
 
 import { updateSecuritySettings } from "../actions";
 
 export function SecurityForm() {
   const [state, formAction, isPending] = useActionState<ActionState, FormData>(
-    updateSecuritySettings,
+    withToast(updateSecuritySettings),
     { error: "", success: "", inputs: {} },
   );
 

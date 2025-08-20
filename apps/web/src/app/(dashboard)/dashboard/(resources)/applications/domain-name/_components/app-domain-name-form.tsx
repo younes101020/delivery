@@ -15,6 +15,7 @@ import { Separator } from "@/app/_components/ui/separator";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { useUser } from "@/app/_hooks/use-user";
 import { useFetch } from "@/app/_lib/fetch-provider";
+import { withToast } from "@/app/_lib/utils";
 
 import type { ApplicationsDomainConfiguration } from "../_lib/queries";
 
@@ -36,7 +37,7 @@ export function ApplicationDomainConfigurationForm() {
 function Form() {
   const { user } = useUser();
   const [state, formAction, pending] = useActionState<ActionState<ApplicationDomainConfigurationFormProps>, FormData>(
-    applicationDomainForm,
+    withToast(applicationDomainForm),
     {
       error: "",
       success: "",

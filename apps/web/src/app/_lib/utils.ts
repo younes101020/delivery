@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
+import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 
 import type { ActionState } from "./form-middleware";
@@ -89,6 +90,23 @@ export function withInvalidation<Args extends unknown[], T extends ActionState>(
     const promise = fn(...args);
 
     queryClient.invalidateQueries({ queryKey });
+
+    return promise;
+  };
+}
+
+export function withToast<Args extends unknown[], T extends ActionState>(fn: (...args: Args) => Promise<T>) {
+  return async (...args: Args) => {
+    const promise = fn(...args);
+
+    promise.then((result) => {
+      if (result.success) {
+        toast.success(result.success);
+      }
+      else if (result.error) {
+        toast.error(result.error);
+      }
+    });
 
     return promise;
   };

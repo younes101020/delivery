@@ -7,6 +7,7 @@ import type { ActionState } from "@/app/_lib/form-middleware";
 
 import { Button } from "@/app/_components/ui/button";
 import { Paragraph } from "@/app/_components/ui/paragraph";
+import { withToast } from "@/app/_lib/utils";
 import { retryDeploy } from "@/app/actions";
 
 import { useGetRepoName } from "../_hooks/use-get-repo-name";
@@ -18,7 +19,7 @@ interface RedeployButtonProps {
 export function RedeployButton({ jobId }: RedeployButtonProps) {
   const repoName = useGetRepoName();
   const [state, formAction, isPending] = useActionState<ActionState, FormData>(
-    retryDeploy,
+    withToast(retryDeploy),
     { error: "", success: "", inputs: { repoName, jobId } },
   );
 

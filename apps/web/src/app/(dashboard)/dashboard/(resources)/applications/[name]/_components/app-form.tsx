@@ -11,6 +11,7 @@ import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
 import { Paragraph } from "@/app/_components/ui/paragraph";
 import { Textarea } from "@/app/_components/ui/textarea";
+import { withToast } from "@/app/_lib/utils";
 
 import { editApplication } from "../../actions";
 
@@ -23,7 +24,7 @@ interface AppFormProps {
 
 export function AppForm(applicationData: AppFormProps) {
   const [state, formAction, pending] = useActionState<ActionState<AppFormProps>, FormData>(
-    editApplication,
+    withToast(editApplication),
     {
       error: "",
       success: "",

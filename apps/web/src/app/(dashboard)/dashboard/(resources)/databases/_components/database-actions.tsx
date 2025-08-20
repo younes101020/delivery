@@ -8,7 +8,7 @@ import type { ActionState } from "@/app/_lib/form-middleware";
 
 import { Button } from "@/app/_components/ui/button";
 import { getQueryClient } from "@/app/_lib/react-query-provider";
-import { cn } from "@/app/_lib/utils";
+import { cn, withToast } from "@/app/_lib/utils";
 
 import type { DatabaseStatusData } from "./types";
 
@@ -62,7 +62,7 @@ function StartButton({
   };
 
   const [state, formAction, pending] = useActionState<ActionState<{ serviceId: string }>, FormData>(
-    startDatabaseService,
+    withToast(startDatabaseService),
     {
       inputs: initialInputs,
     },
@@ -103,7 +103,7 @@ function StopButton({
   };
 
   const [state, formAction, pending] = useActionState<ActionState<{ serviceId: string }>, FormData>(
-    stopDatabaseService,
+    withToast(stopDatabaseService),
     {
       inputs: initialInputs,
     },

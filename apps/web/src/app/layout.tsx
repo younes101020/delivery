@@ -8,6 +8,7 @@ import "./globals.css";
 import ReactQueryProviders from "@/app/_lib/react-query-provider";
 import { env } from "@/env";
 
+import { Toaster } from "./_components/ui/sonner";
 import { FetcherProvider } from "./_lib/fetch-provider";
 import { getQueryClient } from "./_lib/get-rsc-query-client";
 import { getUser } from "./_lib/user-session";
@@ -60,6 +61,7 @@ export default function RootLayout({
             </HydrationBoundary>
           </ReactQueryProviders>
         </FetcherProvider>
+        <Toaster position="top-center" />
       </body>
     </html>
   );
