@@ -11,32 +11,9 @@ That’s where ***Delivery*** comes in. We combine data integrity, affordability
 
 ---
 
-## Screenshots
+## Demo (not final)
 
-* Onboarding page
-
-  ![deliver_onboarding](https://github.com/user-attachments/assets/70440c22-650e-413b-8424-11f23cbe9e12)
-
-* Deployment page
-
-  ![deployment-page](https://github.com/user-attachments/assets/93bc3e2c-66a9-4f03-8ede-6dc484eb8909)
-
-* Signin
-  
-  ![signin_page](https://github.com/user-attachments/assets/13ae3ba5-de42-46e0-86d5-5619d894e599)
-
-* Applications page
-
-  ![app_page](https://github.com/user-attachments/assets/fcd90d7e-e9be-4f91-ac3a-dbffbddb2222)
-
-* Databases page
-
-  ![db_page](https://github.com/user-attachments/assets/afa59c16-dc72-41f5-b785-1504b4119e4c)
-
-* Databases hub page
-
-  ![db_hub_page_dialog](https://github.com/user-attachments/assets/db0f0cdd-8a1d-4912-9d22-0b91ea2c9631)
-
+https://github.com/user-attachments/assets/58216b74-6c24-45a5-b8b9-76f7a80d4d5f
 
 ## Inspiration
 
