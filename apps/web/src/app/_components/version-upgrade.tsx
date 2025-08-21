@@ -41,6 +41,7 @@ function VersionUpgradeCard() {
   const { data } = useSuspenseQuery<DeliveryVersion>({
     queryKey: ["version"],
     queryFn: () => fetcher("/api/version"),
+    refetchInterval: ({ state }) => state.data?.isInProgress ? 5000 : undefined,
   });
   const queryClient = getQueryClient();
 
@@ -65,43 +66,45 @@ function VersionUpgradeCard() {
       </span>
       <div className="flex items-center gap-2">
         {
-          isPending
+          isPending || data.isInProgress
             ? <Spinner variant="secondary" className="mr-2" />
             : <CircleFadingArrowUp size={22} />
         }
         <Separator orientation="vertical" className="h-6" />
-        {data.isLatest
-          ? <p>Already up to date</p>
-          : (
-              <div className="flex flex-col gap-2">
-                <p>New version is available</p>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button size="sm" variant="secondary" disabled={isPending}>
-                      {isPending ? "Updating..." : "Update"}
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This will update the Delivery instance to the latest version. You can take a look at the latest release notes on the
-                        {" "}
-                        <a href="https://github.com/younes101020/delivery/releases" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">GitHub releases page</a>
-                        .
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <form action={updateDeliveryWithInvalidation}>
-                        <AlertDialogAction type="submit">Update</AlertDialogAction>
-                      </form>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+        {data.isInProgress
+          ? <p>Updating...</p>
+          : data.isLatest
+            ? <p>Already up to date</p>
+            : (
+                <div className="flex flex-col gap-2">
+                  <p>New version is available</p>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button size="sm" variant="secondary" disabled={isPending}>
+                        {isPending ? "Updating..." : "Update"}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will update the Delivery instance to the latest version. You can take a look at the latest release notes on the
+                          {" "}
+                          <a href="https://github.com/younes101020/delivery/releases" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">GitHub releases page</a>
+                          .
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <form action={updateDeliveryWithInvalidation}>
+                          <AlertDialogAction type="submit">Update</AlertDialogAction>
+                        </form>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
 
-              </div>
-            )}
+                </div>
+              )}
 
       </div>
     </div>

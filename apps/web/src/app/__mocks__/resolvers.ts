@@ -8,6 +8,7 @@ export function getVersionResolver() {
   return HttpResponse.json({
     version: "0.8.2",
     isLatest: true,
+    isInProgress: false,
   });
 }
 

@@ -62,3 +62,10 @@ export async function updateDeliveryVersion() {
 
   return latestImageVersion;
 }
+
+export async function isDeliveryServicesUpdating() {
+  const deliveryServices = await getSwarmServicesByName(
+    [DELIVERY_WEB_SERVICE_NAME, DELIVERY_JOBS_SERVICE_NAME],
+  );
+  return deliveryServices.some(s => s.UpdateStatus?.State === "updating");
+}
