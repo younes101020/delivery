@@ -13,7 +13,6 @@ import { Button } from "@/app/_components/ui/button";
 import { CardFooter } from "@/app/_components/ui/card";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
-import { Paragraph } from "@/app/_components/ui/paragraph";
 import { RadioGroup, RadioGroupItem } from "@/app/_components/ui/radio-group";
 import { ScrollArea } from "@/app/_components/ui/scroll-area";
 import { Separator } from "@/app/_components/ui/separator";
@@ -155,8 +154,6 @@ export function TeamFormContent() {
             The role of the user you want to invite to your team. Members can access the team, while owners have full control over it.
           </p>
         </div>
-        {state?.error && <Paragraph variant="error">{state.error}</Paragraph>}
-        {state?.success && <Paragraph variant="success">{state.success}</Paragraph>}
 
         <CardFooter className="flex px-0 pt-8 col-span-2">
           <Button type="submit" disabled={pending || !isOwner} aria-label="submit" className="w-full">

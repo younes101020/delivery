@@ -10,7 +10,6 @@ import { Button } from "@/app/_components/ui/button";
 import { CardFooter } from "@/app/_components/ui/card";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
-import { Paragraph } from "@/app/_components/ui/paragraph";
 import { Separator } from "@/app/_components/ui/separator";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { useUser } from "@/app/_hooks/use-user";
@@ -75,7 +74,6 @@ function Form() {
               If specified, this domain will be used as a wildcard domain for all your applications.
             </p>
           </div>
-          {state?.error && <Paragraph variant="error">{state.error}</Paragraph>}
           {user.role === "owner" && (
             <CardFooter className="flex px-0 pt-8 col-span-2">
               <Button type="submit" disabled={pending} aria-label="submit" className="w-full">

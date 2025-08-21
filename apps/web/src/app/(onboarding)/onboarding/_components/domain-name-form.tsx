@@ -8,7 +8,7 @@ import type { ActionState } from "@/app/_lib/form-middleware";
 import { Button } from "@/app/_components/ui/button";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
-import { Paragraph } from "@/app/_components/ui/paragraph";
+import { withToast } from "@/app/_lib/utils";
 import { domainName } from "@/app/actions";
 
 interface DomainNameState {
@@ -16,8 +16,8 @@ interface DomainNameState {
 }
 
 export function DomainNameForm() {
-  const [state, formAction, pending] = useActionState<ActionState<DomainNameState>, FormData>(
-    domainName,
+  const [_, formAction, pending] = useActionState<ActionState<DomainNameState>, FormData>(
+    withToast(domainName),
     {
       error: "",
       inputs: {
@@ -47,7 +47,6 @@ export function DomainNameForm() {
             The domain name or public IP that directs to the server where you launched Delivery.
           </p>
         </div>
-        {state?.error && <Paragraph variant="error">{state.error}</Paragraph>}
         <div className="flex justify-end">
           <Button type="submit" disabled={pending} aria-label="submit">
             {pending

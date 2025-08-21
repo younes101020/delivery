@@ -8,13 +8,12 @@ import type { ActionState } from "@/app/_lib/form-middleware";
 import { Button } from "@/app/_components/ui/button";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
-import { Paragraph } from "@/app/_components/ui/paragraph";
 import { withToast } from "@/app/_lib/utils";
 
 import { updateSecuritySettings } from "../actions";
 
 export function SecurityForm() {
-  const [state, formAction, isPending] = useActionState<ActionState, FormData>(
+  const [_, formAction, isPending] = useActionState<ActionState, FormData>(
     withToast(updateSecuritySettings),
     { error: "", success: "", inputs: {} },
   );
@@ -44,12 +43,6 @@ export function SecurityForm() {
           required
         />
       </div>
-      {state.error && (
-        <Paragraph variant="error">{state.error}</Paragraph>
-      )}
-      {state.success && (
-        <Paragraph variant="success">{state.success}</Paragraph>
-      )}
       <Button
         type="submit"
         className="bg-orange-500 hover:bg-orange-600 text-white"

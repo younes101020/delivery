@@ -16,7 +16,6 @@ import {
 } from "@/app/_components/ui/command";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
-import { Paragraph } from "@/app/_components/ui/paragraph";
 import {
   Popover,
   PopoverContent,
@@ -68,7 +67,6 @@ export function CreateDatabaseForm({ type, version, versionsCombobox }: CreateDa
         </p>
       </div>
       <input type="hidden" name="type" id="type" value={type} />
-      {state?.error && <Paragraph variant="error">{state.error}</Paragraph>}
       <Button type="submit" disabled={pending} aria-label="submit" className="mt-4">
         {pending
           ? (

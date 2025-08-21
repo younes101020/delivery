@@ -14,7 +14,6 @@ import {
   AlertDialogTitle,
 } from "@/app/_components/ui/alert-dialog";
 import { Button } from "@/app/_components/ui/button";
-import { Paragraph } from "@/app/_components/ui/paragraph";
 import { withToast } from "@/app/_lib/utils";
 
 import { revokeTeamMember } from "../actions";
@@ -24,7 +23,7 @@ interface RevvokeTeamMemberFormProps {
 }
 
 export function RevokeTeamMemberForm({ memberId }: RevvokeTeamMemberFormProps) {
-  const [state, revokeAction, isRevokingPending] = useActionState<ActionState, FormData>(
+  const [_, revokeAction, isRevokingPending] = useActionState<ActionState, FormData>(
     withToast(revokeTeamMember),
     {
       inputs: {},
@@ -41,8 +40,6 @@ export function RevokeTeamMemberForm({ memberId }: RevvokeTeamMemberFormProps) {
       </AlertDialogHeader>
       <AlertDialogFooter>
         <AlertDialogCancel>Cancel</AlertDialogCancel>
-        {state?.error && <Paragraph variant="error">{state.error}</Paragraph>}
-        {state?.success && <Paragraph variant="success">{state.success}</Paragraph>}
         <AlertDialogAction asChild>
           <form action={revokeAction}>
             <input type="hidden" name="memberId" value={memberId} />

@@ -15,7 +15,6 @@ import type { ActionState } from "../_lib/form-middleware";
 import { useDeploymentSelectedApplication } from "../_ctx/deployment-selected-application";
 import { withToast } from "../_lib/utils";
 import { deploy } from "../actions";
-import { Paragraph } from "./ui/paragraph";
 import { Separator } from "./ui/separator";
 import { Textarea } from "./ui/textarea";
 
@@ -188,11 +187,6 @@ export function DeploymentForm({ isOnboarding = false, children }: DeploymentPro
           />
           {isOnboarding && (
             <input type="hidden" name="isOnboarding" id="isOnboarding" value="true" />
-          )}
-          {state?.error && (
-            <Paragraph variant="error">
-              {state.error}
-            </Paragraph>
           )}
           <Button type="submit" disabled={!selectedApplication.name || pending} aria-label="submit">
             {pending

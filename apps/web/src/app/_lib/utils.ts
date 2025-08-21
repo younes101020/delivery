@@ -91,6 +91,15 @@ export function withInvalidation<Args extends unknown[], T extends ActionState>(
 
     queryClient.invalidateQueries({ queryKey });
 
+    promise.then((result) => {
+      if (result.success) {
+        toast.success(result.success);
+      }
+      else if (result.error) {
+        toast.error(result.error);
+      }
+    });
+
     return promise;
   };
 }

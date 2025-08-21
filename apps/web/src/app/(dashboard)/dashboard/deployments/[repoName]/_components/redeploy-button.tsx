@@ -6,7 +6,6 @@ import { useActionState } from "react";
 import type { ActionState } from "@/app/_lib/form-middleware";
 
 import { Button } from "@/app/_components/ui/button";
-import { Paragraph } from "@/app/_components/ui/paragraph";
 import { withToast } from "@/app/_lib/utils";
 import { retryDeploy } from "@/app/actions";
 
@@ -18,14 +17,13 @@ interface RedeployButtonProps {
 
 export function RedeployButton({ jobId }: RedeployButtonProps) {
   const repoName = useGetRepoName();
-  const [state, formAction, isPending] = useActionState<ActionState, FormData>(
+  const [_, formAction, isPending] = useActionState<ActionState, FormData>(
     withToast(retryDeploy),
     { error: "", success: "", inputs: { repoName, jobId } },
   );
 
   return (
     <div className="flex flex-col gap-2">
-      {state.error && <Paragraph variant="error">{state.error}</Paragraph>}
       <form>
         <input type="hidden" name="repoName" defaultValue={repoName} />
         <input type="hidden" name="jobId" defaultValue={jobId} />
