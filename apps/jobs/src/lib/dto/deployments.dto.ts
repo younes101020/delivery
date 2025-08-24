@@ -71,6 +71,15 @@ export const previousJobSchema = z.object({
   timestamp: z.string(),
   repoName: z.string(),
   logs: z.string(),
+  deploymentDuration: z.array(
+    z.object({
+      id: z.string(),
+      step: z.string(),
+      label: z.string(),
+      startTimeTimestamp: z.number(),
+      endTimeTimestamp: z.number(),
+    }),
+  ),
 });
 
 export const currentJobCountSchema = z.object({

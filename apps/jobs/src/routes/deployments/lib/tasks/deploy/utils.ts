@@ -46,24 +46,43 @@ export function getDeploymentQueue(repoName: string) {
   return new Queue<AllQueueDeploymentJobsData>(repoName, { connection: getBullConnection(connection), prefix: PREFIX });
 }
 
+const StepLabels = new Map([
+  ["clone", "Source code import"],
+  ["build", "Image building"],
+  ["configure", "Application configuration"],
+]);
+
 export async function getPreviousDeploymentsState() {
   const deployments = await fetchQueueTitles(connection, PREFIX);
 
   const previousDeploymentsState = await Promise.all(deployments.map(async (deployment) => {
-    const queue = new Queue(deployment.queueName, { connection: getBullConnection(connection), prefix: PREFIX });
+    const queue = new Queue<AllQueueDeploymentJobsData>(deployment.queueName, { connection: getBullConnection(connection), prefix: PREFIX });
     const jobs = await queue.getJobs(["completed"]);
 
-    if (jobs.length < 1)
+    if (jobs.length < 3)
       return null;
 
     const latestStep = getLatestJob(jobs)!;
-    const logs = jobs.find(job => job.name === "build").data.logs;
-    const applicationId = jobs.find(job => job.name === "configure").returnvalue;
+
+    const buildJob = jobs.find(job => job.name === "build");
+    const configureJob = jobs.find(job => job.name === "configure");
+
+    const logs = buildJob?.data.logs as string;
+    const applicationId = configureJob?.returnvalue;
+
+    const deploymentDuration = jobs.map(j => ({
+      id: j.id!,
+      step: j.name as "clone" | "build" | "configure",
+      label: StepLabels.get(j.name)!,
+      startTimeTimestamp: j.processedOn || 0,
+      endTimeTimestamp: j.finishedOn || 0,
+    }));
 
     return {
       id: latestStep.id!,
       timestamp: new Date(latestStep.timestamp).toDateString(),
       repoName: deployment.queueName,
+      deploymentDuration,
       logs,
       applicationId,
     };

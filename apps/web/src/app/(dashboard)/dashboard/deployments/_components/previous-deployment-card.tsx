@@ -1,11 +1,14 @@
 "use client";
 
+import { Cog, Scroll } from "lucide-react";
 import Link from "next/link";
 
 import { Button, buttonVariants } from "@/app/_components/ui/button";
-import { Card, CardContent, CardFooter } from "@/app/_components/ui/card";
-import { Dialog, DialogContent, DialogTrigger } from "@/app/_components/ui/dialog";
-import { cn } from "@/app/_lib/utils";
+import { Card, CardAction, CardContent, CardFooter, CardHeader } from "@/app/_components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/app/_components/ui/dialog";
+import { Separator } from "@/app/_components/ui/separator";
+import { cn, formatDateFromTimestamp } from "@/app/_lib/utils";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/(dashboard)/dashboard/_components/ui/table";
 
 import { DeploymentLogsCard } from "./deployment-logs";
 
@@ -14,41 +17,90 @@ interface DeploymentPreviewCardProps {
   repoName: string;
   logs: string;
   applicationId: number;
+  deploymentDuration: DeploymentDuration[];
+}
+
+interface DeploymentDuration {
+  id: string;
+  step: string;
+  label: string;
+  startTimeTimestamp: number;
+  endTimeTimestamp: number;
 }
 
 export function PreviousDeploymentPreviewCard({
   repoName,
   logs,
   applicationId,
+  deploymentDuration,
 }: DeploymentPreviewCardProps) {
   return (
     <Card
-      className="flex flex-col border py-10 relative group/feature"
+      className="rounded-none"
     >
-      <div className="opacity-0 group-hover/feature:opacity-100 transition duration-200 absolute inset-0 h-full w-full bg-linear-to-t to-transparent pointer-events-none from-primary/25" />
-
-      <CardContent className="px-0">
-        <div className="text-lg mb-2 relative z-10 px-10 flex flex-col">
-          <span className="group-hover/feature:translate-x-2 transition duration-200 inline-block">
-            {repoName}
-          </span>
+      <CardHeader>
+        <div className="flex flex-row justify-between items-center">
+          <p>{repoName}</p>
+          <CardAction>
+            <Link href={`/dashboard/applications/${applicationId}`} className={cn(buttonVariants({ variant: "outline" }), "text-xs")}>
+              <Cog strokeWidth={0.8} />
+              {" "}
+              Application setting
+            </Link>
+          </CardAction>
         </div>
+
+      </CardHeader>
+      <Separator />
+      <CardContent className="text-xs">
+        <DeploymentDurationTable deploymentDuration={deploymentDuration} />
       </CardContent>
 
-      <CardFooter className="flex flex-wrap gap-3">
+      <CardFooter>
         <Dialog>
           <DialogTrigger asChild>
-            <Button className="text-xs">View build logs</Button>
+            <Button className="text-xs">
+              <Scroll />
+              {" "}
+              View build logs
+            </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-4xl w-full border-none">
+            <DialogHeader>
+              <DialogTitle>Logs</DialogTitle>
+            </DialogHeader>
             <DeploymentLogsCard logs={logs} />
           </DialogContent>
         </Dialog>
-        <Link href={`/dashboard/applications/${applicationId}`} className={cn(buttonVariants({ variant: "outline" }), "text-xs")}>
-          Application setting
-        </Link>
       </CardFooter>
 
     </Card>
+  );
+}
+
+interface DeploymentDurationTableProps {
+  deploymentDuration: DeploymentDuration[];
+}
+
+function DeploymentDurationTable({ deploymentDuration }: DeploymentDurationTableProps) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Step</TableHead>
+          <TableHead>Started at</TableHead>
+          <TableHead>Ended at</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {deploymentDuration.map(duration => (
+          <TableRow key={duration.id}>
+            <TableCell className="font-medium">{duration.label}</TableCell>
+            <TableCell>{formatDateFromTimestamp(duration.startTimeTimestamp)}</TableCell>
+            <TableCell>{formatDateFromTimestamp(duration.endTimeTimestamp)}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 }

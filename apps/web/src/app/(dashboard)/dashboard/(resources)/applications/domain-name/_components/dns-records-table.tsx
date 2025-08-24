@@ -16,7 +16,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "./ui/table";
+} from "../../../../_components/ui/table";
 
 export function DNSRecords() {
   return (

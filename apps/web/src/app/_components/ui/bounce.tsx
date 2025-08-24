@@ -9,6 +9,7 @@ const bounceVariants = cva("bg-primary", {
     variant: {
       default: "bg-secondary/50",
       active: "bg-primary",
+      failed: "bg-destructive",
     },
   },
   defaultVariants: {

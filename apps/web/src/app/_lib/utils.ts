@@ -51,6 +51,15 @@ export function formatDate(date: string | null | Date | number) {
     : "Invalid Date";
 }
 
+export function formatDateFromTimestamp(ts: number) {
+  return new Intl.DateTimeFormat(undefined, {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  }).format(ts);
+}
+
 async function get(url: string, input: Record<string, string>) {
   return fetch(
     `${url}?${new URLSearchParams(input).toString()}`,
