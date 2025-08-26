@@ -34,7 +34,6 @@ export async function clone(job: QueueDeploymentJob<"clone">) {
   });
 
   const authenticatedUrl = convertGitToAuthenticatedUrl(repoUrl, installationAuthentication.token);
-
   await ssh(`git clone --depth=1 ${authenticatedUrl} ${repoName}`, {
     cwd: APPLICATIONS_PATH,
     onStdout: async ({ chunk, chunks, isCriticalError }) => {
