@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { Button } from "@/app/_components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/app/_components/ui/dropdown-menu";
+import { useUser } from "@/app/_hooks/use-user";
 
 import { removeDatabaseService } from "../actions";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./../../../_components/ui/alert-dialog";
@@ -14,6 +15,15 @@ interface ContainerOptionsProps {
 };
 
 export function DatabaseOptions({ serviceName }: ContainerOptionsProps) {
+  const { user } = useUser();
+
+  if (user.role !== "owner")
+    return null;
+
+  return <DatabaseOptionsDropdown serviceName={serviceName} />;
+}
+
+function DatabaseOptionsDropdown({ serviceName }: ContainerOptionsProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

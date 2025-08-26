@@ -7,6 +7,7 @@ import { useActionState } from "react";
 import type { ActionState } from "@/app/_lib/form-middleware";
 
 import { Button } from "@/app/_components/ui/button";
+import { useUser } from "@/app/_hooks/use-user";
 import { getQueryClient } from "@/app/_lib/react-query-provider";
 import { cn, withToast } from "@/app/_lib/utils";
 
@@ -20,7 +21,16 @@ interface DatabaseActionsProps {
   serviceId: string;
 }
 
-export function DatabaseActions({ initialState, serviceId }: DatabaseActionsProps) {
+export function DatabaseActions(props: DatabaseActionsProps) {
+  const { user } = useUser();
+
+  if (user.role !== "owner")
+    return null;
+
+  return <DatabaseActionButton {...props} />;
+}
+
+function DatabaseActionButton({ initialState, serviceId }: DatabaseActionsProps) {
   const { data } = useQuery<DatabaseStatusData>({ queryKey: [serviceId] }, getQueryClient(true));
 
   if (data?.status === "completed" || !data || data.processName) {

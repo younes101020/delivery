@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import { buttonVariants } from "@/app/_components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/app/_components/ui/card";
 import { Skeleton } from "@/app/_components/ui/skeleton";
+import { useUser } from "@/app/_hooks/use-user";
 
 import type { ContainerStatusProps } from "../../types";
 
@@ -25,8 +26,9 @@ interface AppCardProps {
 }
 
 export function AppCard({ name, firstDeploymentAt, id, initialState }: AppCardProps) {
-  return (
+  const { user } = useUser();
 
+  return (
     <Card className="w-full transition-all">
       <CardHeader>
         <div className="flex items-center justify-between gap-1">
@@ -34,10 +36,12 @@ export function AppCard({ name, firstDeploymentAt, id, initialState }: AppCardPr
             <h2 className="decoration-primary underline">{name}</h2>
           </div>
 
-          <div className="flex gap-2 items-center">
-            <ApplicationActions serviceId={id} initialState={initialState} />
-            <AppOptions applicationName={name} />
-          </div>
+          {user.role === "owner" && (
+            <div className="flex gap-2 items-center">
+              <ApplicationActions serviceId={id} initialState={initialState} />
+              <AppOptions applicationName={name} />
+            </div>
+          )}
 
         </div>
       </CardHeader>
