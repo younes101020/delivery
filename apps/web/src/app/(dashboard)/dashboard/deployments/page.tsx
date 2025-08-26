@@ -1,4 +1,5 @@
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { Check, Radio } from "lucide-react";
 import { Suspense } from "react";
 
 import { PageDescription } from "@/app/_components/ui/page-description";
@@ -10,6 +11,7 @@ import { env } from "@/env";
 
 import { OngoingDeploymentList } from "./_components/ongoing-deployment-list";
 import { PreviousDeploymentList } from "./_components/previous-deployment-list";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./_components/ui/tabs";
 import { getCurrentDeploymentsState, getPreviousDeploymentsState } from "./_lib/queries";
 
 export const dynamic = "force-dynamic";
@@ -42,19 +44,44 @@ async function Deployments() {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div>
-        <PageTitle>Ongoing deployments</PageTitle>
-        <PageDescription>A list of all your deployments in progress.</PageDescription>
-        <OngoingDeploymentList baseUrl={baseUrl} />
+        <PageTitle>Deployments</PageTitle>
+        <PageDescription>All your in progress and completed deployments.</PageDescription>
+      </div>
 
-      </div>
-      <Separator className="my-4" />
-      <div>
-        <PageTitle>Previous deployments</PageTitle>
-        <PageDescription>A list of all your previous deployments.</PageDescription>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10 py-10">
-          <PreviousDeploymentList />
-        </div>
-      </div>
+      <Tabs defaultValue="in-progress" className="w-full relative mr-auto my-6">
+        <TabsList className="justify-start rounded-none border-b bg-transparent p-0">
+          <TabsTrigger
+            value="in-progress"
+            className="relative rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-none focus-visible:ring-0 data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+          >
+            <div className="flex items-center gap-2">
+              <Radio />
+              {" "}
+              <Separator orientation="vertical" className="h-[1rem]" />
+              In progress
+            </div>
+          </TabsTrigger>
+          <TabsTrigger
+            value="completed"
+            className="relative rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-none focus-visible:ring-0 data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none "
+          >
+            <div className="flex items-center gap-2">
+              <Check />
+              {" "}
+              <Separator orientation="vertical" className="h-[1rem]" />
+              Completed
+            </div>
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="in-progress">
+          <OngoingDeploymentList baseUrl={baseUrl} />
+        </TabsContent>
+        <TabsContent value="completed" className="w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10 py-10 w-full">
+            <PreviousDeploymentList />
+          </div>
+        </TabsContent>
+      </Tabs>
     </HydrationBoundary>
   );
 }
