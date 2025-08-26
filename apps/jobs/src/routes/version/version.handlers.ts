@@ -16,7 +16,7 @@ export const getVersion: AppRouteHandler<GetVersionRoute> = async (c) => {
 
   const shouldBeInferredAsLatest = await isPipelineInProgress();
 
-  const isLatest = versionInfo.version === latestVersionInfo || shouldBeInferredAsLatest;
+  const isLatest = versionInfo.version >= latestVersionInfo || shouldBeInferredAsLatest;
 
   return c.json(
     {
