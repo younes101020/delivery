@@ -6,9 +6,6 @@ settings:
 
 catalogs:
   default:
-    drizzle-orm:
-      specifier: ^0.44.2
-      version: 0.44.2
     eslint:
       specifier: ^9.18.0
       version: 9.28.0
@@ -6255,9 +6252,6 @@ packages:
     peerDependencies:
       pg: '>=8.0'
 
-  pg-protocol@1.10.0:
-    resolution: {integrity: sha512-IpdytjudNuLv8nhlHs/UrVBhU0e78J0oIS/0AVdTbWxSOkFUVdsHC/NrorO6nXsQNDTT1kzDSOMJubBQviX18Q==}
-
   pg-protocol@1.10.3:
     resolution: {integrity: sha512-6DIBgBQaTKDJyxnXaLiLR8wBpQQcGWuAESkRBX/t6OwA8YsqP+iVSiond2EDy6Y/dsGk8rh/jtax3js5NeV7JQ==}
 
@@ -10062,13 +10056,14 @@ snapshots:
   '@types/node@24.3.0':
     dependencies:
       undici-types: 7.10.0
+    optional: true
 
   '@types/normalize-package-data@2.4.4': {}
 
   '@types/pg@8.15.5':
     dependencies:
-      '@types/node': 24.3.0
-      pg-protocol: 1.10.0
+      '@types/node': 20.19.11
+      pg-protocol: 1.10.3
       pg-types: 2.2.0
 
   '@types/prop-types@15.7.14': {}
@@ -13615,8 +13610,6 @@ snapshots:
     dependencies:
       pg: 8.16.3
 
-  pg-protocol@1.10.0: {}
-
   pg-protocol@1.10.3: {}
 
   pg-types@2.2.0:
@@ -14882,7 +14875,8 @@ snapshots:
 
   undici-types@6.21.0: {}
 
-  undici-types@7.10.0: {}
+  undici-types@7.10.0:
+    optional: true
 
   unicode-emoji-modifier-base@1.0.0: {}
 
