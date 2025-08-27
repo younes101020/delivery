@@ -7,7 +7,7 @@ import { Button, buttonVariants } from "@/app/_components/ui/button";
 import { Card, CardAction, CardContent, CardFooter, CardHeader } from "@/app/_components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/app/_components/ui/dialog";
 import { Separator } from "@/app/_components/ui/separator";
-import { cn, formatDateFromTimestamp } from "@/app/_lib/utils";
+import { cn, toLocalDateString } from "@/app/_lib/utils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/(dashboard)/dashboard/_components/ui/table";
 
 import { DeploymentLogsCard } from "./deployment-logs";
@@ -96,8 +96,8 @@ function DeploymentDurationTable({ deploymentDuration }: DeploymentDurationTable
         {deploymentDuration.map(duration => (
           <TableRow key={duration.id}>
             <TableCell className="font-medium">{duration.label}</TableCell>
-            <TableCell>{formatDateFromTimestamp(duration.startTimeTimestamp)}</TableCell>
-            <TableCell>{formatDateFromTimestamp(duration.endTimeTimestamp)}</TableCell>
+            <TableCell>{toLocalDateString(duration.startTimeTimestamp)}</TableCell>
+            <TableCell>{toLocalDateString(duration.endTimeTimestamp)}</TableCell>
           </TableRow>
         ))}
       </TableBody>

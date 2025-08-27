@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { formatDate } from "@/app/_lib/utils";
+import { toLocalDateString } from "@/app/_lib/utils";
 
 interface AppDateProps {
   date: string;
@@ -15,5 +15,5 @@ export function AppDate({ date }: AppDateProps) {
     setIsClient(true);
   }, []);
 
-  return <dd>{isClient && formatDate(date)}</dd>;
+  return <dd>{isClient && toLocalDateString(date)}</dd>;
 }

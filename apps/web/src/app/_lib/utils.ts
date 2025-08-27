@@ -26,38 +26,15 @@ export type Nullable<T> = {
   [K in keyof T]: T[K] | null;
 };
 
-function isValidTimestampMs(value: any) {
-  return !Number.isNaN(Number(value));
-}
-
-function isValidDate(date: string | null | Date | number) {
-  return !!Date.parse(date as string);
-}
-
-export function formatDate(date: string | null | Date | number) {
-  const locale = Intl.DateTimeFormat().resolvedOptions().locale;
-
-  const outputDateTemplate = new Intl.DateTimeFormat(locale, {
+export function toLocalDateString(utc: string | number) {
+  return new Intl.DateTimeFormat(undefined, {
     year: "numeric",
-    month: "long",
+    month: "numeric",
     day: "numeric",
     hour: "numeric",
     minute: "numeric",
     second: "numeric",
-  });
-
-  return isValidTimestampMs(date) || isValidDate(date)
-    ? outputDateTemplate.format(new Date(isValidTimestampMs(date) ? (Number(date) * 1000) : date as Date))
-    : "Invalid Date";
-}
-
-export function formatDateFromTimestamp(ts: number) {
-  return new Intl.DateTimeFormat(undefined, {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  }).format(ts);
+  }).format(new Date(utc));
 }
 
 async function get(url: string, input: Record<string, string>) {

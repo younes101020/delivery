@@ -11,7 +11,7 @@ import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/app/_com
 import { Separator } from "@/app/_components/ui/separator";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { getQueryClient } from "@/app/_lib/react-query-provider";
-import { cn, formatDate } from "@/app/_lib/utils";
+import { cn, toLocalDateString } from "@/app/_lib/utils";
 
 import type { DeploymentPreviewState } from "../types";
 
@@ -26,7 +26,7 @@ export function DeploymentPreviewCard({
   timestamp,
   repoName,
 }: DeploymentPreviewCardProps) {
-  const date = formatDate(timestamp);
+  const date = toLocalDateString(timestamp);
   const { data } = useQuery<DeploymentPreviewState>({ queryKey: [repoName] }, getQueryClient(true));
 
   const previousStep = data?.step === "build" ? "clone" : data?.step === "configure" ? "build" : null;
@@ -90,7 +90,11 @@ export function DeploymentPreviewCard({
         <div className="text-xs max-w-xs mt-3">
           {data?.status && (
             <dl>
-              <dt className="text-muted-foreground">This step started at</dt>
+              <dt className="text-muted-foreground">
+                {data?.step}
+                {" "}
+                started at
+              </dt>
               <dd>
                 {date}
               </dd>

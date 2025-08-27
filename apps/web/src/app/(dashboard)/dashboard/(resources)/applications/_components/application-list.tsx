@@ -8,7 +8,7 @@ import { EmptyState } from "@/app/_components/ui/empty-state";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { useUser } from "@/app/_hooks/use-user";
 import { useFetch } from "@/app/_lib/fetch-provider";
-import { formatDate } from "@/app/_lib/utils";
+import { toLocalDateString } from "@/app/_lib/utils";
 
 import type { Applications } from "./types";
 
@@ -44,7 +44,7 @@ function List() {
           id={application.id}
           name={application.name}
           initialState={application.isActive ? "running" : "stop"}
-          firstDeploymentAt={formatDate(application.createdAt) ?? "Unknown"}
+          firstDeploymentAt={toLocalDateString(application.createdAt) ?? "Unknown"}
         />
       ))}
     </>
