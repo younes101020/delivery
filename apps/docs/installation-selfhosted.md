@@ -3,7 +3,7 @@
 Run the following command in your server:
 
 ```bash
-...
+curl -fsSL https://delivery-script.younesfakallah.com | sudo bash
 ```
 
 ## Compatibility
