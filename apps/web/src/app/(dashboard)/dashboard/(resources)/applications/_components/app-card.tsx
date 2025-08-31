@@ -31,7 +31,7 @@ export function AppCard({ name, firstDeploymentAt, id, initialState }: AppCardPr
   return (
     <Card className="w-full transition-all">
       <CardHeader>
-        <div className="flex items-center justify-between gap-1">
+        <div className="flex items-center justify-between gap-1 flex-wrap">
           <div className="truncate flex gap-1">
             <h2 className="decoration-primary underline">{name}</h2>
           </div>
