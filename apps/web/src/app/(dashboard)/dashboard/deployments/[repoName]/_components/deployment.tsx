@@ -36,7 +36,7 @@ export function Deployment() {
 
       <div className="w-200">
         {data && "completed" in data
-        && <FinishDeployment appId={data.appId} />}
+        && <FinishDeployment />}
       </div>
 
     </div>
