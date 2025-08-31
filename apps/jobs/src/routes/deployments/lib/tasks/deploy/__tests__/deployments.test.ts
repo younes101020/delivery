@@ -191,23 +191,15 @@ describe("deployments tests", () => {
       await redeployApp("my-app");
 
       expect(spy).toHaveBeenCalledWith({
-        name: JOBS.configure,
-        data: { ...jobMap.get("configure"), environmentVariable: [env], ...overrideNonInitialQueueData },
+        name: JOBS.build,
+        data: { ...jobMap.get("build"), env: `--env ${env.key}=${env.value}`, isRedeploy: true, ...overrideNonInitialQueueData },
         queueName,
         children: [
           {
-            name: JOBS.build,
-            data: { ...jobMap.get("build"), env: `--env ${env.key}=${env.value}`, isRedeploy: true, ...overrideNonInitialQueueData },
+            name: JOBS.clone,
+            data: { ...jobMap.get("clone"), ...overrideNonInitialQueueData },
             queueName,
             opts: { failParentOnFailure: true },
-            children: [
-              {
-                name: JOBS.clone,
-                data: { ...jobMap.get("clone"), ...overrideNonInitialQueueData },
-                queueName,
-                opts: { failParentOnFailure: true },
-              },
-            ],
           },
         ],
       });

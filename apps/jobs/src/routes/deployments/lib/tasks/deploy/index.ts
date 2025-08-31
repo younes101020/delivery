@@ -35,17 +35,34 @@ function runDeployment(
 
     subscribeWorkerTo(repoName, PREFIX, processorFile);
 
-    const flowProducer = new FlowProducer({ connection: getBullConnection(connection), prefix: PREFIX });
-    await flowProducer.add({
-      name: JOBS.configure,
-      data: data.configure,
-      queueName: repoName,
-      children: [
-        {
+    const isNotRedeployment = !data.build.isRedeploy && "configure" in data;
+
+    const deploymentFlowTree = isNotRedeployment
+      ? {
+          name: JOBS.configure,
+          data: data.configure,
+          queueName: repoName,
+          children: [
+            {
+              name: JOBS.build,
+              data: data.build,
+              queueName: repoName,
+              opts: { failParentOnFailure: true },
+              children: [
+                {
+                  name: JOBS.clone,
+                  data: data.clone,
+                  queueName: repoName,
+                  opts: { failParentOnFailure: true },
+                },
+              ],
+            },
+          ],
+        }
+      : {
           name: JOBS.build,
           data: data.build,
           queueName: repoName,
-          opts: { failParentOnFailure: true },
           children: [
             {
               name: JOBS.clone,
@@ -54,9 +71,10 @@ function runDeployment(
               opts: { failParentOnFailure: true },
             },
           ],
-        },
-      ],
-    });
+        };
+
+    const flowProducer = new FlowProducer({ connection: getBullConnection(connection), prefix: PREFIX });
+    await flowProducer.add(deploymentFlowTree);
 
     return repoName;
   };
@@ -139,7 +157,6 @@ export const redeployApp = runDeployment(async (queueName) => {
     return {
       clone: { ...jobMap.get("clone"), ...overrideNonInitialQueueData },
       build: { ...jobMap.get("build"), env: cmdEnvVars, isRedeploy: true, ...overrideNonInitialQueueData },
-      configure: { ...jobMap.get("configure"), environmentVariable: environmentVariables, ...overrideNonInitialQueueData },
     };
   }
   throw new HTTPException(HttpStatusCodes.BAD_REQUEST, { message: "Invalid redeployment payload" });

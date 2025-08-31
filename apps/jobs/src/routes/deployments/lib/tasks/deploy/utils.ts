@@ -251,3 +251,5 @@ export function convertGitToAuthenticatedUrl(gitUrl: string, token: string) {
     `https://x-access-token:${token}@`,
   );
 }
+
+export type KeysOfUnion<T> = T extends T ? keyof T : never;

@@ -3,9 +3,11 @@ import type { Job } from "bullmq";
 import type { InsertApplicationSchemaWithSharedEnv, InsertEnvironmentVariablesSchema, SelectedGithubAppSecretSchema, SelectedGithubAppsSchema } from "@/lib/dto";
 import type { MergeSubJobs } from "@/lib/tasks/types";
 
+import type { KeysOfUnion } from "./utils";
+
 type Application = InsertApplicationSchemaWithSharedEnv["applicationData"];
 
-export interface QueueDeploymentJobData {
+export interface DeploymentJobData {
   clone: SelectedGithubAppsSchema & {
     secret: SelectedGithubAppSecretSchema;
     repoUrl: string;
@@ -33,9 +35,14 @@ export interface QueueDeploymentJobData {
   };
 }
 
-export type QueueDeploymentJobName = keyof QueueDeploymentJobData;
+export type RedeploymentJobData = Omit<DeploymentJobData, "configure">;
 
-export type QueueDeploymentJob<T extends QueueDeploymentJobName> = Omit<Job, "data"> & { data: QueueDeploymentJobData[T] & { repoName: string } };
+export type QueueDeploymentJobData = DeploymentJobData | RedeploymentJobData;
+
+export type QueueDeploymentJobName = KeysOfUnion<QueueDeploymentJobData>;
+
+export type QueueDeploymentJob<T extends QueueDeploymentJobName> = Omit<Job, "data"> &
+  { data: (DeploymentJobData & RedeploymentJobData)[T] & { repoName: string } };
 
 export type QueueDeploymentJobFns = Record<string, (job: QueueDeploymentJob<any>) => Promise<unknown>>;
 
