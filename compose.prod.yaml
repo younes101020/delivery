@@ -134,5 +134,7 @@ networks:
 volumes:
   postgres_data:
     name: postgres_data
+  redis_data:
+    name: redis_data
   letsencrypt:
     name: letsencrypt
