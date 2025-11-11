@@ -3,7 +3,7 @@
 Run the following command in your server:
 
 ```bash
-curl -fsSL https://delivery-script.younesfakallah.com | sudo bash
+curl -fsSL http://deliveryinstallresources.younesfakallah.com/install.sh | sudo bash
 ```
 
 ## Compatibility
