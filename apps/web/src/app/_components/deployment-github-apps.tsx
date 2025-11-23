@@ -36,14 +36,6 @@ export function DeploymentGithubAppList() {
     (_, newSelectedGithubApp: SelectedGithubApp) => newSelectedGithubApp,
   );
 
-  if (!applicationsWithGithubApps) {
-    return (
-      <p className="text-sm text-muted-foreground px-4 py-8 text-center">
-        Unable to get github app.
-      </p>
-    );
-  }
-
   const handleGithubAppClick = (appId: number) => {
     startTransition(() => {
       addOptimisticSelectedGHApp({
@@ -61,17 +53,23 @@ export function DeploymentGithubAppList() {
       <div className="col-span-1 flex flex-col gap-2 max-h-52">
         <AddNewGithubApp />
         <Separator />
-        {applicationsWithGithubApps.githubApps.map(
-          ghApp => (
-            <GithubAppCard
-              key={ghApp.appId}
-              githubApp={ghApp}
-              handleGithubAppClick={handleGithubAppClick}
-              isSelected={optimisticSelectedGHApp.githubAppId === ghApp.appId}
-              isPending={optimisticSelectedGHApp.isPending && optimisticSelectedGHApp.githubAppId === ghApp.appId}
-            />
-          ),
-        )}
+        {applicationsWithGithubApps
+          ? applicationsWithGithubApps.githubApps.map(
+              ghApp => (
+                <GithubAppCard
+                  key={ghApp.appId}
+                  githubApp={ghApp}
+                  handleGithubAppClick={handleGithubAppClick}
+                  isSelected={optimisticSelectedGHApp.githubAppId === ghApp.appId}
+                  isPending={optimisticSelectedGHApp.isPending && optimisticSelectedGHApp.githubAppId === ghApp.appId}
+                />
+              ),
+            )
+          : (
+              <p className="text-sm text-muted-foreground px-4 py-8 text-center">
+                Unable to get github app.
+              </p>
+            )}
       </div>
     </ScrollArea>
 
