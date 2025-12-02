@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/app/_components/ui/card";
-import { ScrollArea } from "@/app/_components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/app/_components/ui/scroll-area";
 
 interface DeploymentLogsProps {
   logs?: string;
@@ -25,6 +25,7 @@ export function DeploymentLogsCard({ logs, children }: DeploymentLogsProps) {
           {children}
           <div ref={scroller} />
         </CardContent>
+        <ScrollBar orientation="horizontal" className="w-full" />
       </ScrollArea>
     </Card>
   );
