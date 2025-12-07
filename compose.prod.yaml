@@ -123,7 +123,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - ./infrastructure/traefik-config/traefik.yaml:/etc/traefik/traefik.yaml:ro  # static traefik configuration
       - ./infrastructure/traefik-config/dynamic.yaml:/etc/traefik/dynamic.yaml:ro  # dynamic traefik configuration
-      # - ./infrastructure/traefik-config/acme.json:/etc/traefik/acme.json           # TLS certificate storage
+      - ./infrastructure/traefik-config/acme.json:/etc/traefik/acme.json           # TLS certificate storage
     networks:
       - proxy
 
