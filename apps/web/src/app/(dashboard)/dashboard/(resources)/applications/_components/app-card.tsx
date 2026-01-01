@@ -23,9 +23,10 @@ interface AppCardProps {
   id: string;
   firstDeploymentAt: string;
   lastDeployed?: string;
+  refetchApplications: () => void;
 }
 
-export function AppCard({ name, firstDeploymentAt, id, initialState }: AppCardProps) {
+export function AppCard({ name, firstDeploymentAt, id, initialState, refetchApplications }: AppCardProps) {
   const { user } = useUser();
 
   return (
@@ -49,7 +50,7 @@ export function AppCard({ name, firstDeploymentAt, id, initialState }: AppCardPr
 
         <dl className="text-xs pt-2">
           <dt className="text-muted-foreground">State</dt>
-          <ApplicationStatus id={id} initialState={initialState} />
+          <ApplicationStatus id={id} initialState={initialState} refetchApplications={refetchApplications} />
         </dl>
         <dl className="text-xs pt-2">
           <dt className="text-muted-foreground">First deployment at</dt>

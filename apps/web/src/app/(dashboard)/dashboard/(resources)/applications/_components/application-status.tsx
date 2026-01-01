@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 import { Badge } from "@/app/_components/ui/badge";
 import { Bounce } from "@/app/_components/ui/bounce";
@@ -17,8 +18,14 @@ const statusComponents = {
   failed: <FailedContainerProcessStatusBadge />,
 };
 
-export function ApplicationStatus({ initialState, id }: ContainerStatusProps) {
+export function ApplicationStatus({ initialState, id, refetchApplications }: ContainerStatusProps & { refetchApplications: () => void }) {
   const { data } = useQuery<ApplicationStatusData>({ queryKey: [id] }, getQueryClient(true));
+
+  useEffect(() => {
+    if (data?.status === "completed" && data?.queueName === "remove") {
+      refetchApplications();
+    }
+  }, [data?.status, data?.queueName]);
 
   if (!data) {
     return (

@@ -45,6 +45,7 @@ function List() {
           name={application.name}
           initialState={application.isActive ? "running" : "stop"}
           firstDeploymentAt={toLocalDateString(application.createdAt) ?? "Unknown"}
+          refetchApplications={apps.refetch}
         />
       ))}
     </>
