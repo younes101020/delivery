@@ -261,7 +261,7 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
 
   const applicationService = applicationServices ? applicationServices[0] : null;
 
-  await Promise.all([
+  const results = await Promise.allSettled([
     ...(applicationService ? [removeApplicationResource(applicationService.ID)] : []),
     deleteApplicationByName(name),
     ssh(
@@ -271,14 +271,18 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
       },
     ),
     deleteDeploymentJobs(name),
-  ]).catch((e) => {
+  ]);
+
+  const errors = results.filter((r): r is PromiseRejectedResult => r.status === "rejected");
+
+  if (errors.length > 0) {
     return c.json(
       {
-        message: e instanceof Error ? e.message : HttpStatusPhrases.INTERNAL_SERVER_ERROR,
+        message: errors.map(e => e.reason instanceof Error ? e.reason.message : String(e.reason)).join(", "),
       },
-      HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      HttpStatusCodes.MULTI_STATUS,
     );
-  });
+  }
 
   return c.body(null, HttpStatusCodes.NO_CONTENT);
 };
