@@ -1,0 +1,24 @@
+on:
+  push:
+    paths:
+      - 'infrastructure/traefik-config/dynamic.yaml'
+    branches:
+      - main
+
+jobs:
+  sync-with-s3:
+    name: Since delivery is downloadable from S3, we need to sync the traefik config with S3 whenever there is a change in the traefik config files.
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@master
+    - uses: arcezd/s3-cp-action@master
+      with:
+        args: --follow-symlinks
+      env:
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_S3_ENDPOINT: ${{ secrets.AWS_S3_ENDPOINT }}
+        AWS_REGION: 'auto'
+        SOURCE_DIR: 'infrastructure/traefik-config/dynamic.yaml'
+        DEST_DIR: 'dynamic.yaml'

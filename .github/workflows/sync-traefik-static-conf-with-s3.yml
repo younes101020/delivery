@@ -1,7 +1,7 @@
 on:
   push:
     paths:
-      - 'infrastructure/traefik-config/**'
+      - 'infrastructure/traefik-config/traefik.yaml'
     branches:
       - main
 
@@ -20,5 +20,5 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_S3_ENDPOINT: ${{ secrets.AWS_S3_ENDPOINT }}
         AWS_REGION: 'auto'
-        SOURCE_DIR: 'infrastructure/traefik-config/'
-
+        SOURCE_DIR: 'infrastructure/traefik-config/traefik.yaml'
+        DEST_DIR: 'traefik.yaml'
