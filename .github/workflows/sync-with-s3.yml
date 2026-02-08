@@ -21,4 +21,5 @@ jobs:
         AWS_S3_ENDPOINT: ${{ secrets.AWS_S3_ENDPOINT }}
         AWS_REGION: 'auto'
         SOURCE_DIR: 'infrastructure/traefik-config'
+        DEST_DIR: './'
 
