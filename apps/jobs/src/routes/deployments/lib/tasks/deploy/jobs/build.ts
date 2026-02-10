@@ -58,14 +58,21 @@ export async function build(job: QueueDeploymentJob<"build">) {
   }
 }
 
-function railpackCmd(env: string | undefined, startCmd: string | undefined) {
+function railpackCmd(env: ReturnType<typeof transformEnvVars> | undefined, startCmd: string | undefined) {
   return {
     init: () => "docker buildx create --use --name builder-containerd --driver docker-container || true",
     prepare: () => {
       return {
-        cmd: `railpack prepare --plan-out ./railpack-plan.json --info-out ./railpack-info.json ${env ?? ""} ${startCmd ? `--start-cmd "${startCmd}"` : ""}`,
-        build: (appName: string, cache: boolean) => `docker buildx build -f ./railpack-plan.json --output type=docker,name=${appName} --build-arg ghcr.io/railwayapp/railpack-frontend:v0.17.1 ${cache ? "" : "--no-cache"} `,
-      }
+        cmd: `railpack prepare --plan-out ./railpack-plan.json --info-out ./railpack-info.json ${env?.cmdEnvVars ?? ""} ${startCmd ? `--start-cmd "${startCmd}"` : ""}`,
+        build: (appName: string, cache: boolean) => {
+          const secrets = env?.persistedEnvVars.map(envVar => `--secret id=${envVar.key},env=${envVar.key}`).join(" ") ?? "";
+          return `docker buildx build \
+        -f ./railpack-plan.json --output type=docker,name=${appName} \
+        --build-arg ghcr.io/railwayapp/railpack-frontend:v0.17.1 \
+        ${secrets} \
+        ${cache ? "" : "--no-cache"} ./`;
+        },
+      };
     },
   };
 }
