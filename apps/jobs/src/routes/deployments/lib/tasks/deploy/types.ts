@@ -3,7 +3,7 @@ import type { Job } from "bullmq";
 import type { InsertApplicationSchemaWithSharedEnv, InsertEnvironmentVariablesSchema, SelectedGithubAppSecretSchema, SelectedGithubAppsSchema } from "@/lib/dto";
 import type { MergeSubJobs } from "@/lib/tasks/types";
 
-import type { KeysOfUnion } from "./utils";
+import type { KeysOfUnion, transformEnvVars } from "./utils";
 
 type Application = InsertApplicationSchemaWithSharedEnv["applicationData"];
 
@@ -15,7 +15,7 @@ export interface DeploymentJobData {
   };
   build: {
     isRedeploy: boolean;
-    env?: string;
+    env?: ReturnType<typeof transformEnvVars>;
     port: number;
     staticdeploy: boolean;
     startCmd?: string;

@@ -118,7 +118,7 @@ export const deployApp = runDeployment(async (payload) => {
         staticdeploy,
         startCmd,
         isRedeploy: false,
-        env: environmentVariables && environmentVariables.cmdEnvVars,
+        env: environmentVariables,
         cache,
         fqdn,
         repoName,

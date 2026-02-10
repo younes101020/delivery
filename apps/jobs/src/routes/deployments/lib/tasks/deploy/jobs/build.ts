@@ -4,6 +4,7 @@ import { ssh } from "@/lib/ssh";
 import { defineApplicationServiceTask } from "@/routes/deployments/lib/remote-docker/service-tasks";
 
 import type { QueueDeploymentJob } from "../types";
+import type { transformEnvVars } from "../utils";
 
 export type Chunk = string;
 
