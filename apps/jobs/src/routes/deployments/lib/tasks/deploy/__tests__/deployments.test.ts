@@ -120,7 +120,7 @@ describe("deployments tests", () => {
           {
             name: JOBS.build,
             data: {
-              env: env.cmdEnvVars,
+              env,
               cache,
               ...(staticdeploy && { publishdir }),
               port,
@@ -182,7 +182,7 @@ describe("deployments tests", () => {
     it("call the add method from bullmq flowproducer with jobs dependencies", async ({ completedJobs }) => {
       const env = { key: "VAR", value: "VAL" };
       const jobMap = new Map(completedJobs.map(j => [j.name, j.data]));
-      const overrideNonInitialQueueData = { isCriticalError: undefined, logs: undefined };
+      const overrideComputedQueueData = { isCriticalError: undefined, logs: undefined };
       const queueName = jobMap.get("configure")?.repoName;
 
       const spy = vi.spyOn(FlowProducer.prototype, "add");
@@ -192,12 +192,17 @@ describe("deployments tests", () => {
 
       expect(spy).toHaveBeenCalledWith({
         name: JOBS.build,
-        data: { ...jobMap.get("build"), env: `--env ${env.key}=${env.value}`, isRedeploy: true, ...overrideNonInitialQueueData },
+        data: {
+          ...jobMap.get("build"),
+          env: `--env ${env.key}=${env.value}`,
+          isRedeploy: true,
+          ...overrideComputedQueueData,
+        },
         queueName,
         children: [
           {
             name: JOBS.clone,
-            data: { ...jobMap.get("clone"), ...overrideNonInitialQueueData },
+            data: { ...jobMap.get("clone"), ...overrideComputedQueueData },
             queueName,
             opts: { failParentOnFailure: true },
           },

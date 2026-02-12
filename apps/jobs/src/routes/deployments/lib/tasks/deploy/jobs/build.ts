@@ -17,13 +17,12 @@ export async function build(job: QueueDeploymentJob<"build">) {
   const { repoName, port, env, cache, staticdeploy, publishdir, isRedeploy, fqdn, enableTls, startCmd } = job.data;
   await job.updateProgress({ logs: "\nImage will be built..." });
 
-  // BUILD APP IMAGE
+  const build = railpackCmd(env, startCmd, repoName, cache ?? false);
 
-  const buildImageFromSourceCmd = `railpack build ./ --name ${repoName} --env CI=false ${env ?? ""} ${!cache ? "--no-cache" : ""} ${startCmd ? `--start-cmd "${startCmd}"` : ""}`;
-
-  const extractStaticArtefactCmd = staticdeploy && `railpack build ./ --name buildonly-${repoName} --env CI=false ${env ?? ""} --start-cmd "echo 'static web files extraction in progress...'; /bin/bash" ${!cache ? "--no-cache" : ""} && docker run -dt --name temp-${repoName} buildonly-${repoName} && mkdir -p ./build-artefact && pushd ./build-artefact && docker container cp temp-${repoName}:/app${publishdir} ./ && docker ps -aq --filter ancestor="buildonly-${repoName}" | xargs -r docker stop | xargs -r docker rm && docker rmi buildonly-${repoName} &&`;
-
-  const buildCmd = staticdeploy ? `${extractStaticArtefactCmd} ${buildImageFromSourceCmd}` : buildImageFromSourceCmd;
+  let buildCmd = build.plan();
+  if (staticdeploy)
+    buildCmd += build.staticArtefact(publishdir ?? "/");
+  buildCmd += build.build();
 
   try {
     await ssh(
@@ -59,21 +58,13 @@ export async function build(job: QueueDeploymentJob<"build">) {
   }
 }
 
-function railpackCmd(env: ReturnType<typeof transformEnvVars> | undefined, startCmd: string | undefined) {
+function railpackCmd(env: ReturnType<typeof transformEnvVars> | undefined, startCmd: string | undefined, appName: string, cache: boolean) {
   return {
-    init: () => "docker buildx create --use --name builder-containerd --driver docker-container || true",
-    prepare: () => {
-      return {
-        cmd: `railpack prepare --plan-out ./railpack-plan.json --info-out ./railpack-info.json ${env?.cmdEnvVars ?? ""} ${startCmd ? `--start-cmd "${startCmd}"` : ""}`,
-        build: (appName: string, cache: boolean) => {
-          const secrets = env?.persistedEnvVars.map(envVar => `--secret id=${envVar.key},env=${envVar.key}`).join(" ") ?? "";
-          return `docker buildx build \
-        -f ./railpack-plan.json --output type=docker,name=${appName} \
-        --build-arg ghcr.io/railwayapp/railpack-frontend:v0.17.1 \
-        ${secrets} \
-        ${cache ? "" : "--no-cache"} ./`;
-        },
-      };
+    plan: () => `docker buildx create --use --name builder-containerd --driver docker-container || true && docker buildx use builder-containerd && railpack prepare --plan-out ./railpack-plan.json --info-out ./railpack-info.json ${env?.cmdEnvVars ?? ""} ${startCmd ? `--start-cmd "${startCmd}"` : ""} && `,
+    staticArtefact: (publishDir: string) => `docker buildx build -f ./railpack-plan.json --output type=docker,name=buildonly-${appName} --build-arg ghcr.io/railwayapp/railpack-frontend:v0.17.1 ${cache ? "" : "--no-cache"} ./ && docker run -dt --name temp-${appName} buildonly-${appName} && mkdir -p ./build-artefact && pushd ./build-artefact && docker container cp temp-${appName}:/app${publishDir} ./ && docker ps -aq --filter ancestor="buildonly-${appName}" | xargs -r docker stop | xargs -r docker rm && docker rmi buildonly-${appName} && `,
+    build: () => {
+      const secrets = env?.persistedEnvVars.map(envVar => `--secret id=${envVar.key},env=${envVar.key}`).join(" ") ?? "";
+      return `docker buildx build -f ./railpack-plan.json --output type=docker,name=${appName} --build-arg ghcr.io/railwayapp/railpack-frontend:v0.17.1 ${secrets} ${cache ? "" : "--no-cache"} ./`;
     },
   };
 }
