@@ -53,14 +53,14 @@ export async function build(job: QueueDeploymentJob<"build">) {
   catch (error) {
     throw new DeploymentError({
       name: "DEPLOYMENT_APP_ERROR",
-      message: error instanceof Error ? error.message.slice(0, 45) : "Unexpected error occurred while building the application.",
+      message: error instanceof Error ? error.message : "Unexpected error occurred while building the application.",
     });
   }
 }
 
 function railpackCmd(env: ReturnType<typeof transformEnvVars> | undefined, startCmd: string | undefined, appName: string, cache: boolean) {
   return {
-    plan: () => `docker buildx create --use --name builder-containerd --driver docker-container || true && docker buildx use builder-containerd && railpack prepare --plan-out ./railpack-plan.json --info-out ./railpack-info.json ${env?.cmdEnvVars ?? ""} ${startCmd ? `--start-cmd "${startCmd}"` : ""} && `,
+    plan: () => `docker buildx use builder-containerd && railpack prepare --plan-out ./railpack-plan.json --info-out ./railpack-info.json ${env?.cmdEnvVars ?? ""} ${startCmd ? `--start-cmd "${startCmd}"` : ""} && `,
     staticArtefact: (publishDir: string) => `docker buildx build -f ./railpack-plan.json --output type=docker,name=buildonly-${appName} --build-arg ghcr.io/railwayapp/railpack-frontend:v0.17.1 ${cache ? "" : "--no-cache"} ./ && docker run -dt --name temp-${appName} buildonly-${appName} && mkdir -p ./build-artefact && pushd ./build-artefact && docker container cp temp-${appName}:/app${publishDir} ./ && docker ps -aq --filter ancestor="buildonly-${appName}" | xargs -r docker stop | xargs -r docker rm && docker rmi buildonly-${appName} && `,
     build: () => {
       const secrets = env?.persistedEnvVars.map(envVar => `--secret id=${envVar.key},env=${envVar.key}`).join(" ") ?? "";
