@@ -4,7 +4,8 @@ import { ssh } from "@/lib/ssh";
 import { defineApplicationServiceTask } from "@/routes/deployments/lib/remote-docker/service-tasks";
 
 import type { QueueDeploymentJob } from "../types";
-import type { transformEnvVars } from "../utils";
+
+import { persistedToManifestEnvVars, type transformEnvVars } from "../utils";
 
 export type Chunk = string;
 
@@ -45,6 +46,7 @@ export async function build(job: QueueDeploymentJob<"build">) {
       fqdn,
       port,
       enableTls,
+      envs: persistedToManifestEnvVars(env?.persistedEnvVars ?? []),
     });
 
     await job.updateProgress({ logs: "Your application is now online! 🚀" });

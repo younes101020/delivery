@@ -7,7 +7,7 @@ import { ZodError } from "zod";
 import { insertDeploymentSchema } from "@/lib/dto";
 import { DeploymentError } from "@/lib/error";
 import { it } from "@/routes/deployments/__tests__/fixtures";
-import { convertGitToAuthenticatedUrl, parseAppHost, persistedEnvVarsToCmdEnvVars, plainEnvVarsToCmdEnvVars, plainEnvVarsToPersistedEnvVars, shouldEnableTls, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
+import { convertGitToAuthenticatedUrl, parseAppHost, persistedEnvVarsToCmdEnvVars, persistedToManifestEnvVars, plainEnvVarsToCmdEnvVars, plainEnvVarsToPersistedEnvVars, shouldEnableTls, waitForDeploymentToComplete } from "@/routes/deployments/lib/tasks/deploy/utils";
 
 const eventHandlers: Record<string, ({ jobId }: { jobId: string }) => void> = {};
 
@@ -122,5 +122,24 @@ describe("deployments utils unit tests", () => {
     const value = environmentVariable.structured[0].value;
     const expected = `--env ${key}="${value}" --env ${key}="${value}"`;
     expect(plainEnvVarsToCmdEnvVars(environmentVariable.plain)).toStrictEqual(expected);
+  });
+
+  it("return manifest environment variables from persisted env vars", ({ environmentVariable }) => {
+    const expected = environmentVariable.structured.map(({ key, value }) => `${key}=${value}`);
+    expect(persistedToManifestEnvVars(environmentVariable.structured)).toEqual(expected);
+  });
+
+  it("return single manifest environment variable from persisted env vars", () => {
+    const envs = [{ key: "NODE_ENV", value: "\"production\"" }];
+    expect(persistedToManifestEnvVars(envs)).toEqual(["NODE_ENV=\"production\""]);
+  });
+
+  it("return empty array when persisted env vars is empty", () => {
+    expect(persistedToManifestEnvVars([])).toEqual([]);
+  });
+
+  it("preserve special characters in manifest environment variables", () => {
+    const envs = [{ key: "DATABASE_URL", value: "\"postgres://user:pass@host:5432/db\"" }];
+    expect(persistedToManifestEnvVars(envs)).toEqual(["DATABASE_URL=\"postgres://user:pass@host:5432/db\""]);
   });
 });

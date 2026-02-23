@@ -194,6 +194,10 @@ export function plainEnvVarsToPersistedEnvVars(envs: string) {
     );
 }
 
+export function persistedToManifestEnvVars(envs: ReturnType<typeof plainEnvVarsToPersistedEnvVars>) {
+  return envs.map(env => `${env.key}=${env.value}`);
+}
+
 export function persistedEnvVarsToCmdEnvVars(envs: InsertEnvironmentVariablesSchema[]) {
   return envs
     .map(env => `--env ${env.key}=${env.value}`)
