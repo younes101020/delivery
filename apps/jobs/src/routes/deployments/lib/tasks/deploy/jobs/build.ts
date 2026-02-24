@@ -1,3 +1,5 @@
+import { quote } from "shell-quote";
+
 import { APPLICATIONS_PATH } from "@/lib/constants";
 import { DeploymentError } from "@/lib/error";
 import { ssh } from "@/lib/ssh";
@@ -64,7 +66,7 @@ function railpackCmd(env: ReturnType<typeof transformEnvVars> | undefined, start
     plan: () => `docker buildx use builder-containerd && railpack prepare . --plan-out ./railpack-plan.json --info-out ./railpack-info.json ${env?.cmdEnvVars ?? ""} ${startCmd ? `--start-cmd "${startCmd}"` : ""} && `,
     staticArtefact: (publishDir: string) => `docker buildx build -f ./railpack-plan.json --output type=docker,name=buildonly-${appName} --build-arg BUILDKIT_SYNTAX="ghcr.io/railwayapp/railpack-frontend:v0.17.1" ${cache ? "" : "--no-cache"} ./ && docker run -dt --name temp-${appName} buildonly-${appName} && mkdir -p ./build-artefact && pushd ./build-artefact && docker container cp temp-${appName}:/app${publishDir} ./ && docker ps -aq --filter ancestor="buildonly-${appName}" | xargs -r docker stop | xargs -r docker rm && docker rmi buildonly-${appName} && `,
     build: () => {
-      const injectEnvVars = env?.persistedEnvVars.map(envVar => `export ${envVar.key}=${envVar.value}`).join("\n") ?? "";
+      const injectEnvVars = env?.persistedEnvVars.map(envVar => `export ${envVar.key}=${quote([envVar.value])}`).join("\n") ?? "";
       const secrets = env?.persistedEnvVars.map(envVar => `--secret id=${envVar.key},env=${envVar.key}`).join(" ") ?? "";
       return `${injectEnvVars} docker buildx build -f ./railpack-plan.json --output type=docker,name=${appName} --build-arg BUILDKIT_SYNTAX="ghcr.io/railwayapp/railpack-frontend:v0.17.1" ${secrets} ${cache ? "" : "--no-cache"} ./`;
     },
