@@ -112,7 +112,7 @@ describe("deployments utils unit tests", () => {
 
   it("return structured environment variables from plain env vars", ({ environmentVariable }) => {
     const key = environmentVariable.structured[0].key;
-    const value = `"${environmentVariable.structured[0].value}"`;
+    const value = environmentVariable.structured[0].value;
     const expected = [{ key, value }, { key, value }];
     expect(plainEnvVarsToPersistedEnvVars(environmentVariable.plain)).toEqual(expected);
   });
@@ -130,8 +130,8 @@ describe("deployments utils unit tests", () => {
   });
 
   it("return single manifest environment variable from persisted env vars", () => {
-    const envs = [{ key: "NODE_ENV", value: "\"production\"" }];
-    expect(persistedToManifestEnvVars(envs)).toEqual(["NODE_ENV=\"production\""]);
+    const envs = [{ key: "NODE_ENV", value: "production" }];
+    expect(persistedToManifestEnvVars(envs)).toEqual(["NODE_ENV=production"]);
   });
 
   it("return empty array when persisted env vars is empty", () => {

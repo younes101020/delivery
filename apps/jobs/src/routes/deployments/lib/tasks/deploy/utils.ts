@@ -188,7 +188,8 @@ export function plainEnvVarsToPersistedEnvVars(envs: string) {
     .trim()
     .split(/\s+(?=\w+=")/)
     .map((env) => {
-      const [key, value] = env.split("=");
+      const [key, ...rest] = env.split("=");
+      const value = rest.join("=").replace(/^"|"$/g, "");
       return { key, value };
     },
     );
