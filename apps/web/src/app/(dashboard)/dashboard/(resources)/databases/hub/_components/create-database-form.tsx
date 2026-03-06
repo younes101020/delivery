@@ -14,6 +14,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/app/_components/ui/command";
+import { DialogClose } from "@/app/_components/ui/dialog";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
 import {
@@ -67,18 +68,20 @@ export function CreateDatabaseForm({ type, version, versionsCombobox }: CreateDa
         </p>
       </div>
       <input type="hidden" name="type" id="type" value={type} />
-      <Button type="submit" disabled={pending} aria-label="submit" className="mt-4">
-        {pending
-          ? (
-              <>
-                <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                Loading...
-              </>
-            )
-          : (
-              "Create"
-            )}
-      </Button>
+      <DialogClose asChild>
+        <Button type="submit" disabled={pending} aria-label="submit" className="mt-4">
+          {pending
+            ? (
+                <>
+                  <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                  Loading...
+                </>
+              )
+            : (
+                "Create"
+              )}
+        </Button>
+      </DialogClose>
     </form>
   );
 }
