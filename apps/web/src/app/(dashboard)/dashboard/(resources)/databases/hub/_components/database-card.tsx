@@ -46,7 +46,7 @@ export function DatabaseCard({ label, fillIcon, description, dbType, children }:
         </CardHeader>
 
       </div>
-      {user.role === "owner" && (
+      {user && user.role === "owner" && (
         <CardFooter className="flex flex-col gap-2 items-start">
           <Separator />
           {children}

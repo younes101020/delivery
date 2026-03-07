@@ -24,7 +24,7 @@ interface DatabaseActionsProps {
 export function DatabaseActions(props: DatabaseActionsProps) {
   const { user } = useUser();
 
-  if (user.role !== "owner")
+  if (!user || user.role !== "owner")
     return null;
 
   return <DatabaseActionButton {...props} />;

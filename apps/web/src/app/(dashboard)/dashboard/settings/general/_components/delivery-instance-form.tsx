@@ -56,6 +56,9 @@ function Form() {
     queryFn: () => fetcher("/api/delivery-instance-configuration"),
   });
 
+  if (!user)
+    return null;
+
   return (
     <>
       {deliveryWebInstanceConfiguration.data

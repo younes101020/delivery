@@ -60,16 +60,18 @@ function Form() {
             <p className="bg-secondary text-secondary-foreground w-fit px-2 text-sm truncate">step 1: Specify your wildcard domain</p>
             <Separator className="mt-2" />
             <Label htmlFor="wildcardDomain">Wildcard domain</Label>
-            <Input
-              disabled={user.role !== "owner"}
-              id="wildcardDomain"
-              name="wildcardDomain"
-              type="text"
-              aria-label="wildcard domain, will be created automatically for each application."
-              placeholder="mywildcarddomain.com"
-              defaultValue={state.inputs.wildcardDomain || applicationsDomainConfiguration.data?.wildcardDomain}
-              className="rounded-r-none"
-            />
+            {user && (
+              <Input
+                disabled={user.role !== "owner"}
+                id="wildcardDomain"
+                name="wildcardDomain"
+                type="text"
+                aria-label="wildcard domain, will be created automatically for each application."
+                placeholder="mywildcarddomain.com"
+                defaultValue={state.inputs.wildcardDomain || applicationsDomainConfiguration.data?.wildcardDomain}
+                className="rounded-r-none"
+              />
+            )}
             <p className="text-muted-foreground text-xs pt-2">
               If specified, this domain will be used as a wildcard domain for all your applications.
             </p>

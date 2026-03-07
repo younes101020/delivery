@@ -89,7 +89,7 @@ interface TeamFormContentProps {
 
 export function TeamFormContent() {
   const { user } = useUser();
-  const isOwner = user?.role === "owner";
+  const isOwner = user && user?.role === "owner";
   const [state, formAction, pending] = useActionState<ActionState<TeamFormContentProps>, FormData>(
     withToast(inviteTeamMember),
     {

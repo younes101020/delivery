@@ -17,7 +17,7 @@ interface ContainerOptionsProps {
 export function DatabaseOptions({ serviceName }: ContainerOptionsProps) {
   const { user } = useUser();
 
-  if (user.role !== "owner")
+  if (!user || user.role !== "owner")
     return null;
 
   return <DatabaseOptionsDropdown serviceName={serviceName} />;

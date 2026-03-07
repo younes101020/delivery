@@ -29,6 +29,9 @@ interface AppCardProps {
 export function AppCard({ name, firstDeploymentAt, id, initialState, refetchApplications }: AppCardProps) {
   const { user } = useUser();
 
+  if (!user)
+    return null;
+
   return (
     <Card className="w-full transition-all">
       <CardHeader>
