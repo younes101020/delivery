@@ -76,7 +76,7 @@ services:
     networks:
       - proxy
     volumes:
-      - ${PWD}/db-data/:/var/lib/postgresql@16/data
+      - ${PWD}/db-data/:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 5s
