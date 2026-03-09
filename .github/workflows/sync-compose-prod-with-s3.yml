@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  sync-with-s3:
+  sync-with-compose-s3:
     name: "Since delivery is downloadable from S3, we need to sync the compose.prod.yaml with S3 whenever there is a change in the compose.prod.yaml file."
     runs-on: ubuntu-24.04
     steps:
