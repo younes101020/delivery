@@ -1,6 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { getQueryClient } from "@/app/_lib/react-query-provider";
@@ -8,13 +10,18 @@ import { getQueryClient } from "@/app/_lib/react-query-provider";
 import type { DeploymentLogState } from "../../types";
 
 import { DeploymentLogsCard } from "../../_components/deployment-logs";
-import { FinishDeployment } from "./deployment-completed";
 import { DeploymentError } from "./deployment-error";
 import { DeploymentLogsHeader } from "./deployment-logs-header";
 import Ripple from "./ui/ripple";
 
 export function Deployment() {
+  const router = useRouter();
   const { data, isLoading } = useQuery<DeploymentLogState>({ queryKey: ["deployment"] }, getQueryClient(true));
+
+  useEffect(() => {
+    if (data && "completed" in data)
+      router.push("/dashboard/applications");
+  }, [data, router]);
 
   if (isLoading)
     return <PendingDeployment />;
@@ -33,12 +40,6 @@ export function Deployment() {
       )}
 
       <Ripple />
-
-      <div className="w-200">
-        {data && "completed" in data
-        && <FinishDeployment />}
-      </div>
-
     </div>
   );
 }
