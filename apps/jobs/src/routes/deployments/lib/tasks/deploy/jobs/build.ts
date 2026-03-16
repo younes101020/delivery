@@ -21,9 +21,14 @@ export async function build(job: QueueDeploymentJob<"build">) {
   const build = railpackCmd(env, startCmd, repoName, cache ?? false);
 
   let buildCmd = build.plan();
-  if (staticdeploy)
+  if (staticdeploy) {
     buildCmd += build.staticArtefact(publishdir ?? "/");
-  buildCmd += build.build();
+    buildCmd += build.staticPlan();
+    buildCmd += build.staticBuild();
+  }
+  else {
+    buildCmd += build.build();
+  }
 
   try {
     await ssh(
@@ -63,6 +68,12 @@ function railpackCmd(env: ReturnType<typeof transformEnvVars> | undefined, start
   return {
     plan: () => `docker buildx use builder-containerd && railpack prepare . --plan-out ./railpack-plan.json --info-out ./railpack-info.json ${env?.cmdEnvVars ?? ""} ${startCmd ? `--start-cmd "${startCmd}"` : ""} && `,
     staticArtefact: (publishDir: string) => `docker buildx build -f ./railpack-plan.json --output type=docker,name=buildonly-${appName} --build-arg BUILDKIT_SYNTAX="ghcr.io/railwayapp/railpack-frontend:v0.17.1" ${cache ? "" : "--no-cache"} ./ && docker run -dt --name temp-${appName} buildonly-${appName} && mkdir -p ./build-artefact && pushd ./build-artefact && docker container cp temp-${appName}:/app${publishDir} ./ && popd && docker ps -aq --filter ancestor="buildonly-${appName}" | xargs -r docker stop | xargs -r docker rm && docker rmi buildonly-${appName} && `,
+    staticPlan: () => `railpack prepare ./build-artefact --plan-out ./build-artefact/railpack-plan.json --info-out ./build-artefact/railpack-info.json && `,
+    staticBuild: () => {
+      const injectEnvVars = env?.persistedEnvVars.map(envVar => `export ${envVar.key}=${envVar.value}`).join(" ") ?? "";
+      const secrets = env?.persistedEnvVars.map(envVar => `--secret id=${envVar.key},env=${envVar.key}`).join(" ") ?? "";
+      return `${injectEnvVars} \n docker buildx build -f ./build-artefact/railpack-plan.json --output type=docker,name=${appName} --build-arg BUILDKIT_SYNTAX="ghcr.io/railwayapp/railpack-frontend:v0.17.1" ${secrets} ${cache ? "" : "--no-cache"} ./build-artefact/`;
+    },
     build: () => {
       const injectEnvVars = env?.persistedEnvVars.map(envVar => `export ${envVar.key}=${envVar.value}`).join(" ") ?? "";
       const secrets = env?.persistedEnvVars.map(envVar => `--secret id=${envVar.key},env=${envVar.key}`).join(" ") ?? "";
