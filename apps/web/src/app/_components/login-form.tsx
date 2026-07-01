@@ -1,10 +1,10 @@
 "use client";
 
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 // import { useSearchParams } from "next/navigation";
-import { Suspense, useActionState } from "react";
+import { Suspense, useActionState, useState } from "react";
 
 import type { ActionState } from "@/app/_lib/form-middleware";
 
@@ -25,6 +25,8 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", is
     mode === "signin" ? signIn : signUp,
     { error: "", inputs: {} },
   );
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
 
   return (
     <form className="space-y-6" action={formAction} aria-label="form">
@@ -52,19 +54,33 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", is
         <Label htmlFor="password" className="block text-sm font-medium">
           Password
         </Label>
-        <div className="mt-1">
+        <div className="mt-1 relative z-0">
           <Input
             id="password"
             name="password"
-            type="password"
+            type={showPassword ? "text" : "password"}
             aria-label="password"
             autoComplete={mode === "signin" ? "current-password" : "new-password"}
             required
             minLength={8}
-            className="appearance-none relative block w-full px-3 py-2 border focus:outline-hidden focus:z-10 sm:text-sm"
+            className="appearance-none relative block w-full px-3 py-2 border pr-10 focus:outline-hidden focus:z-0 sm:text-sm"
             placeholder="Enter your password"
             defaultValue={state.inputs.password ?? ""}
           />
+          <span
+            role="button"
+            tabIndex={0}
+            onMouseDown={event => event.preventDefault()}
+            onClick={() => setShowPassword(value => !value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ")
+                setShowPassword(value => !value);
+            }}
+            className="absolute inset-y-0 right-0 z-10 flex items-center pr-3 text-muted-foreground hover:text-foreground"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </span>
         </div>
       </div>
       {mode === "signup" && (
@@ -73,18 +89,34 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", is
             Repeat password
           </Label>
           <div className="mt-1">
-            <Input
-              id="repeatPassword"
-              name="repeatPassword"
-              type="password"
-              aria-label="repeatPassword"
-              autoComplete="new-password"
-              required
-              minLength={8}
-              className="appearance-none relative block w-full px-3 py-2 border focus:outline-hidden focus:z-10 sm:text-sm"
-              placeholder="Repeat your password"
-              defaultValue={state.inputs.repeatPassword ?? ""}
-            />
+            <div className="mt-1 relative z-0">
+              <Input
+                id="repeatPassword"
+                name="repeatPassword"
+                type={showRepeatPassword ? "text" : "password"}
+                aria-label="repeatPassword"
+                autoComplete="new-password"
+                required
+                minLength={8}
+                className="appearance-none relative block w-full px-3 py-2 border pr-10 focus:outline-hidden focus:z-0 sm:text-sm"
+                placeholder="Repeat your password"
+                defaultValue={state.inputs.repeatPassword ?? ""}
+              />
+              <span
+                role="button"
+                tabIndex={0}
+                onMouseDown={event => event.preventDefault()}
+                onClick={() => setShowRepeatPassword(value => !value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ")
+                    setShowRepeatPassword(value => !value);
+                }}
+                className="absolute inset-y-0 right-0 z-10 flex items-center pr-3 text-muted-foreground hover:text-foreground"
+                aria-label={showRepeatPassword ? "Hide repeat password" : "Show repeat password"}
+              >
+                {showRepeatPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </span>
+            </div>
           </div>
         </div>
       )}
