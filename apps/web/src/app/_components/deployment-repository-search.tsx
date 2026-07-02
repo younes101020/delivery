@@ -1,12 +1,11 @@
 "use client";
 
-import { SearchIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { startTransition } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
 import { useDeploymentApplicationList } from "../_ctx/deployment-application-list";
-import { Input } from "./ui/input";
+import { SearchInput } from "./search-input";
 
 export function RepositorySearch() {
   const { triggerPending } = useDeploymentApplicationList();
@@ -30,18 +29,14 @@ export function RepositorySearch() {
   }, 300);
 
   return (
-    <div className="flex w-full items-center border rounded-lg px-2.5 py-1.5 mb-2">
-      <SearchIcon className="h-4 w-4 mr-2.5" />
-      <Input
-        type="text"
-        className="w-full border-0"
-        placeholder="Search repositories..."
-        autoComplete="off"
-        defaultValue={searchParams.get("query")?.toString()}
-        onChange={(e) => {
-          handleRepositorySearch(e.target.value);
-        }}
-      />
-    </div>
+    <SearchInput
+      type="text"
+      placeholder="Search repositories..."
+      autoComplete="off"
+      defaultValue={searchParams.get("query")?.toString()}
+      onChange={(e) => {
+        handleRepositorySearch(e.target.value);
+      }}
+    />
   );
 }
