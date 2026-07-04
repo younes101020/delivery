@@ -68,7 +68,6 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", is
             defaultValue={state.inputs.password ?? ""}
           />
           <span
-            role="button"
             tabIndex={0}
             onMouseDown={event => event.preventDefault()}
             onClick={() => setShowPassword(value => !value)}
@@ -103,7 +102,6 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", is
                 defaultValue={state.inputs.repeatPassword ?? ""}
               />
               <span
-                role="button"
                 tabIndex={0}
                 onMouseDown={event => event.preventDefault()}
                 onClick={() => setShowRepeatPassword(value => !value)}
