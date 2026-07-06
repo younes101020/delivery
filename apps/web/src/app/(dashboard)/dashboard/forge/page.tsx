@@ -1,7 +1,8 @@
 import { PageDescription } from "@/app/_components/ui/page-description";
 import { PageTitle } from "@/app/_components/ui/page-title";
 
-import { DockerImagesPanel } from "./_components/docker-images-panel";
+import Sidebar from "./_components/sidebar";
+import FlowCanvasWrapper from "./_components/flow-canvas";
 
 export default function ForgePage() {
   return (
@@ -15,9 +16,11 @@ export default function ForgePage() {
       </div>
 
       <div className="mt-4 h-full flex ">
-        <div className="flex-3 border-r"></div>
-        <div className="flex-1">
-          <DockerImagesPanel />
+        <div className="flex-3 border-r">
+          <FlowCanvasWrapper />
+        </div>
+        <div className="flex-2 mx-2">
+          <Sidebar />
         </div>
       </div>
     </section>
