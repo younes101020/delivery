@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactFlow, ReactFlowProvider, useReactFlow } from "@xyflow/react";
+import { applyEdgeChanges, applyNodeChanges, ReactFlow, ReactFlowProvider, useReactFlow } from "@xyflow/react";
 import React, { useCallback, useRef, useState } from "react";
 
 export default function FlowCanvasWrapper() {
@@ -19,6 +19,14 @@ function FlowCanvas() {
   const [edges, setEdges] = useState<any[]>([]);
   const rf = useReactFlow();
 
+  const onNodesChange = useCallback((changes: any[]) => {
+    setNodes(currentNodes => applyNodeChanges(changes, currentNodes));
+  }, []);
+
+  const onEdgesChange = useCallback((changes: any[]) => {
+    setEdges(currentEdges => applyEdgeChanges(changes, currentEdges));
+  }, []);
+
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
@@ -35,7 +43,7 @@ function FlowCanvas() {
     try {
       payload = JSON.parse(raw);
     }
-    catch (e) {
+    catch {
       return;
     }
 
@@ -63,7 +71,7 @@ function FlowCanvas() {
 
   return (
     <div ref={containerRef} className="h-full w-full" onDragOver={onDragOver} onDrop={onDrop}>
-      <ReactFlow nodes={nodes} edges={edges} onNodesChange={setNodes} onEdgesChange={setEdges} fitView />
+      <ReactFlow nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} fitView />
     </div>
   );
 }

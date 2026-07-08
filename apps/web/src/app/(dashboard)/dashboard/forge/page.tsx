@@ -1,8 +1,8 @@
 import { PageDescription } from "@/app/_components/ui/page-description";
 import { PageTitle } from "@/app/_components/ui/page-title";
 
-import Sidebar from "./_components/sidebar";
 import FlowCanvasWrapper from "./_components/flow-canvas";
+import Sidebar from "./_components/sidebar";
 
 export default function ForgePage() {
   return (
