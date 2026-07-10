@@ -1,5 +1,6 @@
 "use client";
 
+import { GripVertical } from "lucide-react";
 import React, { Suspense, useState } from "react";
 
 import { useInfiniteDockerImages } from "../_hooks/use-infinite-docker-images";
@@ -49,12 +50,15 @@ function DockerImageCard({
           );
           e.dataTransfer.effectAllowed = "move";
         }
-        catch (err) {
+        catch {
           // ignore
         }
       }}
       className="relative rounded-sm border p-4 transition-colors hover:border-primary/50 hover:bg-white/[0.045] overflow-hidden"
     >
+      <div className="absolute top-1 right-0 flex h-full opacity-50">
+        <GripVertical />
+      </div>
       <div className="relative flex items-start justify-between">
         <div className="flex items-center">
           <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center">

@@ -1,6 +1,7 @@
 "use client";
 
-import { applyEdgeChanges, applyNodeChanges, ReactFlow, ReactFlowProvider, useReactFlow } from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
+import { addEdge, applyEdgeChanges, applyNodeChanges, ReactFlow, ReactFlowProvider, useReactFlow } from "@xyflow/react";
 import React, { useCallback, useRef, useState } from "react";
 
 export default function FlowCanvasWrapper() {
@@ -25,6 +26,10 @@ function FlowCanvas() {
 
   const onEdgesChange = useCallback((changes: any[]) => {
     setEdges(currentEdges => applyEdgeChanges(changes, currentEdges));
+  }, []);
+
+  const onConnect = useCallback((connection: any) => {
+    setEdges(currentEdges => addEdge({ ...connection, animated: true }, currentEdges));
   }, []);
 
   const onDragOver = useCallback((event: React.DragEvent) => {
@@ -59,11 +64,30 @@ function FlowCanvas() {
     }
 
     const id = `docker-${Date.now()}`;
+    const label = payload?.payload?.name ?? payload?.payload?.label ?? "Docker Image";
+    const iconSlug = payload?.payload?.iconSlug;
     const newNode = {
       id,
       type: "default",
       position,
-      data: { label: payload?.payload?.name ?? payload?.payload?.label ?? "Docker Image", payload: payload?.payload },
+      data: {
+        label: (
+          <div className="flex items-center gap-2">
+            {iconSlug && (
+              <img
+                src={`https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/${iconSlug}.svg`}
+                alt=""
+                className="h-5 w-5 shrink-0 object-contain"
+                onError={(error) => {
+                  error.currentTarget.style.display = "none";
+                }}
+              />
+            )}
+            <span>{label}</span>
+          </div>
+        ),
+        payload: payload?.payload,
+      },
     };
 
     setNodes(nds => nds.concat(newNode));
@@ -71,7 +95,15 @@ function FlowCanvas() {
 
   return (
     <div ref={containerRef} className="h-full w-full" onDragOver={onDragOver} onDrop={onDrop}>
-      <ReactFlow nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} fitView />
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        defaultEdgeOptions={{ animated: true, style: { stroke: "hsl(var(--primary))", strokeWidth: 2 } }}
+        fitView
+      />
     </div>
   );
 }
