@@ -1,7 +1,6 @@
 "use client";
 
-import "@xyflow/react/dist/style.css";
-import { addEdge, applyEdgeChanges, applyNodeChanges, ReactFlow, ReactFlowProvider, useReactFlow } from "@xyflow/react";
+import { addEdge, applyEdgeChanges, applyNodeChanges, ConnectionMode, ReactFlow, ReactFlowProvider, useReactFlow } from "@xyflow/react";
 import React, { useCallback, useRef, useState } from "react";
 
 export default function FlowCanvasWrapper() {
@@ -101,6 +100,7 @@ function FlowCanvas() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        connectionMode={ConnectionMode.Loose}
         defaultEdgeOptions={{ animated: true, style: { stroke: "hsl(var(--primary))", strokeWidth: 2 } }}
         fitView
       />
