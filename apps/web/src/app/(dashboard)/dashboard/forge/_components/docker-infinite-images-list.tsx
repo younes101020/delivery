@@ -1,6 +1,6 @@
 "use client";
 
-import { GripVertical } from "lucide-react";
+import { GripVertical, ShieldCheck } from "lucide-react";
 import React, { Suspense, useState } from "react";
 
 import { useInfiniteDockerImages } from "../_hooks/use-infinite-docker-images";
@@ -59,7 +59,7 @@ function DockerImageCard({
       <div className="absolute top-1 right-0 flex h-full opacity-50">
         <GripVertical />
       </div>
-      <div className="relative flex items-start justify-between">
+      <div className="flex items-start justify-between">
         <div className="flex items-center">
           <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center">
             {iconSlug && !iconFailed
@@ -83,7 +83,8 @@ function DockerImageCard({
         </div>
 
         {official && (
-          <span className="whitespace-nowrap rounded-sm border border-white/10 px-[7px] py-[3px] text-[10px] uppercase tracking-wider">
+          <span className="flex gap-1 items-center px-1 absolute top-0 left-0 text-xs uppercase bg-primary text-primary-foreground">
+            <ShieldCheck className="h-4 w-4" />
             official
           </span>
         )}
@@ -113,8 +114,8 @@ function InfiniteListInner({ query }: { query: string }) {
           return (
             <DockerImageCard
               key={img.repo_name ?? img.name ?? iconSlug}
-              name={img.name}
-              description={img.description}
+              name={img.repo_name ?? img.name}
+              description={img.description ?? img.short_description}
               pulls={img.pull_count}
               stars={img.star_count}
               official={Boolean(img.is_official)}
