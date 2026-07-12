@@ -6,7 +6,7 @@ import Sidebar from "./_components/sidebar";
 
 export default function ForgePage() {
   return (
-    <section className="p-5 bg-background/50 border h-[90%] overflow-hidden">
+    <section className="flex h-[calc(100dvh-4rem)] flex-col overflow-hidden border bg-background/50 p-5">
       <div className="flex justify-between gap-2">
         <div>
           <PageTitle>Forge</PageTitle>
@@ -15,11 +15,11 @@ export default function ForgePage() {
 
       </div>
 
-      <div className="mt-4 h-full flex ">
-        <div className="flex-3 border-r">
+      <div className="mt-4 flex min-h-0 flex-1">
+        <div className="min-w-0 flex-3 border-r">
           <FlowCanvasWrapper />
         </div>
-        <div className="flex-2 mx-2">
+        <div className="mx-2 min-w-0 flex-2">
           <Sidebar />
         </div>
       </div>

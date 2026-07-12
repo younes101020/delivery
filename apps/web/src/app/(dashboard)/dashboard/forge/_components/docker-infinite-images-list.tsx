@@ -1,7 +1,10 @@
 "use client";
 
-import { GripVertical, ShieldCheck } from "lucide-react";
+import { ChevronDown, GripVertical, LoaderCircle, ShieldCheck } from "lucide-react";
 import React, { Suspense, useState } from "react";
+
+import { Button } from "@/app/_components/ui/button";
+import { Skeleton } from "@/app/_components/ui/skeleton";
 
 import { useInfiniteDockerImages } from "../_hooks/use-infinite-docker-images";
 
@@ -126,9 +129,14 @@ function InfiniteListInner({ query }: { query: string }) {
       </div>
 
       {hasNextPage && (
-        <button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
-          {isFetchingNextPage ? "Loading..." : "Load more"}
-        </button>
+        <div className="flex justify-center py-4">
+          <Button variant="outline" onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+            {isFetchingNextPage
+              ? <LoaderCircle className="animate-spin" />
+              : <ChevronDown />}
+            {isFetchingNextPage ? "Loading..." : "Load more"}
+          </Button>
+        </div>
       )}
     </div>
   );
@@ -136,8 +144,18 @@ function InfiniteListInner({ query }: { query: string }) {
 
 export function InfiniteDockerImageList({ query }: { query: string }) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<DockerImagesListSkeleton />}>
       <InfiniteListInner query={query} />
     </Suspense>
+  );
+}
+
+function DockerImagesListSkeleton() {
+  return (
+    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <Skeleton key={index} className="h-32 rounded-sm" />
+      ))}
+    </div>
   );
 }
