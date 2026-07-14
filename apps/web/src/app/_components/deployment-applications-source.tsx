@@ -5,6 +5,7 @@ import { DeploymentRepositories } from "./deployment-repositories";
 import { RepositorySearch } from "./deployment-repository-search";
 
 interface ApplicationSourceProps {
+  defaultGithubAppsOpen?: boolean;
   sp: Promise<{
     page: string;
     githubapp?: string;
@@ -13,7 +14,7 @@ interface ApplicationSourceProps {
   } | undefined>;
 }
 
-export async function ApplicationSource({ sp }: ApplicationSourceProps) {
+export async function ApplicationSource({ defaultGithubAppsOpen = true, sp }: ApplicationSourceProps) {
   const searchParams = await sp;
 
   const repositoryPage = searchParams?.page ? Number.parseInt(searchParams.page) : 1;
@@ -24,9 +25,9 @@ export async function ApplicationSource({ sp }: ApplicationSourceProps) {
 
   return (
     <DeploymentApplicationListProvider repositoriesWithGithubAppPromise={installationWithRepos}>
-      <div className="grid grid-cols-4 gap-4">
-        <DeploymentGithubAppList />
-        <div className="col-span-3">
+      <div className="flex min-w-0 gap-4">
+        <DeploymentGithubAppList defaultOpen={defaultGithubAppsOpen} />
+        <div className="min-w-0 flex-1">
           <RepositorySearch />
           <DeploymentRepositories />
         </div>

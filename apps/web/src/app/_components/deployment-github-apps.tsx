@@ -1,9 +1,9 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { motion } from "motion/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { startTransition, useOptimistic } from "react";
+import { startTransition, useOptimistic, useState } from "react";
 
 import { Card, CardDescription, CardHeader, CardTitle } from "@/app/_components/ui/card";
 
@@ -19,8 +19,13 @@ interface SelectedGithubApp {
   isPending: boolean;
 }
 
-export function DeploymentGithubAppList() {
+interface DeploymentGithubAppListProps {
+  defaultOpen?: boolean;
+}
+
+export function DeploymentGithubAppList({ defaultOpen = true }: DeploymentGithubAppListProps) {
   const { applicationsWithGithubApps } = useDeploymentApplicationList();
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
@@ -49,30 +54,44 @@ export function DeploymentGithubAppList() {
   };
 
   return (
-    <ScrollArea>
-      <div className="col-span-1 flex flex-col gap-2 max-h-52">
-        <AddNewGithubApp />
-        <Separator />
-        {applicationsWithGithubApps
-          ? applicationsWithGithubApps.githubApps.map(
-              ghApp => (
-                <GithubAppCard
-                  key={ghApp.appId}
-                  githubApp={ghApp}
-                  handleGithubAppClick={handleGithubAppClick}
-                  isSelected={optimisticSelectedGHApp.githubAppId === ghApp.appId}
-                  isPending={optimisticSelectedGHApp.isPending && optimisticSelectedGHApp.githubAppId === ghApp.appId}
-                />
-              ),
-            )
-          : (
-              <p className="text-sm text-muted-foreground px-4 py-8 text-center">
-                Unable to get github app.
-              </p>
-            )}
-      </div>
-    </ScrollArea>
-
+    <section className={`shrink-0 overflow-hidden transition-[width] duration-200 ${isOpen ? "w-64" : "w-9"}`}>
+      <button
+        type="button"
+        aria-label={`${isOpen ? "Hide" : "Show"} GitHub Apps`}
+        className={`flex w-full items-center rounded-md py-1 text-sm font-medium hover:bg-muted ${isOpen ? "justify-between px-2" : "justify-center"}`}
+        onClick={() => setIsOpen(open => !open)}
+      >
+        {isOpen ? <span>GitHub Apps</span> : null}
+        {isOpen ? <ChevronLeft className="size-4" /> : <ChevronRight className="size-4" />}
+      </button>
+      {isOpen
+        ? (
+            <ScrollArea>
+              <div className="flex max-h-52 flex-col gap-2 pt-2">
+                <AddNewGithubApp />
+                <Separator />
+                {applicationsWithGithubApps
+                  ? applicationsWithGithubApps.githubApps.map(
+                      ghApp => (
+                        <GithubAppCard
+                          key={ghApp.appId}
+                          githubApp={ghApp}
+                          handleGithubAppClick={handleGithubAppClick}
+                          isSelected={optimisticSelectedGHApp.githubAppId === ghApp.appId}
+                          isPending={optimisticSelectedGHApp.isPending && optimisticSelectedGHApp.githubAppId === ghApp.appId}
+                        />
+                      ),
+                    )
+                  : (
+                      <p className="px-4 py-8 text-center text-sm text-muted-foreground">
+                        Unable to get github app.
+                      </p>
+                    )}
+              </div>
+            </ScrollArea>
+          )
+        : null}
+    </section>
   );
 }
 

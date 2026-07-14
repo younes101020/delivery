@@ -42,7 +42,7 @@ export default function ForgePage({ searchParams }: ForgePageProps) {
             repositories={(
               <Suspense fallback={<PendingRepositories />}>
                 <DeploymentSelectedApplicationProvider>
-                  <ApplicationSource sp={repositorySearchParams} />
+                  <ApplicationSource defaultGithubAppsOpen={false} sp={repositorySearchParams} />
                 </DeploymentSelectedApplicationProvider>
               </Suspense>
             )}
