@@ -6,7 +6,9 @@ import React, { useCallback, useRef, useState } from "react";
 
 import { Button } from "@/app/_components/ui/button";
 
-import { NODE_WIDTH, nodeTypes, PROJECT_HEADER_HEIGHT, PROJECT_HEIGHT, PROJECT_PADDING, PROJECT_WIDTH } from "./const";
+import type { DockerNodeSettings } from "./types";
+
+import { NODE_HEIGHT, NODE_WIDTH, nodeTypes, PROJECT_HEADER_HEIGHT, PROJECT_HEIGHT, PROJECT_PADDING, PROJECT_WIDTH } from "./const";
 import { clampNodePosition, getProjectAtPosition } from "./utils";
 
 export default function FlowCanvasWrapper() {
@@ -28,6 +30,12 @@ function FlowCanvas() {
   const onProjectNameChange = useCallback((id: string, name: string) => {
     setNodes(currentNodes => currentNodes.map(node => node.id === id
       ? { ...node, data: { ...node.data, name } }
+      : node));
+  }, []);
+
+  const onDockerSettingsChange = useCallback((id: string, settings: DockerNodeSettings) => {
+    setNodes(currentNodes => currentNodes.map(node => node.id === id
+      ? { ...node, data: { ...node.data, ...settings } }
       : node));
   }, []);
 
@@ -130,33 +138,23 @@ function FlowCanvas() {
 
       newNodes.push({
         id: `docker-${Date.now()}`,
-        type: "default",
+        type: "docker",
         parentId: targetProject.id,
         position: relativePosition,
-        style: { width: NODE_WIDTH },
+        style: { height: NODE_HEIGHT, width: NODE_WIDTH },
         data: {
-          label: (
-            <div className="flex min-w-0 items-center gap-1">
-              {iconSlug && (
-                <img
-                  src={`https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/${iconSlug}.svg`}
-                  alt=""
-                  className="h-4 w-4 shrink-0 object-contain"
-                  onError={(error) => {
-                    error.currentTarget.style.display = "none";
-                  }}
-                />
-              )}
-              <span className="truncate text-xs">{label}</span>
-            </div>
-          ),
-          payload: payload?.payload,
+          imageName: label,
+          iconSlug,
+          ports: getDefaultPorts(label),
+          environmentVariables: "",
+          startCommand: "",
+          onSettingsChange: onDockerSettingsChange,
         },
       });
 
       return currentNodes.concat(newNodes);
     });
-  }, [createProject, rf]);
+  }, [createProject, onDockerSettingsChange, rf]);
 
   const onAddProject = useCallback(() => {
     setNodes((currentNodes) => {
@@ -193,4 +191,21 @@ function FlowCanvas() {
       </ReactFlow>
     </div>
   );
+}
+
+function getDefaultPorts(imageName: string) {
+  const image = imageName.toLowerCase().split("/").pop()?.split(":")[0] ?? "";
+  const portsByImage: Record<string, string> = {
+    httpd: "80",
+    mariadb: "3306",
+    mongo: "27017",
+    mysql: "3306",
+    nginx: "80",
+    postgres: "5432",
+    rabbitmq: "5672",
+    redis: "6379",
+    traefik: "80, 443",
+  };
+
+  return portsByImage[image] ?? "";
 }

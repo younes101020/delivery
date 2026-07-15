@@ -1,4 +1,4 @@
-import { NODE_WIDTH, PROJECT_HEADER_HEIGHT, PROJECT_HEIGHT, PROJECT_PADDING, PROJECT_WIDTH } from "./const";
+import { NODE_HEIGHT, NODE_WIDTH, PROJECT_HEADER_HEIGHT, PROJECT_HEIGHT, PROJECT_PADDING, PROJECT_WIDTH } from "./const";
 
 interface Position {
   x: number;
@@ -44,6 +44,6 @@ export function clampNodePosition(position: Position, project: CanvasNode) {
 
   return {
     x: Math.max(PROJECT_PADDING, Math.min(position.x, width - NODE_WIDTH - PROJECT_PADDING)),
-    y: Math.max(PROJECT_HEADER_HEIGHT + PROJECT_PADDING, Math.min(position.y, height - 48)),
+    y: Math.max(PROJECT_HEADER_HEIGHT + PROJECT_PADDING, Math.min(position.y, height - NODE_HEIGHT - PROJECT_PADDING)),
   };
 }
