@@ -2,6 +2,7 @@ import type { Node } from "@xyflow/react";
 
 export interface ProjectNodeData {
   [key: string]: unknown;
+  isActive: boolean;
   name: string;
   onNameChange: (id: string, name: string) => void;
 }
@@ -10,6 +11,7 @@ export type ProjectNodeType = Node<ProjectNodeData, "project">;
 
 export interface DockerNodeData {
   [key: string]: unknown;
+  isActive: boolean;
   imageName: string;
   iconSlug?: string;
   ports: string;

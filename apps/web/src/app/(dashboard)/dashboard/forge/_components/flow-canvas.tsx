@@ -43,7 +43,7 @@ function FlowCanvas() {
     id: `project-${Date.now()}`,
     type: "project",
     position,
-    data: { name: `Project ${count}`, onNameChange: onProjectNameChange },
+    data: { isActive: false, name: `Project ${count}`, onNameChange: onProjectNameChange },
     style: { height: PROJECT_HEIGHT, width: PROJECT_WIDTH },
   }), [onProjectNameChange]);
 
@@ -144,6 +144,7 @@ function FlowCanvas() {
         style: { height: NODE_HEIGHT, width: NODE_WIDTH },
         data: {
           imageName: label,
+          isActive: false,
           iconSlug,
           ports: getDefaultPorts(label),
           environmentVariables: "",
@@ -168,10 +169,20 @@ function FlowCanvas() {
     });
   }, [createProject]);
 
+  const nodesWithProjectActivity = nodes.map((node) => {
+    if (node.type !== "project")
+      return node;
+
+    const childNodes = nodes.filter(childNode => childNode.parentId === node.id);
+    const isActive = childNodes.length > 0 && childNodes.every(childNode => childNode.data.isActive === true);
+
+    return { ...node, data: { ...node.data, isActive } };
+  });
+
   return (
     <div ref={canvasRef} className="h-full w-full" onDragOver={onDragOver} onDrop={onDrop}>
       <ReactFlow
-        nodes={nodes}
+        nodes={nodesWithProjectActivity}
         edges={edges}
         nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
