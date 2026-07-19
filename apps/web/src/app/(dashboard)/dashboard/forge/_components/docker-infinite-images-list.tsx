@@ -44,23 +44,26 @@ function DockerImageCard({
 
   return (
     <div
-      draggable
-      onDragStart={(e) => {
-        try {
-          e.dataTransfer.setData(
-            "application/reactflow",
-            JSON.stringify({ type: "docker", payload: { name, description, iconSlug } }),
-          );
-          e.dataTransfer.effectAllowed = "move";
-        }
-        catch {
-          // ignore
-        }
-      }}
       className="relative rounded-sm border p-4 transition-colors hover:border-primary/50 hover:bg-white/[0.045] overflow-hidden"
     >
-      <div className="absolute top-1 right-0 flex h-full opacity-50">
-        <GripVertical />
+      <div
+        draggable
+        aria-label={`Drag ${name} to canvas`}
+        onDragStart={(e) => {
+          try {
+            e.dataTransfer.setData(
+              "application/reactflow",
+              JSON.stringify({ type: "docker", payload: { name, description, iconSlug } }),
+            );
+            e.dataTransfer.effectAllowed = "move";
+          }
+          catch {
+            // ignore
+          }
+        }}
+        className="absolute top-1 right-0 flex h-full cursor-grab opacity-50 active:cursor-grabbing"
+      >
+        <GripVertical className="pointer-events-none" />
       </div>
       <div className="flex items-start justify-between">
         <div className="flex items-center">
