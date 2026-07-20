@@ -9,7 +9,7 @@ import { Button } from "@/app/_components/ui/button";
 import type { DockerNodeSettings } from "./types";
 
 import { NODE_HEIGHT, NODE_WIDTH, nodeTypes, PROJECT_HEADER_HEIGHT, PROJECT_HEIGHT, PROJECT_PADDING, PROJECT_WIDTH } from "./const";
-import { clampNodePosition, getProjectAtPosition } from "./utils";
+import { clampNodePosition, expandProjectToFitNode, getProjectAtPosition } from "./utils";
 
 export default function FlowCanvasWrapper() {
   return (
@@ -122,6 +122,7 @@ function FlowCanvas() {
       let targetProject = getProjectAtPosition(position, currentNodes);
       const projects = currentNodes.filter(node => node.type === "project");
       const newNodes = [];
+      let updatedNodes = currentNodes;
 
       if (!targetProject) {
         targetProject = createProject({
@@ -131,10 +132,23 @@ function FlowCanvas() {
         newNodes.push(targetProject);
       }
 
-      const relativePosition = clampNodePosition({
+      const requestedPosition = {
         x: position.x - targetProject.position.x,
         y: position.y - targetProject.position.y,
-      }, targetProject);
+      };
+      const relativePosition = {
+        x: Math.max(PROJECT_PADDING, requestedPosition.x),
+        y: Math.max(PROJECT_HEADER_HEIGHT + PROJECT_PADDING, requestedPosition.y),
+      };
+      const expandedProject = expandProjectToFitNode(relativePosition, targetProject);
+
+      if (newNodes.length > 0) {
+        const projectIndex = newNodes.findIndex(node => node.id === targetProject.id);
+        newNodes[projectIndex] = expandedProject;
+      }
+      else {
+        updatedNodes = currentNodes.map(node => node.id === targetProject.id ? expandedProject : node);
+      }
 
       newNodes.push({
         id: `docker-${Date.now()}`,
@@ -153,7 +167,7 @@ function FlowCanvas() {
         },
       });
 
-      return currentNodes.concat(newNodes);
+      return updatedNodes.concat(newNodes);
     });
   }, [createProject, onDockerSettingsChange, rf]);
 

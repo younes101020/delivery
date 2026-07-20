@@ -20,10 +20,23 @@ interface CanvasNode {
   width?: number;
 }
 
-function getProjectDimensions(project: CanvasNode) {
+export function getProjectDimensions(project: CanvasNode) {
   return {
     height: project.measured?.height ?? project.height ?? (typeof project.style?.height === "number" ? project.style.height : PROJECT_HEIGHT),
     width: project.measured?.width ?? project.width ?? (typeof project.style?.width === "number" ? project.style.width : PROJECT_WIDTH),
+  };
+}
+
+export function expandProjectToFitNode<T extends CanvasNode>(position: Position, project: T) {
+  const { height, width } = getProjectDimensions(project);
+
+  return {
+    ...project,
+    style: {
+      ...project.style,
+      height: Math.max(height, position.y + NODE_HEIGHT + PROJECT_PADDING),
+      width: Math.max(width, position.x + NODE_WIDTH + PROJECT_PADDING),
+    },
   };
 }
 
