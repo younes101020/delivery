@@ -3,6 +3,7 @@
 import { addEdge, applyEdgeChanges, applyNodeChanges, ConnectionMode, Panel, ReactFlow, ReactFlowProvider, useReactFlow } from "@xyflow/react";
 import { Plus } from "lucide-react";
 import React, { useCallback, useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/app/_components/ui/button";
 
@@ -90,7 +91,7 @@ function FlowCanvas() {
     event.dataTransfer.dropEffect = "move";
   }, []);
 
-  const onDrop = useCallback((event: React.DragEvent) => {
+  const onDrop = useCallback(async (event: React.DragEvent) => {
     event.preventDefault();
 
     const raw = event.dataTransfer.getData("application/reactflow");
@@ -117,6 +118,23 @@ function FlowCanvas() {
 
     const label = payload?.payload?.name ?? payload?.payload?.label ?? "Docker Image";
     const iconSlug = payload?.payload?.iconSlug;
+
+    try {
+      const response = await fetch("/api/hub/pull", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ image: label }),
+      });
+
+      if (!response.ok)
+        throw new Error("Image pull failed.");
+    }
+    catch {
+      toast.error(`Unable to pull ${label}.`);
+      return;
+    }
 
     setNodes((currentNodes) => {
       let targetProject = getProjectAtPosition(position, currentNodes);

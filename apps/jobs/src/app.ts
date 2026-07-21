@@ -6,6 +6,7 @@ import auth from "@/routes/auth/auth.index";
 import databases from "@/routes/databases/databases.index";
 import deployments from "@/routes/deployments/deployments.index";
 import githubApps from "@/routes/githubapps/githubapps.index";
+import hub from "@/routes/hub/hub.index";
 import index from "@/routes/index.route";
 import serverConfig from "@/routes/server-config/server-config.index";
 import invitation from "@/routes/users/team/invitation/invitation.index";
@@ -28,6 +29,7 @@ const routes = [
   team,
   invitation,
   githubApps,
+  hub,
   serverConfig,
   auth,
   applications,
