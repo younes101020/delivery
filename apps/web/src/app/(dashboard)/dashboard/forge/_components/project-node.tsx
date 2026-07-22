@@ -18,8 +18,8 @@ export function ProjectNode({ data, id, selected }: NodeProps<ProjectNodeType>) 
           aria-label="Project name"
           onChange={event => data.onNameChange(id, event.target.value)}
         />
-        <Button className="nodrag nopan h-7 shrink-0 text-xs" size="sm" type="button">
-          Start project
+        <Button className="nodrag nopan h-7 shrink-0 text-xs" size="sm" type="button" disabled={data.isStarting} onClick={() => data.onStart(id)}>
+          {data.isStarting ? "Starting..." : "Start project"}
         </Button>
       </div>
     </div>

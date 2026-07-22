@@ -2,7 +2,7 @@
 
 import { addEdge, applyEdgeChanges, applyNodeChanges, ConnectionMode, Panel, ReactFlow, ReactFlowProvider, useReactFlow } from "@xyflow/react";
 import { Plus } from "lucide-react";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/app/_components/ui/button";
@@ -11,6 +11,13 @@ import type { DockerNodeSettings } from "./types";
 
 import { NODE_HEIGHT, NODE_WIDTH, nodeTypes, PROJECT_HEADER_HEIGHT, PROJECT_HEIGHT, PROJECT_PADDING, PROJECT_WIDTH } from "./const";
 import { clampNodePosition, expandProjectToFitNode, getProjectAtPosition } from "./utils";
+
+interface StartStackResponse {
+  results: Array<{
+    nodeId: string;
+    status: "created" | "failed" | "updated";
+  }>;
+}
 
 export default function FlowCanvasWrapper() {
   return (
@@ -26,7 +33,12 @@ function FlowCanvas() {
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const [nodes, setNodes] = useState<any[]>([]);
   const [edges, setEdges] = useState<any[]>([]);
+  const nodesRef = useRef<any[]>([]);
   const rf = useReactFlow();
+
+  useEffect(() => {
+    nodesRef.current = nodes;
+  }, [nodes]);
 
   const onProjectNameChange = useCallback((id: string, name: string) => {
     setNodes(currentNodes => currentNodes.map(node => node.id === id
@@ -40,13 +52,82 @@ function FlowCanvas() {
       : node));
   }, []);
 
+  const onProjectStart = useCallback(async (id: string) => {
+    const project = nodesRef.current.find(node => node.id === id && node.type === "project");
+    const services = nodesRef.current.filter(node => node.type === "docker" && node.parentId === id);
+
+    if (!project)
+      return;
+
+    if (services.length === 0) {
+      toast.error("Add at least one image before starting a project.");
+      return;
+    }
+
+    setNodes(currentNodes => currentNodes.map(node => node.id === id
+      ? { ...node, data: { ...node.data, isStarting: true } }
+      : node));
+
+    try {
+      const response = await fetch("/api/hub/stacks/start", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          project: {
+            id: project.id,
+            name: project.data.name,
+          },
+          services: services.map(service => ({
+            nodeId: service.id,
+            image: service.data.imageName,
+            ports: service.data.ports,
+            environmentVariables: service.data.environmentVariables,
+            startCommand: service.data.startCommand,
+          })),
+        }),
+      });
+      const result = await response.json() as StartStackResponse;
+
+      if (!response.ok)
+        throw new Error("Unable to start the project.");
+
+      const startedNodeIds = new Set(result.results
+        .filter(service => service.status !== "failed")
+        .map(service => service.nodeId));
+      const failedServices = result.results.filter(service => service.status === "failed");
+
+      setNodes(currentNodes => currentNodes.map((node) => {
+        if (node.id === id)
+          return { ...node, data: { ...node.data, isStarting: false } };
+
+        if (startedNodeIds.has(node.id))
+          return { ...node, data: { ...node.data, isActive: true } };
+
+        return node;
+      }));
+
+      if (failedServices.length > 0)
+        toast.error(`Unable to start ${failedServices.length} service${failedServices.length === 1 ? "" : "s"}.`);
+      else
+        toast.success("Project started.");
+    }
+    catch {
+      setNodes(currentNodes => currentNodes.map(node => node.id === id
+        ? { ...node, data: { ...node.data, isStarting: false } }
+        : node));
+      toast.error("Unable to start the project.");
+    }
+  }, []);
+
   const createProject = useCallback((position: { x: number; y: number }, count: number) => ({
     id: `project-${Date.now()}`,
     type: "project",
     position,
-    data: { isActive: false, name: `Project ${count}`, onNameChange: onProjectNameChange },
+    data: { isActive: false, isStarting: false, name: `Project ${count}`, onNameChange: onProjectNameChange, onStart: onProjectStart },
     style: { height: PROJECT_HEIGHT, width: PROJECT_WIDTH },
-  }), [onProjectNameChange]);
+  }), [onProjectNameChange, onProjectStart]);
 
   const onNodesChange = useCallback((changes: any[]) => {
     setNodes(currentNodes => applyNodeChanges(changes, currentNodes));

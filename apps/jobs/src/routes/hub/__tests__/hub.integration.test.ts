@@ -16,4 +16,18 @@ describe("hub routes", () => {
 
     expect(response.status).toBe(422);
   });
+
+  it("post /hub/stacks/start validates duplicate node IDs", async () => {
+    const response = await client.hub.stacks.start.$post({
+      json: {
+        project: { id: "project-1", name: "Project 1" },
+        services: [
+          { nodeId: "node-1", image: "nginx", ports: "80", environmentVariables: "", startCommand: "" },
+          { nodeId: "node-1", image: "redis", ports: "6379", environmentVariables: "", startCommand: "" },
+        ],
+      },
+    });
+
+    expect(response.status).toBe(422);
+  });
 });
