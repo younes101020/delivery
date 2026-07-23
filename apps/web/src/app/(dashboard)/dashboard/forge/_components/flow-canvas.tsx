@@ -1,7 +1,7 @@
 "use client";
 
 import { addEdge, applyEdgeChanges, applyNodeChanges, ConnectionMode, Panel, ReactFlow, ReactFlowProvider, useReactFlow } from "@xyflow/react";
-import { Plus } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -33,6 +33,7 @@ function FlowCanvas() {
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const [nodes, setNodes] = useState<any[]>([]);
   const [edges, setEdges] = useState<any[]>([]);
+  const [isDropLoading, setIsDropLoading] = useState(false);
   const nodesRef = useRef<any[]>([]);
   const rf = useReactFlow();
 
@@ -200,6 +201,9 @@ function FlowCanvas() {
     const label = payload?.payload?.name ?? payload?.payload?.label ?? "Docker Image";
     const iconSlug = payload?.payload?.iconSlug;
 
+    setIsDropLoading(true);
+    let pullSucceeded = false;
+
     try {
       const response = await fetch("/api/hub/pull", {
         method: "POST",
@@ -211,63 +215,69 @@ function FlowCanvas() {
 
       if (!response.ok)
         throw new Error("Image pull failed.");
+
+      pullSucceeded = true;
     }
     catch {
       toast.error(`Unable to pull ${label}.`);
       return;
     }
+    finally {
+      if (pullSucceeded) {
+        setNodes((currentNodes) => {
+          let targetProject = getProjectAtPosition(position, currentNodes);
+          const projects = currentNodes.filter(node => node.type === "project");
+          const newNodes = [];
+          let updatedNodes = currentNodes;
 
-    setNodes((currentNodes) => {
-      let targetProject = getProjectAtPosition(position, currentNodes);
-      const projects = currentNodes.filter(node => node.type === "project");
-      const newNodes = [];
-      let updatedNodes = currentNodes;
+          if (!targetProject) {
+            targetProject = createProject({
+              x: position.x - PROJECT_PADDING,
+              y: position.y - PROJECT_HEADER_HEIGHT - PROJECT_PADDING,
+            }, projects.length + 1);
+            newNodes.push(targetProject);
+          }
 
-      if (!targetProject) {
-        targetProject = createProject({
-          x: position.x - PROJECT_PADDING,
-          y: position.y - PROJECT_HEADER_HEIGHT - PROJECT_PADDING,
-        }, projects.length + 1);
-        newNodes.push(targetProject);
+          const requestedPosition = {
+            x: position.x - targetProject.position.x,
+            y: position.y - targetProject.position.y,
+          };
+          const relativePosition = {
+            x: Math.max(PROJECT_PADDING, requestedPosition.x),
+            y: Math.max(PROJECT_HEADER_HEIGHT + PROJECT_PADDING, requestedPosition.y),
+          };
+          const expandedProject = expandProjectToFitNode(relativePosition, targetProject);
+
+          if (newNodes.length > 0) {
+            const projectIndex = newNodes.findIndex(node => node.id === targetProject.id);
+            newNodes[projectIndex] = expandedProject;
+          }
+          else {
+            updatedNodes = currentNodes.map(node => node.id === targetProject.id ? expandedProject : node);
+          }
+
+          newNodes.push({
+            id: `docker-${Date.now()}`,
+            type: "docker",
+            parentId: targetProject.id,
+            position: relativePosition,
+            style: { height: NODE_HEIGHT, width: NODE_WIDTH },
+            data: {
+              imageName: label,
+              isActive: false,
+              iconSlug,
+              ports: getDefaultPorts(label),
+              environmentVariables: "",
+              startCommand: "",
+              onSettingsChange: onDockerSettingsChange,
+            },
+          });
+
+          return updatedNodes.concat(newNodes);
+        });
       }
-
-      const requestedPosition = {
-        x: position.x - targetProject.position.x,
-        y: position.y - targetProject.position.y,
-      };
-      const relativePosition = {
-        x: Math.max(PROJECT_PADDING, requestedPosition.x),
-        y: Math.max(PROJECT_HEADER_HEIGHT + PROJECT_PADDING, requestedPosition.y),
-      };
-      const expandedProject = expandProjectToFitNode(relativePosition, targetProject);
-
-      if (newNodes.length > 0) {
-        const projectIndex = newNodes.findIndex(node => node.id === targetProject.id);
-        newNodes[projectIndex] = expandedProject;
-      }
-      else {
-        updatedNodes = currentNodes.map(node => node.id === targetProject.id ? expandedProject : node);
-      }
-
-      newNodes.push({
-        id: `docker-${Date.now()}`,
-        type: "docker",
-        parentId: targetProject.id,
-        position: relativePosition,
-        style: { height: NODE_HEIGHT, width: NODE_WIDTH },
-        data: {
-          imageName: label,
-          isActive: false,
-          iconSlug,
-          ports: getDefaultPorts(label),
-          environmentVariables: "",
-          startCommand: "",
-          onSettingsChange: onDockerSettingsChange,
-        },
-      });
-
-      return updatedNodes.concat(newNodes);
-    });
+      setIsDropLoading(false);
+    }
   }, [createProject, onDockerSettingsChange, rf]);
 
   const onAddProject = useCallback(() => {
@@ -307,9 +317,20 @@ function FlowCanvas() {
         fitView
       >
         <Panel position="top-left">
-          <Button variant="outline" onClick={onAddProject}>
-            <Plus />
-            Add project
+          <Button variant="outline" onClick={onAddProject} disabled={isDropLoading}>
+            {isDropLoading
+              ? (
+                  <>
+                    <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                    Loading...
+                  </>
+                )
+              : (
+                  <>
+                    <Plus />
+                    Add project
+                  </>
+                )}
           </Button>
         </Panel>
       </ReactFlow>
