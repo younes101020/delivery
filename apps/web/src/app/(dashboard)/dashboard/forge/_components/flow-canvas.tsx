@@ -1,8 +1,8 @@
 "use client";
 
 import { addEdge, applyEdgeChanges, applyNodeChanges, ConnectionMode, Panel, ReactFlow, ReactFlowProvider, useReactFlow } from "@xyflow/react";
-import { Loader2, Plus } from "lucide-react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Plus } from "lucide-react";
+import React, { startTransition, useCallback, useEffect, useOptimistic, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/app/_components/ui/button";
@@ -33,7 +33,7 @@ function FlowCanvas() {
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const [nodes, setNodes] = useState<any[]>([]);
   const [edges, setEdges] = useState<any[]>([]);
-  const [isDropLoading, setIsDropLoading] = useState(false);
+  const [optimisticNodes, addOptimisticNodes] = useOptimistic(nodes, (_currentNodes, nextNodes: any[]) => nextNodes);
   const nodesRef = useRef<any[]>([]);
   const rf = useReactFlow();
 
@@ -201,83 +201,39 @@ function FlowCanvas() {
     const label = payload?.payload?.name ?? payload?.payload?.label ?? "Docker Image";
     const iconSlug = payload?.payload?.iconSlug;
 
-    setIsDropLoading(true);
-    let pullSucceeded = false;
+    const newNodes = createDockerNodes({
+      currentNodes: nodesRef.current,
+      createProject,
+      iconSlug,
+      label,
+      onDockerSettingsChange,
+      position,
+    });
+    const dockerNodeId = newNodes.find(node => node.type === "docker")?.id;
 
-    try {
-      const response = await fetch("/api/hub/pull", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ image: label }),
-      });
+    startTransition(async () => {
+      addOptimisticNodes(newNodes);
 
-      if (!response.ok)
-        throw new Error("Image pull failed.");
-
-      pullSucceeded = true;
-    }
-    catch {
-      toast.error(`Unable to pull ${label}.`);
-      return;
-    }
-    finally {
-      if (pullSucceeded) {
-        setNodes((currentNodes) => {
-          let targetProject = getProjectAtPosition(position, currentNodes);
-          const projects = currentNodes.filter(node => node.type === "project");
-          const newNodes = [];
-          let updatedNodes = currentNodes;
-
-          if (!targetProject) {
-            targetProject = createProject({
-              x: position.x - PROJECT_PADDING,
-              y: position.y - PROJECT_HEADER_HEIGHT - PROJECT_PADDING,
-            }, projects.length + 1);
-            newNodes.push(targetProject);
-          }
-
-          const requestedPosition = {
-            x: position.x - targetProject.position.x,
-            y: position.y - targetProject.position.y,
-          };
-          const relativePosition = {
-            x: Math.max(PROJECT_PADDING, requestedPosition.x),
-            y: Math.max(PROJECT_HEADER_HEIGHT + PROJECT_PADDING, requestedPosition.y),
-          };
-          const expandedProject = expandProjectToFitNode(relativePosition, targetProject);
-
-          if (newNodes.length > 0) {
-            const projectIndex = newNodes.findIndex(node => node.id === targetProject.id);
-            newNodes[projectIndex] = expandedProject;
-          }
-          else {
-            updatedNodes = currentNodes.map(node => node.id === targetProject.id ? expandedProject : node);
-          }
-
-          newNodes.push({
-            id: `docker-${Date.now()}`,
-            type: "docker",
-            parentId: targetProject.id,
-            position: relativePosition,
-            style: { height: NODE_HEIGHT, width: NODE_WIDTH },
-            data: {
-              imageName: label,
-              isActive: false,
-              iconSlug,
-              ports: getDefaultPorts(label),
-              environmentVariables: "",
-              startCommand: "",
-              onSettingsChange: onDockerSettingsChange,
-            },
-          });
-
-          return updatedNodes.concat(newNodes);
+      try {
+        const response = await fetch("/api/hub/pull", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ image: label }),
         });
+
+        if (!response.ok)
+          throw new Error("Image pull failed.");
+
+        setNodes(newNodes.map(node => node.id === dockerNodeId
+          ? { ...node, data: { ...node.data, isPullPending: false } }
+          : node));
       }
-      setIsDropLoading(false);
-    }
+      catch {
+        toast.error(`Unable to pull ${label}.`);
+      }
+    });
   }, [createProject, onDockerSettingsChange, rf]);
 
   const onAddProject = useCallback(() => {
@@ -292,11 +248,11 @@ function FlowCanvas() {
     });
   }, [createProject]);
 
-  const nodesWithProjectActivity = nodes.map((node) => {
+  const nodesWithProjectActivity = optimisticNodes.map((node) => {
     if (node.type !== "project")
       return node;
 
-    const childNodes = nodes.filter(childNode => childNode.parentId === node.id);
+    const childNodes = optimisticNodes.filter(childNode => childNode.parentId === node.id);
     const isActive = childNodes.length > 0 && childNodes.every(childNode => childNode.data.isActive === true);
 
     return { ...node, data: { ...node.data, isActive } };
@@ -317,20 +273,9 @@ function FlowCanvas() {
         fitView
       >
         <Panel position="top-left">
-          <Button variant="outline" onClick={onAddProject} disabled={isDropLoading}>
-            {isDropLoading
-              ? (
-                  <>
-                    <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                    Loading...
-                  </>
-                )
-              : (
-                  <>
-                    <Plus />
-                    Add project
-                  </>
-                )}
+          <Button variant="outline" onClick={onAddProject}>
+            <Plus />
+            Add project
           </Button>
         </Panel>
       </ReactFlow>
@@ -353,4 +298,54 @@ function getDefaultPorts(imageName: string) {
   };
 
   return portsByImage[image] ?? "";
+}
+
+function createDockerNodes({ currentNodes, createProject, iconSlug, label, onDockerSettingsChange, position }: {
+  currentNodes: any[];
+  createProject: (position: { x: number; y: number }, count: number) => any;
+  iconSlug?: string;
+  label: string;
+  onDockerSettingsChange: (id: string, settings: DockerNodeSettings) => void;
+  position: { x: number; y: number };
+}) {
+  let targetProject = getProjectAtPosition(position, currentNodes);
+  const projects = currentNodes.filter(node => node.type === "project");
+  let nextNodes = currentNodes;
+
+  if (!targetProject) {
+    targetProject = createProject({
+      x: position.x - PROJECT_PADDING,
+      y: position.y - PROJECT_HEADER_HEIGHT - PROJECT_PADDING,
+    }, projects.length + 1);
+    nextNodes = nextNodes.concat(targetProject);
+  }
+
+  const requestedPosition = {
+    x: position.x - targetProject.position.x,
+    y: position.y - targetProject.position.y,
+  };
+  const relativePosition = {
+    x: Math.max(PROJECT_PADDING, requestedPosition.x),
+    y: Math.max(PROJECT_HEADER_HEIGHT + PROJECT_PADDING, requestedPosition.y),
+  };
+  const expandedProject = expandProjectToFitNode(relativePosition, targetProject);
+  nextNodes = nextNodes.map(node => node.id === targetProject.id ? expandedProject : node);
+
+  return nextNodes.concat({
+    id: `docker-${Date.now()}`,
+    type: "docker",
+    parentId: targetProject.id,
+    position: relativePosition,
+    style: { height: NODE_HEIGHT, width: NODE_WIDTH },
+    data: {
+      imageName: label,
+      isActive: false,
+      isPullPending: true,
+      iconSlug,
+      ports: getDefaultPorts(label),
+      environmentVariables: "",
+      startCommand: "",
+      onSettingsChange: onDockerSettingsChange,
+    },
+  });
 }

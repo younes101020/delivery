@@ -34,7 +34,7 @@ export function DockerNode({ data, id, selected }: NodeProps<DockerNodeType>) {
       <Handle type="target" position={Position.Left} className="!h-2 !w-2 !border-primary !bg-background" />
       <div className="flex h-full flex-col gap-1 px-2 py-1">
         <div className="flex min-w-0 items-center gap-1">
-          <ActivityIndicator isActive={data.isActive} />
+          <ActivityIndicator isActive={data.isActive} isPullPending={data.isPullPending} />
           {data.iconSlug && (
             <img
               src={`https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/${data.iconSlug}.svg`}
@@ -92,7 +92,16 @@ export function DockerNode({ data, id, selected }: NodeProps<DockerNodeType>) {
   );
 }
 
-function ActivityIndicator({ isActive }: { isActive: boolean }) {
+function ActivityIndicator({ isActive, isPullPending }: { isActive: boolean; isPullPending?: boolean }) {
+  if (isPullPending) {
+    return (
+      <span className="relative flex size-3 shrink-0" aria-label="Pulling image">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75" />
+        <span className="relative inline-flex size-3 rounded-full bg-orange-500" />
+      </span>
+    );
+  }
+
   const color = isActive ? "bg-blue-500" : "bg-red-500";
   const pingColor = isActive ? "bg-blue-400" : "bg-red-400";
 
