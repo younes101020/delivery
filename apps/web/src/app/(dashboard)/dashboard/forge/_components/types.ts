@@ -3,10 +3,8 @@ import type { Node } from "@xyflow/react";
 export interface ProjectNodeData {
   [key: string]: unknown;
   isActive: boolean;
-  isStarting: boolean;
   name: string;
   onNameChange: (id: string, name: string) => void;
-  onStart: (id: string) => void;
 }
 
 export type ProjectNodeType = Node<ProjectNodeData, "project">;

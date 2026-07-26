@@ -22,11 +22,20 @@ const forgeStackServiceSchema = z.object({
   ports: z.string(),
   environmentVariables: z.string(),
   startCommand: z.string(),
+  layout: z.object({ x: z.number(), y: z.number() }).optional(),
+});
+
+const forgeProjectLayoutSchema = z.object({
+  x: z.number(),
+  y: z.number(),
+  width: z.number().positive(),
+  height: z.number().positive(),
 });
 
 export const startForgeStackSchema = z.object({
   project: forgeProjectSchema,
   services: z.array(forgeStackServiceSchema).min(1),
+  projectLayout: forgeProjectLayoutSchema.optional(),
 }).superRefine((input, ctx) => {
   const nodeIds = new Set<string>();
   const ports = new Set<number>();
@@ -83,6 +92,15 @@ export const startForgeStackSchema = z.object({
   }
 });
 
+export const forgeStackDtoSchema = z.object({
+  projects: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    layout: forgeProjectLayoutSchema,
+    services: z.array(forgeStackServiceSchema.extend({ serviceId: z.string().optional() })),
+  })),
+});
+
 const startForgeStackResultSchema = z.object({
   nodeId: z.string(),
   serviceId: z.string().optional(),
@@ -126,5 +144,24 @@ export const startStack = createRoute({
   middleware: rbacMiddleware,
 });
 
+export const listStacks = createRoute({
+  path: "/hub/stacks",
+  method: "get",
+  tags,
+  responses: { [HttpStatusCodes.OK]: jsonContent(forgeStackDtoSchema, "Persisted Forge stacks.") },
+  middleware: rbacMiddleware,
+});
+
+export const upsertStackService = createRoute({
+  path: "/hub/stacks/services",
+  method: "post",
+  tags,
+  request: { body: jsonContentRequired(z.object({ project: forgeProjectSchema, projectLayout: forgeProjectLayoutSchema, service: forgeStackServiceSchema }), "A Forge service.") },
+  responses: { [HttpStatusCodes.OK]: jsonContent(z.object({ nodeId: z.string(), serviceId: z.string(), status: z.enum(["created", "updated"]) }), "Service saved.") },
+  middleware: rbacMiddleware,
+});
+
 export type PullRoute = typeof pull;
 export type StartStackRoute = typeof startStack;
+export type ListStacksRoute = typeof listStacks;
+export type UpsertStackServiceRoute = typeof upsertStackService;

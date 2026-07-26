@@ -81,11 +81,6 @@ export function DockerNode({ data, id, selected }: NodeProps<DockerNodeType>) {
             </DialogContent>
           </Dialog>
         </div>
-        <Button className="nodrag nopan h-6 w-full text-[10px]" size="sm" type="button">
-          Start
-          {" "}
-          {data.imageName}
-        </Button>
       </div>
       <Handle type="source" position={Position.Right} className="!h-2 !w-2 !border-primary !bg-background" />
     </div>

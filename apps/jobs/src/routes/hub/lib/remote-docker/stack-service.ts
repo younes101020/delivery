@@ -8,15 +8,27 @@ export interface ForgeStackService {
   ports: string;
   environmentVariables: string;
   startCommand: string;
+  layout?: {
+    x: number;
+    y: number;
+  };
 }
 
 interface CreateForgeStackServiceSpecInput {
   projectId: string;
   projectName: string;
+  projectLayout?: ForgeProjectLayout;
   service: ForgeStackService;
 }
 
-export function createForgeStackServiceSpec({ projectId, projectName, service }: CreateForgeStackServiceSpecInput): Dockerode.ServiceSpec {
+export interface ForgeProjectLayout {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export function createForgeStackServiceSpec({ projectId, projectName, projectLayout, service }: CreateForgeStackServiceSpecInput): Dockerode.ServiceSpec {
   const ports = parsePorts(service.ports);
   const environmentVariables = parseEnvironmentVariables(service.environmentVariables);
   const command = service.startCommand.trim();
@@ -45,7 +57,19 @@ export function createForgeStackServiceSpec({ projectId, projectName, service }:
       "resource": "forge",
       "com.docker.stack.namespace": getStackNamespace(projectName),
       "delivery.forge.project-id": projectId,
+      "delivery.forge.project-name": projectName,
       "delivery.forge.node-id": service.nodeId,
+      "delivery.forge.schema-version": "1",
+      "delivery.forge.node-x": String(service.layout?.x ?? 0),
+      "delivery.forge.node-y": String(service.layout?.y ?? 0),
+      ...(projectLayout
+        ? {
+            "delivery.forge.project-x": String(projectLayout.x),
+            "delivery.forge.project-y": String(projectLayout.y),
+            "delivery.forge.project-width": String(projectLayout.width),
+            "delivery.forge.project-height": String(projectLayout.height),
+          }
+        : {}),
     },
     EndpointSpec: ports.length > 0
       ? {

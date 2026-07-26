@@ -1,351 +1,208 @@
 "use client";
 
-import { addEdge, applyEdgeChanges, applyNodeChanges, ConnectionMode, Panel, ReactFlow, ReactFlowProvider, useReactFlow } from "@xyflow/react";
-import { Plus } from "lucide-react";
-import React, { startTransition, useCallback, useEffect, useOptimistic, useRef, useState } from "react";
+import { applyEdgeChanges, applyNodeChanges, ConnectionMode, ReactFlow, ReactFlowProvider, useReactFlow } from "@xyflow/react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-
-import { Button } from "@/app/_components/ui/button";
 
 import type { DockerNodeSettings } from "./types";
 
-import { NODE_HEIGHT, NODE_WIDTH, nodeTypes, PROJECT_HEADER_HEIGHT, PROJECT_HEIGHT, PROJECT_PADDING, PROJECT_WIDTH } from "./const";
+import { NODE_HEIGHT, NODE_WIDTH, nodeTypes, PROJECT_HEIGHT, PROJECT_PADDING, PROJECT_WIDTH } from "./const";
 import { clampNodePosition, expandProjectToFitNode, getProjectAtPosition } from "./utils";
 
-interface StartStackResponse {
-  results: Array<{
-    nodeId: string;
-    status: "created" | "failed" | "updated";
-  }>;
+interface PersistedService {
+  nodeId: string;
+  serviceId?: string;
+  image: string;
+  ports: string;
+  environmentVariables: string;
+  startCommand: string;
+  layout: { x: number; y: number };
+}
+
+interface PersistedProject {
+  id: string;
+  name: string;
+  layout: { x: number; y: number; width: number; height: number };
+  services: PersistedService[];
 }
 
 export default function FlowCanvasWrapper() {
-  return (
-    <div className="h-full w-full">
-      <ReactFlowProvider>
-        <FlowCanvas />
-      </ReactFlowProvider>
-    </div>
-  );
+  return <ReactFlowProvider><FlowCanvas /></ReactFlowProvider>;
 }
 
 function FlowCanvas() {
-  const canvasRef = useRef<HTMLDivElement | null>(null);
   const [nodes, setNodes] = useState<any[]>([]);
   const [edges, setEdges] = useState<any[]>([]);
-  const [optimisticNodes, addOptimisticNodes] = useOptimistic(nodes, (_currentNodes, nextNodes: any[]) => nextNodes);
   const nodesRef = useRef<any[]>([]);
+  const layoutSaveTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const rf = useReactFlow();
 
   useEffect(() => {
     nodesRef.current = nodes;
   }, [nodes]);
 
-  const onProjectNameChange = useCallback((id: string, name: string) => {
-    setNodes(currentNodes => currentNodes.map(node => node.id === id
-      ? { ...node, data: { ...node.data, name } }
-      : node));
+  const persistService = useCallback(async (project: any, service: any) => {
+    const response = await fetch("/api/hub/stacks/services", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        project: { id: project.id, name: project.data.name },
+        projectLayout: getProjectLayout(project),
+        service: {
+          nodeId: service.id,
+          image: service.data.imageName,
+          ports: service.data.ports,
+          environmentVariables: service.data.environmentVariables,
+          startCommand: service.data.startCommand,
+          layout: service.position,
+        },
+      }),
+    });
+    if (!response.ok)
+      throw new Error("Unable to save Forge service.");
   }, []);
 
-  const onDockerSettingsChange = useCallback((id: string, settings: DockerNodeSettings) => {
-    setNodes(currentNodes => currentNodes.map(node => node.id === id
-      ? { ...node, data: { ...node.data, ...settings } }
-      : node));
-  }, []);
-
-  const onProjectStart = useCallback(async (id: string) => {
-    const project = nodesRef.current.find(node => node.id === id && node.type === "project");
-    const services = nodesRef.current.filter(node => node.type === "docker" && node.parentId === id);
-
+  const persistProject = useCallback(async (projectId: string, nextNodes = nodesRef.current) => {
+    const project = nextNodes.find(node => node.id === projectId && node.type === "project");
     if (!project)
       return;
+    await Promise.all(nextNodes.filter(node => node.type === "docker" && node.parentId === projectId).map(service => persistService(project, service)));
+  }, [persistService]);
 
-    if (services.length === 0) {
-      toast.error("Add at least one image before starting a project.");
-      return;
+  const onProjectNameChange = useCallback((id: string, name: string) => {
+    setNodes((current) => {
+      const next = current.map(node => node.id === id ? { ...node, data: { ...node.data, name } } : node);
+      void persistProject(id, next).catch(() => toast.error("Unable to rename project."));
+      return next;
+    });
+  }, [persistProject]);
+
+  const onDockerSettingsChange = useCallback((id: string, settings: DockerNodeSettings) => {
+    setNodes((current) => {
+      const next = current.map(node => node.id === id ? { ...node, data: { ...node.data, ...settings } } : node);
+      const service = next.find(node => node.id === id);
+      const project = next.find(node => node.id === service?.parentId);
+      if (service && project)
+        void persistService(project, service).catch(() => toast.error("Unable to save container settings."));
+      return next;
+    });
+  }, [persistService]);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const response = await fetch("/api/hub/stacks");
+        if (!response.ok)
+          throw new Error("Unable to load Forge stacks.");
+        const { projects } = await response.json() as { projects: PersistedProject[] };
+        setNodes(projects.flatMap((project) => {
+          const projectNode = createProjectNode(project, onProjectNameChange);
+          return [projectNode, ...project.services.map(service => createDockerNode({ project, service, onDockerSettingsChange }))];
+        }));
+      }
+      catch {
+        toast.error("Unable to load Forge projects.");
+      }
     }
-
-    setNodes(currentNodes => currentNodes.map(node => node.id === id
-      ? { ...node, data: { ...node.data, isStarting: true } }
-      : node));
-
-    try {
-      const response = await fetch("/api/hub/stacks/start", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          project: {
-            id: project.id,
-            name: project.data.name,
-          },
-          services: services.map(service => ({
-            nodeId: service.id,
-            image: service.data.imageName,
-            ports: service.data.ports,
-            environmentVariables: service.data.environmentVariables,
-            startCommand: service.data.startCommand,
-          })),
-        }),
-      });
-      const result = await response.json() as StartStackResponse;
-
-      if (!response.ok)
-        throw new Error("Unable to start the project.");
-
-      const startedNodeIds = new Set(result.results
-        .filter(service => service.status !== "failed")
-        .map(service => service.nodeId));
-      const failedServices = result.results.filter(service => service.status === "failed");
-
-      setNodes(currentNodes => currentNodes.map((node) => {
-        if (node.id === id)
-          return { ...node, data: { ...node.data, isStarting: false } };
-
-        if (startedNodeIds.has(node.id))
-          return { ...node, data: { ...node.data, isActive: true } };
-
-        return node;
-      }));
-
-      if (failedServices.length > 0)
-        toast.error(`Unable to start ${failedServices.length} service${failedServices.length === 1 ? "" : "s"}.`);
-      else
-        toast.success("Project started.");
-    }
-    catch {
-      setNodes(currentNodes => currentNodes.map(node => node.id === id
-        ? { ...node, data: { ...node.data, isStarting: false } }
-        : node));
-      toast.error("Unable to start the project.");
-    }
-  }, []);
-
-  const createProject = useCallback((position: { x: number; y: number }, count: number) => ({
-    id: `project-${Date.now()}`,
-    type: "project",
-    position,
-    data: { isActive: false, isStarting: false, name: `Project ${count}`, onNameChange: onProjectNameChange, onStart: onProjectStart },
-    style: { height: PROJECT_HEIGHT, width: PROJECT_WIDTH },
-  }), [onProjectNameChange, onProjectStart]);
+    void load();
+  }, [onDockerSettingsChange, onProjectNameChange]);
 
   const onNodesChange = useCallback((changes: any[]) => {
-    setNodes(currentNodes => applyNodeChanges(changes, currentNodes));
-  }, []);
-
-  const onEdgesChange = useCallback((changes: any[]) => {
-    setEdges(currentEdges => applyEdgeChanges(changes, currentEdges));
-  }, []);
-
-  const onConnect = useCallback((connection: any) => {
-    setEdges(currentEdges => addEdge({ ...connection, animated: true }, currentEdges));
-  }, []);
+    setNodes(current => applyNodeChanges(changes, current));
+    if (!changes.some(change => change.type === "position" || change.type === "dimensions"))
+      return;
+    if (layoutSaveTimeout.current)
+      clearTimeout(layoutSaveTimeout.current);
+    layoutSaveTimeout.current = setTimeout(() => {
+      const projectIds = nodesRef.current.filter(node => node.type === "project").map(node => node.id);
+      void Promise.all(projectIds.map(projectId => persistProject(projectId))).catch(() => toast.error("Unable to save project layout."));
+    }, 500);
+  }, [persistProject]);
+  const onEdgesChange = useCallback((changes: any[]) => setEdges(current => applyEdgeChanges(changes, current)), []);
 
   const onNodeDragStop = useCallback((_event: MouseEvent | TouchEvent, draggedNode: any) => {
-    if (draggedNode.type === "project")
+    if (draggedNode.type === "project") {
+      void persistProject(draggedNode.id).catch(() => toast.error("Unable to save project layout."));
       return;
-
-    setNodes((currentNodes) => {
-      const currentNode = currentNodes.find(node => node.id === draggedNode.id);
-      const currentProject = currentNodes.find(node => node.id === currentNode?.parentId);
-      if (!currentNode || !currentProject)
-        return currentNodes;
-
-      const absolutePosition = {
-        x: currentProject.position.x + draggedNode.position.x,
-        y: currentProject.position.y + draggedNode.position.y,
-      };
-      const targetProject = getProjectAtPosition(absolutePosition, currentNodes) ?? currentProject;
-      const relativePosition = clampNodePosition({
-        x: absolutePosition.x - targetProject.position.x,
-        y: absolutePosition.y - targetProject.position.y,
-      }, targetProject);
-
-      return currentNodes.map(node => node.id === draggedNode.id
-        ? { ...node, parentId: targetProject.id, position: relativePosition }
-        : node);
+    }
+    setNodes((current) => {
+      const currentNode = current.find(node => node.id === draggedNode.id);
+      const sourceProject = current.find(node => node.id === currentNode?.parentId);
+      if (!currentNode || !sourceProject)
+        return current;
+      const absolute = { x: sourceProject.position.x + draggedNode.position.x, y: sourceProject.position.y + draggedNode.position.y };
+      const target = getProjectAtPosition(absolute, current) ?? sourceProject;
+      const position = clampNodePosition({ x: absolute.x - target.position.x, y: absolute.y - target.position.y }, target);
+      const expanded = expandProjectToFitNode(position, target);
+      const next = current.map(node => node.id === target.id ? expanded : node.id === draggedNode.id ? { ...node, parentId: target.id, position } : node);
+      const service = next.find(node => node.id === draggedNode.id);
+      const project = next.find(node => node.id === target.id);
+      if (service && project)
+        void persistService(project, service).catch(() => toast.error("Unable to save container position."));
+      return next;
     });
-  }, []);
-
-  const onDragOver = useCallback((event: React.DragEvent) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "move";
-  }, []);
+  }, [persistProject, persistService]);
 
   const onDrop = useCallback(async (event: React.DragEvent) => {
     event.preventDefault();
-
     const raw = event.dataTransfer.getData("application/reactflow");
     if (!raw)
       return;
-
-    let payload: any;
+    const payload: { payload?: { name?: string; label?: string; iconSlug?: string } } = JSON.parse(raw);
+    const position = rf.screenToFlowPosition({ x: event.clientX, y: event.clientY });
+    const label = payload.payload?.name ?? payload.payload?.label ?? "Docker Image";
+    const current = nodesRef.current;
+    let project = getProjectAtPosition(position, current);
+    const next = [...current];
+    if (!project) {
+      project = createNewProject(position, onProjectNameChange);
+      next.push(project);
+    }
+    const service = createNewDockerNode({ project, label, iconSlug: payload.payload?.iconSlug, position, onDockerSettingsChange });
+    const expanded = expandProjectToFitNode(service.position, project);
+    const withService = next.map(node => node.id === project.id ? expanded : node).concat(service);
+    setNodes(withService);
     try {
-      payload = JSON.parse(raw);
+      const pull = await fetch("/api/hub/pull", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ image: label }) });
+      if (!pull.ok)
+        throw new Error("Image pull failed.");
+      await persistService(expanded, service);
+      setNodes(currentNodes => currentNodes.map(node => node.id === service.id ? { ...node, data: { ...node.data, isPullPending: false, isActive: true } } : node));
+      toast.success(`${label} started.`);
     }
     catch {
-      return;
+      toast.error(`Unable to create ${label}.`);
     }
-
-    let position = { x: event.clientX, y: event.clientY };
-
-    if (rf && typeof (rf as any).screenToFlowPosition === "function") {
-      position = (rf as any).screenToFlowPosition({ x: event.clientX, y: event.clientY });
-    }
-    else if (rf && typeof (rf as any).project === "function" && canvasRef.current) {
-      const rect = canvasRef.current.getBoundingClientRect();
-      position = (rf as any).project({ x: event.clientX - rect.left, y: event.clientY - rect.top });
-    }
-
-    const label = payload?.payload?.name ?? payload?.payload?.label ?? "Docker Image";
-    const iconSlug = payload?.payload?.iconSlug;
-
-    const newNodes = createDockerNodes({
-      currentNodes: nodesRef.current,
-      createProject,
-      iconSlug,
-      label,
-      onDockerSettingsChange,
-      position,
-    });
-    const dockerNodeId = newNodes.find(node => node.type === "docker")?.id;
-
-    startTransition(async () => {
-      addOptimisticNodes(newNodes);
-
-      try {
-        const response = await fetch("/api/hub/pull", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ image: label }),
-        });
-
-        if (!response.ok)
-          throw new Error("Image pull failed.");
-
-        setNodes(newNodes.map(node => node.id === dockerNodeId
-          ? { ...node, data: { ...node.data, isPullPending: false } }
-          : node));
-      }
-      catch {
-        toast.error(`Unable to pull ${label}.`);
-      }
-    });
-  }, [createProject, onDockerSettingsChange, rf]);
-
-  const onAddProject = useCallback(() => {
-    setNodes((currentNodes) => {
-      const projectCount = currentNodes.filter(node => node.type === "project").length;
-      const column = projectCount % 3;
-      const row = Math.floor(projectCount / 3);
-      return currentNodes.concat(createProject({
-        x: 32 + column * (PROJECT_WIDTH + 32),
-        y: 32 + row * (PROJECT_HEIGHT + 32),
-      }, projectCount + 1));
-    });
-  }, [createProject]);
-
-  const nodesWithProjectActivity = optimisticNodes.map((node) => {
-    if (node.type !== "project")
-      return node;
-
-    const childNodes = optimisticNodes.filter(childNode => childNode.parentId === node.id);
-    const isActive = childNodes.length > 0 && childNodes.every(childNode => childNode.data.isActive === true);
-
-    return { ...node, data: { ...node.data, isActive } };
-  });
+  }, [onDockerSettingsChange, onProjectNameChange, persistService, rf]);
 
   return (
-    <div ref={canvasRef} className="h-full w-full" onDragOver={onDragOver} onDrop={onDrop}>
-      <ReactFlow
-        nodes={nodesWithProjectActivity}
-        edges={edges}
-        nodeTypes={nodeTypes}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onNodeDragStop={onNodeDragStop}
-        onConnect={onConnect}
-        connectionMode={ConnectionMode.Loose}
-        defaultEdgeOptions={{ animated: true, style: { stroke: "hsl(var(--primary))", strokeWidth: 2 } }}
-        fitView
-      >
-        <Panel position="top-left">
-          <Button variant="outline" onClick={onAddProject}>
-            <Plus />
-            Add project
-          </Button>
-        </Panel>
-      </ReactFlow>
+    <div className="h-full w-full" onDragOver={event => event.preventDefault()} onDrop={onDrop}>
+      <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onNodeDragStop={onNodeDragStop} connectionMode={ConnectionMode.Loose} deleteKeyCode={null} fitView />
     </div>
   );
 }
 
-function getDefaultPorts(imageName: string) {
-  const image = imageName.toLowerCase().split("/").pop()?.split(":")[0] ?? "";
-  const portsByImage: Record<string, string> = {
-    httpd: "80",
-    mariadb: "3306",
-    mongo: "27017",
-    mysql: "3306",
-    nginx: "80",
-    postgres: "5432",
-    rabbitmq: "5672",
-    redis: "6379",
-    traefik: "80, 443",
-  };
-
-  return portsByImage[image] ?? "";
+function createProjectNode(project: PersistedProject, onNameChange: (id: string, name: string) => void) {
+  return { id: project.id, type: "project", position: { x: project.layout.x, y: project.layout.y }, style: { width: project.layout.width, height: project.layout.height }, data: { name: project.name, isActive: true, onNameChange } };
 }
 
-function createDockerNodes({ currentNodes, createProject, iconSlug, label, onDockerSettingsChange, position }: {
-  currentNodes: any[];
-  createProject: (position: { x: number; y: number }, count: number) => any;
-  iconSlug?: string;
-  label: string;
-  onDockerSettingsChange: (id: string, settings: DockerNodeSettings) => void;
-  position: { x: number; y: number };
-}) {
-  let targetProject = getProjectAtPosition(position, currentNodes);
-  const projects = currentNodes.filter(node => node.type === "project");
-  let nextNodes = currentNodes;
+function createNewProject(position: { x: number; y: number }, onNameChange: (id: string, name: string) => void) {
+  return { id: crypto.randomUUID(), type: "project", position: { x: position.x - PROJECT_PADDING, y: position.y - PROJECT_PADDING }, style: { width: PROJECT_WIDTH, height: PROJECT_HEIGHT }, data: { name: "Project", isActive: true, onNameChange } };
+}
 
-  if (!targetProject) {
-    targetProject = createProject({
-      x: position.x - PROJECT_PADDING,
-      y: position.y - PROJECT_HEADER_HEIGHT - PROJECT_PADDING,
-    }, projects.length + 1);
-    nextNodes = nextNodes.concat(targetProject);
-  }
+function createDockerNode({ project, service, onDockerSettingsChange }: { project: PersistedProject; service: PersistedService; onDockerSettingsChange: (id: string, settings: DockerNodeSettings) => void }) {
+  return { id: service.nodeId, type: "docker", parentId: project.id, position: service.layout, style: { width: NODE_WIDTH, height: NODE_HEIGHT }, data: { imageName: service.image, ports: service.ports, environmentVariables: service.environmentVariables, startCommand: service.startCommand, isActive: true, onSettingsChange: onDockerSettingsChange } };
+}
 
-  const requestedPosition = {
-    x: position.x - targetProject.position.x,
-    y: position.y - targetProject.position.y,
-  };
-  const relativePosition = {
-    x: Math.max(PROJECT_PADDING, requestedPosition.x),
-    y: Math.max(PROJECT_HEADER_HEIGHT + PROJECT_PADDING, requestedPosition.y),
-  };
-  const expandedProject = expandProjectToFitNode(relativePosition, targetProject);
-  nextNodes = nextNodes.map(node => node.id === targetProject.id ? expandedProject : node);
+function createNewDockerNode({ project, label, iconSlug, position, onDockerSettingsChange }: { project: any; label: string; iconSlug?: string; position: { x: number; y: number }; onDockerSettingsChange: (id: string, settings: DockerNodeSettings) => void }) {
+  return { id: crypto.randomUUID(), type: "docker", parentId: project.id, position: { x: Math.max(PROJECT_PADDING, position.x - project.position.x), y: Math.max(PROJECT_PADDING, position.y - project.position.y) }, style: { width: NODE_WIDTH, height: NODE_HEIGHT }, data: { imageName: label, iconSlug, ports: getDefaultPorts(label), environmentVariables: "", startCommand: "", isActive: false, isPullPending: true, onSettingsChange: onDockerSettingsChange } };
+}
 
-  return nextNodes.concat({
-    id: `docker-${Date.now()}`,
-    type: "docker",
-    parentId: targetProject.id,
-    position: relativePosition,
-    style: { height: NODE_HEIGHT, width: NODE_WIDTH },
-    data: {
-      imageName: label,
-      isActive: false,
-      isPullPending: true,
-      iconSlug,
-      ports: getDefaultPorts(label),
-      environmentVariables: "",
-      startCommand: "",
-      onSettingsChange: onDockerSettingsChange,
-    },
-  });
+function getProjectLayout(project: any) {
+  return { x: project.position.x, y: project.position.y, width: project.measured?.width ?? project.style?.width ?? PROJECT_WIDTH, height: project.measured?.height ?? project.style?.height ?? PROJECT_HEIGHT };
+}
+
+function getDefaultPorts(imageName: string) {
+  const image = imageName.toLowerCase().split("/").pop()?.split(":")[0] ?? "";
+  return ({ httpd: "80", mariadb: "3306", mongo: "27017", mysql: "3306", nginx: "80", postgres: "5432", rabbitmq: "5672", redis: "6379", traefik: "80, 443" } as Record<string, string>)[image] ?? "";
 }
