@@ -23,6 +23,7 @@ describe("forge stack service manifest", () => {
     expect(service.Labels?.["com.docker.stack.namespace"]).toBe("my-stack");
     expect(taskTemplate.ContainerSpec?.Env).toEqual(["MODE=production", "DEBUG=false"]);
     expect(taskTemplate.ContainerSpec?.Command).toEqual(["nginx", "-g", "daemon", "off;"]);
+    expect(taskTemplate.Networks).toEqual([{ Target: "forge" }]);
     expect(service.EndpointSpec?.Ports).toEqual([
       { Protocol: "tcp", PublishedPort: 80, TargetPort: 80 },
       { Protocol: "tcp", PublishedPort: 443, TargetPort: 443 },

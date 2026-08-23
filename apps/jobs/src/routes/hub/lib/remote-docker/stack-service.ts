@@ -1,7 +1,5 @@
 import type Dockerode from "dockerode";
 
-import { CLUSTER_NETWORK_NAME } from "@/lib/remote-docker/const";
-
 export interface ForgeStackService {
   nodeId: string;
   image: string;
@@ -28,6 +26,8 @@ export interface ForgeProjectLayout {
   height: number;
 }
 
+export const FORGE_NETWORK_NAME = "forge";
+
 export function createForgeStackServiceSpec({ projectId, projectName, projectLayout, service }: CreateForgeStackServiceSpecInput): Dockerode.ServiceSpec {
   const ports = parsePorts(service.ports);
   const environmentVariables = parseEnvironmentVariables(service.environmentVariables);
@@ -41,7 +41,7 @@ export function createForgeStackServiceSpec({ projectId, projectName, projectLay
         ...(environmentVariables.length > 0 ? { Env: environmentVariables } : {}),
         ...(command ? { Command: command.split(/\s+/) } : {}),
       },
-      Networks: [{ Target: CLUSTER_NETWORK_NAME }],
+      Networks: [{ Target: FORGE_NETWORK_NAME }],
       RestartPolicy: {
         Condition: "on-failure",
         Delay: 5,

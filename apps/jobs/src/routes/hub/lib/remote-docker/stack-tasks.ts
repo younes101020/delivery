@@ -4,7 +4,7 @@ import { withDocker } from "@/lib/remote-docker/middleware";
 
 import type { ForgeProjectLayout, ForgeStackService } from "./stack-service";
 
-import { createForgeStackServiceSpec } from "./stack-service";
+import { createForgeStackServiceSpec, FORGE_NETWORK_NAME } from "./stack-service";
 
 interface StartForgeStackInput {
   project: {
@@ -38,6 +38,8 @@ export interface StartForgeStackResult {
 export const startForgeStack = withDocker<StartForgeStackResult[], StartForgeStackInput>(async (docker, input) => {
   if (!input)
     throw new Error("Stack data is required.");
+
+  await ensureForgeNetwork(docker);
 
   const existingServices = await docker.listServices({
     filters: {
@@ -87,6 +89,8 @@ export const startForgeStack = withDocker<StartForgeStackResult[], StartForgeSta
 export const upsertForgeStackService = withDocker<{ nodeId: string; serviceId: string; status: "created" | "updated" }, UpsertForgeStackServiceInput>(async (docker, input) => {
   if (!input)
     throw new Error("Forge service data is required.");
+
+  await ensureForgeNetwork(docker);
 
   const existingServices = await docker.listServices({ filters: { label: [`delivery.forge.project-id=${input.project.id}`, `delivery.forge.node-id=${input.service.nodeId}`] } });
   const spec = createForgeStackServiceSpec({
@@ -159,6 +163,24 @@ function getProjectLayout(labels: Record<string, string>) {
 function getNumberLabel(labels: Record<string, string>, key: string, fallback = 0) {
   const value = Number(labels[key]);
   return Number.isFinite(value) ? value : fallback;
+}
+
+async function ensureForgeNetwork(docker: Dockerode) {
+  const networks = await docker.listNetworks({ filters: { name: [FORGE_NETWORK_NAME] } });
+  const network = networks.find(item => item.Name === FORGE_NETWORK_NAME);
+
+  if (network?.Driver === "overlay")
+    return;
+
+  if (network)
+    throw new Error(`The ${FORGE_NETWORK_NAME} network must use the overlay driver to run Forge services in Swarm.`);
+
+  await docker.createNetwork({
+    Name: FORGE_NETWORK_NAME,
+    Driver: "overlay",
+    Attachable: true,
+    CheckDuplicate: true,
+  });
 }
 
 function getPorts(spec: Dockerode.ServiceSpec) {
