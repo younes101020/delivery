@@ -27,6 +27,8 @@ export interface ForgeProjectLayout {
 }
 
 export const FORGE_NETWORK_NAME = "forge";
+const MAX_SERVICE_NAME_LENGTH = 63;
+const SERVICE_NAME_HASH_LENGTH = 8;
 
 export function createForgeStackServiceSpec({ projectId, projectName, projectLayout, service }: CreateForgeStackServiceSpecInput): Dockerode.ServiceSpec {
   const ports = parsePorts(service.ports);
@@ -84,7 +86,13 @@ export function createForgeStackServiceSpec({ projectId, projectName, projectLay
 }
 
 export function getForgeServiceName(projectId: string, nodeId: string) {
-  return `forge-${sanitizeName(projectId)}-${sanitizeName(nodeId)}`;
+  const name = `forge-${sanitizeName(projectId)}-${sanitizeName(nodeId)}`;
+
+  if (name.length <= MAX_SERVICE_NAME_LENGTH)
+    return name;
+
+  const prefixLength = MAX_SERVICE_NAME_LENGTH - SERVICE_NAME_HASH_LENGTH - 1;
+  return `${name.slice(0, prefixLength)}-${getNameHash(name)}`;
 }
 
 export function parsePorts(value: string) {
@@ -123,4 +131,15 @@ function sanitizeName(value: string) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "")
     .slice(0, 63) || "forge";
+}
+
+function getNameHash(value: string) {
+  let hash = 0x811C9DC5;
+
+  for (let index = 0; index < value.length; index++) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193);
+  }
+
+  return (hash >>> 0).toString(36).padStart(SERVICE_NAME_HASH_LENGTH, "0").slice(-SERVICE_NAME_HASH_LENGTH);
 }

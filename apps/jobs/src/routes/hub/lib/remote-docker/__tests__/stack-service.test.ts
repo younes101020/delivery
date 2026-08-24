@@ -2,7 +2,7 @@ import type Dockerode from "dockerode";
 
 import { describe, expect, it } from "vitest";
 
-import { createForgeStackServiceSpec, parseEnvironmentVariables, parsePorts } from "../stack-service";
+import { createForgeStackServiceSpec, getForgeServiceName, parseEnvironmentVariables, parsePorts } from "../stack-service";
 
 describe("forge stack service manifest", () => {
   it("maps node settings to a published Swarm service", () => {
@@ -33,5 +33,15 @@ describe("forge stack service manifest", () => {
   it("rejects invalid ports and environment variables", () => {
     expect(() => parsePorts("0")).toThrow("Invalid port");
     expect(() => parseEnvironmentVariables("INVALID")).toThrow("Invalid environment variable");
+  });
+
+  it("keeps generated Swarm service names within Docker's limit", () => {
+    const projectId = "project-".repeat(10);
+    const nodeId = "node-".repeat(10);
+    const name = getForgeServiceName(projectId, nodeId);
+
+    expect(name).toHaveLength(63);
+    expect(name).toMatch(/^forge-[a-z0-9-]+-[a-z0-9]{8}$/);
+    expect(getForgeServiceName(projectId, `${nodeId}different`)).not.toBe(name);
   });
 });
