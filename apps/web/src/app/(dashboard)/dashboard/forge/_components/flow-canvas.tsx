@@ -34,7 +34,6 @@ function FlowCanvas() {
   const [nodes, setNodes] = useState<any[]>([]);
   const [edges, setEdges] = useState<any[]>([]);
   const nodesRef = useRef<any[]>([]);
-  const layoutSaveTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const rf = useReactFlow();
 
   useEffect(() => {
@@ -108,39 +107,33 @@ function FlowCanvas() {
   }, [onDockerSettingsChange, onProjectNameChange]);
 
   const onNodesChange = useCallback((changes: any[]) => {
-    setNodes(current => applyNodeChanges(changes, current));
-    if (!changes.some(change => change.type === "position" || change.type === "dimensions"))
-      return;
-    if (layoutSaveTimeout.current)
-      clearTimeout(layoutSaveTimeout.current);
-    layoutSaveTimeout.current = setTimeout(() => {
-      const projectIds = nodesRef.current.filter(node => node.type === "project").map(node => node.id);
-      void Promise.all(projectIds.map(projectId => persistProject(projectId))).catch(() => toast.error("Unable to save project layout."));
-    }, 500);
-  }, [persistProject]);
+    const next = applyNodeChanges(changes, nodesRef.current);
+    nodesRef.current = next;
+    setNodes(next);
+  }, []);
   const onEdgesChange = useCallback((changes: any[]) => setEdges(current => applyEdgeChanges(changes, current)), []);
 
   const onNodeDragStop = useCallback((_event: MouseEvent | TouchEvent, draggedNode: any) => {
     if (draggedNode.type === "project") {
-      void persistProject(draggedNode.id).catch(() => toast.error("Unable to save project layout."));
+      void persistProject(draggedNode.id, nodesRef.current).catch(() => toast.error("Unable to save project layout."));
       return;
     }
-    setNodes((current) => {
-      const currentNode = current.find(node => node.id === draggedNode.id);
-      const sourceProject = current.find(node => node.id === currentNode?.parentId);
-      if (!currentNode || !sourceProject)
-        return current;
-      const absolute = { x: sourceProject.position.x + draggedNode.position.x, y: sourceProject.position.y + draggedNode.position.y };
-      const target = getProjectAtPosition(absolute, current) ?? sourceProject;
-      const position = clampNodePosition({ x: absolute.x - target.position.x, y: absolute.y - target.position.y }, target);
-      const expanded = expandProjectToFitNode(position, target);
-      const next = current.map(node => node.id === target.id ? expanded : node.id === draggedNode.id ? { ...node, parentId: target.id, position } : node);
-      const service = next.find(node => node.id === draggedNode.id);
-      const project = next.find(node => node.id === target.id);
-      if (service && project)
-        void persistService(project, service).catch(() => toast.error("Unable to save container position."));
-      return next;
-    });
+    const current = nodesRef.current;
+    const currentNode = current.find(node => node.id === draggedNode.id);
+    const sourceProject = current.find(node => node.id === currentNode?.parentId);
+    if (!currentNode || !sourceProject)
+      return;
+    const absolute = { x: sourceProject.position.x + draggedNode.position.x, y: sourceProject.position.y + draggedNode.position.y };
+    const target = getProjectAtPosition(absolute, current) ?? sourceProject;
+    const position = clampNodePosition({ x: absolute.x - target.position.x, y: absolute.y - target.position.y }, target);
+    const expanded = expandProjectToFitNode(position, target);
+    const next = current.map(node => node.id === target.id ? expanded : node.id === draggedNode.id ? { ...node, parentId: target.id, position } : node);
+    const service = next.find(node => node.id === draggedNode.id);
+    const project = next.find(node => node.id === target.id);
+    nodesRef.current = next;
+    setNodes(next);
+    if (service && project)
+      void persistService(project, service).catch(() => toast.error("Unable to save container position."));
   }, [persistProject, persistService]);
 
   const onDrop = useCallback(async (event: React.DragEvent) => {
