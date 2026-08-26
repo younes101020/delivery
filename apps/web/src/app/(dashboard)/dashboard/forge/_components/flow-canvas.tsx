@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import type { DockerNodeSettings } from "./types";
 
 import { NODE_HEIGHT, NODE_WIDTH, nodeTypes, PROJECT_HEIGHT, PROJECT_PADDING, PROJECT_WIDTH } from "./const";
+import { pullDockerImage } from "./pull-docker-image";
 import { clampNodePosition, expandProjectToFitNode, getProjectAtPosition } from "./utils";
 
 interface PersistedService {
@@ -153,18 +154,22 @@ function FlowCanvas() {
     }
     const service = createNewDockerNode({ project, label, iconSlug: payload.payload?.iconSlug, position, onDockerSettingsChange });
     const expanded = expandProjectToFitNode(service.position, project);
-    const withService = next.map(node => node.id === project.id ? expanded : node).concat(service);
-    setNodes(withService);
+    const withPendingService = next.map(node => node.id === project.id ? expanded : node).concat(service);
+    nodesRef.current = withPendingService;
+    setNodes(withPendingService);
     try {
-      const pull = await fetch("/api/hub/pull", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ image: label }) });
-      if (!pull.ok)
-        throw new Error("Image pull failed.");
-      await persistService(expanded, service);
-      setNodes(currentNodes => currentNodes.map(node => node.id === service.id ? { ...node, data: { ...node.data, isPullPending: false, isActive: true } } : node));
+      await pullDockerImage(label);
+      const activeService = { ...service, data: { ...service.data, isPullPending: false, isActive: true } };
+      const withActiveService = next.map(node => node.id === project.id ? expanded : node).concat(activeService);
+      nodesRef.current = withActiveService;
+      setNodes(withActiveService);
+      await persistService(expanded, activeService);
       toast.success(`${label} started.`);
     }
-    catch {
-      toast.error(`Unable to create ${label}.`);
+    catch (error) {
+      nodesRef.current = current;
+      setNodes(current);
+      toast.error(error instanceof Error ? error.message : `Unable to create ${label}.`);
     }
   }, [onDockerSettingsChange, onProjectNameChange, persistService, rf]);
 

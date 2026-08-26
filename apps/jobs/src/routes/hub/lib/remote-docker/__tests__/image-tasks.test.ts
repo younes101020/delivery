@@ -27,8 +27,11 @@ describe("pullImage", () => {
 
   it("rejects when Docker reports a pull failure", async () => {
     docker.pull.mockResolvedValue({} as NodeJS.ReadableStream);
-    docker.modem.followProgress.mockImplementation((_stream, onFinished) => onFinished(new Error("image not found"), []));
+    docker.modem.followProgress.mockImplementation((_stream, onFinished) => onFinished(new Error("scratch is a reserved name"), []));
 
-    await expect(pullImage({ image: "missing" })).rejects.toThrow("image not found");
+    await expect(pullImage({ image: "scratch" })).rejects.toMatchObject({
+      message: "scratch is a reserved name",
+      status: 422,
+    });
   });
 });

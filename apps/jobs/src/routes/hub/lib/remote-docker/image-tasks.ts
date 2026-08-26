@@ -15,7 +15,7 @@ export const pullImage = withDocker<void, PullImageInput>(async (docker, input) 
   }
 
   const stream = await docker.pull(input.image).catch((error) => {
-    throw new HTTPException(HttpStatusCodes.INTERNAL_SERVER_ERROR, {
+    throw new HTTPException(HttpStatusCodes.UNPROCESSABLE_ENTITY, {
       message: error instanceof Error ? error.message : "Unexpected error occurred while pulling the Docker image.",
     });
   });
@@ -23,7 +23,7 @@ export const pullImage = withDocker<void, PullImageInput>(async (docker, input) 
   await new Promise<void>((resolve, reject) => {
     docker.modem.followProgress(stream, (error) => {
       if (error) {
-        reject(new HTTPException(HttpStatusCodes.INTERNAL_SERVER_ERROR, {
+        reject(new HTTPException(HttpStatusCodes.UNPROCESSABLE_ENTITY, {
           message: error.message,
         }));
         return;

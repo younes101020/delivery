@@ -11,6 +11,10 @@ export const pullImageSchema = z.object({
   image: z.string().trim().min(1),
 });
 
+const pullImageErrorSchema = z.object({
+  message: z.string(),
+});
+
 const forgeProjectSchema = z.object({
   id: z.string().trim().min(1),
   name: z.string().trim().min(1),
@@ -118,10 +122,7 @@ export const pull = createRoute({
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(pullImageSchema, "Docker image pulled successfully."),
-    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(pullImageSchema),
-      "The validation error(s)",
-    ),
+    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(pullImageErrorSchema, "The Docker image could not be pulled."),
   },
   middleware: rbacMiddleware,
 });
