@@ -6,6 +6,7 @@ import { PageTitle } from "@/app/_components/ui/page-title";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { DeploymentSelectedApplicationProvider } from "@/app/_ctx/deployment-selected-application";
 
+import { DockerImagesDrawer } from "./_components/docker-images-drawer";
 import FlowCanvasWrapper from "./_components/flow-canvas";
 import Sidebar from "./_components/sidebar";
 
@@ -30,7 +31,7 @@ export default function ForgePage({ searchParams }: ForgePageProps) {
           <PageTitle>Forge</PageTitle>
           <PageDescription>Visual stack builder, drag-and-drop canvas for designing your infrastructure</PageDescription>
         </div>
-
+        <DockerImagesDrawer />
       </div>
 
       <div className="mt-4 flex min-h-0 flex-1">
