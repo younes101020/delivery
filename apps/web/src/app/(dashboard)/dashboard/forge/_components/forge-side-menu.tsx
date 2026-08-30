@@ -6,7 +6,7 @@ import { Container, FolderGit2, X } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/app/_components/ui/button";
-import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from "@/app/_components/ui/drawer";
+import { Drawer, DrawerClose, DrawerContent } from "@/app/_components/ui/drawer";
 import { cn } from "@/app/_lib/utils";
 
 import { DockerImagesPanel } from "./docker-images-panel";
@@ -18,6 +18,7 @@ interface ForgeSideMenuProps {
 type OpenDrawer = "images" | "repositories" | null;
 
 export function ForgeSideMenu({ repositories }: ForgeSideMenuProps) {
+  const [drawerContainer, setDrawerContainer] = useState<HTMLDivElement | null>(null);
   const [openDrawer, setOpenDrawer] = useState<OpenDrawer>("images");
 
   function handleDrawerChange(drawer: Exclude<OpenDrawer, null>, open: boolean) {
@@ -25,8 +26,8 @@ export function ForgeSideMenu({ repositories }: ForgeSideMenuProps) {
   }
 
   return (
-    <>
-      <aside className="absolute top-0 right-0 z-40 flex w-12 flex-col gap-1 border-l bg-background/95 p-1 shadow-sm backdrop-blur">
+    <div ref={setDrawerContainer} className="pointer-events-none absolute inset-0">
+      <aside className="pointer-events-auto absolute inset-y-0 right-0 z-40 flex w-12 flex-col gap-1 border-l bg-background/95 p-1 shadow-sm backdrop-blur">
         <Button
           variant="ghost"
           size="icon"
@@ -49,15 +50,13 @@ export function ForgeSideMenu({ repositories }: ForgeSideMenuProps) {
 
       <Drawer
         direction="right"
+        container={drawerContainer}
         modal={false}
         open={openDrawer === "images"}
         shouldScaleBackground={false}
         onOpenChange={open => handleDrawerChange("images", open)}
       >
-        <DrawerContent showOverlay={false} className="inset-y-0 right-12 left-auto mt-0 h-dvh w-full max-w-xl rounded-none border-y-0 border-r-0 border-l shadow-lg [&>div:first-child]:hidden">
-          <DrawerHeader className="shrink-0 border-b pr-14">
-            <DrawerTitle>Docker images</DrawerTitle>
-          </DrawerHeader>
+        <DrawerContent showOverlay={false} className="pointer-events-auto absolute inset-y-0 right-12 left-auto mt-0 w-full max-w-xl rounded-none border-y-0 border-r-0 border-l shadow-lg [&>div:first-child]:hidden">
           <DrawerClose asChild>
             <Button variant="ghost" size="icon" className="absolute top-3 right-3" aria-label="Close Docker images">
               <X />
@@ -71,15 +70,13 @@ export function ForgeSideMenu({ repositories }: ForgeSideMenuProps) {
 
       <Drawer
         direction="right"
+        container={drawerContainer}
         modal={false}
         open={openDrawer === "repositories"}
         shouldScaleBackground={false}
         onOpenChange={open => handleDrawerChange("repositories", open)}
       >
-        <DrawerContent showOverlay={false} className="inset-y-0 right-12 left-auto mt-0 h-dvh w-full max-w-xl rounded-none border-y-0 border-r-0 border-l shadow-lg [&>div:first-child]:hidden">
-          <DrawerHeader className="shrink-0 border-b pr-14">
-            <DrawerTitle>GitHub repositories</DrawerTitle>
-          </DrawerHeader>
+        <DrawerContent showOverlay={false} className="pointer-events-auto absolute inset-y-0 right-12 left-auto mt-0 w-full max-w-xl rounded-none border-y-0 border-r-0 border-l shadow-lg [&>div:first-child]:hidden">
           <DrawerClose asChild>
             <Button variant="ghost" size="icon" className="absolute top-3 right-3" aria-label="Close GitHub repositories">
               <X />
@@ -90,6 +87,6 @@ export function ForgeSideMenu({ repositories }: ForgeSideMenuProps) {
           </div>
         </DrawerContent>
       </Drawer>
-    </>
+    </div>
   );
 }
