@@ -6,7 +6,7 @@ import { Container, FolderGit2, X } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/app/_components/ui/button";
-import { Drawer, DrawerClose, DrawerContent } from "@/app/_components/ui/drawer";
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/app/_components/ui/drawer";
 import { cn } from "@/app/_lib/utils";
 
 import { DockerImagesPanel } from "./docker-images-panel";
@@ -57,6 +57,12 @@ export function ForgeSideMenu({ repositories }: ForgeSideMenuProps) {
         onOpenChange={open => handleDrawerChange("images", open)}
       >
         <DrawerContent showOverlay={false} className="pointer-events-auto absolute inset-y-0 right-12 left-auto mt-0 w-full max-w-xl rounded-none border-y-0 border-r-0 border-l shadow-lg [&>div:first-child]:hidden">
+          <DrawerHeader>
+            <DrawerTitle>Services hub</DrawerTitle>
+            <DrawerDescription>
+              Drag and drop from hundreds of preconfigured services
+            </DrawerDescription>
+          </DrawerHeader>
           <DrawerClose asChild>
             <Button variant="ghost" size="icon" className="absolute top-3 right-3" aria-label="Close Docker images">
               <X />
@@ -77,6 +83,12 @@ export function ForgeSideMenu({ repositories }: ForgeSideMenuProps) {
         onOpenChange={open => handleDrawerChange("repositories", open)}
       >
         <DrawerContent showOverlay={false} className="pointer-events-auto absolute inset-y-0 right-12 left-auto mt-0 w-full max-w-xl rounded-none border-y-0 border-r-0 border-l shadow-lg [&>div:first-child]:hidden">
+          <DrawerHeader>
+            <DrawerTitle>GitHub Repositories</DrawerTitle>
+            <DrawerDescription>
+              Drag and drop your repositories to deploy them
+            </DrawerDescription>
+          </DrawerHeader>
           <DrawerClose asChild>
             <Button variant="ghost" size="icon" className="absolute top-3 right-3" aria-label="Close GitHub repositories">
               <X />
