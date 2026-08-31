@@ -9,6 +9,8 @@ export interface ForgeStackService {
   layout?: {
     x: number;
     y: number;
+    width?: number;
+    height?: number;
   };
 }
 
@@ -64,6 +66,8 @@ export function createForgeStackServiceSpec({ projectId, projectName, projectLay
       "delivery.forge.schema-version": "1",
       "delivery.forge.node-x": String(service.layout?.x ?? 0),
       "delivery.forge.node-y": String(service.layout?.y ?? 0),
+      "delivery.forge.node-width": String(service.layout?.width ?? 200),
+      "delivery.forge.node-height": String(service.layout?.height ?? 68),
       ...(projectLayout
         ? {
             "delivery.forge.project-x": String(projectLayout.x),

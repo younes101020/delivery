@@ -2,10 +2,10 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import type { ListStacksRoute, PullRoute, StartStackRoute, UpsertStackServiceRoute } from "./hub.routes";
+import type { ListStacksRoute, PullRoute, RemoveStackServiceRoute, StartStackRoute, UpsertStackServiceRoute } from "./hub.routes";
 
 import { pullImage } from "./lib/remote-docker/image-tasks";
-import { listForgeStacks, startForgeStack, upsertForgeStackService } from "./lib/remote-docker/stack-tasks";
+import { listForgeStacks, removeForgeStackService, startForgeStack, upsertForgeStackService } from "./lib/remote-docker/stack-tasks";
 
 export const pull: AppRouteHandler<PullRoute> = async (c) => {
   const { image } = c.req.valid("json");
@@ -30,4 +30,10 @@ export const listStacks: AppRouteHandler<ListStacksRoute> = async (c) => {
 export const upsertStackService: AppRouteHandler<UpsertStackServiceRoute> = async (c) => {
   const result = await upsertForgeStackService(c.req.valid("json"));
   return c.json(result, HttpStatusCodes.OK);
+};
+
+export const removeStackService: AppRouteHandler<RemoveStackServiceRoute> = async (c) => {
+  const { nodeId } = c.req.valid("param");
+  await removeForgeStackService(nodeId);
+  return c.json({ nodeId }, HttpStatusCodes.OK);
 };

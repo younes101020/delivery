@@ -19,6 +19,7 @@ export interface DockerNodeData {
   environmentVariables: string;
   startCommand: string;
   onSettingsChange: (id: string, settings: DockerNodeSettings) => void;
+  onDelete: (id: string) => Promise<void>;
 }
 
 export interface DockerNodeSettings {

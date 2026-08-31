@@ -2,10 +2,11 @@
 
 import type { NodeProps } from "@xyflow/react";
 
-import { Handle, Position } from "@xyflow/react";
-import { Settings } from "lucide-react";
+import { Handle, NodeResizer, Position } from "@xyflow/react";
+import { Loader2, Settings, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/app/_components/ui/alert-dialog";
 import { Button } from "@/app/_components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/app/_components/ui/dialog";
 import { Input } from "@/app/_components/ui/input";
@@ -16,6 +17,8 @@ import type { DockerNodeSettings, DockerNodeType } from "./types";
 
 export function DockerNode({ data, id, selected }: NodeProps<DockerNodeType>) {
   const [open, setOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [settings, setSettings] = useState<DockerNodeSettings>(getSettings(data));
 
   useEffect(() => {
@@ -29,8 +32,27 @@ export function DockerNode({ data, id, selected }: NodeProps<DockerNodeType>) {
     setOpen(false);
   }
 
+  async function deleteService() {
+    if (isDeleting)
+      return;
+
+    setIsDeleting(true);
+    try {
+      await data.onDelete(id);
+      setIsDeleteDialogOpen(false);
+      setOpen(false);
+    }
+    catch {
+      // The canvas reports the deletion failure and preserves the node.
+    }
+    finally {
+      setIsDeleting(false);
+    }
+  }
+
   return (
     <div className={`h-full w-full min-w-0 rounded-md border bg-background shadow-sm ${selected ? "border-primary" : "border-border"}`}>
+      <NodeResizer color="hsl(var(--primary))" isVisible={selected} minWidth={160} minHeight={68} />
       <Handle type="target" position={Position.Left} className="!h-2 !w-2 !border-primary !bg-background" />
       <div className="flex h-full flex-col gap-1 px-2 py-1">
         <div className="flex min-w-0 items-center gap-1">
@@ -78,6 +100,37 @@ export function DockerNode({ data, id, selected }: NodeProps<DockerNodeType>) {
                   <Button type="submit">Save settings</Button>
                 </DialogFooter>
               </form>
+              <div className="border-t pt-4">
+                <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                  <AlertDialogTrigger asChild>
+                    <Button type="button" variant="secondary" className="text-destructive hover:bg-destructive/10" disabled={isDeleting}  >
+                      <Trash2 className="size-4" />
+                      {`Delete ${data.imageName}`}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="nodrag nopan">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>{`Delete ${data.imageName} ?`}</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete the service from the stack.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        disabled={isDeleting}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          void deleteService();
+                        }}
+                      >
+                        {isDeleting && <Loader2 className="size-4 animate-spin" />}
+                        {`Delete ${data.imageName}`}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </DialogContent>
           </Dialog>
         </div>

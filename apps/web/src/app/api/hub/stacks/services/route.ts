@@ -11,7 +11,7 @@ const requestSchema = z.object({
     ports: z.string(),
     environmentVariables: z.string(),
     startCommand: z.string(),
-    layout: z.object({ x: z.number(), y: z.number() }),
+    layout: z.object({ x: z.number(), y: z.number(), width: z.number().positive(), height: z.number().positive() }),
   }),
 });
 

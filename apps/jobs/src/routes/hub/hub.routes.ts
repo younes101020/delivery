@@ -3,6 +3,7 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema } from "stoker/openapi/schemas";
 
+import { notFoundSchema } from "@/lib/constants";
 import { rbacMiddleware } from "@/middlewares/rbac";
 
 const tags = ["Docker Hub"];
@@ -26,7 +27,7 @@ const forgeStackServiceSchema = z.object({
   ports: z.string(),
   environmentVariables: z.string(),
   startCommand: z.string(),
-  layout: z.object({ x: z.number(), y: z.number() }).optional(),
+  layout: z.object({ x: z.number(), y: z.number(), width: z.number().positive().optional(), height: z.number().positive().optional() }).optional(),
 });
 
 const forgeProjectLayoutSchema = z.object({
@@ -162,7 +163,20 @@ export const upsertStackService = createRoute({
   middleware: rbacMiddleware,
 });
 
+export const removeStackService = createRoute({
+  path: "/hub/stacks/services/{nodeId}",
+  method: "delete",
+  request: { params: z.object({ nodeId: z.string().uuid() }) },
+  tags,
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(z.object({ nodeId: z.string() }), "Forge service removed."),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Forge service not found."),
+  },
+  middleware: rbacMiddleware,
+});
+
 export type PullRoute = typeof pull;
 export type StartStackRoute = typeof startStack;
 export type ListStacksRoute = typeof listStacks;
 export type UpsertStackServiceRoute = typeof upsertStackService;
+export type RemoveStackServiceRoute = typeof removeStackService;

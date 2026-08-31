@@ -17,7 +17,7 @@ interface PersistedService {
   ports: string;
   environmentVariables: string;
   startCommand: string;
-  layout: { x: number; y: number };
+  layout: { x: number; y: number; width?: number; height?: number };
 }
 
 interface PersistedProject {
@@ -54,7 +54,7 @@ function FlowCanvas() {
           ports: service.data.ports,
           environmentVariables: service.data.environmentVariables,
           startCommand: service.data.startCommand,
-          layout: service.position,
+          layout: getServiceLayout(service),
         },
       }),
     });
@@ -88,6 +88,21 @@ function FlowCanvas() {
     });
   }, [persistService]);
 
+  const onDockerDelete = useCallback(async (id: string) => {
+    const response = await fetch(`/api/hub/stacks/services/${id}`, { method: "DELETE" });
+    if (!response.ok) {
+      toast.error("Unable to delete service.");
+      throw new Error("Unable to delete Forge service.");
+    }
+
+    setNodes((current) => {
+      const next = current.filter(node => node.id !== id);
+      nodesRef.current = next;
+      return next;
+    });
+    toast.success("Service deleted.");
+  }, []);
+
   useEffect(() => {
     async function load() {
       try {
@@ -97,7 +112,7 @@ function FlowCanvas() {
         const { projects } = await response.json() as { projects: PersistedProject[] };
         setNodes(projects.flatMap((project) => {
           const projectNode = createProjectNode(project, onProjectNameChange);
-          return [projectNode, ...project.services.map(service => createDockerNode({ project, service, onDockerSettingsChange }))];
+          return [projectNode, ...project.services.map(service => createDockerNode({ project, service, onDockerSettingsChange, onDockerDelete }))];
         }));
       }
       catch {
@@ -105,13 +120,30 @@ function FlowCanvas() {
       }
     }
     void load();
-  }, [onDockerSettingsChange, onProjectNameChange]);
+  }, [onDockerDelete, onDockerSettingsChange, onProjectNameChange]);
 
   const onNodesChange = useCallback((changes: any[]) => {
     const next = applyNodeChanges(changes, nodesRef.current);
     nodesRef.current = next;
     setNodes(next);
-  }, []);
+    const resizedNodeIds = changes
+      .filter(change => change.type === "dimensions" && !change.resizing)
+      .map(change => change.id);
+
+    for (const id of resizedNodeIds) {
+      const node = next.find(current => current.id === id);
+      if (!node)
+        continue;
+      if (node.type === "project") {
+        void persistProject(id, next).catch(() => toast.error("Unable to save project layout."));
+      }
+      else if (node.type === "docker") {
+        const project = next.find(current => current.id === node.parentId);
+        if (project)
+          void persistService(project, node).catch(() => toast.error("Unable to save container size."));
+      }
+    }
+  }, [persistProject, persistService]);
   const onEdgesChange = useCallback((changes: any[]) => setEdges(current => applyEdgeChanges(changes, current)), []);
 
   const onNodeDragStop = useCallback((_event: MouseEvent | TouchEvent, draggedNode: any) => {
@@ -152,7 +184,7 @@ function FlowCanvas() {
       project = createNewProject(position, onProjectNameChange);
       next.push(project);
     }
-    const service = createNewDockerNode({ project, label, iconSlug: payload.payload?.iconSlug, position, onDockerSettingsChange });
+    const service = createNewDockerNode({ project, label, iconSlug: payload.payload?.iconSlug, position, onDockerSettingsChange, onDockerDelete });
     const expanded = expandProjectToFitNode(service.position, project);
     const withPendingService = next.map(node => node.id === project.id ? expanded : node).concat(service);
     nodesRef.current = withPendingService;
@@ -171,7 +203,7 @@ function FlowCanvas() {
       setNodes(current);
       toast.error(error instanceof Error ? error.message : `Unable to create ${label}.`);
     }
-  }, [onDockerSettingsChange, onProjectNameChange, persistService, rf]);
+  }, [onDockerDelete, onDockerSettingsChange, onProjectNameChange, persistService, rf]);
 
   return (
     <div className="h-full w-full" onDragOver={event => event.preventDefault()} onDrop={onDrop}>
@@ -188,16 +220,25 @@ function createNewProject(position: { x: number; y: number }, onNameChange: (id:
   return { id: crypto.randomUUID(), type: "project", position: { x: position.x - PROJECT_PADDING, y: position.y - PROJECT_PADDING }, style: { width: PROJECT_WIDTH, height: PROJECT_HEIGHT }, data: { name: "Project", isActive: true, onNameChange } };
 }
 
-function createDockerNode({ project, service, onDockerSettingsChange }: { project: PersistedProject; service: PersistedService; onDockerSettingsChange: (id: string, settings: DockerNodeSettings) => void }) {
-  return { id: service.nodeId, type: "docker", parentId: project.id, position: service.layout, style: { width: NODE_WIDTH, height: NODE_HEIGHT }, data: { imageName: service.image, ports: service.ports, environmentVariables: service.environmentVariables, startCommand: service.startCommand, isActive: true, onSettingsChange: onDockerSettingsChange } };
+function createDockerNode({ project, service, onDockerSettingsChange, onDockerDelete }: { project: PersistedProject; service: PersistedService; onDockerSettingsChange: (id: string, settings: DockerNodeSettings) => void; onDockerDelete: (id: string) => Promise<void> }) {
+  return { id: service.nodeId, type: "docker", parentId: project.id, position: service.layout, style: { width: service.layout.width ?? NODE_WIDTH, height: service.layout.height ?? NODE_HEIGHT }, data: { imageName: service.image, ports: service.ports, environmentVariables: service.environmentVariables, startCommand: service.startCommand, isActive: true, onSettingsChange: onDockerSettingsChange, onDelete: onDockerDelete } };
 }
 
-function createNewDockerNode({ project, label, iconSlug, position, onDockerSettingsChange }: { project: any; label: string; iconSlug?: string; position: { x: number; y: number }; onDockerSettingsChange: (id: string, settings: DockerNodeSettings) => void }) {
-  return { id: crypto.randomUUID(), type: "docker", parentId: project.id, position: { x: Math.max(PROJECT_PADDING, position.x - project.position.x), y: Math.max(PROJECT_PADDING, position.y - project.position.y) }, style: { width: NODE_WIDTH, height: NODE_HEIGHT }, data: { imageName: label, iconSlug, ports: getDefaultPorts(label), environmentVariables: "", startCommand: "", isActive: false, isPullPending: true, onSettingsChange: onDockerSettingsChange } };
+function createNewDockerNode({ project, label, iconSlug, position, onDockerSettingsChange, onDockerDelete }: { project: any; label: string; iconSlug?: string; position: { x: number; y: number }; onDockerSettingsChange: (id: string, settings: DockerNodeSettings) => void; onDockerDelete: (id: string) => Promise<void> }) {
+  return { id: crypto.randomUUID(), type: "docker", parentId: project.id, position: { x: Math.max(PROJECT_PADDING, position.x - project.position.x), y: Math.max(PROJECT_PADDING, position.y - project.position.y) }, style: { width: NODE_WIDTH, height: NODE_HEIGHT }, data: { imageName: label, iconSlug, ports: getDefaultPorts(label), environmentVariables: "", startCommand: "", isActive: false, isPullPending: true, onSettingsChange: onDockerSettingsChange, onDelete: onDockerDelete } };
 }
 
 function getProjectLayout(project: any) {
   return { x: project.position.x, y: project.position.y, width: project.measured?.width ?? project.style?.width ?? PROJECT_WIDTH, height: project.measured?.height ?? project.style?.height ?? PROJECT_HEIGHT };
+}
+
+function getServiceLayout(service: any) {
+  return {
+    x: service.position.x,
+    y: service.position.y,
+    width: service.measured?.width ?? service.style?.width ?? NODE_WIDTH,
+    height: service.measured?.height ?? service.style?.height ?? NODE_HEIGHT,
+  };
 }
 
 function getDefaultPorts(imageName: string) {

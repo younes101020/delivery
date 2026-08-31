@@ -1,5 +1,8 @@
 import type Dockerode from "dockerode";
 
+import { HTTPException } from "hono/http-exception";
+import * as HttpStatusCodes from "stoker/http-status-codes";
+
 import { withDocker } from "@/lib/remote-docker/middleware";
 
 import type { ForgeProjectLayout, ForgeStackService } from "./stack-service";
@@ -112,6 +115,15 @@ export const upsertForgeStackService = withDocker<{ nodeId: string; serviceId: s
   return { nodeId: input.service.nodeId, serviceId: existingService.ID, status: "updated" };
 });
 
+export const removeForgeStackService = withDocker<void, string>(async (docker, nodeId) => {
+  const services = await docker.listServices({ filters: { label: ["resource=forge", `delivery.forge.node-id=${nodeId}`] } });
+  const service = services[0];
+  if (!service)
+    throw new HTTPException(HttpStatusCodes.NOT_FOUND, { message: "Forge service not found." });
+
+  await docker.getService(service.ID).remove();
+});
+
 export const listForgeStacks = withDocker<ForgeStackDto[], void>(async (docker) => {
   const services = await docker.listServices({ filters: { label: ["resource=forge"] } });
   const projects = new Map<string, ForgeStackDto>();
@@ -143,7 +155,12 @@ export const listForgeStacks = withDocker<ForgeStackDto[], void>(async (docker) 
       ports: getPorts(spec),
       environmentVariables: (container?.Env ?? []).join("\n"),
       startCommand: (container?.Command ?? []).join(" "),
-      layout: { x: getNumberLabel(labels, "delivery.forge.node-x"), y: getNumberLabel(labels, "delivery.forge.node-y") },
+      layout: {
+        x: getNumberLabel(labels, "delivery.forge.node-x"),
+        y: getNumberLabel(labels, "delivery.forge.node-y"),
+        width: getNumberLabel(labels, "delivery.forge.node-width", 200),
+        height: getNumberLabel(labels, "delivery.forge.node-height", 68),
+      },
     });
     projects.set(projectId, project);
   }
