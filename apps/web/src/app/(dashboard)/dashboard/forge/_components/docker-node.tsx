@@ -103,7 +103,7 @@ export function DockerNode({ data, id, selected }: NodeProps<DockerNodeType>) {
               <div className="border-t pt-4">
                 <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                   <AlertDialogTrigger asChild>
-                    <Button type="button" variant="secondary" className="text-destructive hover:bg-destructive/10" disabled={isDeleting}  >
+                    <Button type="button" variant="secondary" className="text-destructive hover:bg-destructive/10" disabled={isDeleting}>
                       <Trash2 className="size-4" />
                       {`Delete ${data.imageName}`}
                     </Button>
@@ -150,13 +150,12 @@ function ActivityIndicator({ isActive, isPullPending }: { isActive: boolean; isP
     );
   }
 
-  const color = isActive ? "bg-blue-500" : "bg-red-500";
-  const pingColor = isActive ? "bg-blue-400" : "bg-red-400";
+  const color = isActive ? "bg-green-500" : "bg-red-500";
 
   return (
-    <span className="relative flex size-3 shrink-0" aria-label={isActive ? "Active" : "Inactive"}>
-      {isActive && <span className={`absolute inline-flex h-full w-full animate-ping rounded-full ${pingColor} opacity-75`} />}
-      <span className={`relative inline-flex size-3 rounded-full ${color}`} />
+    <span className="relative flex size-2 shrink-0" aria-label={isActive ? "Active" : "Inactive"}>
+      {isActive && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />}
+      <span className={`relative inline-flex size-2 rounded-full ${color}`} />
     </span>
   );
 }
