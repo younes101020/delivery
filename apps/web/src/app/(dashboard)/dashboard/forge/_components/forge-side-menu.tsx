@@ -9,15 +9,19 @@ import { Button } from "@/app/_components/ui/button";
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/app/_components/ui/drawer";
 import { cn } from "@/app/_lib/utils";
 
+import type { DockerHubResponse } from "../_lib/docker-hub";
+
 import { DockerImagesPanel } from "./docker-images-panel";
 
 interface ForgeSideMenuProps {
   repositories: ReactNode;
+  category?: string;
+  databaseImages?: DockerHubResponse;
 }
 
 type OpenDrawer = "images" | "repositories" | null;
 
-export function ForgeSideMenu({ repositories }: ForgeSideMenuProps) {
+export function ForgeSideMenu({ repositories, category, databaseImages }: ForgeSideMenuProps) {
   const [drawerContainer, setDrawerContainer] = useState<HTMLDivElement | null>(null);
   const [openDrawer, setOpenDrawer] = useState<OpenDrawer>("images");
 
@@ -69,7 +73,7 @@ export function ForgeSideMenu({ repositories }: ForgeSideMenuProps) {
             </Button>
           </DrawerClose>
           <div className="min-h-0 flex-1 p-4">
-            <DockerImagesPanel />
+            <DockerImagesPanel category={category} initialPage={databaseImages} />
           </div>
         </DrawerContent>
       </Drawer>

@@ -12,6 +12,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@base-ui/react": "^1.8.0",
     "@delivery/auth": "workspace:*",
     "@delivery/jobs": "workspace:*",
     "@hookform/resolvers": "^5.2.1",

@@ -6,6 +6,8 @@ import React, { Suspense, useState } from "react";
 import { Button } from "@/app/_components/ui/button";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 
+import type { DockerHubResponse } from "../_lib/docker-hub";
+
 import { useInfiniteDockerImages } from "../_hooks/use-infinite-docker-images";
 
 function getDockerImageIconSlug(img: { name?: string; repo_name?: string; slug?: string }) {
@@ -105,9 +107,9 @@ function DockerImageCard({
   );
 }
 
-function InfiniteListInner({ query }: { query: string }) {
+function InfiniteListInner({ category, initialPage, query }: { category?: string; initialPage?: DockerHubResponse; query: string }) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage }
-    = useInfiniteDockerImages(query);
+    = useInfiniteDockerImages(query, category, initialPage);
 
   const images = data.pages.flatMap(page => page.results);
 
@@ -145,10 +147,10 @@ function InfiniteListInner({ query }: { query: string }) {
   );
 }
 
-export function InfiniteDockerImageList({ query }: { query: string }) {
+export function InfiniteDockerImageList({ category, initialPage, query }: { category?: string; initialPage?: DockerHubResponse; query: string }) {
   return (
     <Suspense fallback={<DockerImagesListSkeleton />}>
-      <InfiniteListInner query={query} />
+      <InfiniteListInner category={category} initialPage={initialPage} query={query} />
     </Suspense>
   );
 }

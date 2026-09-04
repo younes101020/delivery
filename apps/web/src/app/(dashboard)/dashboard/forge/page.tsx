@@ -8,6 +8,7 @@ import { DeploymentSelectedApplicationProvider } from "@/app/_ctx/deployment-sel
 
 import FlowCanvasWrapper from "./_components/flow-canvas";
 import { ForgeSideMenu } from "./_components/forge-side-menu";
+import { fetchDockerHubImages } from "./_lib/docker-hub";
 
 export const dynamic = "force-dynamic";
 
@@ -17,10 +18,15 @@ interface ForgePageProps {
     githubapp?: string;
     step?: string;
     query?: string;
+    category?: string;
   }>;
 }
 
-export default function ForgePage({ searchParams }: ForgePageProps) {
+export default async function ForgePage({ searchParams }: ForgePageProps) {
+  const resolvedSearchParams = await searchParams;
+  const databaseImages = resolvedSearchParams?.category === "databases"
+    ? await fetchDockerHubImages({ category: "databases", page: "1", pageSize: "25" })
+    : undefined;
   const repositorySearchParams = searchParams ?? Promise.resolve({ page: "1" });
 
   return (
@@ -35,6 +41,8 @@ export default function ForgePage({ searchParams }: ForgePageProps) {
       <div className="relative mt-4 min-h-0 flex-1">
         <FlowCanvasWrapper />
         <ForgeSideMenu
+          category={resolvedSearchParams?.category}
+          databaseImages={databaseImages}
           repositories={(
             <Suspense fallback={<PendingRepositories />}>
               <DeploymentSelectedApplicationProvider>
