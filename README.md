@@ -16,10 +16,6 @@ That’s where ***Delivery*** comes in. We combine data integrity, affordability
 curl -fsSL http://deliveryinstallresources.younesfakallah.com/install.sh | sudo bash
 ```
 
-> ⚠️ **Warning**
-> This script must be run on a **fresh, clean server** with no existing services (Docker containers, PostgreSQL, Redis, etc.) already using ports `80`, `443`, `3000`, `3090`, `5432`, or `6379`.
-> Running it on a server with pre-existing workloads may cause port conflicts and installation failures.
-> 
 ## Demo (not final)
 
 https://github.com/user-attachments/assets/58216b74-6c24-45a5-b8b9-76f7a80d4d5f
