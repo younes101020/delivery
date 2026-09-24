@@ -5,6 +5,7 @@ import React, { Suspense, useState } from "react";
 
 import { Button } from "@/app/_components/ui/button";
 import { Skeleton } from "@/app/_components/ui/skeleton";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/app/_components/ui/tooltip";
 
 import type { DockerHubResponse } from "../_lib/docker-hub";
 
@@ -86,7 +87,14 @@ function DockerImageCard({
 
           <div className="flex items-center gap-2 text-sm">
             <span className="opacity-70">/</span>
-            <span className="font-medium line-clamp-1">{name}</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="font-medium line-clamp-1">{name}</span>
+                </TooltipTrigger>
+                <TooltipContent>{name}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
 
