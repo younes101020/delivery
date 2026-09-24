@@ -155,7 +155,7 @@ export function InfiniteDockerImageList({ category, initialPage, query }: { cate
   );
 }
 
-function DockerImagesListSkeleton() {
+export function DockerImagesListSkeleton() {
   return (
     <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
       {Array.from({ length: 6 }).map((_, index) => (

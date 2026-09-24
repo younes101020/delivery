@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useTransition } from "react";
 
 import { SearchInput } from "@/app/_components/search-input";
 import {
@@ -15,12 +16,14 @@ interface DockerImagesSearchProps {
   category?: string;
   query: string;
   onQueryChange: (query: string) => void;
+  onPendingChange: (pending: boolean) => void;
 }
 
-export function DockerImagesSearch({ category, query, onQueryChange }: DockerImagesSearchProps) {
+export function DockerImagesSearch({ category, query, onQueryChange, onPendingChange }: DockerImagesSearchProps) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
   function updateCategory(value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -28,8 +31,14 @@ export function DockerImagesSearch({ category, query, onQueryChange }: DockerIma
       params.set("category", "databases");
     else
       params.delete("category");
-    router.replace(`${pathname}?${params.toString()}`);
+    startTransition(() => {
+      router.replace(`${pathname}?${params.toString()}`);
+    });
   }
+
+  useEffect(() => {
+    onPendingChange(isPending);
+  }, [isPending, onPendingChange]);
 
   return (
     <div className="flex items-start gap-2">
