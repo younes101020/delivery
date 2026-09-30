@@ -8,6 +8,7 @@ import { DeploymentSelectedApplicationProvider } from "@/app/_ctx/deployment-sel
 
 import FlowCanvasWrapper from "./_components/flow-canvas";
 import { ForgeSideMenu } from "./_components/forge-side-menu";
+import { ForgeWorkspace } from "./_components/forge-workspace";
 import { fetchDockerHubImages } from "./_lib/docker-hub";
 
 export const dynamic = "force-dynamic";
@@ -38,7 +39,7 @@ export default async function ForgePage({ searchParams }: ForgePageProps) {
         </div>
       </div>
 
-      <div className="relative mt-4 min-h-0 flex-1">
+      <ForgeWorkspace>
         <FlowCanvasWrapper />
         <ForgeSideMenu
           category={resolvedSearchParams?.category}
@@ -51,7 +52,7 @@ export default async function ForgePage({ searchParams }: ForgePageProps) {
             </Suspense>
           )}
         />
-      </div>
+      </ForgeWorkspace>
     </section>
   );
 }

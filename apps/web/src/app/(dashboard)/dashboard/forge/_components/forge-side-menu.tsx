@@ -2,16 +2,18 @@
 
 import type { ReactNode } from "react";
 
-import { Container, FolderGit2, X } from "lucide-react";
+import { Container, FolderGit2, Maximize, Minimize, X } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/app/_components/ui/button";
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/app/_components/ui/drawer";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/app/_components/ui/tooltip";
 import { cn } from "@/app/_lib/utils";
 
 import type { DockerHubResponse } from "../_lib/docker-hub";
 
 import { DockerImagesPanel } from "./docker-images-panel";
+import { useForgeFullscreen } from "./forge-workspace";
 
 interface ForgeSideMenuProps {
   repositories: ReactNode;
@@ -24,6 +26,7 @@ type OpenDrawer = "images" | "repositories" | null;
 export function ForgeSideMenu({ repositories, category, databaseImages }: ForgeSideMenuProps) {
   const [drawerContainer, setDrawerContainer] = useState<HTMLDivElement | null>(null);
   const [openDrawer, setOpenDrawer] = useState<OpenDrawer>("images");
+  const { isFullscreen, toggleFullscreen } = useForgeFullscreen();
 
   function handleDrawerChange(drawer: Exclude<OpenDrawer, null>, open: boolean) {
     setOpenDrawer(open ? drawer : null);
@@ -50,6 +53,23 @@ export function ForgeSideMenu({ repositories, category, databaseImages }: ForgeS
         >
           <FolderGit2 />
         </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label={isFullscreen ? "Exit Forge fullscreen" : "Enter Forge fullscreen"}
+                onClick={() => void toggleFullscreen()}
+              >
+                {isFullscreen ? <Minimize /> : <Maximize />}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="left">
+              {isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </aside>
 
       <Drawer
