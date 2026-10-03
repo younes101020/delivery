@@ -7,6 +7,7 @@ import { useState } from "react";
 
 import { Button } from "@/app/_components/ui/button";
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/app/_components/ui/drawer";
+import { Separator } from "@/app/_components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/app/_components/ui/tooltip";
 import { cn } from "@/app/_lib/utils";
 
@@ -35,6 +36,24 @@ export function ForgeSideMenu({ repositories, category, databaseImages }: ForgeS
   return (
     <div ref={setDrawerContainer} className="pointer-events-none absolute inset-0">
       <aside className="pointer-events-auto absolute inset-y-0 right-0 z-40 flex w-12 flex-col gap-1 border-l bg-background/95 p-1 shadow-sm backdrop-blur">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label={isFullscreen ? "Exit Forge fullscreen" : "Enter Forge fullscreen"}
+                onClick={() => void toggleFullscreen()}
+              >
+                {isFullscreen ? <Minimize /> : <Maximize />}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="left">
+              {isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <Separator orientation="horizontal" />
         <Button
           variant="ghost"
           size="icon"
@@ -53,23 +72,6 @@ export function ForgeSideMenu({ repositories, category, databaseImages }: ForgeS
         >
           <FolderGit2 />
         </Button>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label={isFullscreen ? "Exit Forge fullscreen" : "Enter Forge fullscreen"}
-                onClick={() => void toggleFullscreen()}
-              >
-                {isFullscreen ? <Minimize /> : <Maximize />}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="left">
-              {isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
       </aside>
 
       <Drawer
