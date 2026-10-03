@@ -84,7 +84,7 @@ export function ForgeSideMenu({ repositories, category, databaseImages }: ForgeS
       >
         <DrawerContent showOverlay={false} className="pointer-events-auto absolute inset-y-0 right-12 left-auto mt-0 w-full max-w-xl rounded-none border-y-0 border-r-0 border-l shadow-lg [&>div:first-child]:hidden">
           <DrawerHeader>
-            <DrawerTitle>Services hub</DrawerTitle>
+            <DrawerTitle>Docker Hub</DrawerTitle>
             <DrawerDescription>
               Drag and drop from hundreds of preconfigured services
             </DrawerDescription>
