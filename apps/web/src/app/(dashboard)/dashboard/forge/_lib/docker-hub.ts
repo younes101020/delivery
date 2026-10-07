@@ -109,7 +109,13 @@ export async function fetchDockerHubImages({
   pageSize: string;
   query?: string;
 }) {
-  const categoryQuery = category === "databases" ? "database" : undefined;
+  const categoryQuery = category === "databases"
+    ? "database"
+    : category === "monitoring"
+      ? "monitoring"
+      : category === "web-servers"
+        ? "web server"
+        : undefined;
   const searchQuery = query?.trim()
     ? categoryQuery ? `${categoryQuery} ${query.trim()}` : query.trim()
     : categoryQuery;

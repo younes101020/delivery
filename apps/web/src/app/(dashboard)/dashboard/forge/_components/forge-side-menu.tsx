@@ -19,12 +19,12 @@ import { useForgeFullscreen } from "./forge-workspace";
 interface ForgeSideMenuProps {
   repositories: ReactNode;
   category?: string;
-  databaseImages?: DockerHubResponse;
+  initialImages?: DockerHubResponse;
 }
 
 type OpenDrawer = "images" | "repositories" | null;
 
-export function ForgeSideMenu({ repositories, category, databaseImages }: ForgeSideMenuProps) {
+export function ForgeSideMenu({ repositories, category, initialImages }: ForgeSideMenuProps) {
   const [drawerContainer, setDrawerContainer] = useState<HTMLDivElement | null>(null);
   const [openDrawer, setOpenDrawer] = useState<OpenDrawer>("images");
   const { isFullscreen, toggleFullscreen } = useForgeFullscreen();
@@ -95,7 +95,7 @@ export function ForgeSideMenu({ repositories, category, databaseImages }: ForgeS
             </Button>
           </DrawerClose>
           <div className="min-h-0 flex-1 p-4">
-            <DockerImagesPanel category={category} initialPage={databaseImages} />
+            <DockerImagesPanel category={category} initialPage={initialImages} />
           </div>
         </DrawerContent>
       </Drawer>

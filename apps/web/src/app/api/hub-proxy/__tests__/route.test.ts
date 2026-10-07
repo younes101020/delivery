@@ -68,4 +68,23 @@ describe("get api hub proxy", () => {
       expect.objectContaining({ method: "GET" }),
     );
   });
+
+  it.each([
+    ["monitoring", "monitoring"],
+    ["web-servers", "web%20server"],
+  ])("searches Docker Hub for %s images when the category is selected", async (category, query) => {
+    const fetch = vi.fn()
+      .mockResolvedValueOnce(hubResponse([image]))
+      .mockResolvedValueOnce(new Response(null, { status: 200 }));
+    vi.stubGlobal("fetch", fetch);
+
+    const response = await GET(new Request(`http://localhost/api/hub-proxy?category=${category}&page=1`));
+
+    expect(await response.json()).toEqual({ results: [image], next: "https://hub.docker.com/v2/repositories/library/?page=2" });
+    expect(fetch).toHaveBeenNthCalledWith(
+      1,
+      `https://hub.docker.com/v2/search/repositories?query=${query}&page=1`,
+      expect.objectContaining({ method: "GET" }),
+    );
+  });
 });

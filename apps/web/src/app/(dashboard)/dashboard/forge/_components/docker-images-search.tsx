@@ -27,10 +27,10 @@ export function DockerImagesSearch({ category, query, onQueryChange, onPendingCh
 
   function updateCategory(value: string) {
     const params = new URLSearchParams(searchParams.toString());
-    if (value === "databases")
-      params.set("category", "databases");
-    else
+    if (value === "all")
       params.delete("category");
+    else
+      params.set("category", value);
     startTransition(() => {
       router.replace(`${pathname}?${params.toString()}`);
     });
@@ -56,6 +56,8 @@ export function DockerImagesSearch({ category, query, onQueryChange, onPendingCh
         <SelectContent>
           <SelectItem value="all">All images</SelectItem>
           <SelectItem value="databases">Databases</SelectItem>
+          <SelectItem value="monitoring">Monitoring</SelectItem>
+          <SelectItem value="web-servers">Web servers</SelectItem>
         </SelectContent>
       </Select>
     </div>

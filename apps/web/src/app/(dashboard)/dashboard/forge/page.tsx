@@ -25,8 +25,9 @@ interface ForgePageProps {
 
 export default async function ForgePage({ searchParams }: ForgePageProps) {
   const resolvedSearchParams = await searchParams;
-  const databaseImages = resolvedSearchParams?.category === "databases"
-    ? await fetchDockerHubImages({ category: "databases", page: "1", pageSize: "25" })
+  const category = resolvedSearchParams?.category;
+  const initialImages = ["databases", "monitoring", "web-servers"].includes(category ?? "")
+    ? await fetchDockerHubImages({ category, page: "1", pageSize: "25" })
     : undefined;
   const repositorySearchParams = searchParams ?? Promise.resolve({ page: "1" });
 
@@ -42,8 +43,8 @@ export default async function ForgePage({ searchParams }: ForgePageProps) {
       <ForgeWorkspace>
         <FlowCanvasWrapper />
         <ForgeSideMenu
-          category={resolvedSearchParams?.category}
-          databaseImages={databaseImages}
+          category={category}
+          initialImages={initialImages}
           repositories={(
             <Suspense fallback={<PendingRepositories />}>
               <DeploymentSelectedApplicationProvider>
