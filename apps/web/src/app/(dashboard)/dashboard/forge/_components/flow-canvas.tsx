@@ -14,6 +14,7 @@ interface PersistedService {
   nodeId: string;
   serviceId?: string;
   image: string;
+  isWebService: boolean;
   ports: string;
   environmentVariables: string;
   startCommand: string;
@@ -51,6 +52,7 @@ function FlowCanvas() {
         service: {
           nodeId: service.id,
           image: service.data.imageName,
+          isWebService: service.data.isWebService,
           ports: service.data.ports,
           environmentVariables: service.data.environmentVariables,
           startCommand: service.data.startCommand,
@@ -174,7 +176,7 @@ function FlowCanvas() {
     const raw = event.dataTransfer.getData("application/reactflow");
     if (!raw)
       return;
-    const payload: { payload?: { name?: string; label?: string; iconSlug?: string } } = JSON.parse(raw);
+    const payload: { payload?: { name?: string; label?: string; iconSlug?: string; isWebService?: boolean } } = JSON.parse(raw);
     const position = rf.screenToFlowPosition({ x: event.clientX, y: event.clientY });
     const label = payload.payload?.name ?? payload.payload?.label ?? "Docker Image";
     const current = nodesRef.current;
@@ -184,7 +186,7 @@ function FlowCanvas() {
       project = createNewProject(position, onProjectNameChange);
       next.push(project);
     }
-    const service = createNewDockerNode({ project, label, iconSlug: payload.payload?.iconSlug, position, onDockerSettingsChange, onDockerDelete });
+    const service = createNewDockerNode({ project, label, iconSlug: payload.payload?.iconSlug, isWebService: payload.payload?.isWebService, position, onDockerSettingsChange, onDockerDelete });
     const expanded = expandProjectToFitNode(service.position, project);
     const withPendingService = next.map(node => node.id === project.id ? expanded : node).concat(service);
     nodesRef.current = withPendingService;
@@ -221,11 +223,11 @@ function createNewProject(position: { x: number; y: number }, onNameChange: (id:
 }
 
 function createDockerNode({ project, service, onDockerSettingsChange, onDockerDelete }: { project: PersistedProject; service: PersistedService; onDockerSettingsChange: (id: string, settings: DockerNodeSettings) => void; onDockerDelete: (id: string) => Promise<void> }) {
-  return { id: service.nodeId, type: "docker", parentId: project.id, position: service.layout, style: { width: service.layout.width ?? NODE_WIDTH, height: service.layout.height ?? NODE_HEIGHT }, data: { imageName: service.image, ports: service.ports, environmentVariables: service.environmentVariables, startCommand: service.startCommand, isActive: true, onSettingsChange: onDockerSettingsChange, onDelete: onDockerDelete } };
+  return { id: service.nodeId, type: "docker", parentId: project.id, position: service.layout, style: { width: service.layout.width ?? NODE_WIDTH, height: service.layout.height ?? NODE_HEIGHT }, data: { imageName: service.image, isWebService: service.isWebService, ports: service.ports, environmentVariables: service.environmentVariables, startCommand: service.startCommand, isActive: true, onSettingsChange: onDockerSettingsChange, onDelete: onDockerDelete } };
 }
 
-function createNewDockerNode({ project, label, iconSlug, position, onDockerSettingsChange, onDockerDelete }: { project: any; label: string; iconSlug?: string; position: { x: number; y: number }; onDockerSettingsChange: (id: string, settings: DockerNodeSettings) => void; onDockerDelete: (id: string) => Promise<void> }) {
-  return { id: crypto.randomUUID(), type: "docker", parentId: project.id, position: { x: Math.max(PROJECT_PADDING, position.x - project.position.x), y: Math.max(PROJECT_PADDING, position.y - project.position.y) }, style: { width: NODE_WIDTH, height: NODE_HEIGHT }, data: { imageName: label, iconSlug, ports: getDefaultPorts(label), environmentVariables: "", startCommand: "", isActive: false, isPullPending: true, onSettingsChange: onDockerSettingsChange, onDelete: onDockerDelete } };
+function createNewDockerNode({ project, label, iconSlug, isWebService = false, position, onDockerSettingsChange, onDockerDelete }: { project: any; label: string; iconSlug?: string; isWebService?: boolean; position: { x: number; y: number }; onDockerSettingsChange: (id: string, settings: DockerNodeSettings) => void; onDockerDelete: (id: string) => Promise<void> }) {
+  return { id: crypto.randomUUID(), type: "docker", parentId: project.id, position: { x: Math.max(PROJECT_PADDING, position.x - project.position.x), y: Math.max(PROJECT_PADDING, position.y - project.position.y) }, style: { width: NODE_WIDTH, height: NODE_HEIGHT }, data: { imageName: label, iconSlug, isWebService, ports: getDefaultPorts(label), environmentVariables: "", startCommand: "", isActive: false, isPullPending: true, onSettingsChange: onDockerSettingsChange, onDelete: onDockerDelete } };
 }
 
 function getProjectLayout(project: any) {

@@ -12,6 +12,7 @@ describe("forge stack service manifest", () => {
       service: {
         nodeId: "node-1",
         image: "nginx:latest",
+        isWebService: true,
         ports: "80, 443",
         environmentVariables: "MODE=production\nDEBUG=false",
         startCommand: "nginx -g daemon off;",
@@ -21,6 +22,7 @@ describe("forge stack service manifest", () => {
 
     expect(service.Name).toBe("forge-project-1-node-1");
     expect(service.Labels?.["com.docker.stack.namespace"]).toBe("my-stack");
+    expect(service.Labels?.["delivery.forge.is-web-service"]).toBe("true");
     expect(taskTemplate.ContainerSpec?.Env).toEqual(["MODE=production", "DEBUG=false"]);
     expect(taskTemplate.ContainerSpec?.Command).toEqual(["nginx", "-g", "daemon", "off;"]);
     expect(taskTemplate.Networks).toEqual([{ Target: "forge" }]);

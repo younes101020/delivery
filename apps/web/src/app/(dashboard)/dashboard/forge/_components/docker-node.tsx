@@ -3,7 +3,7 @@
 import type { NodeProps } from "@xyflow/react";
 
 import { Handle, NodeResizer, Position } from "@xyflow/react";
-import { Loader2, Settings, Trash2 } from "lucide-react";
+import { GlobeCode, Loader2, Settings, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/app/_components/ui/alert-dialog";
@@ -67,6 +67,7 @@ export function DockerNode({ data, id, selected }: NodeProps<DockerNodeType>) {
               }}
             />
           )}
+          {data.isWebService && <GlobeCode className="size-3 shrink-0" aria-hidden="true" />}
           <span className="min-w-0 flex-1 truncate text-[10px] font-medium">{data.imageName}</span>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>

@@ -50,10 +50,10 @@ export function DockerImagesSearch({ category, query, onQueryChange, onPendingCh
         className="mb-2 min-w-0 flex-1"
       />
       <Select value={category ?? "all"} onValueChange={updateCategory}>
-        <SelectTrigger className="w-36" aria-label="Filter Docker image categories">
+        <SelectTrigger className="w-36 h-[85%]" aria-label="Filter Docker image categories">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="h-20">
           <SelectItem value="all">All images</SelectItem>
           <SelectItem value="databases">Databases</SelectItem>
           <SelectItem value="monitoring">Monitoring</SelectItem>

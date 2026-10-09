@@ -13,6 +13,7 @@ export interface DockerNodeData {
   [key: string]: unknown;
   isActive: boolean;
   isPullPending?: boolean;
+  isWebService: boolean;
   imageName: string;
   iconSlug?: string;
   ports: string;

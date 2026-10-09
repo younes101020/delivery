@@ -8,6 +8,7 @@ const requestSchema = z.object({
   service: z.object({
     nodeId: z.string().uuid(),
     image: z.string().trim().min(1),
+    isWebService: z.boolean(),
     ports: z.string(),
     environmentVariables: z.string(),
     startCommand: z.string(),

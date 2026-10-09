@@ -24,6 +24,7 @@ const forgeProjectSchema = z.object({
 const forgeStackServiceSchema = z.object({
   nodeId: z.string().trim().min(1),
   image: z.string().trim().min(1),
+  isWebService: z.boolean(),
   ports: z.string(),
   environmentVariables: z.string(),
   startCommand: z.string(),

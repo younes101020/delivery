@@ -152,6 +152,7 @@ export const listForgeStacks = withDocker<ForgeStackDto[], void>(async (docker) 
       nodeId,
       serviceId: swarmService.ID,
       image,
+      isWebService: labels["delivery.forge.is-web-service"] === "true",
       ports: getPorts(spec),
       environmentVariables: (container?.Env ?? []).join("\n"),
       startCommand: (container?.Command ?? []).join(" "),

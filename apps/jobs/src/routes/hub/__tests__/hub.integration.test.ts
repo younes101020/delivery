@@ -22,8 +22,8 @@ describe("hub routes", () => {
       json: {
         project: { id: "project-1", name: "Project 1" },
         services: [
-          { nodeId: "node-1", image: "nginx", ports: "80", environmentVariables: "", startCommand: "" },
-          { nodeId: "node-1", image: "redis", ports: "6379", environmentVariables: "", startCommand: "" },
+          { nodeId: "node-1", image: "nginx", isWebService: true, ports: "80", environmentVariables: "", startCommand: "" },
+          { nodeId: "node-1", image: "redis", isWebService: false, ports: "6379", environmentVariables: "", startCommand: "" },
         ],
       },
     });

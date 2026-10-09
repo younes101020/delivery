@@ -27,6 +27,7 @@ function DockerImageCard({
   description,
   official,
   iconSlug,
+  isWebService,
 }: {
   name: string;
   description?: string;
@@ -34,6 +35,7 @@ function DockerImageCard({
   stars?: number | string;
   official?: boolean;
   iconSlug?: string;
+  isWebService: boolean;
 }) {
   const fallbackIcon = (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-[22px] w-[22px]">
@@ -56,7 +58,7 @@ function DockerImageCard({
           try {
             e.dataTransfer.setData(
               "application/reactflow",
-              JSON.stringify({ type: "docker", payload: { name, description, iconSlug } }),
+              JSON.stringify({ type: "docker", payload: { name, description, iconSlug, isWebService } }),
             );
             e.dataTransfer.effectAllowed = "move";
           }
@@ -136,6 +138,7 @@ function InfiniteListInner({ category, initialPage, query }: { category?: string
               stars={img.star_count}
               official={Boolean(img.is_official)}
               iconSlug={iconSlug}
+              isWebService={category === "web-servers"}
             />
           );
         })}

@@ -3,6 +3,7 @@ import type Dockerode from "dockerode";
 export interface ForgeStackService {
   nodeId: string;
   image: string;
+  isWebService: boolean;
   ports: string;
   environmentVariables: string;
   startCommand: string;
@@ -63,6 +64,7 @@ export function createForgeStackServiceSpec({ projectId, projectName, projectLay
       "delivery.forge.project-id": projectId,
       "delivery.forge.project-name": projectName,
       "delivery.forge.node-id": service.nodeId,
+      "delivery.forge.is-web-service": String(service.isWebService),
       "delivery.forge.schema-version": "1",
       "delivery.forge.node-x": String(service.layout?.x ?? 0),
       "delivery.forge.node-y": String(service.layout?.y ?? 0),
