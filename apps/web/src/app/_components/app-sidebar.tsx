@@ -74,6 +74,10 @@ const data = {
           url: "/dashboard/settings/general",
         },
         {
+          title: "Customization",
+          url: "/dashboard/settings/customization",
+        },
+        {
           title: "Account",
           url: "/dashboard/settings/account",
         },
@@ -123,3 +127,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     </Sidebar>
   );
 }
+
+

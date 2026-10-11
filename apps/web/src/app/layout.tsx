@@ -9,6 +9,7 @@ import ReactQueryProviders from "@/app/_lib/react-query-provider";
 import { env } from "@/env";
 
 import { Toaster } from "./_components/ui/sonner";
+import { ThemeProvider } from "./_components/theme-provider";
 import { FetcherProvider } from "./_lib/fetch-provider";
 import { getQueryClient } from "./_lib/get-rsc-query-client";
 import { getUser } from "./_lib/user-session";
@@ -55,14 +56,19 @@ export default function RootLayout({
         className={`${geistSans.className} ${geistMono.className} antialiased absolute inset-0 h-full w-full bg-background/15 bg-[linear-gradient(to_right,rgb(156_163_175/0.2)_1px,transparent_1px),linear-gradient(to_bottom,rgb(156_163_175/0.2)_1px,transparent_1px)] bg-size-[24px_24px]`}
       >
         <FetcherProvider baseUrl={baseUrl}>
-          <ReactQueryProviders>
+          <ThemeProvider>
+            <ReactQueryProviders>
             <HydrationBoundary state={dehydrate(queryClient)}>
               {children}
             </HydrationBoundary>
-          </ReactQueryProviders>
+            </ReactQueryProviders>
+          </ThemeProvider>
         </FetcherProvider>
         <Toaster position="top-center" />
       </body>
     </html>
   );
 }
+
+
+
