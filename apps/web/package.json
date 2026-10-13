@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@delivery/auth": "workspace:*",
+    "@delivery/i18n": "workspace:*",
     "@delivery/jobs": "workspace:*",
     "@hookform/resolvers": "^5.2.1",
     "@octokit/app": "^15.1.0",

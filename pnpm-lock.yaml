@@ -175,6 +175,9 @@ importers:
       '@delivery/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@delivery/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
       '@delivery/jobs':
         specifier: workspace:*
         version: link:../jobs
@@ -529,6 +532,25 @@ importers:
       globals:
         specifier: ^15.14.0
         version: 15.15.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.8.3
+
+  packages/i18n:
+    dependencies:
+      server-only:
+        specifier: ^0.0.1
+        version: 0.0.1
+    devDependencies:
+      '@delivery/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@types/node':
+        specifier: ^20.11.30
+        version: 20.19.11
+      eslint:
+        specifier: 'catalog:'
+        version: 9.28.0(jiti@2.5.1)
       typescript:
         specifier: 'catalog:'
         version: 5.8.3
