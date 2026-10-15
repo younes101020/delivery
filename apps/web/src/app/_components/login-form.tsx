@@ -1,5 +1,7 @@
 "use client";
 
+import type { AuthDictionary, Locale } from "@delivery/i18n";
+
 import { ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -18,7 +20,15 @@ import { signIn } from "../(login)/actions";
 import { Paragraph } from "./ui/paragraph";
 import { Separator } from "./ui/separator";
 
-function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", isOnboarding }: { mode?: "signin" | "signup"; redirectTo?: string; isOnboarding?: boolean }) {
+interface LoginFormProps {
+  auth: AuthDictionary;
+  isOnboarding?: boolean;
+  locale: Locale;
+  mode?: "signin" | "signup";
+  redirectTo?: string;
+}
+
+function LoginForm({ auth, mode = "signup", redirectTo, isOnboarding, locale }: LoginFormProps) {
   const searchParams = useSearchParams();
   const inviteId = searchParams.get("inviteId");
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
@@ -32,7 +42,7 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", is
     <form className="space-y-6" action={formAction} aria-label="form">
       <div>
         <Label htmlFor="email" className="block text-sm font-medium">
-          Email
+          {auth.emailLabel}
         </Label>
         <div className="mt-1">
           <Input
@@ -44,7 +54,7 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", is
             required
             maxLength={50}
             className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
-            placeholder="Enter your email"
+            placeholder={auth.emailPlaceholder}
             defaultValue={state.inputs.email ?? ""}
           />
         </div>
@@ -52,7 +62,7 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", is
       <Separator />
       <div>
         <Label htmlFor="password" className="block text-sm font-medium">
-          Password
+          {auth.passwordLabel}
         </Label>
         <div className="mt-1 relative z-0">
           <Input
@@ -64,7 +74,7 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", is
             required
             minLength={8}
             className="appearance-none relative block w-full px-3 py-2 border pr-10 focus:outline-hidden focus:z-0 sm:text-sm"
-            placeholder="Enter your password"
+            placeholder={auth.passwordPlaceholder}
             defaultValue={state.inputs.password ?? ""}
           />
           <span
@@ -76,7 +86,7 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", is
                 setShowPassword(value => !value);
             }}
             className="absolute inset-y-0 right-0 z-10 flex items-center pr-3 text-muted-foreground hover:text-foreground"
-            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-label={showPassword ? auth.hidePassword : auth.showPassword}
           >
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </span>
@@ -85,7 +95,7 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", is
       {mode === "signup" && (
         <div>
           <Label htmlFor="repeatPassword" className="block text-sm font-medium">
-            Repeat password
+            {auth.repeatPasswordLabel}
           </Label>
           <div className="mt-1">
             <div className="mt-1 relative z-0">
@@ -98,7 +108,7 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", is
                 required
                 minLength={8}
                 className="appearance-none relative block w-full px-3 py-2 border pr-10 focus:outline-hidden focus:z-0 sm:text-sm"
-                placeholder="Repeat your password"
+                placeholder={auth.repeatPasswordPlaceholder}
                 defaultValue={state.inputs.repeatPassword ?? ""}
               />
               <span
@@ -110,7 +120,7 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", is
                     setShowRepeatPassword(value => !value);
                 }}
                 className="absolute inset-y-0 right-0 z-10 flex items-center pr-3 text-muted-foreground hover:text-foreground"
-                aria-label={showRepeatPassword ? "Hide repeat password" : "Show repeat password"}
+                aria-label={showRepeatPassword ? auth.hideRepeatPassword : auth.showRepeatPassword}
               >
                 {showRepeatPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </span>
@@ -119,8 +129,9 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", is
         </div>
       )}
 
-      <input type="hidden" name="redirectTo" defaultValue={redirectTo} />
+      <input type="hidden" name="redirectTo" defaultValue={redirectTo ?? `/${locale}/dashboard/applications`} />
       <input type="hidden" name="inviteId" value={inviteId || ""} />
+      <input type="hidden" name="locale" value={locale} />
 
       {state?.error && <Paragraph variant="error">{state.error}</Paragraph>}
 
@@ -128,31 +139,31 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", is
         {mode === "signin"
           ? (
               <>
-                You dont have any account ?
+                {auth.noAccount}
                 {" "}
                 <Link
                   href={{
-                    pathname: "/signup",
+                    pathname: `/${locale}/signup`,
                     query: { inviteId },
                   }}
                   className="underline underline-offset-4"
                 >
-                  register here.
+                  {auth.registerHere}
                 </Link>
               </>
             )
           : !isOnboarding && (
               <>
-                Already have an account ?
+                {auth.alreadyAccount}
                 {" "}
                 <Link
                   href={{
-                    pathname: "/",
+                    pathname: `/${locale}`,
                     query: { inviteId },
                   }}
                   className="underline underline-offset-4"
                 >
-                  sign in here.
+                  {auth.signInHere}
                 </Link>
               </>
             )}
@@ -164,20 +175,20 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", is
             ? (
                 <>
                   <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                  Loading...
+                  {auth.loading}
                 </>
               )
             : mode === "signin"
               ? (
                   <>
-                    Sign in
+                    {auth.signIn}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </>
 
                 )
               : (
                   <>
-                    Sign up
+                    {auth.signUp}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </>
                 )}
@@ -187,10 +198,10 @@ function LoginForm({ mode = "signup", redirectTo = "/dashboard/applications", is
   );
 }
 
-export function Login({ mode = "signup", redirectTo = "/dashboard/applications", isOnboarding = false }: { mode?: "signin" | "signup"; redirectTo?: string; isOnboarding?: boolean }) {
+export function Login({ auth, locale, mode = "signup", redirectTo, isOnboarding = false }: LoginFormProps) {
   return (
     <Suspense>
-      <LoginForm mode={mode} redirectTo={redirectTo} isOnboarding={isOnboarding} />
+      <LoginForm auth={auth} locale={locale} mode={mode} redirectTo={redirectTo} isOnboarding={isOnboarding} />
     </Suspense>
   );
 }

@@ -1,18 +1,14 @@
-import "server-only";
+import type en from "./dictionaries/en.json";
 
-const dictionaries = {
-  en: () => import("./dictionaries/en.json", { with: { type: "json" } })
-    .then(module => module.default),
-  fr: () => import("./dictionaries/fr.json", { with: { type: "json" } })
-    .then(module => module.default),
-};
-
-export type Locale = keyof typeof dictionaries;
-
-export function hasLocale(locale: string): locale is Locale {
-  return locale in dictionaries;
+export type AuthDictionary = typeof en.auth;
+export interface Dictionary {
+  auth: AuthDictionary;
 }
 
-export async function getDictionary(locale: Locale) {
-  return dictionaries[locale]();
+export const LOCALES = ["en", "fr"] as const;
+export type Locale = (typeof LOCALES)[number];
+export const DEFAULT_LOCALE: Locale = "en";
+
+export function hasLocale(locale: string): locale is Locale {
+  return LOCALES.includes(locale as Locale);
 }

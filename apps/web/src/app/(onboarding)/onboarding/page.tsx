@@ -1,9 +1,11 @@
+import { getDictionary } from "@delivery/i18n/server";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { Deployment } from "@/app/_components/deployment";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { getAllGithubAppCreds } from "@/app/_lib/github/queries";
+import { getCurrentLocale } from "@/app/_lib/locale";
 import { getUser } from "@/app/_lib/user-session";
 
 import { Login } from "../../_components/login-form";
@@ -76,7 +78,9 @@ async function LoginStep(props: SearchParams) {
   if (user) {
     redirect("/onboarding/?step=2");
   }
-  return <Login isOnboarding={true} />;
+  const locale = await getCurrentLocale();
+  const dictionary = await getDictionary(locale);
+  return <Login auth={dictionary.auth} isOnboarding={true} locale={locale} />;
 }
 
 async function SkipDeploymentForm(props: SearchParams) {
