@@ -7,6 +7,49 @@ import { GithubAppForm } from "../_components/github-app-form";
 import { onBoardingTest } from "./fixtures";
 import { setup } from "./utils";
 
+const AUTH_DICTIONARY = {
+  signinTitle: "Welcome back",
+  signupTitle: "Welcome",
+  signinDescription: "Sign in to your Delivery account.",
+  signupDescription: "Create your Delivery account.",
+  emailLabel: "Email",
+  emailPlaceholder: "Enter your email",
+  passwordLabel: "Password",
+  passwordPlaceholder: "Enter your password",
+  repeatPasswordLabel: "Repeat password",
+  repeatPasswordPlaceholder: "Repeat your password",
+  showPassword: "Show password",
+  hidePassword: "Hide password",
+  showRepeatPassword: "Show repeat password",
+  hideRepeatPassword: "Hide repeat password",
+  noAccount: "Don't have an account?",
+  registerHere: "Register here.",
+  alreadyAccount: "Already have an account?",
+  signInHere: "Sign in here.",
+  loading: "Loading...",
+  signIn: "Sign in",
+  signUp: "Sign up",
+  invalidCredentials: "Invalid email or password. Please try again.",
+  signUpFailed: "Unable to create your account.",
+} as const;
+
+const FRENCH_AUTH_DICTIONARY = {
+  ...AUTH_DICTIONARY,
+  emailLabel: "E-mail",
+  emailPlaceholder: "Saisissez votre e-mail",
+  passwordLabel: "Mot de passe",
+  passwordPlaceholder: "Saisissez votre mot de passe",
+  repeatPasswordLabel: "Confirmer le mot de passe",
+  repeatPasswordPlaceholder: "Confirmez votre mot de passe",
+  noAccount: "Vous n'avez pas de compte ?",
+  registerHere: "Inscrivez-vous.",
+  alreadyAccount: "Vous avez déjà un compte ?",
+  signInHere: "Connectez-vous.",
+  loading: "Chargement...",
+  signIn: "Se connecter",
+  signUp: "S'inscrire",
+} as const;
+
 describe("onboarding process", () => {
   beforeAll(() => {
     vi.mock("@/app/actions", () => {
@@ -30,7 +73,7 @@ describe("onboarding process", () => {
   onBoardingTest(
     "should display error message related to registering",
     async ({ users }) => {
-      const { userAction } = setup(<Login isOnboarding={true} />);
+      const { userAction } = setup(<Login auth={AUTH_DICTIONARY} isOnboarding={true} locale="en" />);
       const registeredUser = users.find(user => user.registered);
       const form = within(screen.getByRole("form"));
 
@@ -44,6 +87,15 @@ describe("onboarding process", () => {
       });
     },
   );
+
+  onBoardingTest("renders the authentication form in French", () => {
+    setup(<Login auth={FRENCH_AUTH_DICTIONARY} locale="fr" />);
+
+    expect(screen.getByLabelText("E-mail")).toBeDefined();
+    expect(screen.getByLabelText("Mot de passe")).toBeDefined();
+    expect(screen.getByText("S'inscrire")).toBeDefined();
+    expect(screen.getByText("Vous avez déjà un compte ?")).toBeDefined();
+  });
 
   onBoardingTest("github form include initial object to create a github app from manifest", () => {
     setup(<GithubAppForm isOnboarding={true} />);

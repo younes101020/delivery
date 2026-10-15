@@ -5,6 +5,7 @@ import localFont from "next/font/local";
 
 import "./globals.css";
 
+import { getCurrentLocale } from "@/app/_lib/locale";
 import ReactQueryProviders from "@/app/_lib/react-query-provider";
 import { env } from "@/env";
 
@@ -31,11 +32,12 @@ export const metadata: Metadata = {
   description: "From Github repository to production ready application",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getCurrentLocale();
   const baseUrl = env.WEB_BASE_URL;
   const queryClient = getQueryClient();
 
@@ -50,7 +52,7 @@ export default function RootLayout({
   });
 
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body
         className={`${geistSans.className} ${geistMono.className} antialiased absolute inset-0 h-full w-full bg-background/15 bg-[linear-gradient(to_right,rgb(156_163_175/0.2)_1px,transparent_1px),linear-gradient(to_bottom,rgb(156_163_175/0.2)_1px,transparent_1px)] bg-size-[24px_24px]`}
       >

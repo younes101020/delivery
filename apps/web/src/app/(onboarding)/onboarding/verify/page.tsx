@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { getDictionary } from "@delivery/i18n/server";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -8,6 +9,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/app/_components/ui/
 import { PageDescription } from "@/app/_components/ui/page-description";
 import { PageTitle } from "@/app/_components/ui/page-title";
 import { Skeleton } from "@/app/_components/ui/skeleton";
+import { getCurrentLocale } from "@/app/_lib/locale";
 
 export const metadata: Metadata = {
   title: "Wait a moment",
@@ -58,8 +60,10 @@ interface FormProps {
 
 async function Form({ searchParams }: FormProps) {
   const redirectTo = (await searchParams).redirectTo;
+  const locale = await getCurrentLocale();
+  const dictionary = await getDictionary(locale);
 
-  return <Login mode="signin" redirectTo={redirectTo} />;
+  return <Login auth={dictionary.auth} locale={locale} mode="signin" redirectTo={redirectTo} />;
 }
 
 function PendingForm() {

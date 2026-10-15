@@ -1,5 +1,6 @@
 "use server";
 
+import { hasLocale } from "@delivery/i18n";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -15,10 +16,12 @@ export async function signOut() {
 const signInSchema = z.object({
   email: z.string().email().min(3).max(255),
   inviteId: z.string().optional(),
+  locale: z.string().refine(hasLocale, { message: "Invalid locale" }),
   password: z.string().min(8).max(100),
   redirectTo: z.string()
     .refine((pathname) => {
-      const isValidSuccessSignInPathnameRedirect = pathname === "/dashboard/applications" || pathname.startsWith("/onboarding");
+      const isValidSuccessSignInPathnameRedirect = /^\/(?:en|fr)\/dashboard\/applications(?:\/|$)/.test(pathname)
+        || /^\/(?:en|fr)\/onboarding(?:\/|$)/.test(pathname);
       if (isValidSuccessSignInPathnameRedirect) {
         return true;
       }
@@ -28,7 +31,7 @@ const signInSchema = z.object({
 });
 
 export const signIn = validatedAction(signInSchema, async (data) => {
-  const { email, password, redirectTo, inviteId } = data;
+  const { email, password, redirectTo, inviteId, locale } = data;
 
   const http = await client();
   const response = await http.auth.verify.$post({
@@ -40,7 +43,12 @@ export const signIn = validatedAction(signInSchema, async (data) => {
   });
 
   if (response.status !== 200) {
-    return { error: "Invalid email or password. Please try again.", inputs: data };
+    return {
+      error: locale === "fr"
+        ? "E-mail ou mot de passe invalide. Veuillez réessayer."
+        : "Invalid email or password. Please try again.",
+      inputs: data,
+    };
   }
 
   const user = await response.json();

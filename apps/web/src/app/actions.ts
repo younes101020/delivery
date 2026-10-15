@@ -1,5 +1,6 @@
 "use server";
 
+import { hasLocale } from "@delivery/i18n";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -14,12 +15,13 @@ const signUpSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
   repeatPassword: z.string().min(8, "Password must be at least 8 characters"),
   inviteId: z.string().optional(),
+  locale: z.string().refine(hasLocale, { message: "Invalid locale" }),
 }).refine(data => data.password === data.repeatPassword, {
   message: "Passwords do not match",
 });
 
 export const signUp = validatedAction(signUpSchema, async (data) => {
-  const { email, password, inviteId } = data;
+  const { email, password, inviteId, locale } = data;
 
   const http = await client();
   const response = await http.auth.register.$post({
@@ -31,13 +33,17 @@ export const signUp = validatedAction(signUpSchema, async (data) => {
   });
 
   // Non explicit error message to end-user to prevent from enumeration attack
-  if (!response.ok)
-    return { error: "Impossible to sign up", inputs: data };
+  if (!response.ok) {
+    return {
+      error: locale === "fr" ? "Impossible de créer votre compte." : "Unable to create your account.",
+      inputs: data,
+    };
+  }
 
   const createdUser = await response.json();
   await setSession(createdUser);
 
-  redirect("/onboarding?step=2");
+  redirect(`/${locale}/onboarding?step=2`);
 });
 
 export async function signOut() {

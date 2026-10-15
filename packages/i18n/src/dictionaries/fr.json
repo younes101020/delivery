@@ -1,1 +1,27 @@
-{}
+{
+  "auth": {
+    "signinTitle": "Bon retour",
+    "signupTitle": "Bienvenue",
+    "signinDescription": "Connectez-vous à votre compte Delivery.",
+    "signupDescription": "Créez votre compte Delivery.",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "Saisissez votre e-mail",
+    "passwordLabel": "Mot de passe",
+    "passwordPlaceholder": "Saisissez votre mot de passe",
+    "repeatPasswordLabel": "Confirmer le mot de passe",
+    "repeatPasswordPlaceholder": "Confirmez votre mot de passe",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
+    "showRepeatPassword": "Afficher la confirmation du mot de passe",
+    "hideRepeatPassword": "Masquer la confirmation du mot de passe",
+    "noAccount": "Vous n'avez pas de compte ?",
+    "registerHere": "Inscrivez-vous.",
+    "alreadyAccount": "Vous avez déjà un compte ?",
+    "signInHere": "Connectez-vous.",
+    "loading": "Chargement...",
+    "signIn": "Se connecter",
+    "signUp": "S'inscrire",
+    "invalidCredentials": "E-mail ou mot de passe invalide. Veuillez réessayer.",
+    "signUpFailed": "Impossible de créer votre compte."
+  }
+}

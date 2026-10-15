@@ -1,1 +1,27 @@
-{}
+{
+  "auth": {
+    "signinTitle": "Welcome back",
+    "signupTitle": "Welcome",
+    "signinDescription": "Sign in to your Delivery account.",
+    "signupDescription": "Create your Delivery account.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Enter your email",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "repeatPasswordLabel": "Repeat password",
+    "repeatPasswordPlaceholder": "Repeat your password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "showRepeatPassword": "Show repeat password",
+    "hideRepeatPassword": "Hide repeat password",
+    "noAccount": "Don't have an account?",
+    "registerHere": "Register here.",
+    "alreadyAccount": "Already have an account?",
+    "signInHere": "Sign in here.",
+    "loading": "Loading...",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "invalidCredentials": "Invalid email or password. Please try again.",
+    "signUpFailed": "Unable to create your account."
+  }
+}
