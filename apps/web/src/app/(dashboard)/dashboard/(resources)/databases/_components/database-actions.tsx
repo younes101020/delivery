@@ -7,6 +7,7 @@ import { useActionState } from "react";
 import type { ActionState } from "@/app/_lib/form-middleware";
 
 import { Button } from "@/app/_components/ui/button";
+import { useResourcesDictionary } from "@/app/_ctx/resources-dictionary";
 import { useUser } from "@/app/_hooks/use-user";
 import { getQueryClient } from "@/app/_lib/react-query-provider";
 import { cn, withToast } from "@/app/_lib/utils";
@@ -31,6 +32,7 @@ export function DatabaseActions(props: DatabaseActionsProps) {
 }
 
 function DatabaseActionButton({ initialState, serviceId }: DatabaseActionsProps) {
+  const { resources } = useResourcesDictionary();
   const { data } = useQuery<DatabaseStatusData>({ queryKey: [serviceId] }, getQueryClient(true));
 
   if (data?.status === "completed" || !data || data.processName) {
@@ -43,13 +45,13 @@ function DatabaseActionButton({ initialState, serviceId }: DatabaseActionsProps)
         {canStopContainer && (
           <StopButton serviceId={serviceId} className="text-xs">
             <Ban className="stroke-destructive" />
-            Shutdown
+            {resources.databases.shutdown}
           </StopButton>
         )}
         {canStartContainer && (
           <StartButton serviceId={serviceId} className="text-xs">
             <Play className="stroke-primary" />
-            Start
+            {resources.databases.start}
           </StartButton>
         )}
       </>
@@ -67,6 +69,7 @@ function StartButton({
   className,
   serviceId,
 }: ButtonProps) {
+  const { resources } = useResourcesDictionary();
   const initialInputs = {
     serviceId,
   };
@@ -92,11 +95,11 @@ function StartButton({
           ? (
               <>
                 <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                Loading...
+                {resources.common.loading}
               </>
             )
           : state.error
-            ? "Error"
+            ? resources.common.error
             : children}
       </Button>
     </form>
@@ -108,6 +111,7 @@ function StopButton({
   className,
   serviceId,
 }: ButtonProps) {
+  const { resources } = useResourcesDictionary();
   const initialInputs = {
     serviceId,
   };
@@ -133,11 +137,11 @@ function StopButton({
           ? (
               <>
                 <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                Loading...
+                {resources.common.loading}
               </>
             )
           : state.error
-            ? "Error"
+            ? resources.common.error
             : children}
       </Button>
     </form>

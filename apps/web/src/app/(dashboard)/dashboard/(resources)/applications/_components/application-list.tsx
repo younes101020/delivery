@@ -6,6 +6,7 @@ import { Suspense } from "react";
 
 import { EmptyState } from "@/app/_components/ui/empty-state";
 import { Skeleton } from "@/app/_components/ui/skeleton";
+import { useResourcesDictionary } from "@/app/_ctx/resources-dictionary";
 import { useUser } from "@/app/_hooks/use-user";
 import { useFetch } from "@/app/_lib/fetch-provider";
 import { toLocalDateString } from "@/app/_lib/utils";
@@ -25,6 +26,7 @@ export function ApplicationList() {
 }
 
 function List() {
+  const { locale } = useResourcesDictionary();
   const { fetcher } = useFetch();
   const apps = useSuspenseQuery<Applications>({
     queryKey: ["applications"],
@@ -44,7 +46,7 @@ function List() {
           id={application.id}
           name={application.name}
           initialState={application.isActive ? "running" : "stop"}
-          firstDeploymentAt={toLocalDateString(application.createdAt) ?? "Unknown"}
+          firstDeploymentAt={toLocalDateString(application.createdAt, locale) ?? "Unknown"}
           refetchApplications={apps.refetch}
         />
       ))}
@@ -54,18 +56,19 @@ function List() {
 
 function NoApplication() {
   const { user } = useUser();
+  const { resources } = useResourcesDictionary();
 
   if (!user)
     return null;
 
   return (
     <EmptyState
-      title="No application"
-      description="You can see all your applications here."
+      title={resources.applications.emptyTitle}
+      description={resources.applications.emptyDescription}
       icons={[PackagePlus]}
       action={user.role === "owner"
         ? {
-            label: "Deploy application",
+            label: resources.applications.deployApplication,
             href: "/applications/new",
           }
         : undefined}
