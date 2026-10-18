@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/_components/ui/card";
+import { useResourcesDictionary } from "@/app/_ctx/resources-dictionary";
 import { CopyButton } from "@/app/(dashboard)/dashboard/_components/copy-button";
 
 import { DatabaseActions } from "./database-actions";
@@ -18,6 +19,7 @@ interface DatabaseCardProps {
 }
 
 export function DatabaseCard({ name, id, createdAt, image, isActive, dbConnectionUri }: DatabaseCardProps) {
+  const { resources } = useResourcesDictionary();
   const state = isActive ? "running" : "stop";
   return (
     <Card className="h-fit">
@@ -40,12 +42,12 @@ export function DatabaseCard({ name, id, createdAt, image, isActive, dbConnectio
       </CardHeader>
       <CardContent className="text-xs space-y-3">
         <dl>
-          <dt className="text-muted-foreground">State</dt>
+          <dt className="text-muted-foreground">{resources.common.state}</dt>
           <DatabaseStatus id={id} initialState={state} />
         </dl>
         {dbConnectionUri && (
           <dl>
-            <dt className="text-muted-foreground">Connection URI</dt>
+            <dt className="text-muted-foreground">{resources.databases.connectionUri}</dt>
             <dd className="flex items-center gap-2 bg-muted text-muted-foreground px-2 py-1">
               <p className="truncate">{dbConnectionUri}</p>
               <CopyButton value={dbConnectionUri} />
@@ -54,7 +56,7 @@ export function DatabaseCard({ name, id, createdAt, image, isActive, dbConnectio
         )}
 
         <dl>
-          <dt className="text-muted-foreground">Creation date</dt>
+          <dt className="text-muted-foreground">{resources.common.creationDate}</dt>
           <DatabaseDate date={createdAt} />
         </dl>
 

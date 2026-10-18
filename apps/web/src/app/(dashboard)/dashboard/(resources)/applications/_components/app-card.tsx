@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import { buttonVariants } from "@/app/_components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/app/_components/ui/card";
 import { Skeleton } from "@/app/_components/ui/skeleton";
+import { useResourcesDictionary } from "@/app/_ctx/resources-dictionary";
 import { useUser } from "@/app/_hooks/use-user";
 
 import type { ContainerStatusProps } from "../../types";
@@ -28,6 +29,7 @@ interface AppCardProps {
 
 export function AppCard({ name, firstDeploymentAt, id, initialState, refetchApplications }: AppCardProps) {
   const { user } = useUser();
+  const { resources } = useResourcesDictionary();
 
   if (!user)
     return null;
@@ -52,18 +54,18 @@ export function AppCard({ name, firstDeploymentAt, id, initialState, refetchAppl
       <CardContent className="px-6 pb-6">
 
         <dl className="text-xs pt-2">
-          <dt className="text-muted-foreground">State</dt>
+          <dt className="text-muted-foreground">{resources.common.state}</dt>
           <ApplicationStatus id={id} initialState={initialState} refetchApplications={refetchApplications} />
         </dl>
         <dl className="text-xs pt-2">
-          <dt className="text-muted-foreground">First deployment at</dt>
+          <dt className="text-muted-foreground">{resources.applications.firstDeployment}</dt>
           <Suspense fallback={<Skeleton className="h-12 w-full bg-red-500" />}>
             <AppDeploymentDate deployedAt={firstDeploymentAt} />
           </Suspense>
         </dl>
       </CardContent>
       <CardFooter>
-        <Link href={`/dashboard/applications/${name}`} className={buttonVariants()}>View details</Link>
+        <Link href={`/dashboard/applications/${name}`} className={buttonVariants()}>{resources.applications.viewDetails}</Link>
       </CardFooter>
     </Card>
 

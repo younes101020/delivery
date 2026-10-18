@@ -26,8 +26,8 @@ export type Nullable<T> = {
   [K in keyof T]: T[K] | null;
 };
 
-export function toLocalDateString(utc: string | number) {
-  return new Intl.DateTimeFormat(undefined, {
+export function toLocalDateString(utc: string | number, locale?: string) {
+  return new Intl.DateTimeFormat(locale, {
     year: "numeric",
     month: "numeric",
     day: "numeric",

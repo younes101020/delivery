@@ -6,6 +6,7 @@ import { Suspense } from "react";
 
 import { EmptyState } from "@/app/_components/ui/empty-state";
 import { Skeleton } from "@/app/_components/ui/skeleton";
+import { useResourcesDictionary } from "@/app/_ctx/resources-dictionary";
 import { useFetch } from "@/app/_lib/fetch-provider";
 
 import type { Databases } from "../_lib/queries";
@@ -44,13 +45,14 @@ function DatabaseList() {
 }
 
 function NoDatabases() {
+  const { resources } = useResourcesDictionary();
   return (
     <EmptyState
-      title="No databases"
-      description="You can see all your databases here."
+      title={resources.databases.emptyTitle}
+      description={resources.databases.emptyDescription}
       icons={[PackagePlus]}
       action={{
-        label: "Install database from Hub",
+        label: resources.databases.installFromHub,
         href: "/databases/hub",
       }}
     />

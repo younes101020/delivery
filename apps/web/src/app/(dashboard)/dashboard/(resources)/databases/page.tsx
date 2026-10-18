@@ -1,3 +1,4 @@
+import { getDictionary } from "@delivery/i18n/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { Boxes, PackagePlus } from "lucide-react";
 import Link from "next/link";
@@ -9,6 +10,7 @@ import { PageDescription } from "@/app/_components/ui/page-description";
 import { PageTitle } from "@/app/_components/ui/page-title";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { getQueryClient } from "@/app/_lib/get-rsc-query-client";
+import { getCurrentLocale } from "@/app/_lib/locale";
 import { env } from "@/env";
 
 import { DatabaseCard } from "./_components/database-card";
@@ -17,18 +19,20 @@ import { getDatabaseService } from "./_lib/queries";
 
 export const dynamic = "force-dynamic";
 
-export default function DatabasesPage() {
+export default async function DatabasesPage() {
+  const dictionary = await getDictionary(await getCurrentLocale());
+  const { databases } = dictionary.resources;
   return (
     <section className="h-[90%] p-5 bg-background/50 border">
       <div className="flex justify-between gap-2">
         <div>
-          <PageTitle>My databases</PageTitle>
-          <PageDescription>A list of all your databases.</PageDescription>
+          <PageTitle>{databases.title}</PageTitle>
+          <PageDescription>{databases.description}</PageDescription>
         </div>
 
         <Link href="/dashboard/applications/hub" className={buttonVariants({ variant: "outline" })}>
           <Boxes className="mr-1 mt-[.1rem] stroke-1" />
-          Database Hub
+          {databases.hub}
         </Link>
       </div>
 
