@@ -8,11 +8,13 @@ import type { ActionState } from "@/app/_lib/form-middleware";
 import { Button } from "@/app/_components/ui/button";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
+import { useSettingsDictionary } from "@/app/_ctx/resources-dictionary";
 import { withToast } from "@/app/_lib/utils";
 
 import { updateSecuritySettings } from "../actions";
 
 export function SecurityForm() {
+  const { account, common } = useSettingsDictionary();
   const [_, formAction, isPending] = useActionState<ActionState, FormData>(
     withToast(updateSecuritySettings),
     { error: "", success: "", inputs: {} },
@@ -22,7 +24,7 @@ export function SecurityForm() {
 
     <form className="space-y-4" action={formAction}>
       <div>
-        <Label htmlFor="password">New password</Label>
+        <Label htmlFor="password">{account.newPassword}</Label>
         <Input
           id="password"
           name="password"
@@ -33,7 +35,7 @@ export function SecurityForm() {
         />
       </div>
       <div>
-        <Label htmlFor="repeat-password">Repeat new password</Label>
+        <Label htmlFor="repeat-password">{account.repeatPassword}</Label>
         <Input
           id="repeat-password"
           name="repeat-password"
@@ -52,13 +54,13 @@ export function SecurityForm() {
           ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
+                {common.saving}
               </>
             )
           : (
               <>
                 <Shield />
-                Change password
+                {account.changePassword}
               </>
             )}
       </Button>
