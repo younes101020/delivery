@@ -11,6 +11,7 @@ import { CardFooter } from "@/app/_components/ui/card";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
 import { Skeleton } from "@/app/_components/ui/skeleton";
+import { useSettingsDictionary } from "@/app/_ctx/resources-dictionary";
 import { useUser } from "@/app/_hooks/use-user";
 import { useFetch } from "@/app/_lib/fetch-provider";
 import { withToast } from "@/app/_lib/utils";
@@ -37,6 +38,7 @@ export function DeliveryInstanceForm() {
 }
 
 function Form() {
+  const { common, general } = useSettingsDictionary();
   const { user } = useUser();
   const [state, formAction, pending] = useActionState<ActionState<DeliveryInstanceFormProps>, FormData>(
     withToast(deliveryInstanceForm),
@@ -65,23 +67,23 @@ function Form() {
       && (
         <form className="w-full flex flex-col gap-4 pt-4" action={formAction} aria-label="form">
           <div>
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">{general.instanceName}</Label>
             <Input
               disabled={user.role !== "owner"}
               id="name"
               name="name"
               type="text"
               aria-label="delivery dashboard instance name"
-              placeholder="My application dashboard"
+              placeholder={general.instanceName}
               defaultValue={state.inputs.name || deliveryWebInstanceConfiguration.data?.name}
               className="rounded-r-none"
             />
             <p className="text-muted-foreground text-xs pt-2">
-              The name of your delivery instance.
+              {general.instanceNameHelp}
             </p>
           </div>
           <div>
-            <Label htmlFor="fqdn">Domain name</Label>
+            <Label htmlFor="fqdn">{common.domainName}</Label>
             <Input
               disabled={user.role !== "owner"}
               id="fqdn"
@@ -93,7 +95,7 @@ function Form() {
               defaultValue={state.inputs.fqdn || deliveryWebInstanceConfiguration.data?.fqdn}
             />
             <p className="text-muted-foreground text-xs pt-2">
-              The domain name of your application. This is the fully qualified domain name that will be used to access your application.
+              {general.domainHelp}
             </p>
           </div>
           <input type="hidden" name="serviceId" id="serviceId" defaultValue={state.inputs?.serviceId || deliveryWebInstanceConfiguration.data?.serviceId} />
@@ -104,11 +106,11 @@ function Form() {
                   ? (
                       <>
                         <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                        Loading...
+                        {common.loading}
                       </>
                     )
                   : (
-                      "Save"
+                      common.save
                     )}
               </Button>
             </CardFooter>

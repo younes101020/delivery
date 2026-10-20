@@ -2,9 +2,11 @@ import type en from "./dictionaries/en.json";
 
 export type AuthDictionary = typeof en.auth;
 export type ResourcesDictionary = typeof en.resources;
+export type SettingsDictionary = typeof en.settings;
 export interface Dictionary {
   auth: AuthDictionary;
   resources: ResourcesDictionary;
+  settings: SettingsDictionary;
 }
 
 export const LOCALES = ["en", "fr"] as const;

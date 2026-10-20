@@ -17,6 +17,7 @@ import { RadioGroup, RadioGroupItem } from "@/app/_components/ui/radio-group";
 import { ScrollArea } from "@/app/_components/ui/scroll-area";
 import { Separator } from "@/app/_components/ui/separator";
 import { Skeleton } from "@/app/_components/ui/skeleton";
+import { useSettingsDictionary } from "@/app/_ctx/resources-dictionary";
 import { useUser } from "@/app/_hooks/use-user";
 import { useFetch } from "@/app/_lib/fetch-provider";
 import { withToast } from "@/app/_lib/utils";
@@ -26,9 +27,10 @@ import { inviteTeamMember } from "../actions";
 import { RevokeTeamMemberForm } from "./revoke-team-member-form";
 
 export function TeamList() {
+  const { team: settingsTeam } = useSettingsDictionary();
   return (
     <div className="mt-2">
-      <h2>Team Members</h2>
+      <h2>{settingsTeam.members}</h2>
       <Suspense fallback={<PendingTeamList />}>
         <TeamMemberList />
       </Suspense>
@@ -37,6 +39,7 @@ export function TeamList() {
 }
 
 function TeamMemberList() {
+  const { team: settingsTeam } = useSettingsDictionary();
   const { fetcher } = useFetch();
   const { data: team } = useSuspenseQuery<TeamForUser>({
     queryKey: ["team"],
@@ -44,7 +47,7 @@ function TeamMemberList() {
   });
 
   if (!team) {
-    return <div className="mt-4 flex justify-center">No team</div>;
+    return <div className="mt-4 flex justify-center">{settingsTeam.noTeam}</div>;
   }
 
   return (
@@ -68,7 +71,7 @@ function TeamMemberList() {
                       variant="outline"
                       size="sm"
                     >
-                      Revoke
+                      {settingsTeam.revoke}
                     </Button>
                   </AlertDialogTrigger>
                   <RevokeTeamMemberForm memberId={member.id} />
@@ -88,6 +91,7 @@ interface TeamFormContentProps {
 }
 
 export function TeamFormContent() {
+  const { common, team } = useSettingsDictionary();
   const { user } = useUser();
   const isOwner = user && user?.role === "owner";
   const [state, formAction, pending] = useActionState<ActionState<TeamFormContentProps>, FormData>(
@@ -104,9 +108,9 @@ export function TeamFormContent() {
         <>
           <Alert variant="success" className="mt-8">
             <CheckCircle2Icon />
-            <AlertTitle>Share your invitation link</AlertTitle>
+            <AlertTitle>{team.inviteTitle}</AlertTitle>
             <AlertDescription className="text-xs">
-              Your invitation URL has been successfully generated. Share this link with the member you wish to invite to the team.
+              {team.inviteDescription}
               <Separator />
               <div className="flex items-center gap-2 my-2 max-w-full">
                 <p className="text-xs">{state.inputs.inviteUrl}</p>
@@ -123,7 +127,7 @@ export function TeamFormContent() {
 
       <form className="w-full flex flex-col gap-6 pt-4" action={formAction} aria-label="form">
         <div>
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{common.email}</Label>
           <Input
             id="email"
             name="email"
@@ -135,23 +139,23 @@ export function TeamFormContent() {
             defaultValue={state.inputs?.email}
           />
           <p className="text-muted-foreground text-xs pt-2">
-            The email address of the user you want to invite to your team.
+            {team.emailHelp}
           </p>
         </div>
         <div>
-          <Label>Role</Label>
+          <Label>{team.role}</Label>
           <RadioGroup defaultValue="member" className="mt-2" disabled={!isOwner} name="role">
             <div className="flex items-center gap-3">
               <RadioGroupItem value="member" id="member" />
-              <Label htmlFor="member">Member</Label>
+              <Label htmlFor="member">{team.member}</Label>
             </div>
             <div className="flex items-center gap-3">
               <RadioGroupItem value="owner" id="owner" />
-              <Label htmlFor="owner">Owner</Label>
+              <Label htmlFor="owner">{team.owner}</Label>
             </div>
           </RadioGroup>
           <p className="text-muted-foreground text-xs pt-2">
-            The role of the user you want to invite to your team. Members can access the team, while owners have full control over it.
+            {team.roleHelp}
           </p>
         </div>
 
@@ -161,11 +165,11 @@ export function TeamFormContent() {
               ? (
                   <>
                     <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                    Loading...
+                    {common.loading}
                   </>
                 )
               : (
-                  "Get invitation link"
+                  team.getInvitationLink
                 )}
           </Button>
         </CardFooter>

@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
 } from "@/app/_components/ui/alert-dialog";
 import { Button } from "@/app/_components/ui/button";
+import { useSettingsDictionary } from "@/app/_ctx/resources-dictionary";
 import { withToast } from "@/app/_lib/utils";
 
 import { revokeTeamMember } from "../actions";
@@ -23,6 +24,7 @@ interface RevvokeTeamMemberFormProps {
 }
 
 export function RevokeTeamMemberForm({ memberId }: RevvokeTeamMemberFormProps) {
+  const { common, team } = useSettingsDictionary();
   const [_, revokeAction, isRevokingPending] = useActionState<ActionState, FormData>(
     withToast(revokeTeamMember),
     {
@@ -33,13 +35,13 @@ export function RevokeTeamMemberForm({ memberId }: RevvokeTeamMemberFormProps) {
   return (
     <AlertDialogContent>
       <AlertDialogHeader>
-        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+        <AlertDialogTitle>{team.revokeTitle}</AlertDialogTitle>
         <AlertDialogDescription>
-          This action cannot be undone. This will permanently revoke this team member access to your team and all its resources.
+          {team.revokeDescription}
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel>Cancel</AlertDialogCancel>
+        <AlertDialogCancel>{common.cancel}</AlertDialogCancel>
         <AlertDialogAction asChild>
           <form action={revokeAction}>
             <input type="hidden" name="memberId" value={memberId} />
@@ -49,7 +51,7 @@ export function RevokeTeamMemberForm({ memberId }: RevvokeTeamMemberFormProps) {
               size="sm"
               disabled={isRevokingPending}
             >
-              {isRevokingPending ? "Removing..." : "Remove"}
+              {isRevokingPending ? common.removing : common.remove}
             </Button>
           </form>
         </AlertDialogAction>

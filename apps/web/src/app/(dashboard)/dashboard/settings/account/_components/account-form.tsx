@@ -9,6 +9,7 @@ import { Button } from "@/app/_components/ui/button";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
 import { Skeleton } from "@/app/_components/ui/skeleton";
+import { useSettingsDictionary } from "@/app/_ctx/resources-dictionary";
 import { useUser } from "@/app/_hooks/use-user";
 import { withToast } from "@/app/_lib/utils";
 
@@ -23,6 +24,7 @@ export function AccountForm() {
 }
 
 function Form() {
+  const { account, common } = useSettingsDictionary();
   const { user } = useUser();
   const [state, formAction, isPending] = useActionState<ActionState, FormData>(
     withToast(updateAccount),
@@ -32,22 +34,22 @@ function Form() {
   return (
     <form className="space-y-4" action={formAction}>
       <div>
-        <Label htmlFor="name">Name</Label>
+        <Label htmlFor="name">{common.name}</Label>
         <Input
           id="name"
           name="name"
-          placeholder="eg: John Doe"
+          placeholder={account.namePlaceholder}
           defaultValue={state.inputs.name || ""}
           required
         />
       </div>
       <div>
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{common.email}</Label>
         <Input
           id="email"
           name="email"
           type="email"
-          placeholder="Enter your email"
+          placeholder={account.emailPlaceholder}
           defaultValue={state.inputs.email || ""}
           required
         />
@@ -61,13 +63,13 @@ function Form() {
           ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
+                {common.saving}
               </>
             )
           : (
               <>
                 <UserPen />
-                Save Changes
+                {common.save}
               </>
 
             )}
