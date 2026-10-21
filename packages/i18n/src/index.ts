@@ -3,10 +3,12 @@ import type en from "./dictionaries/en.json";
 export type AuthDictionary = typeof en.auth;
 export type ResourcesDictionary = typeof en.resources;
 export type SettingsDictionary = typeof en.settings;
+export type DeploymentsDictionary = typeof en.deployments;
 export interface Dictionary {
   auth: AuthDictionary;
   resources: ResourcesDictionary;
   settings: SettingsDictionary;
+  deployments: DeploymentsDictionary;
 }
 
 export const LOCALES = ["en", "fr"] as const;

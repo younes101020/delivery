@@ -7,6 +7,7 @@ import { Button, buttonVariants } from "@/app/_components/ui/button";
 import { Card, CardAction, CardContent, CardFooter, CardHeader } from "@/app/_components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/app/_components/ui/dialog";
 import { Separator } from "@/app/_components/ui/separator";
+import { useDeploymentsDictionary, useResourcesDictionary } from "@/app/_ctx/resources-dictionary";
 import { cn, toLocalDateString } from "@/app/_lib/utils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/(dashboard)/dashboard/_components/ui/table";
 
@@ -34,6 +35,7 @@ export function PreviousDeploymentPreviewCard({
   applicationId,
   deploymentDuration,
 }: DeploymentPreviewCardProps) {
+  const deployments = useDeploymentsDictionary();
   return (
     <Card
       className="rounded-none"
@@ -45,7 +47,7 @@ export function PreviousDeploymentPreviewCard({
             <Link href={`/dashboard/applications/${applicationId}`} className={cn(buttonVariants({ variant: "outline" }), "text-xs")}>
               <Cog strokeWidth={0.8} />
               {" "}
-              Application setting
+              {deployments.applicationSettings}
             </Link>
           </CardAction>
         </div>
@@ -62,12 +64,12 @@ export function PreviousDeploymentPreviewCard({
             <Button className="text-xs">
               <Scroll />
               {" "}
-              View build logs
+              {deployments.viewBuildLogs}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-4xl w-full border-none">
             <DialogHeader>
-              <DialogTitle>Logs</DialogTitle>
+              <DialogTitle>{deployments.logs}</DialogTitle>
             </DialogHeader>
             <DeploymentLogsCard logs={logs} />
           </DialogContent>
@@ -83,21 +85,23 @@ interface DeploymentDurationTableProps {
 }
 
 function DeploymentDurationTable({ deploymentDuration }: DeploymentDurationTableProps) {
+  const deployments = useDeploymentsDictionary();
+  const { locale } = useResourcesDictionary();
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Step</TableHead>
-          <TableHead>Started at</TableHead>
-          <TableHead>Ended at</TableHead>
+          <TableHead>{deployments.step}</TableHead>
+          <TableHead>{deployments.startedAt}</TableHead>
+          <TableHead>{deployments.endedAt}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {deploymentDuration.map(duration => (
           <TableRow key={duration.id}>
             <TableCell className="font-medium">{duration.label}</TableCell>
-            <TableCell>{toLocalDateString(duration.startTimeTimestamp)}</TableCell>
-            <TableCell>{toLocalDateString(duration.endTimeTimestamp)}</TableCell>
+            <TableCell>{toLocalDateString(duration.startTimeTimestamp, locale)}</TableCell>
+            <TableCell>{toLocalDateString(duration.endTimeTimestamp, locale)}</TableCell>
           </TableRow>
         ))}
       </TableBody>

@@ -10,6 +10,7 @@ import { buttonVariants } from "@/app/_components/ui/button";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/app/_components/ui/card";
 import { Separator } from "@/app/_components/ui/separator";
 import { Skeleton } from "@/app/_components/ui/skeleton";
+import { useDeploymentsDictionary, useResourcesDictionary } from "@/app/_ctx/resources-dictionary";
 import { getQueryClient } from "@/app/_lib/react-query-provider";
 import { cn, toLocalDateString } from "@/app/_lib/utils";
 
@@ -26,7 +27,9 @@ export function DeploymentPreviewCard({
   timestamp,
   repoName,
 }: DeploymentPreviewCardProps) {
-  const date = toLocalDateString(timestamp);
+  const deployments = useDeploymentsDictionary();
+  const { locale } = useResourcesDictionary();
+  const date = toLocalDateString(timestamp, locale);
   const { data } = useQuery<DeploymentPreviewState>({ queryKey: [repoName] }, getQueryClient(true));
 
   const previousStep = data?.step === "build" ? "clone" : data?.step === "configure" ? "build" : null;
@@ -44,7 +47,7 @@ export function DeploymentPreviewCard({
               <CardAction>
                 <Link href={`/dashboard/deployments/${repoName}`} className={cn(buttonVariants({ variant: "outline" }), "mt-2 text-xs")}>
                   <Radio strokeWidth={0.9} size={0.5} />
-                  Live logs
+                  {deployments.liveLogs}
                 </Link>
               </CardAction>
             </div>
@@ -61,7 +64,7 @@ export function DeploymentPreviewCard({
                   {data.status}
                 </Badge>
               )
-            : <Skeleton className="inline-flex items-center h-7 px-2.5 py-0.5 text-xs border w-fit">Checking status...</Skeleton>}
+            : <Skeleton className="inline-flex items-center h-7 px-2.5 py-0.5 text-xs border w-fit">{deployments.checkingStatus}</Skeleton>}
 
         </div>
         {(data?.status === "active" || data?.status === "failed") && (
@@ -93,7 +96,7 @@ export function DeploymentPreviewCard({
               <dt className="text-muted-foreground">
                 {data?.step}
                 {" "}
-                started at
+                {deployments.startedAt}
               </dt>
               <dd>
                 {date}

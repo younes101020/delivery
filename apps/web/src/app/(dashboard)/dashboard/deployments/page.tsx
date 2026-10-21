@@ -1,3 +1,4 @@
+import { getDictionary } from "@delivery/i18n/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { Check, Radio } from "lucide-react";
 import { Suspense } from "react";
@@ -7,6 +8,7 @@ import { PageTitle } from "@/app/_components/ui/page-title";
 import { Separator } from "@/app/_components/ui/separator";
 import { Skeleton } from "@/app/_components/ui/skeleton";
 import { getQueryClient } from "@/app/_lib/get-rsc-query-client";
+import { getCurrentLocale } from "@/app/_lib/locale";
 import { env } from "@/env";
 
 import { OngoingDeploymentList } from "./_components/ongoing-deployment-list";
@@ -27,6 +29,7 @@ export default function DeploymentsPage() {
 }
 
 async function Deployments() {
+  const { deployments } = await getDictionary(await getCurrentLocale());
   const queryClient = getQueryClient();
   const baseUrl = env.WEB_BASE_URL;
 
@@ -44,8 +47,8 @@ async function Deployments() {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div>
-        <PageTitle>Deployments</PageTitle>
-        <PageDescription>All your in progress and completed deployments.</PageDescription>
+        <PageTitle>{deployments.title}</PageTitle>
+        <PageDescription>{deployments.description}</PageDescription>
       </div>
 
       <Tabs defaultValue="in-progress" className="w-full relative mr-auto my-6">
@@ -58,7 +61,7 @@ async function Deployments() {
               <Radio />
               {" "}
               <Separator orientation="vertical" className="h-[1rem]" />
-              In progress
+              {deployments.inProgress}
             </div>
           </TabsTrigger>
           <TabsTrigger
@@ -69,7 +72,7 @@ async function Deployments() {
               <Check />
               {" "}
               <Separator orientation="vertical" className="h-[1rem]" />
-              Completed
+              {deployments.completed}
             </div>
           </TabsTrigger>
         </TabsList>
