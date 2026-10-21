@@ -5,6 +5,7 @@ import { Truck } from "lucide-react";
 import { Suspense } from "react";
 
 import { Skeleton } from "@/app/_components/ui/skeleton";
+import { useDeploymentsDictionary } from "@/app/_ctx/resources-dictionary";
 import { useFetch } from "@/app/_lib/fetch-provider";
 
 import type { OngoingDeployments } from "../_lib/queries";
@@ -28,6 +29,7 @@ export function OngoingDeploymentList({ baseUrl }: OngoingDeploymentListProps) {
 }
 
 function OngoingDeploymentPreview({ baseUrl }: OngoingDeploymentListProps) {
+  const deployments = useDeploymentsDictionary();
   const { fetcher } = useFetch();
   const ongoingDeployments = useSuspenseQuery<OngoingDeployments>({
     queryKey: ["deployments", "ongoing"],
@@ -35,7 +37,7 @@ function OngoingDeploymentPreview({ baseUrl }: OngoingDeploymentListProps) {
   });
 
   if (ongoingDeployments.data.length < 1)
-    return <EmptyDeployment title="No ongoing deployment" description="You can preview all your ongoing deployments here." Icon={Truck} />;
+    return <EmptyDeployment title={deployments.noOngoingTitle} description={deployments.noOngoingDescription} Icon={Truck} />;
 
   return ongoingDeployments.data.map(deployment => (
     <SubscribeToSSE key={deployment.id} baseUrl={baseUrl} repoName={deployment.repoName}>

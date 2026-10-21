@@ -5,6 +5,7 @@ import { History } from "lucide-react";
 import { Suspense } from "react";
 
 import { Skeleton } from "@/app/_components/ui/skeleton";
+import { useDeploymentsDictionary } from "@/app/_ctx/resources-dictionary";
 import { useFetch } from "@/app/_lib/fetch-provider";
 
 import type { PreviousDeployments } from "../_lib/queries";
@@ -21,6 +22,7 @@ export function PreviousDeploymentList() {
 }
 
 function List() {
+  const deployments = useDeploymentsDictionary();
   const { fetcher } = useFetch();
   const prevDeployments = useSuspenseQuery<PreviousDeployments>({
     queryKey: ["deployments", "previous"],
@@ -28,7 +30,7 @@ function List() {
   });
 
   if (prevDeployments.data.length < 1)
-    return <EmptyDeployment title="No previous deployment" description="You can preview all your previous deployments here." Icon={History} />;
+    return <EmptyDeployment title={deployments.noPreviousTitle} description={deployments.noPreviousDescription} Icon={History} />;
 
   return (
     <>

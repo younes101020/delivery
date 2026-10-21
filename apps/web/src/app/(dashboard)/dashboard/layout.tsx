@@ -32,7 +32,7 @@ export default async function Layout({
   });
 
   return (
-    <ResourcesDictionaryProvider locale={locale} resources={dictionary.resources} settings={dictionary.settings}>
+    <ResourcesDictionaryProvider deployments={dictionary.deployments} locale={locale} resources={dictionary.resources} settings={dictionary.settings}>
       <SubscribeToSSE baseUrl={baseUrl}>
         <SidebarProvider>
           <HydrationBoundary state={dehydrate(queryClient)}>
