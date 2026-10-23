@@ -15,12 +15,15 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/app/
 import { useFetch as getBaseUrl } from "@/app/_lib/fetch-provider";
 import { WEBHOOK_EVENTS } from "@/app/_lib/github/config";
 
+import { useOptionalOnboardingDictionary } from "./onboarding-dictionary";
+
 interface GitHubAppFormProps {
   isOnboarding?: boolean;
 }
 
 export function GithubAppForm({ isOnboarding = false }: GitHubAppFormProps) {
   const { baseUrl } = getBaseUrl();
+  const onboarding = useOptionalOnboardingDictionary();
 
   // `ghState` data will be returned by github after gh app creation to webhook endpoint
   const ghState = isOnboarding;
@@ -68,7 +71,7 @@ export function GithubAppForm({ isOnboarding = false }: GitHubAppFormProps) {
     <form action={url} method="POST" className="space-y-8" aria-label="form">
       <div>
         <Label htmlFor="name" className="block text-sm">
-          Github App name
+          {onboarding?.github.nameLabel ?? "Github App name"}
         </Label>
         <div className="mt-1">
           <Input
@@ -81,14 +84,14 @@ export function GithubAppForm({ isOnboarding = false }: GitHubAppFormProps) {
             value={name}
             onChange={e => setName(e.target.value)}
             className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
-            placeholder="MySuperGithubApp"
+            placeholder={onboarding?.github.namePlaceholder ?? "MySuperGithubApp"}
           />
         </div>
-        <p className="text-muted-foreground text-xs pt-1">Enter a name for your Github App</p>
+        <p className="text-muted-foreground text-xs pt-1">{onboarding?.github.nameHelp ?? "Enter a name for your Github App"}</p>
       </div>
       <div>
         <Label htmlFor="events" className="block text-sm mb-2">
-          Redeploy my web applications/site when
+          {onboarding?.github.eventsLabel ?? "Redeploy my web applications/site when"}
         </Label>
         <Separator />
         <ScrollArea className="my-2 w-full h-40">
@@ -104,7 +107,7 @@ export function GithubAppForm({ isOnboarding = false }: GitHubAppFormProps) {
                   htmlFor={option.id}
                   className="text-xs leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
-                  {option.label}
+                  {onboarding?.github.events[option.id as keyof typeof onboarding.github.events] ?? option.label}
                 </Label>
               </div>
             ))}
@@ -112,11 +115,11 @@ export function GithubAppForm({ isOnboarding = false }: GitHubAppFormProps) {
 
         </ScrollArea>
 
-        <p className="text-muted-foreground text-xs pt-1">What events should trigger a redeployment?</p>
+        <p className="text-muted-foreground text-xs pt-1">{onboarding?.github.eventsHelp ?? "What events should trigger a redeployment?"}</p>
       </div>
       <div className={enableOrg ? "" : "opacity-25"}>
         <Label htmlFor="organization" className="block text-sm">
-          Organization name
+          {onboarding?.github.organizationLabel ?? "Organization name"}
         </Label>
         <div className="mt-1">
           <Input
@@ -128,11 +131,11 @@ export function GithubAppForm({ isOnboarding = false }: GitHubAppFormProps) {
             onChange={handleOrgNameChange}
             maxLength={50}
             className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
-            placeholder="Facebook"
+            placeholder={onboarding?.github.organizationPlaceholder ?? "Facebook"}
           />
         </div>
         <p className="text-muted-foreground text-xs pt-1">
-          Enter the name of your Github organization
+          {onboarding?.github.organizationHelp ?? "Enter the name of your Github organization"}
         </p>
       </div>
       <div className="flex items-center space-x-2">
@@ -142,14 +145,14 @@ export function GithubAppForm({ isOnboarding = false }: GitHubAppFormProps) {
           checked={enableOrg}
           onCheckedChange={setEnableOrg}
         />
-        <Label htmlFor="organization-bool">Organization account?</Label>
+        <Label htmlFor="organization-bool">{onboarding?.github.organizationAccount ?? "Organization account?"}</Label>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <Info size={13} className="mb-2" />
             </TooltipTrigger>
             <TooltipContent>
-              <p>Are your repositories in a Github organization account?</p>
+              <p>{onboarding?.github.organizationTooltip ?? "Are your repositories in a Github organization account?"}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -158,12 +161,12 @@ export function GithubAppForm({ isOnboarding = false }: GitHubAppFormProps) {
         type="hidden"
         id="manifest"
         name="manifest"
-        aria-label="manifest"
+        aria-label={onboarding?.github.manifestLabel ?? "manifest"}
         value={JSON.stringify(data)}
       />
 
       <CardFooter className="flex px-0 pt-8 justify-end">
-        <Button type="submit">Create & install Github App</Button>
+        <Button type="submit">{onboarding?.github.createAndInstall ?? "Create & install Github App"}</Button>
       </CardFooter>
     </form>
   );

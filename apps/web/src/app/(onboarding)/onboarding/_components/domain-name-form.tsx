@@ -11,11 +11,14 @@ import { Label } from "@/app/_components/ui/label";
 import { withToast } from "@/app/_lib/utils";
 import { domainName } from "@/app/actions";
 
+import { useOnboardingDictionary } from "./onboarding-dictionary";
+
 interface DomainNameState {
   domainName: string;
 }
 
 export function DomainNameForm() {
+  const onboarding = useOnboardingDictionary();
   const [_, formAction, pending] = useActionState<ActionState<DomainNameState>, FormData>(
     withToast(domainName),
     {
@@ -31,7 +34,7 @@ export function DomainNameForm() {
       <form action={formAction} className="px-5 space-y-4" aria-label="form">
         <div>
           <Label htmlFor="domainName" className="block text-sm font-medium">
-            Domain name
+            {onboarding.domain.label}
           </Label>
           <div className="mt-1">
             <Input
@@ -40,24 +43,24 @@ export function DomainNameForm() {
               type="text"
               required
               className="appearance-none relative block w-full px-3 py-2 border focus:z-10 sm:text-sm"
-              placeholder="ex: http://mydomain.com or http://203.0.113.42"
+              placeholder={onboarding.domain.placeholder}
             />
           </div>
           <p className="text-muted-foreground text-xs pt-1">
-            The domain name or public IP that directs to the server where you launched Delivery.
+            {onboarding.domain.help}
           </p>
         </div>
         <div className="flex justify-end">
-          <Button type="submit" disabled={pending} aria-label="submit">
+          <Button type="submit" disabled={pending} aria-label={onboarding.domain.submitLabel}>
             {pending
               ? (
                   <>
                     <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                    Loading...
+                    {onboarding.loading}
                   </>
                 )
               : (
-                  "Next"
+                  onboarding.domain.next
                 )}
           </Button>
         </div>

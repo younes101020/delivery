@@ -4,11 +4,13 @@ export type AuthDictionary = typeof en.auth;
 export type ResourcesDictionary = typeof en.resources;
 export type SettingsDictionary = typeof en.settings;
 export type DeploymentsDictionary = typeof en.deployments;
+export type OnboardingDictionary = typeof en.onboarding;
 export interface Dictionary {
   auth: AuthDictionary;
   resources: ResourcesDictionary;
   settings: SettingsDictionary;
   deployments: DeploymentsDictionary;
+  onboarding: OnboardingDictionary;
 }
 
 export const LOCALES = ["en", "fr"] as const;
