@@ -1,9 +1,15 @@
+import type { Dictionary } from "@delivery/i18n";
+
 import { cleanup, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, vi } from "vitest";
 
 import { Login } from "@/app/_components/login-form";
 
+import { DomainNameForm } from "../_components/domain-name-form";
 import { GithubAppForm } from "../_components/github-app-form";
+import { OnboardingDictionaryProvider } from "../_components/onboarding-dictionary";
+import { SkipOnboardingForm } from "../_components/skip-onboarding";
+import { StepProvider } from "../_components/step";
 import { onBoardingTest } from "./fixtures";
 import { setup } from "./utils";
 
@@ -50,12 +56,56 @@ const FRENCH_AUTH_DICTIONARY = {
   signUp: "S'inscrire",
 } as const;
 
+const FRENCH_ONBOARDING_DICTIONARY = {
+  loading: "Chargement…",
+  stepStatusLoading: "Vérification de l’étape…",
+  steps: [
+    { title: "Création du compte", description: "Pour gérer vos applications." },
+    { title: "URL", description: "Pour exposer vos applications sur Internet." },
+    { title: "Application GitHub", description: "Pour créer des déploiements." },
+    { title: "Déployer votre application", description: "Pour déployer votre application." },
+  ],
+  domain: {
+    label: "Nom de domaine",
+    placeholder: "ex. http://mondomaine.com",
+    help: "Le nom de domaine public de votre serveur.",
+    next: "Suivant",
+    submitLabel: "Envoyer le nom de domaine",
+  },
+  github: {
+    nameLabel: "Nom de l’application GitHub",
+    namePlaceholder: "MonSuperGitHubApp",
+    nameHelp: "Saisissez un nom pour votre application GitHub.",
+    eventsLabel: "Redéployer lorsque",
+    eventsHelp: "Quels événements doivent déclencher un redéploiement ?",
+    organizationLabel: "Nom de l’organisation",
+    organizationPlaceholder: "Facebook",
+    organizationHelp: "Saisissez le nom de votre organisation GitHub.",
+    organizationAccount: "Compte d’organisation ?",
+    organizationTooltip: "Vos dépôts sont-ils dans un compte d’organisation GitHub ?",
+    createAndInstall: "Créer et installer l’application GitHub",
+    manifestLabel: "Manifeste de l’application GitHub",
+    events: { push: "du code est envoyé sur une branche" },
+  },
+  skip: { action: "Passer", loading: "Chargement…", formLabel: "Passer l’onboarding" },
+} as unknown as Dictionary["onboarding"];
+
+function OnboardingProvider({ children }: React.PropsWithChildren) {
+  return (
+    <OnboardingDictionaryProvider locale="fr" onboarding={FRENCH_ONBOARDING_DICTIONARY}>
+      {children}
+    </OnboardingDictionaryProvider>
+  );
+}
+
 describe("onboarding process", () => {
   beforeAll(() => {
     vi.mock("@/app/actions", () => {
       const signUp = vi.fn();
       signUp.mockResolvedValue({ error: "Impossible to sign up", inputs: { email: "", password: "" } });
-      return { signUp };
+      const domainName = vi.fn();
+      const skipOnboardingDeployment = vi.fn();
+      return { domainName, signUp, skipOnboardingDeployment };
     });
 
     vi.mock("@/app/(login)/actions", () => {
@@ -102,6 +152,8 @@ describe("onboarding process", () => {
 
     const form = within(screen.getByRole("form"));
 
+    expect(screen.getByLabelText("Github App name")).toBeDefined();
+
     const manifestInput = form.getByLabelText<HTMLInputElement>("manifest");
     expect(manifestInput.value).toBeDefined();
 
@@ -128,6 +180,24 @@ describe("onboarding process", () => {
         default_events: expect.any(Array),
       }),
     );
+  });
+
+  onBoardingTest("renders onboarding forms in French", () => {
+    setup(
+      <OnboardingProvider>
+        <DomainNameForm />
+        <GithubAppForm isOnboarding={true} />
+        <SkipOnboardingForm />
+        <StepProvider><div /></StepProvider>
+      </OnboardingProvider>,
+    );
+
+    expect(screen.getByLabelText("Nom de domaine")).toBeDefined();
+    expect(screen.getByPlaceholderText("ex. http://mondomaine.com")).toBeDefined();
+    expect(screen.getByText("Créer et installer l’application GitHub")).toBeDefined();
+    expect(screen.getByText("du code est envoyé sur une branche")).toBeDefined();
+    expect(screen.getByRole("form", { name: "Passer l’onboarding" })).toBeDefined();
+    expect(screen.getByText("Création du compte")).toBeDefined();
   });
 
   /* onBoardingTest(

@@ -1,3 +1,5 @@
+import type { Dictionary, Locale } from "@delivery/i18n";
+
 import { getDictionary } from "@delivery/i18n/server";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -11,6 +13,7 @@ import { getUser } from "@/app/_lib/user-session";
 import { Login } from "../../_components/login-form";
 import { DomainNameForm } from "./_components/domain-name-form";
 import { GithubAppForm } from "./_components/github-app-form";
+import { OnboardingDictionaryProvider } from "./_components/onboarding-dictionary";
 import { SkipOnboardingForm } from "./_components/skip-onboarding";
 import { StepProvider } from "./_components/step";
 import { getServerConfiguration } from "./_lib/queries";
@@ -19,28 +22,33 @@ interface SearchParams {
   searchParams?: Promise<{ step: string; page: string }>;
 }
 
-export default function OnboardingPage({ searchParams }: SearchParams) {
-  return (
-    <div className="flex justify-center items-center h-full max-w-7xl mx-auto relative">
-      <Suspense fallback={<PendingSkipStepper />}>
-        <SkipDeploymentForm searchParams={searchParams} />
-      </Suspense>
+export default async function OnboardingPage({ searchParams }: SearchParams) {
+  const locale = await getCurrentLocale();
+  const dictionary = await getDictionary(locale);
 
-      <StepProvider>
-        <Suspense fallback={<CheckStepStatusLoadingScreen />}>
-          <LoginStep searchParams={searchParams} />
+  return (
+    <OnboardingDictionaryProvider locale={locale} onboarding={dictionary.onboarding}>
+      <div className="flex justify-center items-center h-full max-w-7xl mx-auto relative">
+        <Suspense fallback={<PendingSkipStepper />}>
+          <SkipDeploymentForm searchParams={searchParams} />
         </Suspense>
-        <Suspense fallback={<CheckStepStatusLoadingScreen />}>
-          <DomainNameStep searchParams={searchParams} />
-        </Suspense>
-        <Suspense fallback={<CheckStepStatusLoadingScreen />}>
-          <GithubAppStep searchParams={searchParams} />
-        </Suspense>
-        <Suspense fallback={<CheckStepStatusLoadingScreen />}>
-          <Deployment sp={searchParams!} onboarding={true} />
-        </Suspense>
-      </StepProvider>
-    </div>
+
+        <StepProvider>
+          <Suspense fallback={<CheckStepStatusLoadingScreen message={dictionary.onboarding.stepStatusLoading} />}>
+            <LoginStep auth={dictionary.auth} locale={locale} searchParams={searchParams} />
+          </Suspense>
+          <Suspense fallback={<CheckStepStatusLoadingScreen message={dictionary.onboarding.stepStatusLoading} />}>
+            <DomainNameStep searchParams={searchParams} />
+          </Suspense>
+          <Suspense fallback={<CheckStepStatusLoadingScreen message={dictionary.onboarding.stepStatusLoading} />}>
+            <GithubAppStep searchParams={searchParams} />
+          </Suspense>
+          <Suspense fallback={<CheckStepStatusLoadingScreen message={dictionary.onboarding.stepStatusLoading} />}>
+            <Deployment sp={searchParams!} onboarding={true} />
+          </Suspense>
+        </StepProvider>
+      </div>
+    </OnboardingDictionaryProvider>
   );
 }
 
@@ -69,18 +77,21 @@ async function DomainNameStep(props: SearchParams) {
   return <DomainNameForm />;
 }
 
-async function LoginStep(props: SearchParams) {
-  const searchParams = await props.searchParams;
-  if (searchParams && searchParams.step) {
+interface LoginStepProps extends SearchParams {
+  auth: Dictionary["auth"];
+  locale: Locale;
+}
+
+async function LoginStep({ auth, locale, searchParams }: LoginStepProps) {
+  const resolvedSearchParams = await searchParams;
+  if (resolvedSearchParams && resolvedSearchParams.step) {
     return null;
   }
   const user = await getUser();
   if (user) {
     redirect("/onboarding/?step=2");
   }
-  const locale = await getCurrentLocale();
-  const dictionary = await getDictionary(locale);
-  return <Login auth={dictionary.auth} isOnboarding={true} locale={locale} />;
+  return <Login auth={auth} isOnboarding={true} locale={locale} />;
 }
 
 async function SkipDeploymentForm(props: SearchParams) {
@@ -107,12 +118,10 @@ function PendingSkipStepper() {
   );
 }
 
-function CheckStepStatusLoadingScreen() {
+function CheckStepStatusLoadingScreen({ message }: { message: string }) {
   return (
     <Skeleton className="flex justify-center items-center h-52 w-full">
-      Check step status
-      {" "}
-      <span className=" text-primary">...</span>
+      {message}
     </Skeleton>
   );
 }
