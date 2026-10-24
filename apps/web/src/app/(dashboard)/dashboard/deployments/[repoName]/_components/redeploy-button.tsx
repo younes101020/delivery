@@ -6,6 +6,7 @@ import { useActionState } from "react";
 import type { ActionState } from "@/app/_lib/form-middleware";
 
 import { Button } from "@/app/_components/ui/button";
+import { useDeploymentsDictionary } from "@/app/_ctx/resources-dictionary";
 import { withToast } from "@/app/_lib/utils";
 import { retryDeploy } from "@/app/actions";
 
@@ -17,6 +18,7 @@ interface RedeployButtonProps {
 
 export function RedeployButton({ jobId }: RedeployButtonProps) {
   const repoName = useGetRepoName();
+  const deployments = useDeploymentsDictionary();
   const [_, formAction, isPending] = useActionState<ActionState, FormData>(
     withToast(retryDeploy),
     { error: "", success: "", inputs: { repoName, jobId } },
@@ -36,13 +38,13 @@ export function RedeployButton({ jobId }: RedeployButtonProps) {
             ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Redeployment...
+                  {deployments.redeployment}
                 </>
               )
             : (
                 <>
                   <RotateCcw />
-                  Retry
+                  {deployments.retry}
                 </>
               )}
         </Button>
