@@ -36,6 +36,7 @@ export function PreviousDeploymentPreviewCard({
   deploymentDuration,
 }: DeploymentPreviewCardProps) {
   const deployments = useDeploymentsDictionary();
+  const { locale } = useResourcesDictionary();
   return (
     <Card
       className="rounded-none"
@@ -44,7 +45,7 @@ export function PreviousDeploymentPreviewCard({
         <div className="flex flex-row justify-between items-center">
           <p>{repoName}</p>
           <CardAction>
-            <Link href={`/dashboard/applications/${applicationId}`} className={cn(buttonVariants({ variant: "outline" }), "text-xs")}>
+            <Link href={`/${locale}/dashboard/applications/${applicationId}`} className={cn(buttonVariants({ variant: "outline" }), "text-xs")}>
               <Cog strokeWidth={0.8} />
               {" "}
               {deployments.applicationSettings}

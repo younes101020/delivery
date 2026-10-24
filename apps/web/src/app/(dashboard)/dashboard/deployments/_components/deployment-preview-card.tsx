@@ -45,7 +45,7 @@ export function DeploymentPreviewCard({
           {data?.status !== "completed" && (
             <div>
               <CardAction>
-                <Link href={`/dashboard/deployments/${repoName}`} className={cn(buttonVariants({ variant: "outline" }), "mt-2 text-xs")}>
+                <Link href={`/${locale}/dashboard/deployments/${repoName}`} className={cn(buttonVariants({ variant: "outline" }), "mt-2 text-xs")}>
                   <Radio strokeWidth={0.9} size={0.5} />
                   {deployments.liveLogs}
                 </Link>

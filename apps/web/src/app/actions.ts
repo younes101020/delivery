@@ -1,12 +1,14 @@
 "use server";
 
 import { hasLocale } from "@delivery/i18n";
+import { getDictionary } from "@delivery/i18n/server";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { client } from "./_lib/client-http";
 import { validatedAction, validatedActionWithUser } from "./_lib/form-middleware";
+import { getCurrentLocale } from "./_lib/locale";
 import { setSession } from "./_lib/session";
 import { getUser } from "./_lib/user-session";
 
@@ -161,6 +163,7 @@ const retryDeploySchema = z.object({
 
 export const retryDeploy = validatedAction(retryDeploySchema, async (data) => {
   const { jobId, repoName } = data;
+  const dictionary = await getDictionary(await getCurrentLocale());
   const http = await client();
   const response = await http.deployments.jobs.retry[":jobId"].$post({
     param: {
@@ -171,9 +174,9 @@ export const retryDeploy = validatedAction(retryDeploySchema, async (data) => {
     },
   });
   if (!response.ok) {
-    return { error: "Impossible to retry deployment, please retry later.", inputs: data };
+    return { error: dictionary.deployments.retryFailed, inputs: data };
   }
-  return { success: "Deployment retry attempted", inputs: data };
+  return { success: dictionary.deployments.retrySuccess, inputs: data };
 });
 
 const domainNameSchema = z.object({

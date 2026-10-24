@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 import { Skeleton } from "@/app/_components/ui/skeleton";
+import { useResourcesDictionary } from "@/app/_ctx/resources-dictionary";
 import { getQueryClient } from "@/app/_lib/react-query-provider";
 
 import type { DeploymentLogState } from "../../types";
@@ -16,12 +17,13 @@ import Ripple from "./ui/ripple";
 
 export function Deployment() {
   const router = useRouter();
+  const { locale } = useResourcesDictionary();
   const { data, isLoading } = useQuery<DeploymentLogState>({ queryKey: ["deployment"] }, getQueryClient(true));
 
   useEffect(() => {
     if (data && "completed" in data)
-      router.push("/dashboard/applications");
-  }, [data, router]);
+      router.push(`/${locale}/dashboard/applications`);
+  }, [data, locale, router]);
 
   if (isLoading)
     return <PendingDeployment />;
