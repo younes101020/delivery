@@ -20,6 +20,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/app/_components/ui/sidebar";
+import { useNavigationDictionary, useResourcesDictionary } from "@/app/_ctx/resources-dictionary";
 import { useUser } from "@/app/_hooks/use-user";
 import { signOut } from "@/app/(login)/actions";
 
@@ -28,11 +29,13 @@ import { Skeleton } from "./ui/skeleton";
 export function NavUser() {
   const router = useRouter();
   const { isMobile } = useSidebar();
+  const navigation = useNavigationDictionary();
+  const { locale } = useResourcesDictionary();
 
   async function handleSignOut() {
     await signOut();
     router.refresh();
-    router.push("/");
+    router.push(`/${locale}`);
   }
 
   return (
@@ -67,9 +70,9 @@ export function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <Link href="/dashboard/settings/account" className="relative flex cursor-default select-none items-center gap-2 rounded-sm text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0">
+                <Link href={`/${locale}/dashboard/settings/account`} className="relative flex cursor-default select-none items-center gap-2 rounded-sm text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0">
                   <BadgeCheck />
-                  Account
+                  {navigation.account}
                 </Link>
 
               </DropdownMenuItem>
@@ -77,7 +80,7 @@ export function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleSignOut}>
               <LogOut />
-              Log out
+              {navigation.logOut}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
