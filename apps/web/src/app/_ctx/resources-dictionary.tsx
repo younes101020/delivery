@@ -9,12 +9,13 @@ interface ResourcesDictionaryContextValue {
   resources: Dictionary["resources"];
   settings: Dictionary["settings"];
   deployments: Dictionary["deployments"];
+  navigation: Dictionary["navigation"];
 }
 
 const ResourcesDictionaryContext = createContext<ResourcesDictionaryContextValue | null>(null);
 
-export function ResourcesDictionaryProvider({ children, deployments, locale, resources, settings }: React.PropsWithChildren<ResourcesDictionaryContextValue>) {
-  return <ResourcesDictionaryContext.Provider value={{ deployments, locale, resources, settings }}>{children}</ResourcesDictionaryContext.Provider>;
+export function ResourcesDictionaryProvider({ children, deployments, locale, navigation, resources, settings }: React.PropsWithChildren<ResourcesDictionaryContextValue>) {
+  return <ResourcesDictionaryContext.Provider value={{ deployments, locale, navigation, resources, settings }}>{children}</ResourcesDictionaryContext.Provider>;
 }
 
 export function useResourcesDictionary() {
@@ -30,4 +31,8 @@ export function useSettingsDictionary() {
 
 export function useDeploymentsDictionary() {
   return useResourcesDictionary().deployments;
+}
+
+export function useNavigationDictionary() {
+  return useResourcesDictionary().navigation;
 }

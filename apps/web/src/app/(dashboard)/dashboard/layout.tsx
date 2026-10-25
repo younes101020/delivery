@@ -32,7 +32,7 @@ export default async function Layout({
   });
 
   return (
-    <ResourcesDictionaryProvider deployments={dictionary.deployments} locale={locale} resources={dictionary.resources} settings={dictionary.settings}>
+    <ResourcesDictionaryProvider deployments={dictionary.deployments} locale={locale} navigation={dictionary.navigation} resources={dictionary.resources} settings={dictionary.settings}>
       <SubscribeToSSE baseUrl={baseUrl}>
         <SidebarProvider>
           <HydrationBoundary state={dehydrate(queryClient)}>
@@ -41,7 +41,7 @@ export default async function Layout({
           <SidebarInset>
             <div className="flex h-16 shrink-0 items-center gap-2">
               <div className="flex items-center gap-2 px-4">
-                <SidebarTrigger className="-ml-1" />
+                <SidebarTrigger aria-label={dictionary.navigation.toggle} className="-ml-1" />
                 <Separator orientation="vertical" className="mr-2 h-4" />
                 <Breadcrumb>
                   <BreadcrumbList>

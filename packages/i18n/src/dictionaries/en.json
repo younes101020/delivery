@@ -47,5 +47,8 @@
     },
     "skip": { "action": "Skip", "loading": "Loading...", "formLabel": "Skip onboarding" },
     "loading": "Loading..."
+  },
+  "navigation": {
+    "platform": "Platform", "deployments": "Deployments", "applications": "Applications", "domainName": "Domain name", "new": "New", "databases": "Databases", "hub": "Hub", "settings": "Settings", "general": "General", "account": "Account", "team": "Team", "logOut": "Log out", "toggle": "Toggle navigation"
   }
 }

@@ -21,6 +21,8 @@ import {
 
 export function NavMain({
   items,
+  label,
+  toggleLabel,
 }: {
   items: {
     title: string;
@@ -32,10 +34,12 @@ export function NavMain({
       url: string;
     }[];
   }[];
+  label: string;
+  toggleLabel: string;
 }) {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel>{label}</SidebarGroupLabel>
       <SidebarMenu>
         {items.map(item => (
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
@@ -52,7 +56,7 @@ export function NavMain({
                       <CollapsibleTrigger asChild>
                         <SidebarMenuAction className="data-[state=open]:rotate-90">
                           <ChevronRight />
-                          <span className="sr-only">Toggle</span>
+                          <span className="sr-only">{toggleLabel}</span>
                         </SidebarMenuAction>
                       </CollapsibleTrigger>
                       <CollapsibleContent>

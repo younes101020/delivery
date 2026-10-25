@@ -27,6 +27,7 @@ export function setup(jsx: React.ReactElement, { deployments = DEPLOYMENTS_DICTI
         <ResourcesDictionaryProvider
           deployments={deployments}
           locale={locale}
+          navigation={{} as Dictionary["navigation"]}
           resources={{} as Dictionary["resources"]}
           settings={{} as Dictionary["settings"]}
         >

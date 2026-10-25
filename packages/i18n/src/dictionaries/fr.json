@@ -47,5 +47,8 @@
     },
     "skip": { "action": "Passer", "loading": "Chargement…", "formLabel": "Passer l’onboarding" },
     "loading": "Chargement…"
+  },
+  "navigation": {
+    "platform": "Plateforme", "deployments": "Déploiements", "applications": "Applications", "domainName": "Nom de domaine", "new": "Nouveau", "databases": "Bases de données", "hub": "Hub", "settings": "Paramètres", "general": "Général", "account": "Compte", "team": "Équipe", "logOut": "Se déconnecter", "toggle": "Ouvrir ou fermer la navigation"
   }
 }

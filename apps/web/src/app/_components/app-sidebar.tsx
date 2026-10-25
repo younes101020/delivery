@@ -15,76 +15,26 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/app/_components/ui/sidebar";
+import { useNavigationDictionary, useResourcesDictionary } from "@/app/_ctx/resources-dictionary";
 
 import { useUser } from "../_hooks/use-user";
 import { Logo } from "./ui/logo";
 
-const data = {
-  navMain: [
-    {
-      title: "Deployments",
-      url: "/dashboard/deployments",
-      icon: Truck,
-      items: [],
-    },
-    {
-      title: "Applications",
-      url: "/dashboard/applications",
-      icon: Package,
-      isActive: true,
-      items: [
-        {
-          title: "Domain name",
-          url: "/dashboard/applications/domain-name",
-        },
-        {
-          title: "New",
-          url: "/dashboard/applications/new",
-        },
-      ],
-    },
-    {
-      title: "Databases",
-      url: "/dashboard/databases",
-      isActive: true,
-      icon: Cuboid,
-      items: [
-        {
-          title: "Hub",
-          url: "/dashboard/databases/hub",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      open: true,
-      isActive: true,
-      items: [
-        {
-          title: "General",
-          url: "/dashboard/settings/general",
-        },
-        {
-          title: "Account",
-          url: "/dashboard/settings/account",
-        },
-        { title: "Team", url: "/dashboard/settings/team" },
-      ],
-    },
-  ],
-  navSecondary: [],
-};
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useUser();
+  const navigation = useNavigationDictionary();
+  const { locale } = useResourcesDictionary();
 
   if (!user)
     return null;
 
-  const dataNavMain = data.navMain.map((item) => {
-    if (item.title === "Applications" && user.role !== "owner") {
+  const dataNavMain = [
+    { title: navigation.deployments, url: `/${locale}/dashboard/deployments`, icon: Truck, items: [] },
+    { title: navigation.applications, url: `/${locale}/dashboard/applications`, icon: Package, isActive: true, items: [{ title: navigation.domainName, url: `/${locale}/dashboard/applications/domain-name` }, { title: navigation.new, url: `/${locale}/dashboard/applications/new` }] },
+    { title: navigation.databases, url: `/${locale}/dashboard/databases`, icon: Cuboid, isActive: true, items: [{ title: navigation.hub, url: `/${locale}/dashboard/databases/hub` }] },
+    { title: navigation.settings, url: "#", icon: Settings2, isActive: true, items: [{ title: navigation.general, url: `/${locale}/dashboard/settings/general` }, { title: navigation.account, url: `/${locale}/dashboard/settings/account` }, { title: navigation.team, url: `/${locale}/dashboard/settings/team` }] },
+  ].map((item) => {
+    if (item.title === navigation.applications && user.role !== "owner") {
       return {
         ...item,
         items: item.items?.filter(subItem => subItem.title !== "New"),
@@ -107,8 +57,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={dataNavMain} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <NavMain items={dataNavMain} label={navigation.platform} toggleLabel={navigation.toggle} />
+        <NavSecondary items={[]} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />
