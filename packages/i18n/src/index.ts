@@ -15,7 +15,7 @@ export interface Dictionary {
   navigation: NavigationDictionary;
 }
 
-export const LOCALES = ["en", "fr"] as const;
+export const LOCALES = ["en", "fr", "es", "de"] as const;
 export type Locale = (typeof LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = "en";
 
