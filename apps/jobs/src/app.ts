@@ -4,6 +4,7 @@ import createApp from "@/lib/create-app";
 import applications from "@/routes/applications/applications.index";
 import auth from "@/routes/auth/auth.index";
 import databases from "@/routes/databases/databases.index";
+import { startDatabaseBackupWorker } from "@/routes/databases/lib/tasks/backup-database";
 import deployments from "@/routes/deployments/deployments.index";
 import githubApps from "@/routes/githubapps/githubapps.index";
 import index from "@/routes/index.route";
@@ -16,6 +17,7 @@ import version from "@/routes/version/version.index";
 import env from "./env";
 
 const app = createApp();
+startDatabaseBackupWorker();
 
 configureOpenAPI(app);
 if (env.ENABLE_DEPLOYMENT_QUEUE_MONITORING === "true")

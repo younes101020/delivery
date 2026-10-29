@@ -17,6 +17,7 @@ export const DATABASEERRORNAME = {
   stop: "STOP_DATABASE_ERROR",
   create: "CREATE_DATABASE_ERROR",
   remove: "REMOVE_DATABASE_ERROR",
+  backup: "BACKUP_DATABASE_ERROR",
 } as const;
 
 export type DeploymentErrorNameType = typeof DEPLOYMENTERRORNAME[keyof typeof DEPLOYMENTERRORNAME];

@@ -19,6 +19,27 @@ const EnvSchema = z.object({
   BEARER_TOKEN: z.string(),
   CI: z.string().default("false"),
   ENABLE_DEPLOYMENT_QUEUE_MONITORING: z.string().default("false"),
+  S3_ENDPOINT: z.string().url().optional(),
+  S3_REGION: z.string().optional(),
+  S3_BUCKET: z.string().min(1).optional(),
+  S3_ACCESS_KEY_ID: z.string().min(1).optional(),
+  S3_SECRET_ACCESS_KEY: z.string().min(1).optional(),
+  S3_FORCE_PATH_STYLE: z.coerce.boolean().optional(),
+}).superRefine((config, ctx) => {
+  const requiredS3Settings = ["S3_ENDPOINT", "S3_BUCKET", "S3_ACCESS_KEY_ID", "S3_SECRET_ACCESS_KEY"] as const;
+  const isS3Configured = requiredS3Settings.some(setting => config[setting] !== undefined);
+  if (!isS3Configured)
+    return;
+
+  requiredS3Settings.forEach((setting) => {
+    if (!config[setting]) {
+      ctx.addIssue({
+        code: "custom",
+        path: [setting],
+        message: "Required when S3 backups are configured.",
+      });
+    }
+  });
 });
 
 export type env = z.infer<typeof EnvSchema>;

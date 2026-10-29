@@ -1,5 +1,6 @@
 import { DatabaseError } from "@/lib/error";
 import { createDatabaseService } from "@/routes/databases/lib/remote-docker/service-tasks";
+import { scheduleDatabaseBackup } from "@/routes/databases/lib/tasks/backup-database/utils";
 
 import type { CreateQueueDatabaseJob } from "../types";
 
@@ -12,4 +13,5 @@ export async function create(job: CreateQueueDatabaseJob<"create">) {
         message: error instanceof Error ? error.message : "Unexpected error",
       });
     });
+  await scheduleDatabaseBackup(name);
 }

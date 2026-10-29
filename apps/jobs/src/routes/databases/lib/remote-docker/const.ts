@@ -1,5 +1,15 @@
 export const DATABASE_INSTANCE_REPLICAS = 1;
 
+export const DATABASE_NODE_CONSTRAINT = "node.labels.delivery.database == true";
+
+export const databaseDataDirectories = {
+  postgres: "/var/lib/postgresql/data",
+  mongo: "/data/db",
+  redis: "/data",
+  mariadb: "/var/lib/mysql",
+  mysql: "/var/lib/mysql",
+} as const;
+
 export const databases = [
   {
     image: "postgres",
