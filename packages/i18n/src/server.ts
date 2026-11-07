@@ -3,8 +3,8 @@ import "server-only";
 import type { Dictionary, Locale } from "./index.js";
 
 import de from "./dictionaries/de.js";
-import es from "./dictionaries/es.js";
 import en from "./dictionaries/en.json" with { type: "json" };
+import es from "./dictionaries/es.js";
 
 function mergeDictionary(overlay: { [K in keyof Dictionary]?: Partial<Dictionary[K]> }): Dictionary {
   return Object.fromEntries(Object.entries(en).map(([key, value]) => [key, { ...value, ...overlay[key as keyof Dictionary] }])) as unknown as Dictionary;
