@@ -1,0 +1,26 @@
+{
+  "name": "@delivery/mcp",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "MCP server for the Delivery platform",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "lint": "eslint .",
+    "lint:fix": "pnpm lint --fix",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2"
+  },
+  "devDependencies": {
+    "@delivery/eslint-config": "workspace:*",
+    "@types/node": "^20.11.30",
+    "eslint": "catalog:",
+    "tsx": "^4.19.1",
+    "typescript": "catalog:",
+    "vitest": "^3.1.4"
+  }
+}
