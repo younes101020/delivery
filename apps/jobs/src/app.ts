@@ -1,6 +1,7 @@
 import configureBullBoard from "@/lib/configure-bull-board";
 import configureOpenAPI from "@/lib/configure-open-api";
 import createApp from "@/lib/create-app";
+import apiKeys from "@/routes/api-keys/api-keys.index";
 import applications from "@/routes/applications/applications.index";
 import auth from "@/routes/auth/auth.index";
 import databases from "@/routes/databases/databases.index";
@@ -23,6 +24,7 @@ if (env.ENABLE_DEPLOYMENT_QUEUE_MONITORING === "true")
 
 const routes = [
   index,
+  apiKeys,
   deployments,
   users,
   team,

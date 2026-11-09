@@ -32,7 +32,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     { title: navigation.deployments, url: `/${locale}/dashboard/deployments`, icon: Truck, items: [] },
     { title: navigation.applications, url: `/${locale}/dashboard/applications`, icon: Package, isActive: true, items: [{ title: navigation.domainName, url: `/${locale}/dashboard/applications/domain-name` }, { title: navigation.new, url: `/${locale}/dashboard/applications/new` }] },
     { title: navigation.databases, url: `/${locale}/dashboard/databases`, icon: Cuboid, isActive: true, items: [{ title: navigation.hub, url: `/${locale}/dashboard/databases/hub` }] },
-    { title: navigation.settings, url: "#", icon: Settings2, isActive: true, items: [{ title: navigation.general, url: `/${locale}/dashboard/settings/general` }, { title: navigation.account, url: `/${locale}/dashboard/settings/account` }, { title: navigation.team, url: `/${locale}/dashboard/settings/team` }] },
+    { title: navigation.settings, url: "#", icon: Settings2, isActive: true, items: [{ title: navigation.general, url: `/${locale}/dashboard/settings/general` }, { title: navigation.account, url: `/${locale}/dashboard/settings/account` }, { title: navigation.team, url: `/${locale}/dashboard/settings/team` }, ...(user.role === "owner" ? [{ title: navigation.apiKeys, url: `/${locale}/dashboard/settings/api-keys` }] : [])] },
   ].map((item) => {
     if (item.title === navigation.applications && user.role !== "owner") {
       return {

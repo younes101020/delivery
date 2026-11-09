@@ -131,6 +131,37 @@
       "getInvitationLink": "Get invitation link",
       "revokeTitle": "Are you absolutely sure?",
       "revokeDescription": "This action cannot be undone. It will permanently revoke this member's access to your team and its resources."
+    },
+    "apiKeys": {
+      "title": "API keys",
+      "description": "Create and manage API keys with only the permissions they need.",
+      "createTitle": "Create an API key",
+      "name": "Key name",
+      "namePlaceholder": "e.g. CI deployment",
+      "scopes": "Permissions",
+      "read": "Read",
+      "write": "Write",
+      "applications": "Applications",
+      "databases": "Databases",
+      "deployments": "Deployments",
+      "envvars": "Environment variables",
+      "githubapps": "GitHub apps",
+      "serverconfig": "Server configuration",
+      "version": "Instance version",
+      "create": "Create key",
+      "creating": "Creating...",
+      "empty": "No API keys have been created.",
+      "created": "Created",
+      "lastUsed": "Last used",
+      "neverUsed": "Never",
+      "revoked": "Revoked",
+      "revoke": "Revoke",
+      "revoking": "Revoking...",
+      "revokeTitle": "Revoke this API key?",
+      "revokeDescription": "Applications using this key will immediately lose access.",
+      "tokenTitle": "Copy your API key now",
+      "tokenDescription": "This token is shown only once. Copy and store it securely; it cannot be retrieved later.",
+      "copy": "Copy token"
     }
   },
   "deployments": {
@@ -261,6 +292,7 @@
     "general": "General",
     "account": "Account",
     "team": "Team",
+    "apiKeys": "API keys",
     "logOut": "Log out",
     "toggle": "Toggle navigation"
   }

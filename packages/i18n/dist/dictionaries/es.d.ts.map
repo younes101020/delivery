@@ -1,0 +1,1 @@
+{"version":3,"file":"es.d.ts","sourceRoot":"","sources":["../../src/dictionaries/es.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,UAAU,EAAE,MAAM,aAAa,CAAC;AAE9C,KAAK,iBAAiB,GAAG;KAAG,CAAC,IAAI,MAAM,UAAU,CAAC,CAAC,EAAE,OAAO,CAAC,UAAU,CAAC,CAAC,CAAC,CAAC;CAAE,CAAC;AAE9E,QAAA,MAAM,UAAU,EAAE,iBAKjB,CAAC;AAEF,eAAe,UAAU,CAAC"}
