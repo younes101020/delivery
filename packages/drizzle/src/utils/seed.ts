@@ -89,12 +89,38 @@ DECLARE
     seq_record record;
 BEGIN
     FOR seq_record IN 
-        SELECT schemaname, sequencename 
-        FROM pg_sequences 
-        WHERE schemaname = 'public'
+        SELECT
+            sequence_namespace.nspname AS sequence_schema,
+            sequence_class.relname AS sequence_name,
+            table_namespace.nspname AS table_schema,
+            table_class.relname AS table_name,
+            table_column.attname AS column_name
+        FROM pg_class AS sequence_class
+        JOIN pg_namespace AS sequence_namespace
+            ON sequence_namespace.oid = sequence_class.relnamespace
+        JOIN pg_depend AS sequence_dependency
+            ON sequence_dependency.objid = sequence_class.oid
+            AND sequence_dependency.deptype IN ('a', 'i')
+        JOIN pg_class AS table_class
+            ON table_class.oid = sequence_dependency.refobjid
+        JOIN pg_namespace AS table_namespace
+            ON table_namespace.oid = table_class.relnamespace
+        JOIN pg_attribute AS table_column
+            ON table_column.attrelid = table_class.oid
+            AND table_column.attnum = sequence_dependency.refobjsubid
+        WHERE sequence_class.relkind = 'S'
+            AND sequence_namespace.nspname = 'public'
+            AND table_namespace.nspname = 'public'
     LOOP
-        EXECUTE format('SELECT setval(%L, ${sql.raw((env.TEST_ENTITY_COUNT + 1).toString())})', 
-            seq_record.schemaname || '.' || seq_record.sequencename);
+        EXECUTE format(
+            'SELECT setval(%L, COALESCE((SELECT MAX(%I) FROM %I.%I), 1), EXISTS (SELECT 1 FROM %I.%I))',
+            seq_record.sequence_schema || '.' || seq_record.sequence_name,
+            seq_record.column_name,
+            seq_record.table_schema,
+            seq_record.table_name,
+            seq_record.table_schema,
+            seq_record.table_name
+        );
     END LOOP;
 END $$;`,
   );
