@@ -52,7 +52,7 @@ afterEach(async () => {
   }
 });
 
-describe("aPI key management", () => {
+describe("api key management", () => {
   it("creates hashed team keys, lists metadata only, and revokes keys for owners", async () => {
     if (!ownerUserId || !ownerTeamId)
       throw new Error("The API key test team was not initialized.");
@@ -77,8 +77,8 @@ describe("aPI key management", () => {
 
     expect(stored.tokenHash).toBe(createHash("sha256").update(created.token).digest("hex"));
     expect(stored.tokenHash).not.toBe(created.token);
-    expect(stored.teamId).toBe(ownerTeamId);
     expect(stored.createdByUserId).toBe(ownerUserId);
+    expect(stored.teamId).toBe(ownerTeamId);
 
     const listResponse = await ownerClient["api-keys"].$get();
     expect(listResponse.status).toBe(200);
