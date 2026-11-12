@@ -1,8 +1,7 @@
-import { getCurrentDeploymentsState } from "@/app/(dashboard)/dashboard/deployments/_lib/queries";
+import { apiHandlers } from "@/app/_lib/api-handlers";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const previousDeployments = await getCurrentDeploymentsState();
-  return Response.json(previousDeployments);
+  return apiHandlers.getCurrentDeployments();
 }

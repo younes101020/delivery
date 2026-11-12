@@ -1,8 +1,7 @@
-import { getDatabaseService } from "@/app/(dashboard)/dashboard/(resources)/databases/_lib/queries";
+import { apiHandlers } from "@/app/_lib/api-handlers";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const dbServices = await getDatabaseService();
-  return Response.json(dbServices);
+  return apiHandlers.getDatabaseService();
 }

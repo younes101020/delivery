@@ -1,6 +1,5 @@
-import { getDeliveryVersionInfo } from "@/app/_lib/jobs/queries";
+import { apiHandlers } from "@/app/_lib/api-handlers";
 
 export async function GET() {
-  const version = await getDeliveryVersionInfo();
-  return Response.json(version);
+  return apiHandlers.getVersion();
 }

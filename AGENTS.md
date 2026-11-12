@@ -13,6 +13,7 @@ apps/web/          Next.js 15 frontend (App Router, React 19, shadcn/ui)
 apps/jobs/         Hono REST API + BullMQ background jobs
 apps/docs/         GitBook documentation
 packages/auth/     JWT utilities (jose)
+packages/api/      Shared API endpoint handlers (web BFF)
 packages/drizzle/  Database schema, migrations, seed (Drizzle ORM + PostgreSQL)
 packages/utils/    Shared utility functions
 packages/eslint-config/  Shared ESLint configuration
@@ -162,7 +163,7 @@ API is **OpenAPI-first** via `@hono/zod-openapi`.
 
 ### Frontend (`apps/web`)
 
-Next.js App Router with underscore-prefixed private directories (`_components/`, `_hooks/`, `_lib/`, `_ctx/`), route groups (`(dashboard)/`, `(onboarding)/`, `(login)/`), and `api/` for BFF proxy routes. UI primitives live in `_components/ui/` (shadcn/ui).
+Next.js App Router with underscore-prefixed private directories (`_components/`, `_hooks/`, `_lib/`, `_ctx/`), route groups (`(dashboard)/`, `(onboarding)/`, `(login)/`), and `api/` for thin BFF route adapters. Shared endpoint logic lives in `packages/api`; the web app injects Next.js, session, environment, and jobs-client integrations. UI primitives live in `_components/ui/` (shadcn/ui).
 
 ### Copilot Instructions
 

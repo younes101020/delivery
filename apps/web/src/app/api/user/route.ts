@@ -1,6 +1,5 @@
-import { getUser } from "@/app/_lib/user-session";
+import { apiHandlers } from "@/app/_lib/api-handlers";
 
 export async function GET() {
-  const user = await getUser();
-  return Response.json(user);
+  return apiHandlers.getUser();
 }

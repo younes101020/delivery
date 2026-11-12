@@ -1,4 +1,4 @@
-import { getApplicationByName } from "@/app/(dashboard)/dashboard/(resources)/applications/_lib/queries";
+import { apiHandlers } from "@/app/_lib/api-handlers";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +9,5 @@ interface Params {
 }
 
 export async function GET(_: Request, { params }: Params) {
-  const application = await getApplicationByName(params);
-  return Response.json(application);
+  return apiHandlers.getApplicationByName(_, { params });
 }
