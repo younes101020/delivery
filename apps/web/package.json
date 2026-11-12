@@ -12,6 +12,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@delivery/api": "workspace:*",
     "@delivery/auth": "workspace:*",
     "@delivery/i18n": "workspace:*",
     "@delivery/jobs": "workspace:*",

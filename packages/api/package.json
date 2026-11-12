@@ -1,0 +1,27 @@
+{
+  "name": "@delivery/api",
+  "type": "module",
+  "version": "1.0.0",
+  "packageManager": "pnpm@10.11.0",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "pnpm lint --fix",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@delivery/eslint-config": "workspace:*",
+    "@types/node": "^20.11.30",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "^3.1.4"
+  }
+}

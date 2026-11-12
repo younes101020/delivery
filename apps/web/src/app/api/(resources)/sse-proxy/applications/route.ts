@@ -1,15 +1,7 @@
-import { env } from "@/env";
+import { apiHandlers } from "@/app/_lib/api-handlers";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const { body } = await fetch(`${env.JOBS_API_BASEURL}/applications/ongoing`);
-  return new Response(body, {
-    status: 200,
-    headers: {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache, no-transform",
-      "Connection": "keep-alive",
-    },
-  });
+  return apiHandlers.getApplicationsStream();
 }

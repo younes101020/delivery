@@ -1,8 +1,7 @@
-import { getApplications } from "@/app/(dashboard)/dashboard/(resources)/applications/_lib/queries";
+import { apiHandlers } from "@/app/_lib/api-handlers";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const applications = await getApplications();
-  return Response.json(applications);
+  return apiHandlers.getApplications();
 }

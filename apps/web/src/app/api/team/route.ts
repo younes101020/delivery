@@ -1,6 +1,5 @@
-import { getTeamForUser } from "./queries";
+import { apiHandlers } from "@/app/_lib/api-handlers";
 
 export async function GET() {
-  const team = await getTeamForUser();
-  return Response.json(team);
+  return apiHandlers.getTeam();
 }

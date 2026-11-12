@@ -1,8 +1,7 @@
-import { getDeliveryWebInstanceConfiguration } from "@/app/(dashboard)/dashboard/settings/general/_lib/queries";
+import { apiHandlers } from "@/app/_lib/api-handlers";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const deliveryInstanceConfiguration = await getDeliveryWebInstanceConfiguration();
-  return Response.json(deliveryInstanceConfiguration);
+  return apiHandlers.getDeliveryInstanceConfiguration();
 }
