@@ -8,6 +8,10 @@
     ".": {
       "types": "./src/index.ts",
       "default": "./dist/index.js"
+    },
+    "./mcp": {
+      "types": "./src/mcp/index.ts",
+      "default": "./dist/mcp/index.js"
     }
   },
   "scripts": {
